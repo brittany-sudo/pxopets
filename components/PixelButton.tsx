@@ -18,8 +18,8 @@ export default function PixelButton({ title, onPress, disabled, width, variant =
   const isImportant = variant === 'important';
   const bg = disabled
     ? '#e6e6e6'
-    : (isImportant ? Colors[colorScheme].accentPurpleBg : Colors[colorScheme].accent2);
-  const border = isImportant ? Colors[colorScheme].accentPurple : Colors[colorScheme].accent3;
+    : Colors[colorScheme].accentPurpleBg; // Use purple background for all buttons
+  const border = Colors[colorScheme].accentPurple; // Use purple border for all buttons
 
   return (
     <Pressable onPress={onPress} disabled={disabled} style={{ opacity: disabled ? 0.6 : 1 }}>
@@ -44,11 +44,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 10,
     paddingHorizontal: 14,
+    textAlign: 'center',
   },
   label: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 14,
     color: '#0f0f2a', // Darker navy
+    textAlign: 'center',
   },
 });
 

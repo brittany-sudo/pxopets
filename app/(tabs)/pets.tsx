@@ -18,9 +18,8 @@ export default function PetsScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Pets</Text>
-      
       <BorderedBox>
+        <Text style={styles.title}>PETS</Text>
         <Image
           source={require('@/assets/images/icon.png')}
           style={{ width: 96, height: 96, imageRendering: 'pixelated' as any }}

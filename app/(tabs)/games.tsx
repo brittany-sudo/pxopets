@@ -10,9 +10,8 @@ export default function GamesScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Games</Text>
-      
       <BorderedBox>
+        <Text style={styles.title}>GAMES</Text>
         <Text style={{ marginBottom: 10 }}>Mini-games coming soon.</Text>
         <PixelButton title="Play Quick Tap (+3 coins)" onPress={() => addCoins(3)} />
       </BorderedBox>

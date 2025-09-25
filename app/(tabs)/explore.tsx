@@ -18,9 +18,8 @@ export default function ExploreScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Explore</Text>
-      
       <BorderedBox>
+        <Text style={styles.title}>EXPLORE</Text>
         <Text style={{ marginTop: 6 }}>Highest unlocked: {state.unlockedLevels}</Text>
         <Text>Coins: {state.coins}</Text>
         <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />

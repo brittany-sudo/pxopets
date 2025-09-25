@@ -18,9 +18,8 @@ export default function ShopScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Shop</Text>
-      
       <BorderedBox>
+        <Text style={styles.title}>SHOP</Text>
         <Image
           source={require('@/assets/images/icon.png')}
           style={{ width: 96, height: 96, imageRendering: 'pixelated' as any }}

@@ -17,23 +17,28 @@ export default function HomeScreen() {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <BorderedBox>
-        <Text style={styles.newsHeader}>DAILY GAZETTE</Text>
-        <Text style={styles.newsItem}>Daily Reward: Check back at midnight</Text>
-        <Text style={styles.newsItem}>Lottery: 12 • 19 • 04 • 07</Text>
-        <Text style={styles.newsItem}>Contest: Best Pet Name — entries open</Text>
-      </BorderedBox>
-    </ScrollView>
+    <View style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <BorderedBox>
+          <Text style={styles.newsHeader}>DAILY GAZETTE</Text>
+          <Text style={styles.newsItem}>Daily Reward: Check back at midnight</Text>
+          <Text style={styles.newsItem}>Lottery: 12 • 19 • 04 • 07</Text>
+          <Text style={styles.newsItem}>Contest: Best Pet Name — entries open</Text>
+        </BorderedBox>
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  scrollContent: {
     alignItems: 'center',
     justifyContent: 'center',
     padding: 20,
+    flexGrow: 1,
   },
   title: {
     fontSize: 18,
@@ -57,5 +62,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: 'Silkscreen_400Regular',
     marginBottom: 6,
+    color: '#0f0f2a', // Dark navy to match other text
   },
 });

@@ -21,7 +21,7 @@ export default function AppHeader() {
       <Text style={styles.logo}>pxopets</Text>
       <View style={styles.right}>
         <Link href="/(tabs)/home">
-          <FontAwesome name="home" size={22} color={iconColor} />
+          <FontAwesome name="home" size={26} color={iconColor} />
         </Link>
       </View>
     </View>

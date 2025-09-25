@@ -20,6 +20,7 @@ export default function TabLayout() {
 
   return (
     <Tabs
+      initialRouteName="index"
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tabActive,
         tabBarInactiveTintColor: Colors[colorScheme ?? 'light'].tabBarBorder,
@@ -35,13 +36,6 @@ export default function TabLayout() {
         // to prevent a hydration error in React Navigation v6.
         headerShown: false,
       }}>
-      <Tabs.Screen
-        name="home"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
-        }}
-      />
       <Tabs.Screen
         name="index"
         options={{
