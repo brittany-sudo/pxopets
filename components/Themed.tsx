@@ -8,6 +8,9 @@ import { Text as DefaultText, View as DefaultView } from 'react-native';
 import Colors from '@/constants/Colors';
 import { useColorScheme } from './useColorScheme';
 
+// Global counter for consistent color assignment
+let colorCounter = 0;
+
 type ThemeProps = {
   lightColor?: string;
   darkColor?: string;
@@ -34,12 +37,18 @@ export function Text(props: TextProps) {
   const { style, lightColor, darkColor, ...otherProps } = props;
   const color = useThemeColor({ light: lightColor, dark: darkColor }, 'text');
 
-  return <DefaultText style={[{ color }, style]} {...otherProps} />;
+  // Use off-bone white for text
+  const offBoneWhite = '#f5f5dc';
+
+  return <DefaultText style={[{ color: offBoneWhite, fontFamily: 'Silkscreen_400Regular' }, style]} {...otherProps} />;
 }
 
 export function View(props: ViewProps) {
   const { style, lightColor, darkColor, ...otherProps } = props;
   const backgroundColor = useThemeColor({ light: lightColor, dark: darkColor }, 'background');
 
-  return <DefaultView style={[{ backgroundColor }, style]} {...otherProps} />;
+  // Use light gray background to make bordered boxes stand out
+  const lightGray = '#f7fffd';
+
+  return <DefaultView style={[{ backgroundColor: lightGray }, style]} {...otherProps} />;
 }

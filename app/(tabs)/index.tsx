@@ -1,15 +1,30 @@
-import { StyleSheet } from 'react-native';
-
-import EditScreenInfo from '@/components/EditScreenInfo';
+import React, { useState } from 'react';
+import { StyleSheet, ScrollView } from 'react-native';
 import { Text, View } from '@/components/Themed';
+import { useGame } from '@/store/GameStore';
+import BorderedBox from '@/components/BorderedBox';
 
-export default function TabOneScreen() {
+export default function HomeScreen() {
+  const { state, addCoins, increaseHappiness, renamePet, hydrated } = useGame();
+  const [nameDraft, setNameDraft] = useState(state.pet.name);
+
+  if (!hydrated) {
+    return (
+      <View style={styles.container}>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Tab One</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/(tabs)/index.tsx" />
-    </View>
+    <ScrollView contentContainerStyle={styles.container}>
+      <BorderedBox>
+        <Text style={styles.newsHeader}>DAILY GAZETTE</Text>
+        <Text style={styles.newsItem}>Daily Reward: Check back at midnight</Text>
+        <Text style={styles.newsItem}>Lottery: 12 • 19 • 04 • 07</Text>
+        <Text style={styles.newsItem}>Contest: Best Pet Name — entries open</Text>
+      </BorderedBox>
+    </ScrollView>
   );
 }
 
@@ -18,14 +33,29 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    padding: 20,
   },
   title: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 18,
+    fontFamily: 'PressStart2P_400Regular',
   },
   separator: {
     marginVertical: 30,
     height: 1,
     width: '80%',
+  },
+  newsHeader: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#0f0f2a', // Darker navy to match other headers
+    marginTop: 8,
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  newsItem: {
+    fontSize: 13,
+    fontFamily: 'Silkscreen_400Regular',
+    marginBottom: 6,
   },
 });
