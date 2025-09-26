@@ -1,19 +1,26 @@
-import { StyleSheet, ScrollView, View as RNView, Pressable, Image, Alert } from 'react-native';
+import { StyleSheet, ScrollView, View as RNView, Pressable, Image, Alert, TextInput } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { useGame } from '@/store/GameStore';
 import BorderedBox from '@/components/BorderedBox';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import JazzyTitle from '@/components/JazzyTitle';
+import React, { useState, useMemo } from 'react';
 
 // Import game images
 const tikiGameImage = require('@/assets/images/tiki-game.png');
 const fortunaGameImage = require('@/assets/images/fortuna-game.png');
 const lostFoundImage = require('@/assets/images/lost-found.png');
 const atomicSurfImage = require('@/assets/images/atomic-surf.png');
+const luckyGuessImage = require('@/assets/images/lucky-guess.png');
 
 export default function GamesScreen() {
   const { addCoins, hydrated } = useGame();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  
   if (!hydrated) return <View style={styles.container}><Text>Loading...</Text></View>;
+
+  const categories = ['All', 'Adventure', 'Puzzle', 'Action', 'Simulation', 'Sports'];
 
   const games = [
     {
@@ -21,9 +28,10 @@ export default function GamesScreen() {
       name: 'Lost \'n Found',
       icon: 'search',
       color: '#0ea5e9',
-      world: 'Crystal Cove',
+      world: 'Foggy Harbor',
       description: 'Search for lost treasures and hidden items!',
-      image: lostFoundImage
+      image: lostFoundImage,
+      category: 'Adventure'
     },
     {
       id: 'atomic-surf',
@@ -32,15 +40,18 @@ export default function GamesScreen() {
       color: '#f59e0b',
       world: 'Desert Oasis Resort',
       description: 'Ride the atomic waves in this retro surfing adventure!',
-      image: atomicSurfImage
+      image: atomicSurfImage,
+      category: 'Action'
     },
     {
-      id: 'plant-growing',
-      name: 'Garden Magic',
-      icon: 'leaf',
+      id: 'lucky-guess',
+      name: 'Lucky Guess',
+      icon: 'question',
       color: '#10b981',
-      world: 'Emerald Gardens',
-      description: 'Grow magical plants and herbs!'
+      world: 'Crescent Oasis',
+      description: 'Test your luck with mysterious guessing games!',
+      category: 'Puzzle',
+      image: luckyGuessImage
     },
     {
       id: 'grape-stomping',
@@ -48,7 +59,8 @@ export default function GamesScreen() {
       icon: 'glass',
       color: '#8b5cf6',
       world: 'Vintage Hollow',
-      description: 'Stomp grapes to make wine!'
+      description: 'Stomp grapes to make wine!',
+      category: 'Simulation'
     },
     {
       id: 'bike-riding',
@@ -56,7 +68,8 @@ export default function GamesScreen() {
       icon: 'bicycle',
       color: '#64748b',
       world: 'The Pxoburbs',
-      description: 'Ride your bike around town!'
+      description: 'Ride your bike around town!',
+      category: 'Sports'
     },
     {
       id: 'gem-mining',
@@ -65,7 +78,8 @@ export default function GamesScreen() {
       color: '#6b7280',
       world: 'Mystic Mountains',
       description: 'Mine precious gems and crystals!',
-      image: fortunaGameImage
+      image: fortunaGameImage,
+      category: 'Puzzle'
     },
     {
       id: 'treasure-hunt',
@@ -73,7 +87,8 @@ export default function GamesScreen() {
       icon: 'map',
       color: '#dc2626',
       world: 'Pirate\'s Port',
-      description: 'Find buried treasure on the high seas!'
+      description: 'Find buried treasure on the high seas!',
+      category: 'Adventure'
     },
     {
       id: 'pottery-wheel',
@@ -81,7 +96,8 @@ export default function GamesScreen() {
       icon: 'circle-o',
       color: '#ec4899',
       world: 'Artisan\'s Quarter',
-      description: 'Shape clay on the spinning wheel!'
+      description: 'Shape clay on the spinning wheel!',
+      category: 'Simulation'
     },
     {
       id: 'spell-casting',
@@ -89,7 +105,8 @@ export default function GamesScreen() {
       icon: 'magic',
       color: '#7c3aed',
       world: 'Scholar\'s Library',
-      description: 'Cast spells by drawing runes!'
+      description: 'Cast spells by drawing runes!',
+      category: 'Puzzle'
     },
     {
       id: 'hula-dancing',
@@ -98,7 +115,8 @@ export default function GamesScreen() {
       color: '#f97316',
       world: 'Tiki Island',
       description: 'Learn ancient hula dances!',
-      image: tikiGameImage
+      image: tikiGameImage,
+      category: 'Action'
     },
     {
       id: 'wine-tasting',
@@ -106,7 +124,8 @@ export default function GamesScreen() {
       icon: 'glass',
       color: '#8b5cf6',
       world: 'Vintage Hollow',
-      description: 'Taste and identify rare wines!'
+      description: 'Taste and identify rare wines!',
+      category: 'Puzzle'
     },
     {
       id: 'street-hockey',
@@ -114,7 +133,8 @@ export default function GamesScreen() {
       icon: 'futbol-o',
       color: '#64748b',
       world: 'The Pxoburbs',
-      description: 'Play hockey in the neighborhood!'
+      description: 'Play hockey in the neighborhood!',
+      category: 'Sports'
     },
     {
       id: 'cave-exploration',
@@ -122,7 +142,8 @@ export default function GamesScreen() {
       icon: 'flashlight',
       color: '#6b7280',
       world: 'Mystic Mountains',
-      description: 'Explore dark caves with your torch!'
+      description: 'Explore dark caves with your torch!',
+      category: 'Adventure'
     },
     {
       id: 'ship-battles',
@@ -130,7 +151,8 @@ export default function GamesScreen() {
       icon: 'ship',
       color: '#dc2626',
       world: 'Pirate\'s Port',
-      description: 'Battle enemy ships on the seas!'
+      description: 'Battle enemy ships on the seas!',
+      category: 'Action'
     },
     {
       id: 'potion-brewing',
@@ -138,7 +160,8 @@ export default function GamesScreen() {
       icon: 'flask',
       color: '#10b981',
       world: 'Emerald Gardens',
-      description: 'Brew magical potions and elixirs!'
+      description: 'Brew magical potions and elixirs!',
+      category: 'Simulation'
     },
     {
       id: 'lei-making',
@@ -146,9 +169,19 @@ export default function GamesScreen() {
       icon: 'heart',
       color: '#f97316',
       world: 'Tiki Island',
-      description: 'String beautiful flower leis!'
+      description: 'String beautiful flower leis!',
+      category: 'Simulation'
     }
   ];
+
+  const filteredGames = useMemo(() => {
+    return games.filter(game => {
+      const matchesSearch = game.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                           game.description.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesCategory = selectedCategory === 'All' || game.category === selectedCategory;
+      return matchesSearch && matchesCategory;
+    });
+  }, [searchQuery, selectedCategory]);
 
   const handleGamePress = (game: any) => {
     Alert.alert(
@@ -164,10 +197,43 @@ export default function GamesScreen() {
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        <JazzyTitle style={styles.title}>ARCADE</JazzyTitle>
+        {/* Search Bar */}
+        <RNView style={styles.searchContainer}>
+          <FontAwesome name="search" size={16} color="#0ea5e9" />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search games..."
+            placeholderTextColor="#64748b"
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
+        </RNView>
+
+        {/* Categories */}
+        <BorderedBox style={styles.wideBox}>
+          <RNView style={styles.categoriesContainer}>
+            {categories.map((category) => (
+              <Pressable
+                key={category}
+                style={[
+                  styles.categoryButton,
+                  selectedCategory === category && styles.selectedCategory
+                ]}
+                onPress={() => setSelectedCategory(category)}
+              >
+                <Text style={[
+                  styles.categoryText,
+                  selectedCategory === category && styles.selectedCategoryText
+                ]}>
+                  {category}
+                </Text>
+              </Pressable>
+            ))}
+          </RNView>
+        </BorderedBox>
         
         <RNView style={styles.gamesGrid}>
-            {games.map((game, index) => (
+            {filteredGames.map((game, index) => (
               <Pressable
                 key={game.id}
                 style={styles.gameCard}
@@ -205,14 +271,66 @@ const styles = StyleSheet.create({
     padding: 20,
     flexGrow: 1,
   },
-  title: {
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: '#0ea5e9',
+    borderRadius: 4,
+    backgroundColor: 'rgba(14, 165, 233, 0.05)',
+    width: '95%',
+    marginBottom: 16,
+  },
+  wideBox: {
+    width: '95%',
+    alignItems: 'flex-start',
+    marginBottom: 16,
+  },
+  searchInput: {
+    flex: 1,
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 12,
+    color: '#0f172a',
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderWidth: 0,
+    backgroundColor: 'transparent',
+  },
+  categoriesTitle: {
     fontFamily: 'PressStart2P_400Regular',
-    fontSize: 16,
+    fontSize: 10,
     fontWeight: 'bold',
     color: '#0f172a',
-    marginTop: 8,
-    marginBottom: 20,
+    marginBottom: 12,
     textAlign: 'left',
+  },
+  categoriesContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  categoryButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderWidth: 1,
+    borderColor: '#0ea5e9',
+    borderRadius: 4,
+    backgroundColor: 'transparent',
+  },
+  selectedCategory: {
+    backgroundColor: '#0ea5e9',
+  },
+  categoryText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#0ea5e9',
+    fontWeight: 'bold',
+  },
+  selectedCategoryText: {
+    color: '#ffffff',
   },
   gamesGrid: {
     flexDirection: 'row',

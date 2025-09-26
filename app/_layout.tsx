@@ -60,6 +60,11 @@ function RootLayoutNav() {
         <Stack>
           <Stack.Screen name="(tabs)" options={{ header: () => <AppHeader /> }} />
           <Stack.Screen name="adoption" options={{ headerShown: false }} />
+          <Stack.Screen name="enchanted-island" options={{ headerShown: false }} />
+          <Stack.Screen name="artisan-quarter" options={{ headerShown: false }} />
+          <Stack.Screen name="crescent-oasis" options={{ headerShown: false }} />
+          <Stack.Screen name="foggy-harbor" options={{ headerShown: false }} />
+          <Stack.Screen name="barrelhaven" options={{ headerShown: false }} />
           <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
         </Stack>
       </GameProvider>

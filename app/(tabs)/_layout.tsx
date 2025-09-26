@@ -90,12 +90,6 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
         }}
       />
-      <Tabs.Screen
-        name="more"
-        options={{
-          href: null, // Hide from tab bar
-        }}
-      />
     </Tabs>
   );
 }

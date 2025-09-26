@@ -28,7 +28,7 @@ export default function InteractiveMap({ onRegionPress }: InteractiveMapProps) {
     },
     {
       id: 'casino',
-      name: 'Desert Oasis Resort',
+      name: 'Crescent Oasis',
       x: 350,
       y: 140,
       width: 50,
@@ -91,8 +91,8 @@ export default function InteractiveMap({ onRegionPress }: InteractiveMapProps) {
       height: 40
     },
     {
-      id: 'tiki-island',
-      name: 'Tiki Island',
+      id: 'enchanted-island',
+      name: 'Enchanted Island',
       x: 200,
       y: 110,
       width: 50,
@@ -101,6 +101,8 @@ export default function InteractiveMap({ onRegionPress }: InteractiveMapProps) {
   ];
 
   const handleRegionPress = (region: MapRegion) => {
+    console.log('InteractiveMap: Region pressed:', region.id, region.name);
+    console.log('Available regions:', regions.map(r => r.id));
     setSelectedRegion(region.id);
     onRegionPress(region.id, region.name);
   };

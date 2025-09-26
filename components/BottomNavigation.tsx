@@ -32,7 +32,6 @@ export default function BottomNavigation() {
     { name: 'Shop', route: '/(tabs)/shop', icon: 'shopping-bag' },
     { name: 'Pets', route: '/(tabs)/pets', icon: 'heart' }, // Match the main tabs icon
     { name: 'Mail', route: '/(tabs)/mail', icon: 'envelope' },
-    { name: 'More', route: '/(tabs)/more', icon: 'ellipsis-h' },
   ];
 
   const handleTabPress = (route: string) => {

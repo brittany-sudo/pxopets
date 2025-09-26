@@ -57,37 +57,45 @@ export default function PlayerHomeScreen() {
               <RNView style={styles.actionButton}>
                 <Text style={styles.actionButtonText}>SWAP PET</Text>
               </RNView>
+              <RNView style={styles.actionButton}>
+                <Text style={styles.actionButtonText}>EXPLORE</Text>
+              </RNView>
             </RNView>
           </RNView>
         </BorderedBox>
 
-        <BorderedBox style={styles.leftAlignedBox}>
-          <Text style={styles.sectionTitle}>STATS</Text>
-          <Text style={styles.meta}>Coins: {state.coins}</Text>
-          <Text style={styles.meta}>Unlocked levels: {state.unlockedLevels}</Text>
-        </BorderedBox>
+        <RNView style={styles.sideBySideContainer}>
+          <BorderedBox style={styles.halfWidthBox}>
+            <Text style={styles.sectionTitle}>INFO</Text>
+            <Text style={styles.meta}>Username: PxopetMaster</Text>
+            <Text style={styles.meta}>Guild: Pixel Pioneers</Text>
+            <Text style={styles.meta}>Level: {state.pet.level}</Text>
+            <Text style={styles.meta}>Coins: {state.coins}</Text>
+            <Text style={styles.meta}>Unlocked: {state.unlockedLevels}</Text>
+          </BorderedBox>
 
-        <BorderedBox style={styles.leftAlignedBox}>
-          <Text style={styles.sectionTitle}>FAVORITES</Text>
-          <RNView style={styles.favoritesContainer}>
-            <RNView style={styles.favoriteItem}>
-              <FontAwesome name="star" size={16} color="#f59e0b" />
-              <Text style={styles.favoriteText}>Atomic Surf</Text>
+          <BorderedBox style={styles.halfWidthBox}>
+            <Text style={styles.sectionTitle}>FAVORITES</Text>
+            <RNView style={styles.favoritesContainer}>
+              <RNView style={styles.favoriteItem}>
+                <FontAwesome name="star" size={16} color="#f59e0b" />
+                <Text style={styles.favoriteText}>Atomic Surf</Text>
+              </RNView>
+              <RNView style={styles.favoriteItem}>
+                <FontAwesome name="star" size={16} color="#f59e0b" />
+                <Text style={styles.favoriteText}>Daily Riddle</Text>
+              </RNView>
+              <RNView style={styles.favoriteItem}>
+                <FontAwesome name="star" size={16} color="#f59e0b" />
+                <Text style={styles.favoriteText}>Pearl Diver</Text>
+              </RNView>
+              <RNView style={styles.emptyFavorite}>
+                <FontAwesome name="star-o" size={16} color="#64748b" />
+                <Text style={styles.emptyFavoriteText}>No more favorites yet</Text>
+              </RNView>
             </RNView>
-            <RNView style={styles.favoriteItem}>
-              <FontAwesome name="star" size={16} color="#f59e0b" />
-              <Text style={styles.favoriteText}>Daily Riddle</Text>
-            </RNView>
-            <RNView style={styles.favoriteItem}>
-              <FontAwesome name="star" size={16} color="#f59e0b" />
-              <Text style={styles.favoriteText}>Pearl Diver</Text>
-            </RNView>
-            <RNView style={styles.emptyFavorite}>
-              <FontAwesome name="star-o" size={16} color="#64748b" />
-              <Text style={styles.emptyFavoriteText}>No more favorites yet</Text>
-            </RNView>
-          </RNView>
-        </BorderedBox>
+          </BorderedBox>
+        </RNView>
 
         <BorderedBox style={styles.leftAlignedBox}>
           <Text style={styles.sectionTitle}>INVENTORY</Text>
@@ -243,6 +251,18 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     justifyContent: 'flex-start',
   },
+  sideBySideContainer: {
+    flexDirection: 'row',
+    gap: 12,
+    width: '85%',
+    marginBottom: 16,
+    alignSelf: 'center',
+  },
+  halfWidthBox: {
+    flex: 1,
+    alignItems: 'flex-start',
+    justifyContent: 'flex-start',
+  },
   petSectionContainer: {
     flexDirection: 'row',
     alignItems: 'flex-start',
@@ -256,7 +276,7 @@ const styles = StyleSheet.create({
   },
   actionButtons: {
     flexDirection: 'column',
-    gap: 8,
+    gap: 6,
     alignItems: 'flex-start',
   },
   actionButton: {
