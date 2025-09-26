@@ -19,7 +19,7 @@ const styles = StyleSheet.create({
     width: '85%',
     padding: 16,
     borderWidth: 2,
-    borderColor: '#0ea5e9', // Premium rich teal-blue
+    borderColor: '#10b981', // Teal
     backgroundColor: 'transparent', // No fill - just border
     marginVertical: 8,
     alignItems: 'center',

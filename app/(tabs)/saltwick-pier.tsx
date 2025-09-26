@@ -95,7 +95,7 @@ export default function SaltwickPierScreen() {
         {/* Back Button */}
         <Pressable 
           style={styles.backButton}
-          onPress={() => router.back()}
+          onPress={() => router.navigate('/(tabs)/explore')}
         >
           <FontAwesome name="arrow-left" size={16} color="#0f172a" />
           <Text style={styles.backButtonText}>Back</Text>

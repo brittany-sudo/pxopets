@@ -1,5 +1,5 @@
-import React from 'react';
-import { Image, StyleSheet, View as RNView, ScrollView } from 'react-native';
+import React, { useState } from 'react';
+import { Image, StyleSheet, View as RNView, ScrollView, Pressable } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { useGame } from '@/store/GameStore';
 import PixelButton from '@/components/PixelButton';
@@ -10,11 +10,45 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 export default function PetsScreen() {
   const { state, increaseHappiness, hydrated } = useGame();
+  const [activePet, setActivePet] = useState('juno'); // Default to Juno
+  
+  const pets = {
+    juno: {
+      name: 'JUNO',
+      image: require('@/assets/images/tigerguy.png'),
+      level: 1,
+      hp: 100,
+      atk: 50
+    },
+    frekki: {
+      name: 'FREKKI',
+      image: require('@/assets/images/coco-guy.png'),
+      level: 3,
+      hp: 85,
+      atk: 42
+    },
+    noxia: {
+      name: 'NOXIA',
+      image: require('@/assets/images/purple-guy.png'),
+      level: 5,
+      hp: 92,
+      atk: 38
+    },
+    technor: {
+      name: 'TECHNOR',
+      image: require('@/assets/images/robot-guy.png'),
+      level: 2,
+      hp: 78,
+      atk: 45
+    }
+  };
+
   if (!hydrated) return <View style={styles.container}><Text>Loading...</Text></View>;
 
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
+        <Text style={[styles.collectionTitle, { marginTop: 8 }]}>ACTIVE PET</Text>
         <BorderedBox>
         {/* Pet with full-width border */}
         <RNView style={styles.petImageContainer}>
@@ -24,23 +58,22 @@ export default function PetsScreen() {
             resizeMode="cover"
           />
           <Image
-            source={require('@/assets/images/tigerguy.png')}
+            source={pets[activePet].image}
             style={styles.petImage}
           />
-        </RNView>
-        
-        {/* Pet info and health bar side by side */}
-        <RNView style={styles.petInfoSection}>
-          <RNView style={styles.petBasicInfo}>
-            <Text style={styles.petName}>{state.pet.name}</Text>
-            <Text style={styles.petLevel}>Level {state.pet.level}</Text>
+          
+          {/* Pet info on left side of image */}
+          <RNView style={styles.petInfoOverlay}>
+            <Text style={styles.petName}>{pets[activePet].name}</Text>
+            <Text style={styles.petLevel}>Level {pets[activePet].level}</Text>
           </RNView>
           
-          <RNView style={styles.staminaSection}>
+          {/* Stamina on right side of image */}
+          <RNView style={styles.staminaOverlay}>
             <Text style={styles.staminaLabel}>STAMINA</Text>
             <RNView style={styles.staminaContainer}>
               <FontAwesome name="bolt" size={12} color="#f59e0b" />
-              <Text style={styles.staminaText}>{state.coins} ⚡</Text>
+              <Text style={styles.staminaText}>{state.coins}</Text>
             </RNView>
           </RNView>
         </RNView>
@@ -48,97 +81,161 @@ export default function PetsScreen() {
         {/* Action boxes underneath */}
         <RNView style={styles.actionBoxes}>
           <RNView style={styles.actionBox}>
-            <FontAwesome name="cutlery" size={12} color="#0ea5e9" />
+            <FontAwesome name="cutlery" size={20} color="#8b5cf6" />
             <Text style={styles.actionLabel}>FEED</Text>
           </RNView>
           <RNView style={styles.actionBox}>
-            <FontAwesome name="gamepad" size={12} color="#0ea5e9" />
+            <FontAwesome name="futbol-o" size={20} color="#8b5cf6" />
             <Text style={styles.actionLabel}>PLAY</Text>
           </RNView>
           <RNView style={styles.actionBox}>
-            <FontAwesome name="map" size={12} color="#0ea5e9" />
+            <FontAwesome name="map" size={20} color="#8b5cf6" />
             <Text style={styles.actionLabel}>EXPLORE</Text>
           </RNView>
         </RNView>
 
-        {/* Stats Title */}
-        <Text style={styles.statsTitle}>STATS</Text>
-
-          {/* All Stats with Bars */}
-          <RNView style={styles.barStatsContainer}>
-            <RNView style={styles.barStatRow}>
-              <Text style={styles.barStatLabel}>ATK</Text>
-              <RNView style={styles.barStatBar}>
-                <RNView style={[styles.barStatFill, { width: `${Math.min(100, (state.pet.level * 10) % 100)}%` }]} />
+        {/* Stats and Closet Side by Side */}
+        <RNView style={styles.statsClosetContainer}>
+          {/* Stats Section - Left Half */}
+          <RNView style={styles.statsSection}>
+            <Text style={styles.statsTitle}>STATS</Text>
+            <RNView style={styles.barStatsContainer}>
+              <RNView style={styles.barStatRow}>
+                <Text style={styles.barStatLabel}>ATK</Text>
+                <RNView style={styles.barStatBar}>
+                  <RNView style={[styles.barStatFill, { width: `${Math.min(100, (state.pet.level * 10) % 100)}%` }]} />
+                </RNView>
+                <Text style={styles.barStatValue}>{Math.min(100, (state.pet.level * 10) % 100)}</Text>
               </RNView>
-              <Text style={styles.barStatValue}>{Math.min(100, (state.pet.level * 10) % 100)}</Text>
-            </RNView>
-            <RNView style={styles.barStatRow}>
-              <Text style={styles.barStatLabel}>DEF</Text>
-              <RNView style={styles.barStatBar}>
-                <RNView style={[styles.barStatFill, { width: `${Math.min(100, (state.pet.level * 8) % 100)}%` }]} />
+              <RNView style={styles.barStatRow}>
+                <Text style={styles.barStatLabel}>DEF</Text>
+                <RNView style={styles.barStatBar}>
+                  <RNView style={[styles.barStatFill, { width: `${Math.min(100, (state.pet.level * 8) % 100)}%` }]} />
+                </RNView>
+                <Text style={styles.barStatValue}>{Math.min(100, (state.pet.level * 8) % 100)}</Text>
               </RNView>
-              <Text style={styles.barStatValue}>{Math.min(100, (state.pet.level * 8) % 100)}</Text>
-            </RNView>
-            <RNView style={styles.barStatRow}>
-              <Text style={styles.barStatLabel}>SPD</Text>
-              <RNView style={styles.barStatBar}>
-                <RNView style={[styles.barStatFill, { width: `${Math.min(100, (state.pet.level * 12) % 100)}%` }]} />
+              <RNView style={styles.barStatRow}>
+                <Text style={styles.barStatLabel}>SPD</Text>
+                <RNView style={styles.barStatBar}>
+                  <RNView style={[styles.barStatFill, { width: `${Math.min(100, (state.pet.level * 12) % 100)}%` }]} />
+                </RNView>
+                <Text style={styles.barStatValue}>{Math.min(100, (state.pet.level * 12) % 100)}</Text>
               </RNView>
-              <Text style={styles.barStatValue}>{Math.min(100, (state.pet.level * 12) % 100)}</Text>
-            </RNView>
-            <RNView style={styles.barStatRow}>
-              <Text style={styles.barStatLabel}>HP</Text>
-              <RNView style={styles.barStatBar}>
-                <RNView style={[styles.barStatFill, { width: `${Math.min(100, (state.pet.level * 15) % 100)}%` }]} />
+              <RNView style={styles.barStatRow}>
+                <Text style={styles.barStatLabel}>HP</Text>
+                <RNView style={styles.barStatBar}>
+                  <RNView style={[styles.barStatFill, { width: `${Math.min(100, (state.pet.level * 15) % 100)}%` }]} />
+                </RNView>
+                <Text style={styles.barStatValue}>{Math.min(100, (state.pet.level * 15) % 100)}</Text>
               </RNView>
-              <Text style={styles.barStatValue}>{Math.min(100, (state.pet.level * 15) % 100)}</Text>
-            </RNView>
-            <RNView style={styles.barStatRow}>
-              <Text style={styles.barStatLabel}>LUCK</Text>
-              <RNView style={styles.barStatBar}>
-                <RNView style={[styles.barStatFill, { width: `${Math.min(100, (state.pet.level * 7) % 100)}%` }]} />
+              <RNView style={styles.barStatRow}>
+                <Text style={styles.barStatLabel}>LUCK</Text>
+                <RNView style={styles.barStatBar}>
+                  <RNView style={[styles.barStatFill, { width: `${Math.min(100, (state.pet.level * 7) % 100)}%` }]} />
+                </RNView>
+                <Text style={styles.barStatValue}>{Math.min(100, (state.pet.level * 7) % 100)}</Text>
               </RNView>
-              <Text style={styles.barStatValue}>{Math.min(100, (state.pet.level * 7) % 100)}</Text>
-            </RNView>
-            <RNView style={styles.barStatRow}>
-              <Text style={styles.barStatLabel}>INT</Text>
-              <RNView style={styles.barStatBar}>
-                <RNView style={[styles.barStatFill, { width: `${Math.min(100, (state.pet.level * 9) % 100)}%` }]} />
+              <RNView style={styles.barStatRow}>
+                <Text style={styles.barStatLabel}>INT</Text>
+                <RNView style={styles.barStatBar}>
+                  <RNView style={[styles.barStatFill, { width: `${Math.min(100, (state.pet.level * 9) % 100)}%` }]} />
+                </RNView>
+                <Text style={styles.barStatValue}>{Math.min(100, (state.pet.level * 9) % 100)}</Text>
               </RNView>
-              <Text style={styles.barStatValue}>{Math.min(100, (state.pet.level * 9) % 100)}</Text>
-            </RNView>
-            <RNView style={styles.barStatRow}>
-              <Text style={styles.barStatLabel}>CHARM</Text>
-              <RNView style={styles.barStatBar}>
-                <RNView style={[styles.barStatFill, { width: `${Math.min(100, (state.pet.level * 6) % 100)}%` }]} />
+              <RNView style={styles.barStatRow}>
+                <Text style={styles.barStatLabel}>CHARM</Text>
+                <RNView style={styles.barStatBar}>
+                  <RNView style={[styles.barStatFill, { width: `${Math.min(100, (state.pet.level * 6) % 100)}%` }]} />
+                </RNView>
+                <Text style={styles.barStatValue}>{Math.min(100, (state.pet.level * 6) % 100)}</Text>
               </RNView>
-              <Text style={styles.barStatValue}>{Math.min(100, (state.pet.level * 6) % 100)}</Text>
-            </RNView>
-            <RNView style={styles.barStatRow}>
-              <Text style={styles.barStatLabel}>DEX</Text>
-              <RNView style={styles.barStatBar}>
-                <RNView style={[styles.barStatFill, { width: `${Math.min(100, (state.pet.level * 11) % 100)}%` }]} />
+              <RNView style={styles.barStatRow}>
+                <Text style={styles.barStatLabel}>DEX</Text>
+                <RNView style={styles.barStatBar}>
+                  <RNView style={[styles.barStatFill, { width: `${Math.min(100, (state.pet.level * 11) % 100)}%` }]} />
+                </RNView>
+                <Text style={styles.barStatValue}>{Math.min(100, (state.pet.level * 11) % 100)}</Text>
               </RNView>
-              <Text style={styles.barStatValue}>{Math.min(100, (state.pet.level * 11) % 100)}</Text>
             </RNView>
           </RNView>
+
+          {/* Closet Section - Right Half */}
+          <RNView style={styles.closetSection}>
+            <Text style={styles.closetTitle}>CLOSET</Text>
+            <RNView style={styles.closetContainer}>
+              <RNView style={styles.closetItem}>
+                <FontAwesome name="star" size={20} color="#f59e0b" />
+              </RNView>
+              <RNView style={styles.closetItem}>
+                <FontAwesome name="leaf" size={20} color="#10b981" />
+              </RNView>
+              <RNView style={styles.closetItem}>
+                <FontAwesome name="gem" size={20} color="#8b5cf6" />
+              </RNView>
+              <RNView style={styles.closetItem}>
+                <FontAwesome name="heart" size={20} color="#ec4899" />
+              </RNView>
+              <RNView style={styles.closetItem}>
+                <FontAwesome name="diamond" size={20} color="#06b6d4" />
+              </RNView>
+              <RNView style={styles.closetItem}>
+                <FontAwesome name="trophy" size={20} color="#fbbf24" />
+              </RNView>
+            </RNView>
+          </RNView>
+        </RNView>
       </BorderedBox>
 
+      <Text style={[styles.collectionTitle, { marginTop: 16 }]}>ALL PETS</Text>
       <BorderedBox>
-        <Text style={styles.collectionTitle}>SWITCH MAIN PET</Text>
         <RNView style={styles.petCollection}>
-          {/* All Empty Pet Slots */}
-          {[1, 2, 3, 4].map((index) => (
-            <Link key={index} href="/(tabs)/adoption" asChild>
-              <RNView style={styles.petSlot}>
-                <RNView style={styles.emptyPetSlot}>
-                  <Text style={styles.plusIcon}>+</Text>
-                </RNView>
-                <Text style={styles.emptySlotText}>Adopt Pet</Text>
-              </RNView>
-            </Link>
-          ))}
+          {/* Pet 1 - FREKKI */}
+          <Pressable 
+            style={[styles.petSlot, activePet === 'frekki' && styles.activePetSlot]}
+            onPress={() => setActivePet('frekki')}
+          >
+            <RNView style={styles.petSlotHeader}>
+              <Image source={require('@/assets/images/coco-guy.png')} style={styles.petSlotImage} />
+              <Text style={styles.petSlotName}>FREKKI</Text>
+            </RNView>
+            <RNView style={styles.petSlotStats}>
+              <Text style={styles.petSlotStat}>Lvl 3</Text>
+              <Text style={styles.petSlotStat}>HP: 85</Text>
+              <Text style={styles.petSlotStat}>ATK: 42</Text>
+            </RNView>
+          </Pressable>
+          
+          {/* Pet 2 - NOXIA */}
+          <Pressable 
+            style={[styles.petSlot, activePet === 'noxia' && styles.activePetSlot]}
+            onPress={() => setActivePet('noxia')}
+          >
+            <RNView style={styles.petSlotHeader}>
+              <Image source={require('@/assets/images/purple-guy.png')} style={styles.petSlotImage} />
+              <Text style={styles.petSlotName}>NOXIA</Text>
+            </RNView>
+            <RNView style={styles.petSlotStats}>
+              <Text style={styles.petSlotStat}>Lvl 5</Text>
+              <Text style={styles.petSlotStat}>HP: 92</Text>
+              <Text style={styles.petSlotStat}>ATK: 38</Text>
+            </RNView>
+          </Pressable>
+          
+          {/* Pet 3 - TECHNOR */}
+          <Pressable 
+            style={[styles.petSlot, activePet === 'technor' && styles.activePetSlot]}
+            onPress={() => setActivePet('technor')}
+          >
+            <RNView style={styles.petSlotHeader}>
+              <Image source={require('@/assets/images/robot-guy.png')} style={styles.petSlotImage} />
+              <Text style={styles.petSlotName}>TECHNOR</Text>
+            </RNView>
+            <RNView style={styles.petSlotStats}>
+              <Text style={styles.petSlotStat}>Lvl 2</Text>
+              <Text style={styles.petSlotStat}>HP: 78</Text>
+              <Text style={styles.petSlotStat}>ATK: 45</Text>
+            </RNView>
+          </Pressable>
         </RNView>
       </BorderedBox>
 
@@ -184,9 +281,9 @@ const styles = StyleSheet.create({
   },
     petImageContainer: {
       width: '100%',
-      height: 200,
+      height: 240,
       borderRadius: 0,
-      borderWidth: 1,
+      borderWidth: 2,
       borderColor: '#0ea5e9',
       backgroundColor: 'rgba(14, 165, 233, 0.05)',
       alignItems: 'center',
@@ -205,27 +302,41 @@ const styles = StyleSheet.create({
       width: '100%',
       height: '100%',
     },
-    petInfoSection: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'flex-start',
-      marginBottom: 8,
-      gap: 250,
+    petInfoOverlay: {
+      position: 'absolute',
+      top: 10,
+      left: 10,
+      backgroundColor: 'rgba(0, 0, 0, 0.7)',
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      borderRadius: 4,
     },
-    petBasicInfo: {
-      flex: 1,
-      alignItems: 'flex-start',
-      marginTop: -8,
-    },
-    staminaSection: {
-      flex: 1,
-      alignItems: 'flex-end',
+    staminaOverlay: {
+      position: 'absolute',
+      top: 10,
+      right: 10,
+      backgroundColor: 'rgba(0, 0, 0, 0.7)',
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      borderRadius: 4,
+      alignItems: 'center',
     },
     actionBoxes: {
       flexDirection: 'row',
-      justifyContent: 'center',
+      justifyContent: 'space-between',
       gap: 8,
       marginBottom: 24,
+      width: '100%',
+    },
+    statsClosetContainer: {
+      flexDirection: 'row',
+      gap: 12,
+    },
+    statsSection: {
+      flex: 1,
+    },
+    closetSection: {
+      flex: 1,
     },
     statsTitle: {
       fontFamily: 'PressStart2P_400Regular',
@@ -236,51 +347,84 @@ const styles = StyleSheet.create({
       marginBottom: 12,
       alignSelf: 'flex-start',
     },
-    actionBox: {
-      borderWidth: 1,
+    closetTitle: {
+      fontFamily: 'PressStart2P_400Regular',
+      fontSize: 10,
+      fontWeight: 'bold',
+      color: '#0f172a',
+      textAlign: 'left',
+      marginBottom: 12,
+      alignSelf: 'flex-start',
+    },
+    closetContainer: {
+      borderWidth: 2,
       borderColor: '#0ea5e9',
-      backgroundColor: 'rgba(14, 165, 233, 0.1)',
-      paddingHorizontal: 16,
-      paddingVertical: 8,
-      borderRadius: 2,
+      backgroundColor: 'rgba(14, 165, 233, 0.05)',
+      borderRadius: 8,
+      padding: 12,
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 8,
+      minHeight: 120,
+    },
+    closetItem: {
       alignItems: 'center',
       justifyContent: 'center',
-      flexDirection: 'row',
-      gap: 6,
-      minWidth: 80,
+      padding: 8,
+      backgroundColor: 'rgba(14, 165, 233, 0.1)',
+      borderRadius: 4,
+      borderWidth: 1,
+      borderColor: '#0ea5e9',
+      minWidth: '30%',
+      minHeight: 40,
+    },
+    actionBox: {
+      borderWidth: 1,
+      borderColor: '#10b981',
+      backgroundColor: '#ffffff',
+      paddingHorizontal: 24,
+      paddingVertical: 20,
+      borderRadius: 6,
+      alignItems: 'center',
+      justifyContent: 'center',
+      flexDirection: 'column',
+      gap: 8,
+      flex: 1,
+      height: 80,
+      boxShadow: '3px 3px 0px #10b981',
+      elevation: 4,
     },
     actionLabel: {
       fontFamily: 'Silkscreen_400Regular',
-      fontSize: 10,
-      color: '#0ea5e9',
+      fontSize: 12,
+      color: '#8b5cf6',
       textAlign: 'center',
+      fontWeight: 'bold',
     },
   petImage: {
-    width: 96,
-    height: 96,
+    width: 110,
+    height: 110,
     imageRendering: 'pixelated' as any,
-    marginTop: 60, // Lower by 30% (200px height * 0.3 = 60px)
+    marginTop: 80, // Moved down a bit more
   },
   petName: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#0f172a',
-    textAlign: 'center',
-    marginTop: 8,
+    color: '#ffffff',
+    textAlign: 'left',
   },
   petLevel: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 12,
-    color: '#0f172a',
-    textAlign: 'center',
-    opacity: 0.7,
-    marginBottom: 12,
+    color: '#ffffff',
+    textAlign: 'left',
+    opacity: 0.8,
   },
     staminaLabel: {
       fontFamily: 'Silkscreen_400Regular',
       fontSize: 8,
-      color: '#0f172a',
+      color: '#ffffff',
       textAlign: 'right',
       marginBottom: 4,
     },
@@ -375,32 +519,46 @@ const styles = StyleSheet.create({
     gap: 20,
   },
   petSlot: {
-    width: 60,
-    alignItems: 'center',
-  },
-  emptyPetSlot: {
-    width: 60,
-    height: 60,
-    borderRadius: 8,
+    width: '30%',
     borderWidth: 2,
-    borderColor: 'rgba(14, 165, 233, 0.3)',
-    borderStyle: 'dashed',
+    borderColor: '#0ea5e9',
+    borderRadius: 8,
     backgroundColor: 'rgba(14, 165, 233, 0.05)',
+    padding: 8,
+    marginBottom: 8,
+  },
+  petSlotHeader: {
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
     marginBottom: 6,
   },
-  plusIcon: {
-    fontFamily: 'Silkscreen_400Regular',
-    fontSize: 24,
-    color: 'rgba(14, 165, 233, 0.6)',
-    fontWeight: 'bold',
+  petSlotImage: {
+    width: 24,
+    height: 24,
+    marginRight: 8,
+    imageRendering: 'pixelated' as any,
   },
-  emptySlotText: {
+  petSlotName: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#0f172a',
+    fontWeight: 'bold',
+    flex: 1,
+  },
+  petSlotStats: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    flexWrap: 'wrap',
+  },
+  petSlotStat: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 8,
-    color: 'rgba(14, 165, 233, 0.6)',
-    textAlign: 'center',
+    color: '#0f172a',
+    marginBottom: 2,
+  },
+  activePetSlot: {
+    borderColor: '#8b5cf6',
+    backgroundColor: 'rgba(139, 92, 246, 0.1)',
   },
   barStatsContainer: {
     width: '100%',

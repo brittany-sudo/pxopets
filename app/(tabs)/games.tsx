@@ -7,6 +7,7 @@ import JazzyTitle from '@/components/JazzyTitle';
 import React, { useState, useMemo } from 'react';
 
 // Import game images
+const arcadeImage = require('@/assets/images/arcade.png');
 const tikiGameImage = require('@/assets/images/tiki-game.png');
 const fortunaGameImage = require('@/assets/images/fortuna-game.png');
 const lostFoundImage = require('@/assets/images/lost-found.png');
@@ -207,6 +208,71 @@ export default function GamesScreen() {
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
+        {/* Arcade Header with Welcome Box */}
+        <RNView style={styles.arcadeHeader}>
+          {/* Welcome Box with High Scores */}
+          <RNView style={styles.welcomeBox}>
+            <Text style={styles.welcomeTitle}>WELCOME TO THE ARCADE!</Text>
+            <RNView>
+              <RNView style={styles.highScoreItem}>
+                <Text style={styles.highScoreText}>1. ATOMIC SURF</Text>
+                <Text style={styles.highScoreValue}>12,450</Text>
+              </RNView>
+              <Text style={styles.playerName}>- NEO_PLAYER</Text>
+              
+              <RNView style={styles.highScoreItem}>
+                <Text style={styles.highScoreText}>2. LOST 'N FOUND</Text>
+                <Text style={styles.highScoreValue}>9,870</Text>
+              </RNView>
+              <Text style={styles.playerName}>- TREASURE_HUNTER</Text>
+              
+              <RNView style={styles.highScoreItem}>
+                <Text style={styles.highScoreText}>3. LUCKY GUESS</Text>
+                <Text style={styles.highScoreValue}>8,230</Text>
+              </RNView>
+              <Text style={styles.playerName}>- LUCKY_STAR</Text>
+              
+              <RNView style={styles.highScoreItem}>
+                <Text style={styles.highScoreText}>4. STAMP SAFARI</Text>
+                <Text style={styles.highScoreValue}>7,650</Text>
+              </RNView>
+              <Text style={styles.playerName}>- SAFARI_MASTER</Text>
+              
+              <RNView style={styles.highScoreItem}>
+                <Text style={styles.highScoreText}>5. TIKI GAME</Text>
+                <Text style={styles.highScoreValue}>6,420</Text>
+              </RNView>
+              <Text style={styles.playerName}>- TIKI_WARRIOR</Text>
+            </RNView>
+          </RNView>
+          
+          {/* Arcade Image */}
+          <Image 
+            source={arcadeImage} 
+            style={styles.arcadeImage}
+            resizeMode="contain"
+          />
+        </RNView>
+
+        {/* Banner Section */}
+        <RNView style={styles.bannerContainer}>
+          <Pressable style={styles.bannerButton} onPress={() => Alert.alert('Favorites', 'Your favorite games will appear here!')}>
+            <RNView style={styles.bannerContent}>
+              <FontAwesome name="heart" size={20} color="#ec4899" />
+              <Text style={styles.bannerTitle}>FAVORITES</Text>
+              <Text style={styles.bannerSubtitle}>Your saved games</Text>
+            </RNView>
+          </Pressable>
+          
+          <Pressable style={styles.bannerButton} onPress={() => Alert.alert('Casino', 'Welcome to the Pxopia Casino!')}>
+            <RNView style={styles.bannerContent}>
+              <FontAwesome name="diamond" size={20} color="#f59e0b" />
+              <Text style={styles.bannerTitle}>CASINO</Text>
+              <Text style={styles.bannerSubtitle}>Betting games</Text>
+            </RNView>
+          </Pressable>
+        </RNView>
+
         {/* Search Bar */}
         <RNView style={styles.searchContainer}>
           <FontAwesome name="search" size={16} color="#0ea5e9" />
@@ -281,6 +347,91 @@ const styles = StyleSheet.create({
     padding: 20,
     flexGrow: 1,
   },
+  arcadeHeader: {
+    width: '90%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+    gap: 15,
+    alignSelf: 'center',
+  },
+  arcadeImage: {
+    width: '55%', // Slightly smaller width to balance better
+    height: 211, // 10% bigger than 192 (192 * 1.1 = 211.2, rounded to 211)
+  },
+  welcomeBox: {
+    width: '40%', // Made bigger
+    backgroundColor: 'rgba(14, 165, 233, 0.1)',
+    borderWidth: 1,
+    borderColor: '#0ea5e9',
+    borderRadius: 8,
+    padding: 15, // Increased padding
+    minHeight: 200, // Added minimum height
+  },
+  welcomeTitle: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 10,
+    color: '#0ea5e9',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  highScoreItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 2,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(14, 165, 233, 0.2)',
+  },
+  highScoreText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 8,
+    color: '#0f172a',
+  },
+  highScoreValue: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 8,
+    color: '#0ea5e9',
+    fontWeight: 'bold',
+  },
+  playerName: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 7,
+    color: '#64748b',
+    fontStyle: 'italic',
+    marginLeft: 8,
+    marginBottom: 4,
+  },
+  bannerContainer: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 12,
+    width: '90%',
+    alignSelf: 'center',
+  },
+  bannerButton: {
+    flex: 1,
+    backgroundColor: 'rgba(14, 165, 233, 0.05)',
+    borderWidth: 1,
+    borderColor: '#0ea5e9',
+    borderRadius: 8,
+    padding: 12,
+  },
+  bannerContent: {
+    alignItems: 'center',
+    gap: 4,
+  },
+  bannerTitle: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 12,
+    color: '#0f172a',
+    fontWeight: 'bold',
+  },
+  bannerSubtitle: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 9,
+    color: '#64748b',
+  },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -291,13 +442,15 @@ const styles = StyleSheet.create({
     borderColor: '#0ea5e9',
     borderRadius: 4,
     backgroundColor: 'rgba(14, 165, 233, 0.05)',
-    width: '95%',
+    width: '90%',
     marginBottom: 16,
+    alignSelf: 'center',
   },
   wideBox: {
-    width: '95%',
+    width: '90%',
     alignItems: 'flex-start',
     marginBottom: 16,
+    alignSelf: 'center',
   },
   searchInput: {
     flex: 1,

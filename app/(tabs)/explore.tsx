@@ -3,7 +3,6 @@ import { Text, View } from '@/components/Themed';
 import { useGame } from '@/store/GameStore';
 import BorderedBox from '@/components/BorderedBox';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import InteractiveMap from '@/components/InteractiveMap';
 import JazzyTitle from '@/components/JazzyTitle';
 import { router } from 'expo-router';
 
@@ -18,6 +17,7 @@ const lilTotemGuyImage = require('@/assets/images/lil-totem-guy.png');
 const lilPopcornImage = require('@/assets/images/lil-popcorn.png');
 const lilScarecrowImage = require('@/assets/images/lil-scarecrow.png');
 const lilGnomeImage = require('@/assets/images/lil-gnome.png');
+const mapOfPxopiaImage = require('@/assets/images/mapofpxopia.png');
 
 export default function ExploreScreen() {
   const { hydrated } = useGame();
@@ -25,8 +25,16 @@ export default function ExploreScreen() {
 
   const worlds = [
     {
+      id: "pxoburbs",
+      name: "The Pxoburbs",
+      icon: "home",
+      color: "#64748b",
+      description: "Nostalgic 90s suburban neighborhood.",
+      image: staticTvImage
+    },
+    {
       id: "artisan",
-      name: "Artisan's Quarter",
+      name: "Shakespeare's Quarter",
       icon: "paint-brush",
       color: "#ec4899",
       description: "Main village square with shops and craftspeople.",
@@ -65,14 +73,6 @@ export default function ExploreScreen() {
       image: lilWineCasketImage
     },
     {
-      id: "pxoburbs",
-      name: "The Pxoburbs",
-      icon: "home",
-      color: "#64748b",
-      description: "Nostalgic 90s suburban neighborhood.",
-      image: staticTvImage
-    },
-    {
       id: "mountains",
       name: "Slumbering Hills",
       icon: "mountain",
@@ -106,79 +106,36 @@ export default function ExploreScreen() {
     }
   ];
 
-  const handleRegionPress = (regionId: string, regionName: string) => {
-    console.log('Region pressed:', regionId, regionName);
-    const world = worlds.find(w => w.id === regionId);
-    if (world) {
-      if (regionId === 'enchanted-island') {
-        console.log('Navigating to Enchanted Island...');
-        router.push('/(tabs)/enchanted-island');
-      } else if (regionId === 'artisan') {
-        console.log('Navigating to Artisan\'s Quarter...');
-        router.push('/(tabs)/artisan-quarter');
-      } else if (regionId === 'casino') {
-        console.log('Navigating to Crescent Oasis...');
-        router.push('/(tabs)/crescent-oasis');
-      } else if (regionId === 'crystal-cove') {
-        console.log('Navigating to Foggy Harbor...');
-        router.push('/(tabs)/foggy-harbor');
-      } else if (regionId === 'vintage-hollow') {
-        console.log('Navigating to Barrelhaven...');
-        router.push('/(tabs)/barrelhaven');
-      } else if (regionId === 'bag-of-stars-forest') {
-        console.log('Navigating to Bag of Stars Forest...');
-        router.push('/(tabs)/bag-of-stars-forest');
-      } else if (regionId === 'pxoburbs') {
-        console.log('Navigating to The Pxoburbs...');
-        router.push('/(tabs)/pxoburbs');
-      } else if (regionId === 'pirate-port') {
-        console.log('Navigating to Saltwick Pier...');
-        router.push('/(tabs)/saltwick-pier');
-      } else if (regionId === 'library') {
-        console.log('Navigating to Scarecrow Vale...');
-        router.push('/(tabs)/scarecrow-vale');
-      } else {
-        Alert.alert(
-          `Welcome to ${regionName}!`,
-          world.description,
-          [
-            { text: "Explore", onPress: () => console.log(`Navigating to ${regionName}`) },
-            { text: "Cancel", style: "cancel" }
-          ]
-        );
-      }
-    }
-  };
 
   const handleWorldPress = (world: any) => {
     console.log('World pressed:', world.id, world.name);
     if (world.id === 'enchanted-island') {
       console.log('Navigating to Enchanted Island from list...');
-      router.push('/enchanted-island');
+      router.navigate('/(tabs)/enchanted-island');
     } else if (world.id === 'artisan') {
       console.log('Navigating to Artisan\'s Quarter from list...');
-      router.push('/artisan-quarter');
+      router.navigate('/(tabs)/artisan-quarter');
     } else if (world.id === 'casino') {
       console.log('Navigating to Crescent Oasis from list...');
-      router.push('/crescent-oasis');
+      router.navigate('/(tabs)/crescent-oasis');
     } else if (world.id === 'crystal-cove') {
       console.log('Navigating to Foggy Harbor from list...');
-      router.push('/foggy-harbor');
+      router.navigate('/(tabs)/foggy-harbor');
     } else if (world.id === 'vintage-hollow') {
       console.log('Navigating to Barrelhaven from list...');
-      router.push('/barrelhaven');
+      router.navigate('/(tabs)/barrelhaven');
     } else if (world.id === 'bag-of-stars-forest') {
       console.log('Navigating to Bag of Stars Forest from list...');
-      router.push('/bag-of-stars-forest');
+      router.navigate('/(tabs)/bag-of-stars-forest');
     } else if (world.id === 'pxoburbs') {
       console.log('Navigating to The Pxoburbs from list...');
-      router.push('/pxoburbs');
+      router.navigate('/(tabs)/pxoburbs');
     } else if (world.id === 'pirate-port') {
       console.log('Navigating to Saltwick Pier from list...');
-      router.push('/saltwick-pier');
+      router.navigate('/(tabs)/saltwick-pier');
     } else if (world.id === 'library') {
       console.log('Navigating to Scarecrow Vale from list...');
-      router.push('/scarecrow-vale');
+      router.navigate('/(tabs)/scarecrow-vale');
     } else {
       Alert.alert(
         `Welcome to ${world.name}!`,
@@ -193,15 +150,43 @@ export default function ExploreScreen() {
 
   return (
     <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Interactive Map */}
-        <RNView style={styles.mapContainer}>
-          <InteractiveMap onRegionPress={handleRegionPress} />
-        </RNView>
+      {/* Second Top Navigation */}
+      <RNView style={styles.secondNavContainer}>
+        <Pressable style={styles.navButton} onPress={() => Alert.alert('Battle', 'Battle system coming soon!')}>
+          <FontAwesome name="sword" size={20} color="#ef4444" />
+          <Text style={styles.navButtonText}>BATTLE</Text>
+        </Pressable>
+        <Pressable style={styles.navButton} onPress={() => Alert.alert('Trade', 'Trading system coming soon!')}>
+          <FontAwesome name="exchange" size={20} color="#f59e0b" />
+          <Text style={styles.navButtonText}>TRADE</Text>
+        </Pressable>
+        <Pressable style={styles.navButton} onPress={() => Alert.alert('User Shop', 'User shops coming soon!')}>
+          <FontAwesome name="store" size={20} color="#8b5cf6" />
+          <Text style={styles.navButtonText}>SHOP</Text>
+        </Pressable>
+        <Pressable style={styles.navButton} onPress={() => Alert.alert('Contest', 'Contests coming soon!')}>
+          <FontAwesome name="trophy" size={20} color="#fbbf24" />
+          <Text style={styles.navButtonText}>CONTEST</Text>
+        </Pressable>
+        <Pressable style={styles.navButton} onPress={() => Alert.alert('Dailies', 'Daily quests coming soon!')}>
+          <FontAwesome name="calendar" size={20} color="#10b981" />
+          <Text style={styles.navButtonText}>DAILIES</Text>
+        </Pressable>
+      </RNView>
 
+      <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Worlds List */}
         <BorderedBox>
-          <Text style={styles.worldsTitle}>MAP OF PXOPIA</Text>
+          <Image 
+            source={mapOfPxopiaImage} 
+            style={styles.mapOfPxopiaImage}
+            resizeMode="contain"
+          />
+          <Text style={styles.pxopiaBlurb}>
+            Welcome to Pxopia, a magical realm where pixelated adventures await! 
+            Explore diverse worlds, meet quirky characters, and discover hidden treasures 
+            in this vibrant digital universe.
+          </Text>
           {worlds.map((world, index) => (
             <Pressable 
               key={index} 
@@ -229,6 +214,31 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  secondNavContainer: {
+    flexDirection: 'row',
+    backgroundColor: 'rgba(14, 165, 233, 0.1)',
+    borderBottomWidth: 2,
+    borderBottomColor: '#0ea5e9',
+    paddingVertical: 8,
+    paddingHorizontal: 4,
+    justifyContent: 'space-around',
+    alignItems: 'center',
+  },
+  navButton: {
+    alignItems: 'center',
+    paddingVertical: 6,
+    paddingHorizontal: 4,
+    borderRadius: 6,
+    minWidth: 60,
+  },
+  navButtonText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 8,
+    color: '#0f172a',
+    fontWeight: 'bold',
+    marginTop: 2,
+    textAlign: 'center',
+  },
   scrollContent: {
     alignItems: 'center',
     justifyContent: 'flex-start',
@@ -244,12 +254,6 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     textAlign: 'left',
   },
-  mapContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 0,
-    width: '100%',
-  },
   mapText: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 12,
@@ -257,14 +261,22 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontStyle: 'italic',
   },
-  worldsTitle: {
-    fontFamily: 'PressStart2P_400Regular',
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#0f172a',
-    marginTop: 8,
-    marginBottom: 16,
+  mapOfPxopiaImage: {
+    width: '100%',
+    height: 134, // 40% bigger than 96px (96 * 1.4 = 134.4, rounded to 134)
+    marginTop: -16, // Negative margin to counteract BorderedBox padding
+    marginBottom: 0,
+    alignSelf: 'center',
+  },
+  pxopiaBlurb: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#64748b',
     textAlign: 'center',
+    fontStyle: 'italic',
+    lineHeight: 14,
+    marginBottom: 16,
+    paddingHorizontal: 8,
   },
   worldItem: {
     flexDirection: 'row',

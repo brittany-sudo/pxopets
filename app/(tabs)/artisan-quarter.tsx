@@ -5,7 +5,7 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { router } from 'expo-router';
 
 // Import the banner image
-const lilPaletteImage = require('@/assets/images/lil-palette.png');
+const shakespeareQuartImage = require('@/assets/images/shakespeare-quart.png');
 
 export default function ArtisanQuarterScreen() {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
@@ -23,6 +23,14 @@ export default function ArtisanQuarterScreen() {
   };
 
   const activities = [
+    {
+      id: 'masquerade-hall',
+      name: 'Masquerade Hall',
+      description: 'Weekly balls with elegant dancing and mysterious masks.',
+      reward: '25 Gems',
+      difficulty: 'Medium',
+      icon: 'theater-masks'
+    },
     {
       id: 'pottery-workshop',
       name: 'Pottery Workshop',
@@ -64,14 +72,6 @@ export default function ArtisanQuarterScreen() {
       icon: 'cube'
     },
     {
-      id: 'glass-blowing',
-      name: 'Glass Blowing',
-      description: 'Shape molten glass into delicate works of art.',
-      reward: '20 Gems',
-      difficulty: 'Hard',
-      icon: 'fire'
-    },
-    {
       id: 'textile-dyeing',
       name: 'Textile Dyeing',
       description: 'Create vibrant colors using natural plant dyes.',
@@ -95,18 +95,18 @@ export default function ArtisanQuarterScreen() {
         {/* Back Button */}
         <Pressable 
           style={styles.backButton}
-          onPress={() => router.back()}
+          onPress={() => router.navigate('/(tabs)/explore')}
         >
           <FontAwesome name="arrow-left" size={16} color="#0f172a" />
           <Text style={styles.backButtonText}>Back</Text>
         </Pressable>
 
         {/* Title */}
-        <Text style={styles.title}>ARTISAN'S QUARTER</Text>
+        <Text style={styles.title}>SHAKESPEARE'S QUARTER</Text>
 
         {/* Banner Image */}
         <RNView style={styles.bannerContainer}>
-          <Image source={lilPaletteImage} style={styles.bannerImage} />
+          <Image source={shakespeareQuartImage} style={styles.bannerImage} />
         </RNView>
 
         {/* Description */}
@@ -201,8 +201,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(14, 165, 233, 0.05)',
   },
   bannerImage: {
-    width: 150,
-    height: 150,
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
   },
   description: {
     fontFamily: 'Silkscreen_400Regular',

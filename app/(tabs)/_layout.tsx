@@ -25,7 +25,7 @@ export default function TabLayout() {
               screenOptions={{
                 tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tabActive,
                 tabBarInactiveTintColor: 'rgba(139, 92, 246, 0.8)', // Purple with 80% opacity
-        tabBarLabelStyle: { fontFamily: 'Silkscreen_400Regular', fontSize: FONT_SIZES.xs, paddingBottom: 0, marginTop: 2 },
+        tabBarLabelStyle: { fontFamily: 'Silkscreen_400Regular', fontSize: FONT_SIZES.xs, paddingBottom: 0, marginTop: 6 },
         tabBarItemStyle: { 
           paddingVertical: SPACING.xs,
           marginHorizontal: 2,

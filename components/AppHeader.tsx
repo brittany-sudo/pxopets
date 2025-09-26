@@ -16,7 +16,7 @@ export default function AppHeader() {
 
           const pathname = usePathname();
           const isHome = pathname === '/(tabs)/home' || pathname === '/home';
-          const iconColor = isHome ? 'rgba(139, 92, 246, 0.8)' : 'rgba(139, 92, 246, 0.8)'; // Always purple with 80% opacity
+          const iconColor = isHome ? '#8b5cf6' : '#8b5cf6'; // Always purple with full opacity
 
   const handleRefresh = () => {
     router.replace(router.pathname);
@@ -52,11 +52,16 @@ export default function AppHeader() {
               {/* User greeting and coins */}
               <View style={styles.userBar}>
                 <View style={styles.leftSection}>
-                  <Text style={styles.greeting}>Hello, [user]!</Text>
-                  <View style={styles.mailContainer}>
+                  <Text style={styles.greeting}>Hello, PxopetMaster!</Text>
+                  <Pressable 
+                    style={styles.mailContainer}
+                    onPress={() => router.push('/(tabs)/mail')}
+                  >
                     <FontAwesome name="envelope" size={16} color="#f59e0b" />
-                    <Text style={styles.mailText}>[3]</Text>
-                  </View>
+                    {state.coins > 0 && ( // Using coins as a placeholder for mail count - you can change this logic
+                      <View style={styles.mailDot} />
+                    )}
+                  </Pressable>
                 </View>
                 <View style={styles.currencyContainer}>
                   <View style={styles.coinsContainer}>
@@ -64,15 +69,9 @@ export default function AppHeader() {
                     <Text style={styles.coinsText}>{state.coins}</Text>
                   </View>
                   <View style={styles.ticketsContainer}>
-                    <FontAwesome name="ticket" size={16} color="#0ea5e9" />
+                    <FontAwesome name="ticket" size={16} color="#06b6d4" />
                     <Text style={styles.ticketsText}>0</Text>
                   </View>
-                  <Pressable 
-                    style={styles.shopButton}
-                    onPress={() => router.push('/(tabs)/shop')}
-                  >
-                    <FontAwesome name="shopping-bag" size={16} color="#0ea5e9" />
-                  </Pressable>
                 </View>
               </View>
     </View>
@@ -152,28 +151,30 @@ const styles = StyleSheet.create({
     color: '#0f172a', // Premium deep slate
   },
   mailContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
+    position: 'relative',
+    padding: 4,
+    borderRadius: 4,
   },
-  mailText: {
-    fontFamily: 'Silkscreen_400Regular',
-    fontSize: FONT_SIZES.sm,
-    color: '#f59e0b', // Amber/orange to match the envelope icon
-    fontWeight: 'bold',
+  mailDot: {
+    position: 'absolute',
+    top: 3,
+    right: 2,
+    width: 5,
+    height: 5,
+    borderRadius: 2.5,
+    backgroundColor: '#10b981',
+    shadowColor: '#10b981',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2.5,
+    elevation: 4,
+    zIndex: 1,
   },
   currencyContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
     flexShrink: 0,
-  },
-  shopButton: {
-    padding: 4,
-    borderRadius: 4,
-    backgroundColor: 'rgba(14, 165, 233, 0.1)',
-    borderWidth: 1,
-    borderColor: '#0ea5e9',
   },
   coinsContainer: {
     flexDirection: 'row',

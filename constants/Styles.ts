@@ -35,6 +35,6 @@ export const ICON_SIZES = {
 export const SHADOWS = {
   halftone: {
     textShadow: '2px 2px 0px #ff69b4',
-    boxShadow: '3px 3px 0px #0ecab8',
+    boxShadow: '3px 3px 0px #10b981',
   },
 } as const;

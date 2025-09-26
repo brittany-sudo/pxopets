@@ -12,7 +12,7 @@ export default {
     tabActive: '#374151', // Charcoal for active states
     tabInactive: 'rgba(167, 139, 250, 0.8)', // Soft lavender with 80% opacity
     tabBarBackground: '#fefefe', // Warm white background
-    tabBarBorder: '#0ea5e9', // Blue border
+    tabBarBorder: '#10b981', // Teal border
     accent1: '#0ea5e9', // Primary accent - blue
     accent2: '#a78bfa', // Secondary accent - soft lavender
     accent3: '#10b981', // Tertiary accent - sage (keeping this)

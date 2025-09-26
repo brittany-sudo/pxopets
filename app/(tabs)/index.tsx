@@ -20,7 +20,6 @@ export default function HomeScreen() {
   const celebrationTranslateY = useRef(new Animated.Value(0)).current;
   const buttonScale = useRef(new Animated.Value(1)).current;
   const tickerTranslateX = useRef(new Animated.Value(0)).current;
-  const gradientRotation = useRef(new Animated.Value(0)).current;
 
   // Stock ticker data with color coding
   const stockData = [
@@ -60,20 +59,6 @@ export default function HomeScreen() {
     runTicker();
   }, []);
 
-  // Gradient rotation animation
-  useEffect(() => {
-    const rotateGradient = () => {
-      Animated.loop(
-        Animated.timing(gradientRotation, {
-          toValue: 1,
-          duration: 3000, // 3 seconds for full rotation
-          useNativeDriver: true,
-        })
-      ).start();
-    };
-    
-    rotateGradient();
-  }, []);
 
   const handleDailyReward = () => {
     if (!rewardClaimed) {
@@ -210,39 +195,6 @@ export default function HomeScreen() {
               <ScrollView contentContainerStyle={styles.scrollContent}>
                 {/* Premium Shop Banner */}
                 <RNView style={styles.premiumBanner}>
-                  <Animated.View style={[
-                    styles.gradientBorder1,
-                    {
-                      transform: [{
-                        rotate: gradientRotation.interpolate({
-                          inputRange: [0, 1],
-                          outputRange: ['0deg', '360deg'],
-                        })
-                      }]
-                    }
-                  ]} />
-                  <Animated.View style={[
-                    styles.gradientBorder2,
-                    {
-                      transform: [{
-                        rotate: gradientRotation.interpolate({
-                          inputRange: [0, 1],
-                          outputRange: ['120deg', '480deg'],
-                        })
-                      }]
-                    }
-                  ]} />
-                  <Animated.View style={[
-                    styles.gradientBorder3,
-                    {
-                      transform: [{
-                        rotate: gradientRotation.interpolate({
-                          inputRange: [0, 1],
-                          outputRange: ['240deg', '600deg'],
-                        })
-                      }]
-                    }
-                  ]} />
                   <RNView style={styles.bannerGradient}>
                     <RNView style={styles.bannerContent}>
             <RNView style={styles.bannerLeft}>
@@ -283,7 +235,6 @@ export default function HomeScreen() {
                 </RNView>
 
                 <BorderedBox>
-                  <Text style={styles.dateText}>January 1, 1991</Text>
                   <JazzyTitle style={styles.newsHeader}>DAILY GAZETTE</JazzyTitle>
                   <RNView style={styles.weatherBox}>
                     <FontAwesome name="sun-o" size={14} color="#f59e0b" style={styles.weatherIcon} />
@@ -297,6 +248,8 @@ export default function HomeScreen() {
                       style={styles.dailyGazetteImage}
                     />
                   </RNView>
+                  
+                  <Text style={styles.dateText}>January 1, 1991</Text>
 
                   {/* What's New Section */}
                   <RNView style={styles.whatsNewSection}>
@@ -430,7 +383,7 @@ export default function HomeScreen() {
                       <Pressable onPress={handleDailyReward} disabled={rewardClaimed}>
                         <RNView style={[styles.dailyRewardSection, rewardClaimed && styles.claimedSection]}>
                           <FontAwesome 
-                            name="diamond" 
+                            name="bolt" 
                             size={32} 
                             color={rewardClaimed ? "#64748b" : (isFlashing ? "#8b5cf6" : "#f59e0b")} 
                             style={styles.flashingGem}
@@ -457,7 +410,10 @@ export default function HomeScreen() {
                         ]}
                       >
                         <Animated.View style={[styles.gradientBackground, { transform: [{ scale: celebrationScale }] }]}>
-                          <Text style={styles.celebrationText}>+5 ⚡!</Text>
+                          <RNView style={styles.celebrationContent}>
+                            <Text style={styles.celebrationText}>5</Text>
+                            <FontAwesome name="bolt" size={16} color="#f59e0b" />
+                          </RNView>
                         </Animated.View>
                       </Animated.View>
                     )}
@@ -491,7 +447,7 @@ const styles = StyleSheet.create({
         },
         tickerText: {
           fontFamily: 'Silkscreen_400Regular',
-          fontSize: 12,
+          fontSize: 10,
           fontWeight: 'bold',
           whiteSpace: 'nowrap',
         },
@@ -510,6 +466,7 @@ const styles = StyleSheet.create({
             padding: 20,
             paddingTop: 35, // Reduced gap between ticker and Daily Gazette
             flexGrow: 1,
+            overflow: 'visible', // Ensure animations aren't clipped
           },
           headerRow: {
             flexDirection: 'row',
@@ -694,6 +651,11 @@ const styles = StyleSheet.create({
             borderWidth: 2,
             borderColor: '#f472b6',
           },
+          celebrationContent: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 4,
+          },
           celebrationText: {
             fontFamily: 'PressStart2P_400Regular',
             fontSize: 6,
@@ -804,7 +766,8 @@ const styles = StyleSheet.create({
             borderColor: 'rgba(14, 165, 233, 0.2)',
             padding: 12,
             marginBottom: 16,
-            width: '100%',
+            width: '95%',
+            alignSelf: 'center',
           },
           whatsNewTitle: {
             fontFamily: 'Silkscreen_400Regular',
@@ -853,7 +816,8 @@ const styles = StyleSheet.create({
             borderColor: 'rgba(14, 165, 233, 0.2)',
             padding: 12,
             marginBottom: 8,
-            width: '100%',
+            width: '95%',
+            alignSelf: 'center',
           },
           questIcon: {
             marginRight: 12,
@@ -911,18 +875,21 @@ const styles = StyleSheet.create({
           premiumBanner: {
             marginBottom: 4,
             borderRadius: 12,
-            overflow: 'hidden',
+            overflow: 'visible', // Keep visible for animation
             borderWidth: 2,
             borderColor: '#8b5cf6',
             position: 'relative',
-            width: '85%',
+            width: '95%',
             alignSelf: 'center',
+            marginTop: 8, // Reduced margin
+            marginBottom: 8, // Reduced margin
+            zIndex: 5, // Ensure banner is above other content
           },
           bannerGradient: {
             backgroundColor: '#ffffff',
             padding: 2,
             position: 'relative',
-            zIndex: 4,
+            zIndex: 10, // Higher z-index to appear above borders
             borderRadius: 10,
           },
           bannerContent: {
@@ -931,7 +898,7 @@ const styles = StyleSheet.create({
             alignItems: 'center',
             paddingVertical: 16,
             paddingHorizontal: 20,
-            backgroundColor: '#ffffff',
+            backgroundColor: '#1e1b4b', // Dark purple background
             borderRadius: 10,
           },
           bannerLeft: {
@@ -966,7 +933,7 @@ const styles = StyleSheet.create({
           bannerSubtitle: {
             fontFamily: 'Silkscreen_400Regular',
             fontSize: 14,
-            color: '#0f172a',
+            color: '#ffffff', // White text for dark background
             fontWeight: 'bold',
             marginBottom: 2,
           },
@@ -1022,45 +989,11 @@ const styles = StyleSheet.create({
           bannerTimer: {
             fontFamily: 'Silkscreen_400Regular',
             fontSize: 9,
-            color: '#8b5cf6',
+            color: '#ffffff', // White text for dark background
             fontWeight: 'bold',
-            backgroundColor: 'rgba(139, 92, 246, 0.1)',
+            backgroundColor: 'rgba(255, 255, 255, 0.2)', // Light background for contrast
             paddingHorizontal: 8,
             paddingVertical: 2,
             borderRadius: 4,
-          },
-          // Rotating Gradient Border Effects
-          gradientBorder1: {
-            position: 'absolute',
-            top: -3,
-            left: -3,
-            right: -3,
-            bottom: -3,
-            borderRadius: 15,
-            backgroundColor: '#8b5cf6',
-            opacity: 1,
-            zIndex: 1,
-          },
-          gradientBorder2: {
-            position: 'absolute',
-            top: -2,
-            left: -2,
-            right: -2,
-            bottom: -2,
-            borderRadius: 14,
-            backgroundColor: '#ec4899',
-            opacity: 0.8,
-            zIndex: 2,
-          },
-          gradientBorder3: {
-            position: 'absolute',
-            top: -1,
-            left: -1,
-            right: -1,
-            bottom: -1,
-            borderRadius: 13,
-            backgroundColor: '#fbbf24',
-            opacity: 0.6,
-            zIndex: 3,
           },
 });

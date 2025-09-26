@@ -2,10 +2,8 @@ import React, { useState } from 'react';
 import { StyleSheet, ScrollView, View as RNView, Pressable, Image, Alert } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import PixelButton from '@/components/PixelButton';
-import BorderedBox from '@/components/BorderedBox';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useGame } from '@/store/GameStore';
-import JazzyTitle from '@/components/JazzyTitle';
 
 export default function ShopScreen() {
   const { state, addCoins, spendCoins } = useGame();
@@ -316,20 +314,6 @@ export default function ShopScreen() {
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        <JazzyTitle style={styles.title}>PREMIUM SHOP</JazzyTitle>
-        
-        <BorderedBox>
-          {/* Currency Display */}
-          <RNView style={styles.currencyBar}>
-            <RNView style={styles.currencyItem}>
-              <FontAwesome name="diamond" size={20} color="#8b5cf6" />
-              <Text style={styles.currencyText}>{state.coins}</Text>
-            </RNView>
-            <RNView style={styles.currencyItem}>
-              <FontAwesome name="ticket" size={20} color="#0ea5e9" />
-              <Text style={styles.currencyText}>0</Text>
-            </RNView>
-          </RNView>
 
           {/* Category Tabs */}
           <RNView style={styles.categoryTabs}>
@@ -403,7 +387,6 @@ export default function ShopScreen() {
               </Pressable>
             ))}
           </RNView>
-        </BorderedBox>
       </ScrollView>
     </View>
   );
@@ -418,38 +401,6 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     padding: 20,
     flexGrow: 1,
-  },
-  title: {
-    fontFamily: 'PressStart2P_400Regular',
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#0f172a',
-    marginTop: 8,
-    marginBottom: 20,
-    textAlign: 'left',
-  },
-  currencyBar: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 20,
-    marginBottom: 20,
-  },
-  currencyItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    backgroundColor: 'rgba(14, 165, 233, 0.1)',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#0ea5e9',
-  },
-  currencyText: {
-    fontFamily: 'Silkscreen_400Regular',
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#0f172a',
   },
   categoryTabs: {
     flexDirection: 'row',
