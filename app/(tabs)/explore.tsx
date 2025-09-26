@@ -112,31 +112,31 @@ export default function ExploreScreen() {
     if (world) {
       if (regionId === 'enchanted-island') {
         console.log('Navigating to Enchanted Island...');
-        router.push('/enchanted-island');
+        router.push('/(tabs)/enchanted-island');
       } else if (regionId === 'artisan') {
         console.log('Navigating to Artisan\'s Quarter...');
-        router.push('/artisan-quarter');
+        router.push('/(tabs)/artisan-quarter');
       } else if (regionId === 'casino') {
         console.log('Navigating to Crescent Oasis...');
-        router.push('/crescent-oasis');
+        router.push('/(tabs)/crescent-oasis');
       } else if (regionId === 'crystal-cove') {
         console.log('Navigating to Foggy Harbor...');
-        router.push('/foggy-harbor');
+        router.push('/(tabs)/foggy-harbor');
       } else if (regionId === 'vintage-hollow') {
         console.log('Navigating to Barrelhaven...');
-        router.push('/barrelhaven');
+        router.push('/(tabs)/barrelhaven');
       } else if (regionId === 'bag-of-stars-forest') {
         console.log('Navigating to Bag of Stars Forest...');
-        router.push('/bag-of-stars-forest');
+        router.push('/(tabs)/bag-of-stars-forest');
       } else if (regionId === 'pxoburbs') {
         console.log('Navigating to The Pxoburbs...');
-        router.push('/pxoburbs');
+        router.push('/(tabs)/pxoburbs');
       } else if (regionId === 'pirate-port') {
         console.log('Navigating to Saltwick Pier...');
-        router.push('/saltwick-pier');
+        router.push('/(tabs)/saltwick-pier');
       } else if (regionId === 'library') {
         console.log('Navigating to Scarecrow Vale...');
-        router.push('/scarecrow-vale');
+        router.push('/(tabs)/scarecrow-vale');
       } else {
         Alert.alert(
           `Welcome to ${regionName}!`,

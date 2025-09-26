@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { StyleSheet, ScrollView, View as RNView, Image, Pressable } from 'react-native';
 import { Text, View } from '@/components/Themed';
-import AppHeader from '@/components/AppHeader';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { router } from 'expo-router';
 
@@ -92,7 +91,6 @@ export default function BagOfStarsForestScreen() {
 
   return (
     <View style={styles.container}>
-      <AppHeader />
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Back Button */}
         <Pressable 

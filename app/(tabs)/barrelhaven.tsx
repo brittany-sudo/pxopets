@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
 import { StyleSheet, ScrollView, View as RNView, Image, Pressable } from 'react-native';
 import { Text, View } from '@/components/Themed';
-import AppHeader from '@/components/AppHeader';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { router } from 'expo-router';
 
 // Import the banner image
-const lilPopcornImage = require('@/assets/images/lil-popcorn.png');
+const lilWineCasketImage = require('@/assets/images/lil-wine-casket.png');
 
-export default function SaltwickPierScreen() {
+export default function BarrelhavenScreen() {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
 
   const toggleFavorite = (activityId: string) => {
@@ -25,74 +24,73 @@ export default function SaltwickPierScreen() {
 
   const activities = [
     {
-      id: 'ferris-wheel',
-      name: 'Ferris Wheel',
-      description: 'Take a spin on the iconic pier ferris wheel.',
-      reward: '20 ⚡',
+      id: 'wine-tasting',
+      name: 'Wine Tasting',
+      description: 'Sample the finest vintages from ancient cellars.',
+      reward: '20 Gems',
       difficulty: 'Easy',
+      icon: 'glass'
+    },
+    {
+      id: 'barrel-making',
+      name: 'Barrel Making',
+      description: 'Craft oak barrels using traditional cooper techniques.',
+      reward: '25 Gems',
+      difficulty: 'Hard',
       icon: 'circle'
     },
     {
-      id: 'carnival-games',
-      name: 'Carnival Games',
-      description: 'Test your skills at classic midway games.',
-      reward: '25 ⚡',
+      id: 'grape-harvest',
+      name: 'Grape Harvest',
+      description: 'Pick grapes during the autumn harvest season.',
+      reward: '15 Gems',
       difficulty: 'Medium',
-      icon: 'gamepad'
+      icon: 'leaf'
     },
     {
-      id: 'cotton-candy',
-      name: 'Cotton Candy Stand',
-      description: 'Make and sell the fluffiest cotton candy.',
-      reward: '15 ⚡',
+      id: 'cellar-tour',
+      name: 'Cellar Tour',
+      description: 'Explore the deep underground wine cellars.',
+      reward: '12 Gems',
       difficulty: 'Easy',
-      icon: 'cloud'
+      icon: 'arrow-down'
     },
     {
-      id: 'carousel-ride',
-      name: 'Carousel Ride',
-      description: 'Ride the beautifully painted carousel horses.',
-      reward: '18 ⚡',
-      difficulty: 'Easy',
-      icon: 'horse'
+      id: 'wine-blending',
+      name: 'Wine Blending',
+      description: 'Create your own unique wine blend from different grapes.',
+      reward: '30 Gems',
+      difficulty: 'Hard',
+      icon: 'tint'
     },
     {
-      id: 'ring-toss',
-      name: 'Ring Toss',
-      description: 'Aim for the bottles in this classic game.',
-      reward: '22 ⚡',
+      id: 'medieval-feast',
+      name: 'Medieval Feast',
+      description: 'Dine like royalty at the grand banquet hall.',
+      reward: '35 Gems',
       difficulty: 'Medium',
-      icon: 'bullseye'
+      icon: 'cutlery'
     },
     {
-      id: 'pier-walk',
-      name: 'Pier Walk',
-      description: 'Stroll along the wooden planks and enjoy the view.',
-      reward: '12 ⚡',
+      id: 'vineyard-walk',
+      name: 'Vineyard Walk',
+      description: 'Stroll through the rolling hills of the vineyard.',
+      reward: '10 Gems',
       difficulty: 'Easy',
       icon: 'road'
     },
     {
-      id: 'prize-booth',
-      name: 'Prize Booth',
-      description: 'Help distribute prizes to game winners.',
-      reward: '28 ⚡',
-      difficulty: 'Medium',
-      icon: 'gift'
-    },
-    {
-      id: 'sunset-photography',
-      name: 'Sunset Photography',
-      description: 'Capture the perfect pier sunset photo.',
-      reward: '35 ⚡',
+      id: 'wine-ceremony',
+      name: 'Wine Ceremony',
+      description: 'Participate in ancient wine-making rituals.',
+      reward: '40 Gems',
       difficulty: 'Hard',
-      icon: 'camera'
+      icon: 'heart'
     }
   ];
 
   return (
     <View style={styles.container}>
-      <AppHeader />
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Back Button */}
         <Pressable 
@@ -104,22 +102,22 @@ export default function SaltwickPierScreen() {
         </Pressable>
 
         {/* Title */}
-        <Text style={styles.title}>SALTWICK PIER</Text>
+        <Text style={styles.title}>BARRELHAVEN</Text>
 
         {/* Banner Image */}
         <RNView style={styles.bannerContainer}>
-          <Image source={lilPopcornImage} style={styles.bannerImage} />
+          <Image source={lilWineCasketImage} style={styles.bannerImage} />
         </RNView>
 
         {/* Description */}
         <Text style={styles.description}>
-          A colorful carnival pier where the air is filled with laughter and the scent of cotton candy. 
-          Bright lights twinkle against the evening sky as families enjoy classic midway games, 
-          thrilling rides, and the simple joy of seaside entertainment.
+          A medieval winery village nestled in rolling hills where ancient traditions 
+          meet modern craftsmanship. Oak barrels line the cellars while grapevines 
+          stretch across the countryside. Here, every sip tells a story of centuries past.
         </Text>
 
         {/* Activities Title */}
-        <Text style={styles.activitiesTitle}>PIER ACTIVITIES</Text>
+        <Text style={styles.activitiesTitle}>WINERY ACTIVITIES</Text>
 
         {/* Activities List */}
         {activities.map((activity) => (

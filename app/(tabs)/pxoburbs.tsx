@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
 import { StyleSheet, ScrollView, View as RNView, Image, Pressable } from 'react-native';
 import { Text, View } from '@/components/Themed';
-import AppHeader from '@/components/AppHeader';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { router } from 'expo-router';
 
 // Import the banner image
-const volcanoImage = require('@/assets/images/tiny-volcano.png');
+const staticTvImage = require('@/assets/images/static-tv.png');
 
-export default function EnchantedIslandScreen() {
+export default function PxoburbsScreen() {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
 
   const toggleFavorite = (activityId: string) => {
@@ -25,74 +24,73 @@ export default function EnchantedIslandScreen() {
 
   const activities = [
     {
-      id: 'volcano-dance',
-      name: 'Volcano Dance',
-      description: 'Dance around the sacred volcano with tiki spirits.',
-      reward: '8 Gems',
+      id: 'bike-riding',
+      name: 'Bike Riding',
+      description: 'Cruise through the neighborhood on your trusty bike.',
+      reward: '15 ⚡',
       difficulty: 'Easy',
-      icon: 'fire'
+      icon: 'bicycle'
     },
     {
-      id: 'pearl-diving',
-      name: 'Pearl Diving',
-      description: 'Dive deep into crystal waters to find precious pearls.',
-      reward: '12 Gems',
+      id: 'keycard-hunt',
+      name: 'Lost Motel Key Card Hunt',
+      description: 'Find hidden key cards in the abandoned motel.',
+      reward: '25 ⚡',
       difficulty: 'Medium',
-      icon: 'tint'
+      icon: 'key'
     },
     {
-      id: 'tiki-crafting',
-      name: 'Tiki Crafting',
-      description: 'Carve mystical tiki masks from sacred wood.',
-      reward: '10 Gems',
+      id: 'stamp-safari',
+      name: 'Stamp Safari',
+      description: 'Collect rare stamps from around the world.',
+      reward: '20 ⚡',
+      difficulty: 'Easy',
+      icon: 'book'
+    },
+    {
+      id: 'neighborhood-watch',
+      name: 'Neighborhood Watch',
+      description: 'Keep an eye on the community and report suspicious activity.',
+      reward: '30 ⚡',
       difficulty: 'Medium',
-      icon: 'cut'
+      icon: 'eye'
     },
     {
-      id: 'spirit-ceremony',
-      name: 'Spirit Ceremony',
-      description: 'Participate in ancient Polynesian rituals.',
-      reward: '15 Gems',
-      difficulty: 'Hard',
-      icon: 'heart'
-    },
-    {
-      id: 'coconut-harvest',
-      name: 'Coconut Harvest',
-      description: 'Climb palm trees and harvest fresh coconuts.',
-      reward: '6 Gems',
+      id: 'garage-sale',
+      name: 'Garage Sale',
+      description: 'Browse and buy treasures from your neighbors.',
+      reward: '18 ⚡',
       difficulty: 'Easy',
-      icon: 'leaf'
+      icon: 'shopping-bag'
     },
     {
-      id: 'hula-lessons',
-      name: 'Hula Lessons',
-      description: 'Learn traditional Hawaiian hula dancing.',
-      reward: '7 Gems',
-      difficulty: 'Easy',
+      id: 'block-party',
+      name: 'Block Party',
+      description: 'Join the community celebration with games and food.',
+      reward: '35 ⚡',
+      difficulty: 'Medium',
       icon: 'music'
     },
     {
-      id: 'volcano-offering',
-      name: 'Volcano Offering',
-      description: 'Make offerings to the ancient volcano spirits.',
-      reward: '20 Gems',
-      difficulty: 'Hard',
-      icon: 'gift'
+      id: 'mail-delivery',
+      name: 'Mail Delivery',
+      description: 'Help deliver mail to the neighborhood residents.',
+      reward: '22 ⚡',
+      difficulty: 'Easy',
+      icon: 'envelope'
     },
     {
-      id: 'sunset-meditation',
-      name: 'Sunset Meditation',
-      description: 'Meditate as the sun sets over the Pacific.',
-      reward: '9 Gems',
-      difficulty: 'Medium',
-      icon: 'sun-o'
+      id: 'treehouse-building',
+      name: 'Treehouse Building',
+      description: 'Construct the ultimate backyard treehouse.',
+      reward: '40 ⚡',
+      difficulty: 'Hard',
+      icon: 'home'
     }
   ];
 
   return (
     <View style={styles.container}>
-      <AppHeader />
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Back Button */}
         <Pressable 
@@ -104,22 +102,22 @@ export default function EnchantedIslandScreen() {
         </Pressable>
 
         {/* Title */}
-        <Text style={styles.title}>ENCHANTED ISLAND</Text>
+        <Text style={styles.title}>THE PXOBURBS</Text>
 
         {/* Banner Image */}
         <RNView style={styles.bannerContainer}>
-          <Image source={volcanoImage} style={styles.bannerImage} />
+          <Image source={staticTvImage} style={styles.bannerImage} />
         </RNView>
 
         {/* Description */}
         <Text style={styles.description}>
-          A mystical Polynesian island where tiki spirits dance around ancient volcanoes. 
-          Crystal waters shimmer with magic, and the air hums with ancient chants. 
-          Here, the boundary between the physical and spiritual worlds dissolves in eternal twilight.
+          A nostalgic 90s suburban neighborhood where every house tells a story. 
+          Tree-lined streets, white picket fences, and the hum of lawnmowers create 
+          the perfect backdrop for childhood adventures and community connections.
         </Text>
 
         {/* Activities Title */}
-        <Text style={styles.activitiesTitle}>ISLAND ACTIVITIES</Text>
+        <Text style={styles.activitiesTitle}>NEIGHBORHOOD ACTIVITIES</Text>
 
         {/* Activities List */}
         {activities.map((activity) => (

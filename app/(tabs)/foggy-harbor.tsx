@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
 import { StyleSheet, ScrollView, View as RNView, Image, Pressable } from 'react-native';
 import { Text, View } from '@/components/Themed';
-import AppHeader from '@/components/AppHeader';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { router } from 'expo-router';
 
 // Import the banner image
-const staticTvImage = require('@/assets/images/static-tv.png');
+const lilAnchorImage = require('@/assets/images/lil-anchor.png');
 
-export default function PxoburbsScreen() {
+export default function FoggyHarborScreen() {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
 
   const toggleFavorite = (activityId: string) => {
@@ -25,74 +24,73 @@ export default function PxoburbsScreen() {
 
   const activities = [
     {
-      id: 'bike-riding',
-      name: 'Bike Riding',
-      description: 'Cruise through the neighborhood on your trusty bike.',
-      reward: '15 ⚡',
-      difficulty: 'Easy',
-      icon: 'bicycle'
-    },
-    {
-      id: 'keycard-hunt',
-      name: 'Lost Motel Key Card Hunt',
-      description: 'Find hidden key cards in the abandoned motel.',
-      reward: '25 ⚡',
+      id: 'lobster-trap',
+      name: 'Lobster Trap Master',
+      description: 'Learn the ancient art of lobster trapping from weathered old salts.',
+      reward: '50 Gems',
       difficulty: 'Medium',
-      icon: 'key'
+      icon: 'anchor'
     },
     {
-      id: 'stamp-safari',
-      name: 'Stamp Safari',
-      description: 'Collect rare stamps from around the world.',
-      reward: '20 ⚡',
-      difficulty: 'Easy',
-      icon: 'book'
-    },
-    {
-      id: 'neighborhood-watch',
-      name: 'Neighborhood Watch',
-      description: 'Keep an eye on the community and report suspicious activity.',
-      reward: '30 ⚡',
-      difficulty: 'Medium',
-      icon: 'eye'
-    },
-    {
-      id: 'garage-sale',
-      name: 'Garage Sale',
-      description: 'Browse and buy treasures from your neighbors.',
-      reward: '18 ⚡',
-      difficulty: 'Easy',
-      icon: 'shopping-bag'
-    },
-    {
-      id: 'block-party',
-      name: 'Block Party',
-      description: 'Join the community celebration with games and food.',
-      reward: '35 ⚡',
-      difficulty: 'Medium',
-      icon: 'music'
-    },
-    {
-      id: 'mail-delivery',
-      name: 'Mail Delivery',
-      description: 'Help deliver mail to the neighborhood residents.',
-      reward: '22 ⚡',
-      difficulty: 'Easy',
-      icon: 'envelope'
-    },
-    {
-      id: 'treehouse-building',
-      name: 'Treehouse Building',
-      description: 'Construct the ultimate backyard treehouse.',
-      reward: '40 ⚡',
+      id: 'fog-navigation',
+      name: 'Fog Navigation',
+      description: 'Master the art of navigating through thick coastal fog.',
+      reward: '75 Gems',
       difficulty: 'Hard',
-      icon: 'home'
+      icon: 'compass'
+    },
+    {
+      id: 'tall-tales',
+      name: 'Tall Tales Tavern',
+      description: 'Gather around the crackling fire at the Rusty Anchor Tavern.',
+      reward: '25 Gems',
+      difficulty: 'Easy',
+      icon: 'glass'
+    },
+    {
+      id: 'lighthouse-keeper',
+      name: 'Lighthouse Keeper',
+      description: 'Tend to the ancient lighthouse that guides ships through treacherous waters.',
+      reward: '60 Gems',
+      difficulty: 'Medium',
+      icon: 'lightbulb-o'
+    },
+    {
+      id: 'storm-watching',
+      name: 'Storm Watching',
+      description: 'Experience the raw power of Atlantic storms from the harbor breakwater.',
+      reward: '30 Gems',
+      difficulty: 'Easy',
+      icon: 'cloud'
+    },
+    {
+      id: 'net-mending',
+      name: 'Net Mending',
+      description: 'Learn the traditional craft of mending fishing nets.',
+      reward: '20 Gems',
+      difficulty: 'Easy',
+      icon: 'th'
+    },
+    {
+      id: 'harbor-mystery',
+      name: 'Harbor Mystery',
+      description: 'Investigate the mysterious disappearances that have plagued the harbor.',
+      reward: '100 Gems',
+      difficulty: 'Hard',
+      icon: 'search'
+    },
+    {
+      id: 'fog-horn',
+      name: 'Fog Horn Keeper',
+      description: 'Operate the town\'s iconic fog horn that echoes across the harbor.',
+      reward: '45 Gems',
+      difficulty: 'Medium',
+      icon: 'volume-up'
     }
   ];
 
   return (
     <View style={styles.container}>
-      <AppHeader />
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Back Button */}
         <Pressable 
@@ -104,22 +102,22 @@ export default function PxoburbsScreen() {
         </Pressable>
 
         {/* Title */}
-        <Text style={styles.title}>THE PXOBURBS</Text>
+        <Text style={styles.title}>FOGGY HARBOR</Text>
 
         {/* Banner Image */}
         <RNView style={styles.bannerContainer}>
-          <Image source={staticTvImage} style={styles.bannerImage} />
+          <Image source={lilAnchorImage} style={styles.bannerImage} />
         </RNView>
 
         {/* Description */}
         <Text style={styles.description}>
-          A nostalgic 90s suburban neighborhood where every house tells a story. 
-          Tree-lined streets, white picket fences, and the hum of lawnmowers create 
-          the perfect backdrop for childhood adventures and community connections.
+          A dreary Maine fishing town shrouded in mist and mystery. Weathered lobster boats 
+          bob in the harbor while ancient lighthouses guide ships through treacherous waters. 
+          Here, the line between reality and legend blurs in the eternal fog.
         </Text>
 
         {/* Activities Title */}
-        <Text style={styles.activitiesTitle}>NEIGHBORHOOD ACTIVITIES</Text>
+        <Text style={styles.activitiesTitle}>HARBOR ACTIVITIES</Text>
 
         {/* Activities List */}
         {activities.map((activity) => (

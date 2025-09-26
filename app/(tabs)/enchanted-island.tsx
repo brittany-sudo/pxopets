@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
 import { StyleSheet, ScrollView, View as RNView, Image, Pressable } from 'react-native';
 import { Text, View } from '@/components/Themed';
-import AppHeader from '@/components/AppHeader';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { router } from 'expo-router';
 
 // Import the banner image
-const lilAnchorImage = require('@/assets/images/lil-anchor.png');
+const volcanoImage = require('@/assets/images/tiny-volcano.png');
 
-export default function FoggyHarborScreen() {
+export default function EnchantedIslandScreen() {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
 
   const toggleFavorite = (activityId: string) => {
@@ -25,74 +24,73 @@ export default function FoggyHarborScreen() {
 
   const activities = [
     {
-      id: 'lobster-trap',
-      name: 'Lobster Trap Master',
-      description: 'Learn the ancient art of lobster trapping from weathered old salts.',
-      reward: '50 Gems',
-      difficulty: 'Medium',
-      icon: 'anchor'
+      id: 'volcano-dance',
+      name: 'Volcano Dance',
+      description: 'Dance around the sacred volcano with tiki spirits.',
+      reward: '8 Gems',
+      difficulty: 'Easy',
+      icon: 'fire'
     },
     {
-      id: 'fog-navigation',
-      name: 'Fog Navigation',
-      description: 'Master the art of navigating through thick coastal fog.',
-      reward: '75 Gems',
+      id: 'pearl-diving',
+      name: 'Pearl Diving',
+      description: 'Dive deep into crystal waters to find precious pearls.',
+      reward: '12 Gems',
+      difficulty: 'Medium',
+      icon: 'tint'
+    },
+    {
+      id: 'tiki-crafting',
+      name: 'Tiki Crafting',
+      description: 'Carve mystical tiki masks from sacred wood.',
+      reward: '10 Gems',
+      difficulty: 'Medium',
+      icon: 'cut'
+    },
+    {
+      id: 'spirit-ceremony',
+      name: 'Spirit Ceremony',
+      description: 'Participate in ancient Polynesian rituals.',
+      reward: '15 Gems',
       difficulty: 'Hard',
-      icon: 'compass'
+      icon: 'heart'
     },
     {
-      id: 'tall-tales',
-      name: 'Tall Tales Tavern',
-      description: 'Gather around the crackling fire at the Rusty Anchor Tavern.',
-      reward: '25 Gems',
+      id: 'coconut-harvest',
+      name: 'Coconut Harvest',
+      description: 'Climb palm trees and harvest fresh coconuts.',
+      reward: '6 Gems',
       difficulty: 'Easy',
-      icon: 'glass'
+      icon: 'leaf'
     },
     {
-      id: 'lighthouse-keeper',
-      name: 'Lighthouse Keeper',
-      description: 'Tend to the ancient lighthouse that guides ships through treacherous waters.',
-      reward: '60 Gems',
-      difficulty: 'Medium',
-      icon: 'lightbulb-o'
-    },
-    {
-      id: 'storm-watching',
-      name: 'Storm Watching',
-      description: 'Experience the raw power of Atlantic storms from the harbor breakwater.',
-      reward: '30 Gems',
+      id: 'hula-lessons',
+      name: 'Hula Lessons',
+      description: 'Learn traditional Hawaiian hula dancing.',
+      reward: '7 Gems',
       difficulty: 'Easy',
-      icon: 'cloud'
+      icon: 'music'
     },
     {
-      id: 'net-mending',
-      name: 'Net Mending',
-      description: 'Learn the traditional craft of mending fishing nets.',
+      id: 'volcano-offering',
+      name: 'Volcano Offering',
+      description: 'Make offerings to the ancient volcano spirits.',
       reward: '20 Gems',
-      difficulty: 'Easy',
-      icon: 'th'
-    },
-    {
-      id: 'harbor-mystery',
-      name: 'Harbor Mystery',
-      description: 'Investigate the mysterious disappearances that have plagued the harbor.',
-      reward: '100 Gems',
       difficulty: 'Hard',
-      icon: 'search'
+      icon: 'gift'
     },
     {
-      id: 'fog-horn',
-      name: 'Fog Horn Keeper',
-      description: 'Operate the town\'s iconic fog horn that echoes across the harbor.',
-      reward: '45 Gems',
+      id: 'sunset-meditation',
+      name: 'Sunset Meditation',
+      description: 'Meditate as the sun sets over the Pacific.',
+      reward: '9 Gems',
       difficulty: 'Medium',
-      icon: 'volume-up'
+      icon: 'sun-o'
     }
   ];
 
   return (
     <View style={styles.container}>
-      <AppHeader />
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Back Button */}
         <Pressable 
@@ -104,22 +102,22 @@ export default function FoggyHarborScreen() {
         </Pressable>
 
         {/* Title */}
-        <Text style={styles.title}>FOGGY HARBOR</Text>
+        <Text style={styles.title}>ENCHANTED ISLAND</Text>
 
         {/* Banner Image */}
         <RNView style={styles.bannerContainer}>
-          <Image source={lilAnchorImage} style={styles.bannerImage} />
+          <Image source={volcanoImage} style={styles.bannerImage} />
         </RNView>
 
         {/* Description */}
         <Text style={styles.description}>
-          A dreary Maine fishing town shrouded in mist and mystery. Weathered lobster boats 
-          bob in the harbor while ancient lighthouses guide ships through treacherous waters. 
-          Here, the line between reality and legend blurs in the eternal fog.
+          A mystical Polynesian island where tiki spirits dance around ancient volcanoes. 
+          Crystal waters shimmer with magic, and the air hums with ancient chants. 
+          Here, the boundary between the physical and spiritual worlds dissolves in eternal twilight.
         </Text>
 
         {/* Activities Title */}
-        <Text style={styles.activitiesTitle}>HARBOR ACTIVITIES</Text>
+        <Text style={styles.activitiesTitle}>ISLAND ACTIVITIES</Text>
 
         {/* Activities List */}
         {activities.map((activity) => (

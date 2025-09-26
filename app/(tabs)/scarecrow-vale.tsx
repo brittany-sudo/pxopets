@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
 import { StyleSheet, ScrollView, View as RNView, Image, Pressable } from 'react-native';
 import { Text, View } from '@/components/Themed';
-import AppHeader from '@/components/AppHeader';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { router } from 'expo-router';
 
 // Import the banner image
-const lilPaletteImage = require('@/assets/images/lil-palette.png');
+const lilScarecrowImage = require('@/assets/images/lil-scarecrow.png');
 
-export default function ArtisanQuarterScreen() {
+export default function ScarecrowValeScreen() {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
 
   const toggleFavorite = (activityId: string) => {
@@ -25,74 +24,73 @@ export default function ArtisanQuarterScreen() {
 
   const activities = [
     {
-      id: 'pottery-workshop',
-      name: 'Pottery Workshop',
-      description: 'Shape clay into beautiful vessels on ancient wheels.',
-      reward: '12 Gems',
-      difficulty: 'Medium',
-      icon: 'circle'
-    },
-    {
-      id: 'weaving-circle',
-      name: 'Weaving Circle',
-      description: 'Learn traditional textile arts from master weavers.',
-      reward: '10 Gems',
-      difficulty: 'Medium',
-      icon: 'th'
-    },
-    {
-      id: 'jewelry-making',
-      name: 'Jewelry Making',
-      description: 'Craft intricate pieces from precious metals and gems.',
-      reward: '15 Gems',
-      difficulty: 'Hard',
-      icon: 'diamond'
-    },
-    {
-      id: 'painting-studio',
-      name: 'Painting Studio',
-      description: 'Express your creativity on canvas with master artists.',
-      reward: '8 Gems',
+      id: 'crop-watching',
+      name: 'Crop Watching',
+      description: 'Keep watch over the fields and protect the harvest.',
+      reward: '20 ⚡',
       difficulty: 'Easy',
-      icon: 'paint-brush'
+      icon: 'eye'
     },
     {
-      id: 'sculpture-garden',
-      name: 'Sculpture Garden',
-      description: 'Carve stone and wood into magnificent sculptures.',
-      reward: '18 Gems',
-      difficulty: 'Hard',
-      icon: 'cube'
-    },
-    {
-      id: 'glass-blowing',
-      name: 'Glass Blowing',
-      description: 'Shape molten glass into delicate works of art.',
-      reward: '20 Gems',
-      difficulty: 'Hard',
-      icon: 'fire'
-    },
-    {
-      id: 'textile-dyeing',
-      name: 'Textile Dyeing',
-      description: 'Create vibrant colors using natural plant dyes.',
-      reward: '9 Gems',
-      difficulty: 'Easy',
-      icon: 'tint'
-    },
-    {
-      id: 'art-gallery',
-      name: 'Art Gallery',
-      description: 'Display your creations in the community gallery.',
-      reward: '25 Gems',
+      id: 'scarecrow-building',
+      name: 'Scarecrow Building',
+      description: 'Craft the perfect scarecrow to guard the crops.',
+      reward: '30 ⚡',
       difficulty: 'Medium',
-      icon: 'picture-o'
+      icon: 'user'
+    },
+    {
+      id: 'field-walking',
+      name: 'Field Walking',
+      description: 'Take peaceful walks through the golden fields.',
+      reward: '15 ⚡',
+      difficulty: 'Easy',
+      icon: 'road'
+    },
+    {
+      id: 'bird-watching',
+      name: 'Bird Watching',
+      description: 'Observe the birds that visit the farm fields.',
+      reward: '18 ⚡',
+      difficulty: 'Easy',
+      icon: 'twitter'
+    },
+    {
+      id: 'harvest-helping',
+      name: 'Harvest Helping',
+      description: 'Assist with the seasonal crop harvest.',
+      reward: '35 ⚡',
+      difficulty: 'Hard',
+      icon: 'leaf'
+    },
+    {
+      id: 'windmill-tending',
+      name: 'Windmill Tending',
+      description: 'Maintain the old windmill that powers the farm.',
+      reward: '25 ⚡',
+      difficulty: 'Medium',
+      icon: 'cog'
+    },
+    {
+      id: 'farm-animals',
+      name: 'Farm Animals',
+      description: 'Care for the friendly farm animals.',
+      reward: '22 ⚡',
+      difficulty: 'Easy',
+      icon: 'heart'
+    },
+    {
+      id: 'sunset-meditation',
+      name: 'Sunset Meditation',
+      description: 'Find peace watching the sun set over the fields.',
+      reward: '28 ⚡',
+      difficulty: 'Medium',
+      icon: 'sun-o'
     }
   ];
 
   return (
     <View style={styles.container}>
-      <AppHeader />
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Back Button */}
         <Pressable 
@@ -104,22 +102,22 @@ export default function ArtisanQuarterScreen() {
         </Pressable>
 
         {/* Title */}
-        <Text style={styles.title}>ARTISAN'S QUARTER</Text>
+        <Text style={styles.title}>SCARECROW VALE</Text>
 
         {/* Banner Image */}
         <RNView style={styles.bannerContainer}>
-          <Image source={lilPaletteImage} style={styles.bannerImage} />
+          <Image source={lilScarecrowImage} style={styles.bannerImage} />
         </RNView>
 
         {/* Description */}
         <Text style={styles.description}>
-          A bohemian arts district where creativity flows like wine. Master craftspeople 
-          work in open studios, sharing techniques passed down through generations. 
-          Here, every street corner bursts with color, texture, and artistic expression.
+          Mysterious fields where ancient scarecrows stand silent watch over golden crops. 
+          The air is filled with the rustle of wheat and the gentle creaking of old windmills. 
+          Here, the boundary between the living and the mystical blurs in the endless horizon.
         </Text>
 
         {/* Activities Title */}
-        <Text style={styles.activitiesTitle}>ARTISTIC ACTIVITIES</Text>
+        <Text style={styles.activitiesTitle}>FARM ACTIVITIES</Text>
 
         {/* Activities List */}
         {activities.map((activity) => (

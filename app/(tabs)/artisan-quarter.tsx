@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
 import { StyleSheet, ScrollView, View as RNView, Image, Pressable } from 'react-native';
 import { Text, View } from '@/components/Themed';
-import AppHeader from '@/components/AppHeader';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { router } from 'expo-router';
 
 // Import the banner image
-const lilWineCasketImage = require('@/assets/images/lil-wine-casket.png');
+const lilPaletteImage = require('@/assets/images/lil-palette.png');
 
-export default function BarrelhavenScreen() {
+export default function ArtisanQuarterScreen() {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
 
   const toggleFavorite = (activityId: string) => {
@@ -25,74 +24,73 @@ export default function BarrelhavenScreen() {
 
   const activities = [
     {
-      id: 'wine-tasting',
-      name: 'Wine Tasting',
-      description: 'Sample the finest vintages from ancient cellars.',
-      reward: '20 Gems',
-      difficulty: 'Easy',
-      icon: 'glass'
-    },
-    {
-      id: 'barrel-making',
-      name: 'Barrel Making',
-      description: 'Craft oak barrels using traditional cooper techniques.',
-      reward: '25 Gems',
-      difficulty: 'Hard',
+      id: 'pottery-workshop',
+      name: 'Pottery Workshop',
+      description: 'Shape clay into beautiful vessels on ancient wheels.',
+      reward: '12 Gems',
+      difficulty: 'Medium',
       icon: 'circle'
     },
     {
-      id: 'grape-harvest',
-      name: 'Grape Harvest',
-      description: 'Pick grapes during the autumn harvest season.',
-      reward: '15 Gems',
+      id: 'weaving-circle',
+      name: 'Weaving Circle',
+      description: 'Learn traditional textile arts from master weavers.',
+      reward: '10 Gems',
       difficulty: 'Medium',
-      icon: 'leaf'
+      icon: 'th'
     },
     {
-      id: 'cellar-tour',
-      name: 'Cellar Tour',
-      description: 'Explore the deep underground wine cellars.',
-      reward: '12 Gems',
-      difficulty: 'Easy',
-      icon: 'arrow-down'
-    },
-    {
-      id: 'wine-blending',
-      name: 'Wine Blending',
-      description: 'Create your own unique wine blend from different grapes.',
-      reward: '30 Gems',
+      id: 'jewelry-making',
+      name: 'Jewelry Making',
+      description: 'Craft intricate pieces from precious metals and gems.',
+      reward: '15 Gems',
       difficulty: 'Hard',
+      icon: 'diamond'
+    },
+    {
+      id: 'painting-studio',
+      name: 'Painting Studio',
+      description: 'Express your creativity on canvas with master artists.',
+      reward: '8 Gems',
+      difficulty: 'Easy',
+      icon: 'paint-brush'
+    },
+    {
+      id: 'sculpture-garden',
+      name: 'Sculpture Garden',
+      description: 'Carve stone and wood into magnificent sculptures.',
+      reward: '18 Gems',
+      difficulty: 'Hard',
+      icon: 'cube'
+    },
+    {
+      id: 'glass-blowing',
+      name: 'Glass Blowing',
+      description: 'Shape molten glass into delicate works of art.',
+      reward: '20 Gems',
+      difficulty: 'Hard',
+      icon: 'fire'
+    },
+    {
+      id: 'textile-dyeing',
+      name: 'Textile Dyeing',
+      description: 'Create vibrant colors using natural plant dyes.',
+      reward: '9 Gems',
+      difficulty: 'Easy',
       icon: 'tint'
     },
     {
-      id: 'medieval-feast',
-      name: 'Medieval Feast',
-      description: 'Dine like royalty at the grand banquet hall.',
-      reward: '35 Gems',
+      id: 'art-gallery',
+      name: 'Art Gallery',
+      description: 'Display your creations in the community gallery.',
+      reward: '25 Gems',
       difficulty: 'Medium',
-      icon: 'cutlery'
-    },
-    {
-      id: 'vineyard-walk',
-      name: 'Vineyard Walk',
-      description: 'Stroll through the rolling hills of the vineyard.',
-      reward: '10 Gems',
-      difficulty: 'Easy',
-      icon: 'road'
-    },
-    {
-      id: 'wine-ceremony',
-      name: 'Wine Ceremony',
-      description: 'Participate in ancient wine-making rituals.',
-      reward: '40 Gems',
-      difficulty: 'Hard',
-      icon: 'heart'
+      icon: 'picture-o'
     }
   ];
 
   return (
     <View style={styles.container}>
-      <AppHeader />
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Back Button */}
         <Pressable 
@@ -104,22 +102,22 @@ export default function BarrelhavenScreen() {
         </Pressable>
 
         {/* Title */}
-        <Text style={styles.title}>BARRELHAVEN</Text>
+        <Text style={styles.title}>ARTISAN'S QUARTER</Text>
 
         {/* Banner Image */}
         <RNView style={styles.bannerContainer}>
-          <Image source={lilWineCasketImage} style={styles.bannerImage} />
+          <Image source={lilPaletteImage} style={styles.bannerImage} />
         </RNView>
 
         {/* Description */}
         <Text style={styles.description}>
-          A medieval winery village nestled in rolling hills where ancient traditions 
-          meet modern craftsmanship. Oak barrels line the cellars while grapevines 
-          stretch across the countryside. Here, every sip tells a story of centuries past.
+          A bohemian arts district where creativity flows like wine. Master craftspeople 
+          work in open studios, sharing techniques passed down through generations. 
+          Here, every street corner bursts with color, texture, and artistic expression.
         </Text>
 
         {/* Activities Title */}
-        <Text style={styles.activitiesTitle}>WINERY ACTIVITIES</Text>
+        <Text style={styles.activitiesTitle}>ARTISTIC ACTIVITIES</Text>
 
         {/* Activities List */}
         {activities.map((activity) => (

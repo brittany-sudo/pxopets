@@ -3,7 +3,6 @@ import { StyleSheet, ScrollView, View as RNView } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import BorderedBox from '@/components/BorderedBox';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import BottomNavigation from '@/components/BottomNavigation';
 
 export default function MoreScreen() {
   return (
@@ -36,7 +35,6 @@ export default function MoreScreen() {
           </RNView>
         </BorderedBox>
       </ScrollView>
-      <BottomNavigation />
     </View>
   );
 }
