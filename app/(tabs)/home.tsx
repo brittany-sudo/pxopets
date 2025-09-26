@@ -33,9 +33,10 @@ export default function PlayerHomeScreen() {
                   <Text style={styles.pokemonName}>{state.pet.name}</Text>
                   <Text style={styles.pokemonLevel}>Lv.{state.pet.level}</Text>
                   
-                  {/* Mini Health Bar */}
-                  <RNView style={styles.miniHealthBar}>
-                    <RNView style={[styles.miniHealthFill, { width: `${state.pet.happiness}%` }]} />
+                  {/* Lightning Bolt Currency */}
+                  <RNView style={styles.staminaContainer}>
+                    <FontAwesome name="bolt" size={12} color="#f59e0b" />
+                    <Text style={styles.staminaText}>{state.coins} ⚡</Text>
                   </RNView>
                   
                   {/* Mini Stats */}
@@ -70,7 +71,6 @@ export default function PlayerHomeScreen() {
             <Text style={styles.meta}>Username: PxopetMaster</Text>
             <Text style={styles.meta}>Guild: Pixel Pioneers</Text>
             <Text style={styles.meta}>Level: {state.pet.level}</Text>
-            <Text style={styles.meta}>Coins: {state.coins}</Text>
             <Text style={styles.meta}>Unlocked: {state.unlockedLevels}</Text>
           </BorderedBox>
 
@@ -100,9 +100,27 @@ export default function PlayerHomeScreen() {
         <BorderedBox style={styles.leftAlignedBox}>
           <Text style={styles.sectionTitle}>INVENTORY</Text>
           <RNView style={styles.inventoryGrid}>
-            <View style={styles.inventorySlot}><Text style={styles.slotText}>—</Text></View>
-            <View style={styles.inventorySlot}><Text style={styles.slotText}>—</Text></View>
-            <View style={styles.inventorySlot}><Text style={styles.slotText}>—</Text></View>
+            <View style={styles.inventorySlot}>
+              <Image 
+                source={require('@/assets/images/moonpetal-tea.png')} 
+                style={styles.inventoryImage}
+                resizeMode="contain"
+              />
+            </View>
+            <View style={styles.inventorySlot}>
+              <Image 
+                source={require('@/assets/images/milkshakes.png')} 
+                style={styles.inventoryImage}
+                resizeMode="contain"
+              />
+            </View>
+            <View style={styles.inventorySlot}>
+              <Image 
+                source={require('@/assets/images/glowcorn.png')} 
+                style={styles.inventoryImage}
+                resizeMode="contain"
+              />
+            </View>
             <View style={styles.inventorySlot}><Text style={styles.slotText}>—</Text></View>
             <View style={styles.inventorySlot}><Text style={styles.slotText}>—</Text></View>
             <View style={styles.inventorySlot}><Text style={styles.slotText}>—</Text></View>
@@ -138,7 +156,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontFamily: 'PressStart2P_400Regular',
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: 'bold',
     color: '#0f172a',
     marginBottom: 12,
@@ -190,6 +208,10 @@ const styles = StyleSheet.create({
     color: '#0f172a',
     opacity: 0.4,
   },
+  inventoryImage: {
+    width: 50,
+    height: 50,
+  },
   // Pokemon-style compact layout
   pokemonStyleContainer: {
     flexDirection: 'row',
@@ -221,20 +243,17 @@ const styles = StyleSheet.create({
     opacity: 0.7,
     marginBottom: 4,
   },
-  miniHealthBar: {
-    width: '100%',
-    height: 6,
-    backgroundColor: 'rgba(14, 165, 233, 0.2)',
-    borderRadius: 3,
-    borderWidth: 1,
-    borderColor: '#0ea5e9',
-    overflow: 'hidden',
+  staminaContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 4,
+    gap: 4,
   },
-  miniHealthFill: {
-    height: '100%',
-    backgroundColor: '#10b981',
-    borderRadius: 2,
+  staminaText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#f59e0b',
+    fontWeight: 'bold',
   },
   miniStats: {
     flexDirection: 'row',

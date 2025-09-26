@@ -12,6 +12,11 @@ const fortunaGameImage = require('@/assets/images/fortuna-game.png');
 const lostFoundImage = require('@/assets/images/lost-found.png');
 const atomicSurfImage = require('@/assets/images/atomic-surf.png');
 const luckyGuessImage = require('@/assets/images/lucky-guess.png');
+const stampSafariImage = require('@/assets/images/stamp-safari.png');
+const keycardHuntImage = require('@/assets/images/keycard-hunt.png');
+const perfumersLabImage = require('@/assets/images/perfumers-lab.png');
+const driveInImage = require('@/assets/images/drive-in.png');
+const grapeStompImage = require('@/assets/images/grape-stomp.png');
 
 export default function GamesScreen() {
   const { addCoins, hydrated } = useGame();
@@ -60,16 +65,18 @@ export default function GamesScreen() {
       color: '#8b5cf6',
       world: 'Vintage Hollow',
       description: 'Stomp grapes to make wine!',
+      image: grapeStompImage,
       category: 'Simulation'
     },
     {
-      id: 'bike-riding',
-      name: 'Suburban Ride',
-      icon: 'bicycle',
-      color: '#64748b',
+      id: 'keycard-hunt',
+      name: 'Lost Motel Key Card Hunt',
+      icon: 'key',
+      color: '#dc2626',
       world: 'The Pxoburbs',
-      description: 'Ride your bike around town!',
-      category: 'Sports'
+      description: 'Find hidden key cards in the abandoned motel!',
+      image: keycardHuntImage,
+      category: 'Adventure'
     },
     {
       id: 'gem-mining',
@@ -128,13 +135,14 @@ export default function GamesScreen() {
       category: 'Puzzle'
     },
     {
-      id: 'street-hockey',
-      name: 'Street Hockey',
-      icon: 'futbol-o',
-      color: '#64748b',
+      id: 'stamp-safari',
+      name: 'Stamp Safari',
+      icon: 'book',
+      color: '#8b5cf6',
       world: 'The Pxoburbs',
-      description: 'Play hockey in the neighborhood!',
-      category: 'Sports'
+      description: 'Collect rare stamps from around the world!',
+      image: stampSafariImage,
+      category: 'Adventure'
     },
     {
       id: 'cave-exploration',
@@ -146,21 +154,23 @@ export default function GamesScreen() {
       category: 'Adventure'
     },
     {
-      id: 'ship-battles',
-      name: 'Pirate Battles',
-      icon: 'ship',
+      id: 'drive-in-duel',
+      name: 'Drive-In Duel',
+      icon: 'car',
       color: '#dc2626',
-      world: 'Pirate\'s Port',
-      description: 'Battle enemy ships on the seas!',
+      world: 'The Pxoburbs',
+      description: 'Race and battle at the retro drive-in theater!',
+      image: driveInImage,
       category: 'Action'
     },
     {
-      id: 'potion-brewing',
-      name: 'Potion Brewing',
+      id: 'perfumers-lab',
+      name: 'Perfumer\'s Lab',
       icon: 'flask',
       color: '#10b981',
       world: 'Emerald Gardens',
-      description: 'Brew magical potions and elixirs!',
+      description: 'Create exquisite perfumes and fragrances!',
+      image: perfumersLabImage,
       category: 'Simulation'
     },
     {

@@ -66,7 +66,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="shop"
         options={{
-          href: null, // Hide from tab bar
+          title: 'Shop',
+          tabBarIcon: ({ color }) => <TabBarIcon name="shopping-cart" color={color} />,
         }}
       />
       <Tabs.Screen

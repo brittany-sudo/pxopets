@@ -8,12 +8,12 @@ import { useColorScheme } from '@/components/useColorScheme';
 import { usePathname } from 'expo-router';
 import { FONT_SIZES, SPACING, ICON_SIZES } from '@/constants/Styles';
 
-// Custom TabBarIcon for better spacing
+// Custom TabBarIcon to match Expo Router tabs exactly
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>['name'];
   color: string;
 }) {
-  return <FontAwesome size={ICON_SIZES.sm} style={{ marginBottom: 6 }} {...props} />;
+  return <FontAwesome size={ICON_SIZES.sm} style={{ marginBottom: -3 }} {...props} />;
 }
 
 export default function BottomNavigation() {
@@ -32,6 +32,7 @@ export default function BottomNavigation() {
     { name: 'Shop', route: '/(tabs)/shop', icon: 'shopping-bag' },
     { name: 'Pets', route: '/(tabs)/pets', icon: 'heart' }, // Match the main tabs icon
     { name: 'Mail', route: '/(tabs)/mail', icon: 'envelope' },
+    { name: 'Home', route: '/(tabs)/home', icon: 'home' },
   ];
 
   const handleTabPress = (route: string) => {
@@ -71,21 +72,23 @@ export default function BottomNavigation() {
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    height: 80, // Increase height for better spacing
+    height: 70, // Match Expo Router tabs exactly
     borderTopWidth: 2,
+    paddingTop: 4,
+    paddingBottom: 4,
   },
   tab: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: SPACING.sm,
-    marginHorizontal: 2,
-    gap: 4, // Increase gap between icon and text
+    paddingVertical: SPACING.xs, // Match exactly
+    marginHorizontal: 2, // Match exactly
   },
   tabLabel: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: FONT_SIZES.xs, // Match exactly
-    paddingBottom: 2, // Match exactly
+    paddingBottom: 0, // Match exactly
+    marginTop: 2, // Match exactly
     textAlign: 'center',
   },
 });

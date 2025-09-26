@@ -6,9 +6,9 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { router } from 'expo-router';
 
 // Import the banner image
-const neonBurgerImage = require('@/assets/images/neon-burger.png');
+const lilPopcornImage = require('@/assets/images/lil-popcorn.png');
 
-export default function CrescentOasisScreen() {
+export default function SaltwickPierScreen() {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
 
   const toggleFavorite = (activityId: string) => {
@@ -25,68 +25,68 @@ export default function CrescentOasisScreen() {
 
   const activities = [
     {
-      id: 'atomic-diner',
-      name: 'Atomic Diner',
-      description: 'Dine at the retro 50s diner with alien waitstaff.',
-      reward: '15 Gems',
+      id: 'ferris-wheel',
+      name: 'Ferris Wheel',
+      description: 'Take a spin on the iconic pier ferris wheel.',
+      reward: '20 ⚡',
       difficulty: 'Easy',
-      icon: 'cutlery'
+      icon: 'circle'
     },
     {
-      id: 'neon-gambling',
-      name: 'Neon Gambling',
-      description: 'Try your luck at the glowing slot machines.',
-      reward: '25 Gems',
+      id: 'carnival-games',
+      name: 'Carnival Games',
+      description: 'Test your skills at classic midway games.',
+      reward: '25 ⚡',
       difficulty: 'Medium',
-      icon: 'diamond'
+      icon: 'gamepad'
     },
     {
-      id: 'desert-racing',
-      name: 'Desert Racing',
-      description: 'Race hover cars across the pink sand dunes.',
-      reward: '30 Gems',
+      id: 'cotton-candy',
+      name: 'Cotton Candy Stand',
+      description: 'Make and sell the fluffiest cotton candy.',
+      reward: '15 ⚡',
+      difficulty: 'Easy',
+      icon: 'cloud'
+    },
+    {
+      id: 'carousel-ride',
+      name: 'Carousel Ride',
+      description: 'Ride the beautifully painted carousel horses.',
+      reward: '18 ⚡',
+      difficulty: 'Easy',
+      icon: 'horse'
+    },
+    {
+      id: 'ring-toss',
+      name: 'Ring Toss',
+      description: 'Aim for the bottles in this classic game.',
+      reward: '22 ⚡',
+      difficulty: 'Medium',
+      icon: 'bullseye'
+    },
+    {
+      id: 'pier-walk',
+      name: 'Pier Walk',
+      description: 'Stroll along the wooden planks and enjoy the view.',
+      reward: '12 ⚡',
+      difficulty: 'Easy',
+      icon: 'road'
+    },
+    {
+      id: 'prize-booth',
+      name: 'Prize Booth',
+      description: 'Help distribute prizes to game winners.',
+      reward: '28 ⚡',
+      difficulty: 'Medium',
+      icon: 'gift'
+    },
+    {
+      id: 'sunset-photography',
+      name: 'Sunset Photography',
+      description: 'Capture the perfect pier sunset photo.',
+      reward: '35 ⚡',
       difficulty: 'Hard',
-      icon: 'car'
-    },
-    {
-      id: 'alien-encounter',
-      name: 'Alien Encounter',
-      description: 'Meet friendly hippie aliens from distant galaxies.',
-      reward: '20 Gems',
-      difficulty: 'Medium',
-      icon: 'rocket'
-    },
-    {
-      id: 'crystal-mining',
-      name: 'Crystal Mining',
-      description: 'Extract precious crystals from desert formations.',
-      reward: '18 Gems',
-      difficulty: 'Medium',
-      icon: 'diamond'
-    },
-    {
-      id: 'sunset-meditation',
-      name: 'Sunset Meditation',
-      description: 'Meditate as the pink sun sets over the dunes.',
-      reward: '12 Gems',
-      difficulty: 'Easy',
-      icon: 'sun-o'
-    },
-    {
-      id: 'space-port',
-      name: 'Space Port',
-      description: 'Watch alien ships arrive and depart from the spaceport.',
-      reward: '22 Gems',
-      difficulty: 'Easy',
-      icon: 'plane'
-    },
-    {
-      id: 'desert-party',
-      name: 'Desert Party',
-      description: 'Join the nightly celebration under the stars.',
-      reward: '35 Gems',
-      difficulty: 'Hard',
-      icon: 'music'
+      icon: 'camera'
     }
   ];
 
@@ -104,22 +104,22 @@ export default function CrescentOasisScreen() {
         </Pressable>
 
         {/* Title */}
-        <Text style={styles.title}>CRESCENT OASIS</Text>
+        <Text style={styles.title}>SALTWICK PIER</Text>
 
         {/* Banner Image */}
         <RNView style={styles.bannerContainer}>
-          <Image source={neonBurgerImage} style={styles.bannerImage} />
+          <Image source={lilPopcornImage} style={styles.bannerImage} />
         </RNView>
 
         {/* Description */}
         <Text style={styles.description}>
-          A pink desert mirage where hippie aliens and atomic 50s diners coexist in perfect harmony. 
-          Neon lights pulse against the endless dunes while hover cars zip between crystal formations. 
-          Here, the future meets the past in a kaleidoscope of color and sound.
+          A colorful carnival pier where the air is filled with laughter and the scent of cotton candy. 
+          Bright lights twinkle against the evening sky as families enjoy classic midway games, 
+          thrilling rides, and the simple joy of seaside entertainment.
         </Text>
 
         {/* Activities Title */}
-        <Text style={styles.activitiesTitle}>OASIS ACTIVITIES</Text>
+        <Text style={styles.activitiesTitle}>PIER ACTIVITIES</Text>
 
         {/* Activities List */}
         {activities.map((activity) => (

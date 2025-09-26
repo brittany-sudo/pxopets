@@ -13,54 +13,183 @@ export default function ShopScreen() {
 
   const categories = [
     { id: 'premium', name: 'PREMIUM', icon: 'diamond' },
+    { id: 'foods', name: 'FOODS', icon: 'cutlery' },
     { id: 'backgrounds', name: 'BACKGROUNDS', icon: 'image' },
+    { id: 'tickets', name: 'TICKETS', icon: 'ticket' },
     { id: 'boosters', name: 'BOOSTERS', icon: 'bolt' },
     { id: 'cosmetics', name: 'COSMETICS', icon: 'star' },
   ];
 
   const premiumItems = [
     {
-      id: 'gems_100',
-      name: '100 GEMS',
+      id: 'tickets_100',
+      name: '100 TICKETS',
       price: 0.99,
       currency: 'USD',
-      icon: 'diamond',
-      color: '#8b5cf6',
+      icon: 'ticket',
+      color: '#0ea5e9',
       description: 'Perfect starter pack!',
       popular: true,
     },
     {
-      id: 'gems_550',
-      name: '550 GEMS',
+      id: 'tickets_550',
+      name: '550 TICKETS',
       price: 4.99,
       currency: 'USD',
-      icon: 'diamond',
-      color: '#8b5cf6',
+      icon: 'ticket',
+      color: '#0ea5e9',
       description: 'Best value! 10% bonus',
       popular: false,
       bonus: '+10%',
     },
     {
-      id: 'gems_1200',
-      name: '1200 GEMS',
+      id: 'tickets_1200',
+      name: '1200 TICKETS',
       price: 9.99,
       currency: 'USD',
-      icon: 'diamond',
-      color: '#8b5cf6',
+      icon: 'ticket',
+      color: '#0ea5e9',
       description: 'Most popular! 20% bonus',
       popular: true,
       bonus: '+20%',
     },
     {
-      id: 'gems_2500',
-      name: '2500 GEMS',
+      id: 'tickets_2500',
+      name: '2500 TICKETS',
       price: 19.99,
       currency: 'USD',
-      icon: 'diamond',
-      color: '#8b5cf6',
+      icon: 'ticket',
+      color: '#0ea5e9',
       description: 'Ultimate pack! 30% bonus',
       popular: false,
       bonus: '+30%',
+    },
+  ];
+
+  const foodItems = [
+    {
+      id: 'cupcake',
+      name: 'CUPCAKE',
+      price: 5,
+      currency: 'stamina',
+      icon: 'birthday-cake',
+      color: '#ec4899',
+      description: 'Gives +20 stamina',
+      stamina: '+20',
+      rarity: 'common',
+    },
+    {
+      id: 'pizza_slice',
+      name: 'PIZZA SLICE',
+      price: 8,
+      currency: 'stamina',
+      icon: 'cutlery',
+      color: '#f97316',
+      description: 'Gives +35 stamina',
+      stamina: '+35',
+      rarity: 'common',
+    },
+    {
+      id: 'sushi_roll',
+      name: 'SUSHI ROLL',
+      price: 15,
+      currency: 'stamina',
+      icon: 'circle',
+      color: '#10b981',
+      description: 'Gives +50 stamina',
+      stamina: '+50',
+      rarity: 'rare',
+    },
+    {
+      id: 'chocolate_bar',
+      name: 'CHOCOLATE BAR',
+      price: 12,
+      currency: 'stamina',
+      icon: 'square',
+      color: '#8b5cf6',
+      description: 'Gives +40 stamina',
+      stamina: '+40',
+      rarity: 'uncommon',
+    },
+    {
+      id: 'ice_cream',
+      name: 'ICE CREAM',
+      price: 6,
+      currency: 'stamina',
+      icon: 'tint',
+      color: '#06b6d4',
+      description: 'Gives +25 stamina',
+      stamina: '+25',
+      rarity: 'common',
+    },
+    {
+      id: 'golden_apple',
+      name: 'GOLDEN APPLE',
+      price: 25,
+      currency: 'stamina',
+      icon: 'apple',
+      color: '#fbbf24',
+      description: 'Gives +100 stamina',
+      stamina: '+100',
+      rarity: 'epic',
+    },
+  ];
+
+  const ticketItems = [
+    {
+      id: 'daily_event',
+      name: 'DAILY EVENT PASS',
+      price: 20,
+      currency: 'tickets',
+      icon: 'calendar',
+      color: '#10b981',
+      description: 'Access to daily events',
+      duration: '24h',
+      rarity: 'common',
+    },
+    {
+      id: 'weekly_event',
+      name: 'WEEKLY EVENT PASS',
+      price: 100,
+      currency: 'tickets',
+      icon: 'calendar',
+      color: '#8b5cf6',
+      description: 'Access to weekly events',
+      duration: '7d',
+      rarity: 'rare',
+    },
+    {
+      id: 'special_event',
+      name: 'SPECIAL EVENT TICKET',
+      price: 50,
+      currency: 'tickets',
+      icon: 'star',
+      color: '#f59e0b',
+      description: 'One-time special event access',
+      duration: '1 use',
+      rarity: 'epic',
+    },
+    {
+      id: 'tournament_pass',
+      name: 'TOURNAMENT PASS',
+      price: 150,
+      currency: 'tickets',
+      icon: 'trophy',
+      color: '#dc2626',
+      description: 'Access to tournaments',
+      duration: '1 week',
+      rarity: 'legendary',
+    },
+    {
+      id: 'vip_access',
+      name: 'VIP ACCESS',
+      price: 200,
+      currency: 'tickets',
+      icon: 'crown',
+      color: '#fbbf24',
+      description: 'VIP area access',
+      duration: '1 month',
+      rarity: 'legendary',
     },
   ];
 
@@ -69,7 +198,7 @@ export default function ShopScreen() {
       id: 'bg_neon',
       name: 'NEON CITY',
       price: 150,
-      currency: 'gems',
+      currency: 'tickets',
       icon: 'image',
       color: '#00ff88',
       description: 'Cyberpunk vibes',
@@ -79,7 +208,7 @@ export default function ShopScreen() {
       id: 'bg_forest',
       name: 'MYSTIC FOREST',
       price: 100,
-      currency: 'gems',
+      currency: 'tickets',
       icon: 'tree',
       color: '#10b981',
       description: 'Enchanted woodland',
@@ -89,7 +218,7 @@ export default function ShopScreen() {
       id: 'bg_space',
       name: 'COSMIC VOID',
       price: 300,
-      currency: 'gems',
+      currency: 'tickets',
       icon: 'rocket',
       color: '#8b5cf6',
       description: 'Stellar adventure',
@@ -99,7 +228,7 @@ export default function ShopScreen() {
       id: 'bg_beach',
       name: 'SUNSET BEACH',
       price: 75,
-      currency: 'gems',
+      currency: 'tickets',
       icon: 'sun-o',
       color: '#f59e0b',
       description: 'Tropical paradise',
@@ -112,7 +241,7 @@ export default function ShopScreen() {
       id: 'speed_boost',
       name: 'SPEED BOOST',
       price: 50,
-      currency: 'gems',
+      currency: 'tickets',
       icon: 'bolt',
       color: '#f97316',
       description: '2x speed for 1 hour',
@@ -122,7 +251,7 @@ export default function ShopScreen() {
       id: 'coin_multiplier',
       name: 'COIN MULTIPLIER',
       price: 75,
-      currency: 'gems',
+      currency: 'tickets',
       icon: 'money',
       color: '#fbbf24',
       description: '3x coins for 2 hours',
@@ -132,7 +261,7 @@ export default function ShopScreen() {
       id: 'xp_boost',
       name: 'XP BOOST',
       price: 60,
-      currency: 'gems',
+      currency: 'tickets',
       icon: 'level-up',
       color: '#10b981',
       description: '2x XP for 1 hour',
@@ -143,7 +272,9 @@ export default function ShopScreen() {
   const getCurrentItems = () => {
     switch (selectedCategory) {
       case 'premium': return premiumItems;
+      case 'foods': return foodItems;
       case 'backgrounds': return backgroundItems;
+      case 'tickets': return ticketItems;
       case 'boosters': return boosterItems;
       default: return premiumItems;
     }
@@ -253,10 +384,17 @@ export default function ShopScreen() {
                 </RNView>
                 <Text style={styles.itemName}>{item.name}</Text>
                 <Text style={styles.itemDescription}>{item.description}</Text>
+                {item.stamina && (
+                  <RNView style={styles.staminaContainer}>
+                    <FontAwesome name="heart" size={12} color="#ec4899" />
+                    <Text style={styles.staminaText}>{item.stamina} Stamina</Text>
+                  </RNView>
+                )}
                 <RNView style={styles.priceContainer}>
                   <Text style={styles.price}>
                     {item.currency === 'USD' ? '$' : ''}{item.price}
-                    {item.currency === 'gems' && ' 💎'}
+                    {item.currency === 'stamina' && ' ⚡'}
+                    {item.currency === 'tickets' && ' 🎫'}
                   </Text>
                   {item.duration && (
                     <Text style={styles.duration}>{item.duration}</Text>
@@ -435,5 +573,24 @@ const styles = StyleSheet.create({
     color: '#0f172a',
     opacity: 0.6,
     marginTop: 2,
+  },
+  staminaContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 4,
+    marginVertical: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    backgroundColor: 'rgba(236, 72, 153, 0.1)',
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: 'rgba(236, 72, 153, 0.3)',
+  },
+  staminaText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#ec4899',
+    fontWeight: 'bold',
   },
 });

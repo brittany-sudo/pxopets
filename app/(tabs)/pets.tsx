@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image, StyleSheet, View as RNView } from 'react-native';
+import { Image, StyleSheet, View as RNView, ScrollView } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { useGame } from '@/store/GameStore';
 import PixelButton from '@/components/PixelButton';
@@ -14,9 +14,15 @@ export default function PetsScreen() {
 
   return (
     <View style={styles.container}>
-      <BorderedBox>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <BorderedBox>
         {/* Pet with full-width border */}
         <RNView style={styles.petImageContainer}>
+          <Image
+            source={require('@/assets/images/bg1.png')}
+            style={styles.petBackgroundImage}
+            resizeMode="cover"
+          />
           <Image
             source={require('@/assets/images/tigerguy.png')}
             style={styles.petImage}
@@ -30,12 +36,12 @@ export default function PetsScreen() {
             <Text style={styles.petLevel}>Level {state.pet.level}</Text>
           </RNView>
           
-          <RNView style={styles.healthSection}>
-            <Text style={styles.healthLabel}>HEALTH</Text>
-            <RNView style={styles.healthBar}>
-              <RNView style={[styles.healthFill, { width: `${state.pet.happiness}%` }]} />
+          <RNView style={styles.staminaSection}>
+            <Text style={styles.staminaLabel}>STAMINA</Text>
+            <RNView style={styles.staminaContainer}>
+              <FontAwesome name="bolt" size={12} color="#f59e0b" />
+              <Text style={styles.staminaText}>{state.coins} ⚡</Text>
             </RNView>
-            <Text style={styles.healthValue}>{state.pet.happiness}%</Text>
           </RNView>
         </RNView>
 
@@ -135,6 +141,24 @@ export default function PetsScreen() {
           ))}
         </RNView>
       </BorderedBox>
+
+      <RNView style={styles.adoptButtons}>
+        <Link href="/adoption/pound" asChild>
+          <RNView style={styles.adoptButton}>
+            <FontAwesome name="heart" size={24} color="#8b5cf6" />
+            <Text style={styles.adoptButtonText}>ADOPT</Text>
+            <Text style={styles.adoptButtonSubtext}>From The Pound</Text>
+          </RNView>
+        </Link>
+        <Link href="/adoption/create" asChild>
+          <RNView style={styles.adoptButton}>
+            <FontAwesome name="plus-circle" size={24} color="#8b5cf6" />
+            <Text style={styles.adoptButtonText}>CREATE</Text>
+            <Text style={styles.adoptButtonSubtext}>New Pet</Text>
+          </RNView>
+        </Link>
+      </RNView>
+      </ScrollView>
     </View>
   );
 }
@@ -142,9 +166,12 @@ export default function PetsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  scrollContent: {
     alignItems: 'center',
     justifyContent: 'flex-start',
     paddingTop: 20,
+    paddingBottom: 100,
   },
   title: {
     fontFamily: 'PressStart2P_400Regular',
@@ -166,6 +193,17 @@ const styles = StyleSheet.create({
       justifyContent: 'center',
       marginBottom: 8,
       padding: 20,
+      position: 'relative',
+      overflow: 'hidden',
+    },
+    petBackgroundImage: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      width: '100%',
+      height: '100%',
     },
     petInfoSection: {
       flexDirection: 'row',
@@ -179,7 +217,7 @@ const styles = StyleSheet.create({
       alignItems: 'flex-start',
       marginTop: -8,
     },
-    healthSection: {
+    staminaSection: {
       flex: 1,
       alignItems: 'flex-end',
     },
@@ -221,6 +259,7 @@ const styles = StyleSheet.create({
     width: 96,
     height: 96,
     imageRendering: 'pixelated' as any,
+    marginTop: 60, // Lower by 30% (200px height * 0.3 = 60px)
   },
   petName: {
     fontFamily: 'Silkscreen_400Regular',
@@ -238,33 +277,23 @@ const styles = StyleSheet.create({
     opacity: 0.7,
     marginBottom: 12,
   },
-    healthLabel: {
+    staminaLabel: {
       fontFamily: 'Silkscreen_400Regular',
       fontSize: 8,
       color: '#0f172a',
       textAlign: 'right',
       marginBottom: 4,
     },
-    healthBar: {
-      width: 120,
-      height: 6,
-      backgroundColor: 'rgba(14, 165, 233, 0.2)',
-      borderRadius: 3,
-      borderWidth: 1,
-      borderColor: '#0ea5e9',
-      overflow: 'hidden',
+    staminaContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 4,
     },
-    healthFill: {
-      height: '100%',
-      backgroundColor: '#10b981',
-      borderRadius: 2,
-    },
-    healthValue: {
+    staminaText: {
       fontFamily: 'Silkscreen_400Regular',
-      fontSize: 8,
-      color: '#0f172a',
-      textAlign: 'right',
-      marginTop: 2,
+      fontSize: 10,
+      color: '#f59e0b',
+      fontWeight: 'bold',
     },
   statsGrid: {
     flexDirection: 'row',
@@ -334,10 +363,10 @@ const styles = StyleSheet.create({
     fontFamily: 'PressStart2P_400Regular',
     fontSize: 10,
     fontWeight: 'bold',
-    color: '#0f172a',
+    color: '#0ea5e9',
     textAlign: 'center',
-    marginTop: 8,
-    marginBottom: 16,
+    marginTop: 0,
+    marginBottom: 8,
   },
   petCollection: {
     flexDirection: 'row',
@@ -414,6 +443,38 @@ const styles = StyleSheet.create({
       fontWeight: 'bold',
       width: 30,
       textAlign: 'right',
+    },
+  adoptButtons: {
+    flexDirection: 'row',
+    gap: 4,
+    justifyContent: 'center',
+    marginTop: 12,
+    paddingHorizontal: 4,
+  },
+  adoptButton: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: 24,
+    paddingHorizontal: 28,
+    borderWidth: 2,
+    borderColor: '#8b5cf6',
+    borderRadius: 8,
+    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+  },
+    adoptButtonText: {
+      fontFamily: 'PressStart2P_400Regular',
+      fontSize: 14,
+      fontWeight: 'bold',
+      color: '#8b5cf6',
+      marginTop: 8,
+      marginBottom: 4,
+    },
+    adoptButtonSubtext: {
+      fontFamily: 'Silkscreen_400Regular',
+      fontSize: 10,
+      color: '#0f172a',
+      textAlign: 'center',
+      opacity: 0.8,
     },
 });
 

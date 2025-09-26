@@ -6,9 +6,9 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { router } from 'expo-router';
 
 // Import the banner image
-const neonBurgerImage = require('@/assets/images/neon-burger.png');
+const lilScarecrowImage = require('@/assets/images/lil-scarecrow.png');
 
-export default function CrescentOasisScreen() {
+export default function ScarecrowValeScreen() {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
 
   const toggleFavorite = (activityId: string) => {
@@ -25,68 +25,68 @@ export default function CrescentOasisScreen() {
 
   const activities = [
     {
-      id: 'atomic-diner',
-      name: 'Atomic Diner',
-      description: 'Dine at the retro 50s diner with alien waitstaff.',
-      reward: '15 Gems',
+      id: 'crop-watching',
+      name: 'Crop Watching',
+      description: 'Keep watch over the fields and protect the harvest.',
+      reward: '20 ⚡',
       difficulty: 'Easy',
-      icon: 'cutlery'
+      icon: 'eye'
     },
     {
-      id: 'neon-gambling',
-      name: 'Neon Gambling',
-      description: 'Try your luck at the glowing slot machines.',
-      reward: '25 Gems',
+      id: 'scarecrow-building',
+      name: 'Scarecrow Building',
+      description: 'Craft the perfect scarecrow to guard the crops.',
+      reward: '30 ⚡',
       difficulty: 'Medium',
-      icon: 'diamond'
+      icon: 'user'
     },
     {
-      id: 'desert-racing',
-      name: 'Desert Racing',
-      description: 'Race hover cars across the pink sand dunes.',
-      reward: '30 Gems',
+      id: 'field-walking',
+      name: 'Field Walking',
+      description: 'Take peaceful walks through the golden fields.',
+      reward: '15 ⚡',
+      difficulty: 'Easy',
+      icon: 'road'
+    },
+    {
+      id: 'bird-watching',
+      name: 'Bird Watching',
+      description: 'Observe the birds that visit the farm fields.',
+      reward: '18 ⚡',
+      difficulty: 'Easy',
+      icon: 'twitter'
+    },
+    {
+      id: 'harvest-helping',
+      name: 'Harvest Helping',
+      description: 'Assist with the seasonal crop harvest.',
+      reward: '35 ⚡',
       difficulty: 'Hard',
-      icon: 'car'
+      icon: 'leaf'
     },
     {
-      id: 'alien-encounter',
-      name: 'Alien Encounter',
-      description: 'Meet friendly hippie aliens from distant galaxies.',
-      reward: '20 Gems',
+      id: 'windmill-tending',
+      name: 'Windmill Tending',
+      description: 'Maintain the old windmill that powers the farm.',
+      reward: '25 ⚡',
       difficulty: 'Medium',
-      icon: 'rocket'
+      icon: 'cog'
     },
     {
-      id: 'crystal-mining',
-      name: 'Crystal Mining',
-      description: 'Extract precious crystals from desert formations.',
-      reward: '18 Gems',
-      difficulty: 'Medium',
-      icon: 'diamond'
+      id: 'farm-animals',
+      name: 'Farm Animals',
+      description: 'Care for the friendly farm animals.',
+      reward: '22 ⚡',
+      difficulty: 'Easy',
+      icon: 'heart'
     },
     {
       id: 'sunset-meditation',
       name: 'Sunset Meditation',
-      description: 'Meditate as the pink sun sets over the dunes.',
-      reward: '12 Gems',
-      difficulty: 'Easy',
+      description: 'Find peace watching the sun set over the fields.',
+      reward: '28 ⚡',
+      difficulty: 'Medium',
       icon: 'sun-o'
-    },
-    {
-      id: 'space-port',
-      name: 'Space Port',
-      description: 'Watch alien ships arrive and depart from the spaceport.',
-      reward: '22 Gems',
-      difficulty: 'Easy',
-      icon: 'plane'
-    },
-    {
-      id: 'desert-party',
-      name: 'Desert Party',
-      description: 'Join the nightly celebration under the stars.',
-      reward: '35 Gems',
-      difficulty: 'Hard',
-      icon: 'music'
     }
   ];
 
@@ -104,22 +104,22 @@ export default function CrescentOasisScreen() {
         </Pressable>
 
         {/* Title */}
-        <Text style={styles.title}>CRESCENT OASIS</Text>
+        <Text style={styles.title}>SCARECROW VALE</Text>
 
         {/* Banner Image */}
         <RNView style={styles.bannerContainer}>
-          <Image source={neonBurgerImage} style={styles.bannerImage} />
+          <Image source={lilScarecrowImage} style={styles.bannerImage} />
         </RNView>
 
         {/* Description */}
         <Text style={styles.description}>
-          A pink desert mirage where hippie aliens and atomic 50s diners coexist in perfect harmony. 
-          Neon lights pulse against the endless dunes while hover cars zip between crystal formations. 
-          Here, the future meets the past in a kaleidoscope of color and sound.
+          Mysterious fields where ancient scarecrows stand silent watch over golden crops. 
+          The air is filled with the rustle of wheat and the gentle creaking of old windmills. 
+          Here, the boundary between the living and the mystical blurs in the endless horizon.
         </Text>
 
         {/* Activities Title */}
-        <Text style={styles.activitiesTitle}>OASIS ACTIVITIES</Text>
+        <Text style={styles.activitiesTitle}>FARM ACTIVITIES</Text>
 
         {/* Activities List */}
         {activities.map((activity) => (

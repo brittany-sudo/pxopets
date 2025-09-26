@@ -12,6 +12,7 @@ export default function HomeScreen() {
   const [rewardClaimed, setRewardClaimed] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
   const [tickerPosition, setTickerPosition] = useState(0);
+  const [countdownFlashing, setCountdownFlashing] = useState(true);
   
   // Animation values using useRef to persist across renders
   const celebrationScale = useRef(new Animated.Value(0)).current;
@@ -19,6 +20,7 @@ export default function HomeScreen() {
   const celebrationTranslateY = useRef(new Animated.Value(0)).current;
   const buttonScale = useRef(new Animated.Value(1)).current;
   const tickerTranslateX = useRef(new Animated.Value(0)).current;
+  const gradientRotation = useRef(new Animated.Value(0)).current;
 
   // Stock ticker data with color coding
   const stockData = [
@@ -30,6 +32,14 @@ export default function HomeScreen() {
     const interval = setInterval(() => {
       setIsFlashing(prev => !prev);
     }, 800);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Flash animation for the countdown
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCountdownFlashing(prev => !prev);
+    }, 600);
     return () => clearInterval(interval);
   }, []);
 
@@ -50,6 +60,21 @@ export default function HomeScreen() {
     runTicker();
   }, []);
 
+  // Gradient rotation animation
+  useEffect(() => {
+    const rotateGradient = () => {
+      Animated.loop(
+        Animated.timing(gradientRotation, {
+          toValue: 1,
+          duration: 3000, // 3 seconds for full rotation
+          useNativeDriver: true,
+        })
+      ).start();
+    };
+    
+    rotateGradient();
+  }, []);
+
   const handleDailyReward = () => {
     if (!rewardClaimed) {
       // Button press feedback
@@ -66,7 +91,7 @@ export default function HomeScreen() {
         }),
       ]).start();
 
-      addCoins(5); // Give 5 gems
+      addCoins(5); // Give 5 stamina
       setRewardClaimed(true);
       setIsFlashing(false);
       setShowCelebration(true);
@@ -128,8 +153,8 @@ export default function HomeScreen() {
     );
   }
 
-          return (
-            <View style={styles.container}>
+  return (
+    <View style={styles.container}>
               {/* Stock Ticker */}
               <View style={styles.tickerContainer}>
                 <Animated.View 
@@ -183,6 +208,80 @@ export default function HomeScreen() {
               </View>
               
               <ScrollView contentContainerStyle={styles.scrollContent}>
+                {/* Premium Shop Banner */}
+                <RNView style={styles.premiumBanner}>
+                  <Animated.View style={[
+                    styles.gradientBorder1,
+                    {
+                      transform: [{
+                        rotate: gradientRotation.interpolate({
+                          inputRange: [0, 1],
+                          outputRange: ['0deg', '360deg'],
+                        })
+                      }]
+                    }
+                  ]} />
+                  <Animated.View style={[
+                    styles.gradientBorder2,
+                    {
+                      transform: [{
+                        rotate: gradientRotation.interpolate({
+                          inputRange: [0, 1],
+                          outputRange: ['120deg', '480deg'],
+                        })
+                      }]
+                    }
+                  ]} />
+                  <Animated.View style={[
+                    styles.gradientBorder3,
+                    {
+                      transform: [{
+                        rotate: gradientRotation.interpolate({
+                          inputRange: [0, 1],
+                          outputRange: ['240deg', '600deg'],
+                        })
+                      }]
+                    }
+                  ]} />
+                  <RNView style={styles.bannerGradient}>
+                    <RNView style={styles.bannerContent}>
+            <RNView style={styles.bannerLeft}>
+              <RNView style={styles.bannerIconContainer}>
+                <Image 
+                  source={require('@/assets/images/milkshakes.png')} 
+                  style={styles.bannerImage}
+                  resizeMode="contain"
+                />
+              </RNView>
+                        <RNView style={styles.bannerText}>
+                          <Text style={styles.bannerTitle}>PREMIUM OFFER</Text>
+                          <Text style={styles.bannerSubtitle}>Cosmic Milkshakes</Text>
+                          <RNView style={styles.bannerReward}>
+                            <Text style={styles.bannerRewardText}>200</Text>
+                            <FontAwesome name="bolt" size={12} color="#f59e0b" />
+                          </RNView>
+                        </RNView>
+                      </RNView>
+                      <RNView style={styles.bannerRight}>
+                        <RNView style={styles.priceContainer}>
+                          <RNView style={styles.currentPriceRow}>
+                            <Text style={styles.bannerPrice}>50</Text>
+                            <FontAwesome name="ticket" size={12} color="#0ea5e9" />
+                          </RNView>
+                          <RNView style={styles.originalPriceRow}>
+                            <Text style={styles.bannerOriginalPrice}>75</Text>
+                            <FontAwesome name="ticket" size={10} color="#94a3b8" />
+                          </RNView>
+                        </RNView>
+                        <Text style={[
+                          styles.bannerTimer,
+                          { opacity: countdownFlashing ? 1 : 0.3 }
+                        ]}>2h 15m left</Text>
+                      </RNView>
+                    </RNView>
+                  </RNView>
+                </RNView>
+
                 <BorderedBox>
                   <Text style={styles.dateText}>January 1, 1991</Text>
                   <JazzyTitle style={styles.newsHeader}>DAILY GAZETTE</JazzyTitle>
@@ -290,7 +389,7 @@ export default function HomeScreen() {
                         </RNView>
                       </RNView>
                     </RNView>
-                    <Text style={styles.questReward}>+10 Gems</Text>
+                    <Text style={styles.questReward}>+10 ⚡</Text>
                   </RNView>
 
                   {/* Quest 2 - Pet Care */}
@@ -306,7 +405,7 @@ export default function HomeScreen() {
                         </RNView>
                       </RNView>
                     </RNView>
-                    <Text style={styles.questReward}>+15 Gems</Text>
+                    <Text style={styles.questReward}>+15 ⚡</Text>
                   </RNView>
 
                   {/* Quest 3 - Weekly Challenge */}
@@ -322,7 +421,7 @@ export default function HomeScreen() {
                         </RNView>
                       </RNView>
                     </RNView>
-                    <Text style={styles.questReward}>+25 Gems</Text>
+                    <Text style={styles.questReward}>+25 ⚡</Text>
                   </RNView>
 
                   {/* Daily Reward Section - At Bottom of Quests */}
@@ -358,20 +457,20 @@ export default function HomeScreen() {
                         ]}
                       >
                         <Animated.View style={[styles.gradientBackground, { transform: [{ scale: celebrationScale }] }]}>
-                          <Text style={styles.celebrationText}>+5 GEMS!</Text>
+                          <Text style={styles.celebrationText}>+5 ⚡!</Text>
                         </Animated.View>
                       </Animated.View>
                     )}
                   </RNView>
                 </BorderedBox>
               </ScrollView>
-            </View>
-          );
-        }
+    </View>
+  );
+}
 
 const styles = StyleSheet.create({
-        container: {
-          flex: 1,
+  container: {
+    flex: 1,
         },
         tickerContainer: {
           position: 'absolute',
@@ -379,7 +478,7 @@ const styles = StyleSheet.create({
           left: 0,
           right: 0,
           height: 30,
-          backgroundColor: '#0f172a',
+          backgroundColor: '#1a0033', // Extremely deep/dark purple
           borderBottomWidth: 2,
           borderBottomColor: '#0ea5e9',
           overflow: 'hidden',
@@ -519,8 +618,8 @@ const styles = StyleSheet.create({
             borderRadius: 6,
             borderWidth: 1,
             borderColor: 'rgba(139, 92, 246, 0.4)',
-            justifyContent: 'center',
-          },
+    justifyContent: 'center',
+  },
           claimedSection: {
             backgroundColor: 'rgba(100, 116, 139, 0.05)', // Muted background when claimed
             borderColor: 'rgba(100, 116, 139, 0.2)',
@@ -696,8 +795,8 @@ const styles = StyleSheet.create({
             fontSize: 10,
             color: '#8b5cf6',
             textAlign: 'center',
-            fontWeight: 'bold',
-          },
+    fontWeight: 'bold',
+  },
           whatsNewSection: {
             backgroundColor: 'rgba(14, 165, 233, 0.05)',
             borderRadius: 6,
@@ -808,4 +907,160 @@ const styles = StyleSheet.create({
             textAlign: 'right',
             flexShrink: 0,
           },
-        });
+          // Premium Banner Styles
+          premiumBanner: {
+            marginBottom: 4,
+            borderRadius: 12,
+            overflow: 'hidden',
+            borderWidth: 2,
+            borderColor: '#8b5cf6',
+            position: 'relative',
+            width: '85%',
+            alignSelf: 'center',
+          },
+          bannerGradient: {
+            backgroundColor: '#ffffff',
+            padding: 2,
+            position: 'relative',
+            zIndex: 4,
+            borderRadius: 10,
+          },
+          bannerContent: {
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            paddingVertical: 16,
+            paddingHorizontal: 20,
+            backgroundColor: '#ffffff',
+            borderRadius: 10,
+          },
+          bannerLeft: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            flex: 1,
+          },
+          bannerIconContainer: {
+            width: 60,
+            height: 60,
+            borderRadius: 30,
+            backgroundColor: 'rgba(251, 191, 36, 0.1)',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginRight: 16,
+          },
+          bannerImage: {
+            width: 50,
+            height: 50,
+          },
+          bannerText: {
+            flex: 1,
+          },
+          bannerTitle: {
+            fontFamily: 'PressStart2P_400Regular',
+            fontSize: 8,
+            fontWeight: 'bold',
+            color: '#8b5cf6',
+            marginBottom: 4,
+            letterSpacing: 1,
+          },
+          bannerSubtitle: {
+            fontFamily: 'Silkscreen_400Regular',
+            fontSize: 14,
+            color: '#0f172a',
+            fontWeight: 'bold',
+            marginBottom: 2,
+          },
+          bannerDescription: {
+            fontFamily: 'Silkscreen_400Regular',
+            fontSize: 10,
+            color: '#64748b',
+            fontStyle: 'italic',
+          },
+          bannerReward: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginTop: 2,
+          },
+          bannerRewardText: {
+            fontFamily: 'Silkscreen_400Regular',
+            fontSize: 12,
+            color: '#f59e0b',
+            fontWeight: 'bold',
+            marginRight: 4,
+          },
+          bannerRight: {
+            alignItems: 'flex-end',
+          },
+          priceContainer: {
+            flexDirection: 'column',
+            alignItems: 'flex-end',
+            marginBottom: 4,
+          },
+          currentPriceRow: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginBottom: 2,
+          },
+          originalPriceRow: {
+            flexDirection: 'row',
+            alignItems: 'center',
+          },
+          bannerPrice: {
+            fontFamily: 'PressStart2P_400Regular',
+            fontSize: 12,
+            fontWeight: 'bold',
+            color: '#10b981',
+            marginRight: 4,
+          },
+          bannerOriginalPrice: {
+            fontFamily: 'Silkscreen_400Regular',
+            fontSize: 12,
+            color: '#94a3b8',
+            textDecorationLine: 'line-through',
+            marginRight: 4,
+          },
+          bannerTimer: {
+            fontFamily: 'Silkscreen_400Regular',
+            fontSize: 9,
+            color: '#8b5cf6',
+            fontWeight: 'bold',
+            backgroundColor: 'rgba(139, 92, 246, 0.1)',
+            paddingHorizontal: 8,
+            paddingVertical: 2,
+            borderRadius: 4,
+          },
+          // Rotating Gradient Border Effects
+          gradientBorder1: {
+            position: 'absolute',
+            top: -3,
+            left: -3,
+            right: -3,
+            bottom: -3,
+            borderRadius: 15,
+            backgroundColor: '#8b5cf6',
+            opacity: 1,
+            zIndex: 1,
+          },
+          gradientBorder2: {
+            position: 'absolute',
+            top: -2,
+            left: -2,
+            right: -2,
+            bottom: -2,
+            borderRadius: 14,
+            backgroundColor: '#ec4899',
+            opacity: 0.8,
+            zIndex: 2,
+          },
+          gradientBorder3: {
+            position: 'absolute',
+            top: -1,
+            left: -1,
+            right: -1,
+            bottom: -1,
+            borderRadius: 13,
+            backgroundColor: '#fbbf24',
+            opacity: 0.6,
+            zIndex: 3,
+          },
+});

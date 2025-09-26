@@ -65,6 +65,11 @@ function RootLayoutNav() {
           <Stack.Screen name="crescent-oasis" options={{ headerShown: false }} />
           <Stack.Screen name="foggy-harbor" options={{ headerShown: false }} />
           <Stack.Screen name="barrelhaven" options={{ headerShown: false }} />
+          <Stack.Screen name="bag-of-stars-forest" options={{ headerShown: false }} />
+          <Stack.Screen name="pxoburbs" options={{ headerShown: false }} />
+          <Stack.Screen name="saltwick-pier" options={{ headerShown: false }} />
+          <Stack.Screen name="scarecrow-vale" options={{ headerShown: false }} />
+          <Stack.Screen name="more" options={{ header: () => <AppHeader /> }} />
           <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
         </Stack>
       </GameProvider>

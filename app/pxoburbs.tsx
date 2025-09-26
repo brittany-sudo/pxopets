@@ -6,9 +6,9 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { router } from 'expo-router';
 
 // Import the banner image
-const neonBurgerImage = require('@/assets/images/neon-burger.png');
+const staticTvImage = require('@/assets/images/static-tv.png');
 
-export default function CrescentOasisScreen() {
+export default function PxoburbsScreen() {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
 
   const toggleFavorite = (activityId: string) => {
@@ -25,68 +25,68 @@ export default function CrescentOasisScreen() {
 
   const activities = [
     {
-      id: 'atomic-diner',
-      name: 'Atomic Diner',
-      description: 'Dine at the retro 50s diner with alien waitstaff.',
-      reward: '15 Gems',
+      id: 'bike-riding',
+      name: 'Bike Riding',
+      description: 'Cruise through the neighborhood on your trusty bike.',
+      reward: '15 ⚡',
       difficulty: 'Easy',
-      icon: 'cutlery'
+      icon: 'bicycle'
     },
     {
-      id: 'neon-gambling',
-      name: 'Neon Gambling',
-      description: 'Try your luck at the glowing slot machines.',
-      reward: '25 Gems',
+      id: 'keycard-hunt',
+      name: 'Lost Motel Key Card Hunt',
+      description: 'Find hidden key cards in the abandoned motel.',
+      reward: '25 ⚡',
       difficulty: 'Medium',
-      icon: 'diamond'
+      icon: 'key'
     },
     {
-      id: 'desert-racing',
-      name: 'Desert Racing',
-      description: 'Race hover cars across the pink sand dunes.',
-      reward: '30 Gems',
-      difficulty: 'Hard',
-      icon: 'car'
-    },
-    {
-      id: 'alien-encounter',
-      name: 'Alien Encounter',
-      description: 'Meet friendly hippie aliens from distant galaxies.',
-      reward: '20 Gems',
-      difficulty: 'Medium',
-      icon: 'rocket'
-    },
-    {
-      id: 'crystal-mining',
-      name: 'Crystal Mining',
-      description: 'Extract precious crystals from desert formations.',
-      reward: '18 Gems',
-      difficulty: 'Medium',
-      icon: 'diamond'
-    },
-    {
-      id: 'sunset-meditation',
-      name: 'Sunset Meditation',
-      description: 'Meditate as the pink sun sets over the dunes.',
-      reward: '12 Gems',
+      id: 'stamp-safari',
+      name: 'Stamp Safari',
+      description: 'Collect rare stamps from around the world.',
+      reward: '20 ⚡',
       difficulty: 'Easy',
-      icon: 'sun-o'
+      icon: 'book'
     },
     {
-      id: 'space-port',
-      name: 'Space Port',
-      description: 'Watch alien ships arrive and depart from the spaceport.',
-      reward: '22 Gems',
+      id: 'neighborhood-watch',
+      name: 'Neighborhood Watch',
+      description: 'Keep an eye on the community and report suspicious activity.',
+      reward: '30 ⚡',
+      difficulty: 'Medium',
+      icon: 'eye'
+    },
+    {
+      id: 'garage-sale',
+      name: 'Garage Sale',
+      description: 'Browse and buy treasures from your neighbors.',
+      reward: '18 ⚡',
       difficulty: 'Easy',
-      icon: 'plane'
+      icon: 'shopping-bag'
     },
     {
-      id: 'desert-party',
-      name: 'Desert Party',
-      description: 'Join the nightly celebration under the stars.',
-      reward: '35 Gems',
-      difficulty: 'Hard',
+      id: 'block-party',
+      name: 'Block Party',
+      description: 'Join the community celebration with games and food.',
+      reward: '35 ⚡',
+      difficulty: 'Medium',
       icon: 'music'
+    },
+    {
+      id: 'mail-delivery',
+      name: 'Mail Delivery',
+      description: 'Help deliver mail to the neighborhood residents.',
+      reward: '22 ⚡',
+      difficulty: 'Easy',
+      icon: 'envelope'
+    },
+    {
+      id: 'treehouse-building',
+      name: 'Treehouse Building',
+      description: 'Construct the ultimate backyard treehouse.',
+      reward: '40 ⚡',
+      difficulty: 'Hard',
+      icon: 'home'
     }
   ];
 
@@ -104,22 +104,22 @@ export default function CrescentOasisScreen() {
         </Pressable>
 
         {/* Title */}
-        <Text style={styles.title}>CRESCENT OASIS</Text>
+        <Text style={styles.title}>THE PXOBURBS</Text>
 
         {/* Banner Image */}
         <RNView style={styles.bannerContainer}>
-          <Image source={neonBurgerImage} style={styles.bannerImage} />
+          <Image source={staticTvImage} style={styles.bannerImage} />
         </RNView>
 
         {/* Description */}
         <Text style={styles.description}>
-          A pink desert mirage where hippie aliens and atomic 50s diners coexist in perfect harmony. 
-          Neon lights pulse against the endless dunes while hover cars zip between crystal formations. 
-          Here, the future meets the past in a kaleidoscope of color and sound.
+          A nostalgic 90s suburban neighborhood where every house tells a story. 
+          Tree-lined streets, white picket fences, and the hum of lawnmowers create 
+          the perfect backdrop for childhood adventures and community connections.
         </Text>
 
         {/* Activities Title */}
-        <Text style={styles.activitiesTitle}>OASIS ACTIVITIES</Text>
+        <Text style={styles.activitiesTitle}>NEIGHBORHOOD ACTIVITIES</Text>
 
         {/* Activities List */}
         {activities.map((activity) => (

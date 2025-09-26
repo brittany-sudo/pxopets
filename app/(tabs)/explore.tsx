@@ -15,6 +15,9 @@ const neonBurgerImage = require('@/assets/images/neon-burger.png');
 const lilAnchorImage = require('@/assets/images/lil-anchor.png');
 const lilWineCasketImage = require('@/assets/images/lil-wine-casket.png');
 const lilTotemGuyImage = require('@/assets/images/lil-totem-guy.png');
+const lilPopcornImage = require('@/assets/images/lil-popcorn.png');
+const lilScarecrowImage = require('@/assets/images/lil-scarecrow.png');
+const lilGnomeImage = require('@/assets/images/lil-gnome.png');
 
 export default function ExploreScreen() {
   const { hydrated } = useGame();
@@ -46,7 +49,7 @@ export default function ExploreScreen() {
       image: neonBurgerImage
     },
     {
-      id: "gardens",
+      id: "bag-of-stars-forest",
       name: "Bag of Stars Forest",
       icon: "leaf",
       color: "#10b981",
@@ -71,24 +74,27 @@ export default function ExploreScreen() {
     },
     {
       id: "mountains",
-      name: "Naptime Valley",
+      name: "Slumbering Hills",
       icon: "mountain",
       color: "#6b7280",
-      description: "Peaceful valley where sleepy creatures rest."
+      description: "Peaceful valley where sleepy creatures rest.",
+      image: lilGnomeImage
     },
     {
       id: "pirate-port",
       name: "Saltwick Pier",
       icon: "ship",
       color: "#dc2626",
-      description: "Colorful carnival with rides and games."
+      description: "Colorful carnival with rides and games.",
+      image: lilPopcornImage
     },
     {
       id: "library",
       name: "Scarecrow Vale",
       icon: "book",
       color: "#7c3aed",
-      description: "Mysterious fields where scarecrows watch over crops."
+      description: "Mysterious fields where scarecrows watch over crops.",
+      image: lilScarecrowImage
     },
     {
       id: "enchanted-island",
@@ -119,6 +125,18 @@ export default function ExploreScreen() {
       } else if (regionId === 'vintage-hollow') {
         console.log('Navigating to Barrelhaven...');
         router.push('/barrelhaven');
+      } else if (regionId === 'bag-of-stars-forest') {
+        console.log('Navigating to Bag of Stars Forest...');
+        router.push('/bag-of-stars-forest');
+      } else if (regionId === 'pxoburbs') {
+        console.log('Navigating to The Pxoburbs...');
+        router.push('/pxoburbs');
+      } else if (regionId === 'pirate-port') {
+        console.log('Navigating to Saltwick Pier...');
+        router.push('/saltwick-pier');
+      } else if (regionId === 'library') {
+        console.log('Navigating to Scarecrow Vale...');
+        router.push('/scarecrow-vale');
       } else {
         Alert.alert(
           `Welcome to ${regionName}!`,
@@ -149,6 +167,18 @@ export default function ExploreScreen() {
     } else if (world.id === 'vintage-hollow') {
       console.log('Navigating to Barrelhaven from list...');
       router.push('/barrelhaven');
+    } else if (world.id === 'bag-of-stars-forest') {
+      console.log('Navigating to Bag of Stars Forest from list...');
+      router.push('/bag-of-stars-forest');
+    } else if (world.id === 'pxoburbs') {
+      console.log('Navigating to The Pxoburbs from list...');
+      router.push('/pxoburbs');
+    } else if (world.id === 'pirate-port') {
+      console.log('Navigating to Saltwick Pier from list...');
+      router.push('/saltwick-pier');
+    } else if (world.id === 'library') {
+      console.log('Navigating to Scarecrow Vale from list...');
+      router.push('/scarecrow-vale');
     } else {
       Alert.alert(
         `Welcome to ${world.name}!`,

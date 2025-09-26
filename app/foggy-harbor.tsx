@@ -1,152 +1,154 @@
-import React from 'react';
-import { StyleSheet, ScrollView, Pressable, Image } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, ScrollView, View as RNView, Image, Pressable } from 'react-native';
 import { Text, View } from '@/components/Themed';
-import BorderedBox from '@/components/BorderedBox';
-import BottomNavigation from '@/components/BottomNavigation';
 import AppHeader from '@/components/AppHeader';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { router } from 'expo-router';
 
+// Import the banner image
+const lilAnchorImage = require('@/assets/images/lil-anchor.png');
+
 export default function FoggyHarborScreen() {
+  const [favorites, setFavorites] = useState<Set<string>>(new Set());
+
+  const toggleFavorite = (activityId: string) => {
+    setFavorites(prev => {
+      const newFavorites = new Set(prev);
+      if (newFavorites.has(activityId)) {
+        newFavorites.delete(activityId);
+      } else {
+        newFavorites.add(activityId);
+      }
+      return newFavorites;
+    });
+  };
+
   const activities = [
     {
       id: 'lobster-trap',
       name: 'Lobster Trap Master',
-      description: 'Learn the ancient art of lobster trapping from weathered old salts. Set traps, check buoys, and haul in the day\'s catch while listening to tales of the sea.',
+      description: 'Learn the ancient art of lobster trapping from weathered old salts.',
+      reward: '50 Gems',
       difficulty: 'Medium',
-      reward: '50 coins',
       icon: 'anchor'
     },
     {
       id: 'fog-navigation',
       name: 'Fog Navigation',
-      description: 'Master the art of navigating through thick coastal fog using only sound, instinct, and ancient maritime wisdom. Not for the faint of heart.',
+      description: 'Master the art of navigating through thick coastal fog.',
+      reward: '75 Gems',
       difficulty: 'Hard',
-      reward: '75 coins',
       icon: 'compass'
     },
     {
       id: 'tall-tales',
       name: 'Tall Tales Tavern',
-      description: 'Gather around the crackling fire at the Rusty Anchor Tavern. Listen to legendary sea stories, share your own adventures, and maybe even spot a ghost ship through the mist.',
+      description: 'Gather around the crackling fire at the Rusty Anchor Tavern.',
+      reward: '25 Gems',
       difficulty: 'Easy',
-      reward: '25 coins',
       icon: 'glass'
     },
     {
       id: 'lighthouse-keeper',
       name: 'Lighthouse Keeper',
-      description: 'Tend to the ancient lighthouse that guides ships through the treacherous waters. Keep the beacon burning bright and watch for ships in distress.',
+      description: 'Tend to the ancient lighthouse that guides ships through treacherous waters.',
+      reward: '60 Gems',
       difficulty: 'Medium',
-      reward: '60 coins',
       icon: 'lightbulb-o'
     },
     {
       id: 'storm-watching',
       name: 'Storm Watching',
-      description: 'Experience the raw power of Atlantic storms from the safety of the harbor breakwater. Watch massive waves crash against the rocks while the wind howls.',
+      description: 'Experience the raw power of Atlantic storms from the harbor breakwater.',
+      reward: '30 Gems',
       difficulty: 'Easy',
-      reward: '30 coins',
       icon: 'cloud'
     },
     {
       id: 'net-mending',
-      name: 'Net Mending Circle',
-      description: 'Join the local fishermen in the time-honored tradition of mending fishing nets. Learn intricate knots and listen to stories passed down through generations.',
+      name: 'Net Mending',
+      description: 'Learn the traditional craft of mending fishing nets.',
+      reward: '20 Gems',
       difficulty: 'Easy',
-      reward: '20 coins',
       icon: 'th'
     },
     {
       id: 'harbor-mystery',
       name: 'Harbor Mystery',
-      description: 'Investigate the mysterious disappearances that have plagued Foggy Harbor. Follow clues through the fog-shrouded streets and uncover the town\'s dark secrets.',
+      description: 'Investigate the mysterious disappearances that have plagued the harbor.',
+      reward: '100 Gems',
       difficulty: 'Hard',
-      reward: '100 coins',
       icon: 'search'
     },
     {
       id: 'fog-horn',
       name: 'Fog Horn Keeper',
-      description: 'Operate the town\'s iconic fog horn that echoes mournfully across the harbor. Learn the different signals and keep ships safe in the thickest fog.',
+      description: 'Operate the town\'s iconic fog horn that echoes across the harbor.',
+      reward: '45 Gems',
       difficulty: 'Medium',
-      reward: '45 coins',
       icon: 'volume-up'
     }
   ];
-
-  const handleActivityPress = (activity: any) => {
-    console.log('Activity pressed:', activity.name);
-    // TODO: Implement activity logic
-  };
-
-  const handleBackPress = () => {
-    router.back();
-  };
 
   return (
     <View style={styles.container}>
       <AppHeader />
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Header */}
-        <View style={styles.header}>
-          <Pressable style={styles.backButton} onPress={handleBackPress}>
-            <FontAwesome name="arrow-left" size={16} color="#0f172a" />
-            <Text style={styles.backButtonText}>BACK</Text>
-          </Pressable>
-          <View style={styles.placeholder} />
-        </View>
+        {/* Back Button */}
+        <Pressable 
+          style={styles.backButton}
+          onPress={() => router.back()}
+        >
+          <FontAwesome name="arrow-left" size={16} color="#0f172a" />
+          <Text style={styles.backButtonText}>Back</Text>
+        </Pressable>
 
         {/* Title */}
         <Text style={styles.title}>FOGGY HARBOR</Text>
 
         {/* Banner Image */}
-        <View style={styles.bannerContainer}>
-          <Image
-            source={require('@/assets/images/lil-anchor.png')}
-            style={styles.bannerImage}
-            resizeMode="contain"
-          />
-        </View>
+        <RNView style={styles.bannerContainer}>
+          <Image source={lilAnchorImage} style={styles.bannerImage} />
+        </RNView>
 
         {/* Description */}
-        <BorderedBox style={styles.descriptionBox}>
-          <Text style={styles.description}>
-            A dreary Maine fishing town shrouded in mist. Where weathered lobster boats bob in the harbor, 
-            old salts tell tall tales at the tavern, and the foghorn's mournful call echoes through the night. 
-            Perfect for those who love the melancholy beauty of coastal life.
-          </Text>
-        </BorderedBox>
+        <Text style={styles.description}>
+          A dreary Maine fishing town shrouded in mist and mystery. Weathered lobster boats 
+          bob in the harbor while ancient lighthouses guide ships through treacherous waters. 
+          Here, the line between reality and legend blurs in the eternal fog.
+        </Text>
 
-        {/* Activities */}
+        {/* Activities Title */}
         <Text style={styles.activitiesTitle}>HARBOR ACTIVITIES</Text>
-        
+
+        {/* Activities List */}
         {activities.map((activity) => (
-          <BorderedBox key={activity.id} style={styles.activityBox}>
-            <Pressable 
-              style={styles.activityContent}
-              onPress={() => handleActivityPress(activity)}
-            >
-              <View style={styles.activityHeader}>
-                <FontAwesome name={activity.icon as any} size={24} color="#64748b" />
-                <View style={styles.activityInfo}>
+          <RNView key={activity.id} style={styles.activityItem}>
+            <RNView style={styles.activityHeader}>
+              <RNView style={styles.activityInfo}>
+                <FontAwesome name={activity.icon as any} size={20} color="#8b5cf6" style={styles.activityIcon} />
+                <RNView style={styles.activityText}>
                   <Text style={styles.activityName}>{activity.name}</Text>
                   <Text style={styles.activityDescription}>{activity.description}</Text>
-                </View>
-                <Pressable style={styles.starButton}>
-                  <FontAwesome name="star-o" size={20} color="#f59e0b" />
-                </Pressable>
-              </View>
-              <View style={styles.activityFooter}>
-                <Text style={styles.difficulty}>{activity.difficulty}</Text>
-                <Text style={styles.reward}>{activity.reward}</Text>
-              </View>
-            </Pressable>
-          </BorderedBox>
+                </RNView>
+              </RNView>
+              <Pressable
+                style={styles.favoriteButton}
+                onPress={() => toggleFavorite(activity.id)}
+              >
+                <FontAwesome 
+                  name={favorites.has(activity.id) ? "star" : "star-o"} 
+                  size={16} 
+                  color={favorites.has(activity.id) ? "#fbbf24" : "#6b7280"} 
+                />
+              </Pressable>
+            </RNView>
+            <RNView style={styles.activityFooter}>
+              <Text style={styles.rewardText}>{activity.reward}</Text>
+            </RNView>
+          </RNView>
         ))}
       </ScrollView>
-      
-      <BottomNavigation />
     </View>
   );
 }
@@ -154,7 +156,7 @@ export default function FoggyHarborScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f1f5f9',
+    backgroundColor: '#f0f9ff',
   },
   scrollContent: {
     alignItems: 'center',
@@ -162,40 +164,32 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingBottom: 100,
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    width: '100%',
-    marginBottom: 20,
-  },
   backButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    alignSelf: 'flex-start',
+    marginBottom: 20,
     paddingHorizontal: 12,
     paddingVertical: 8,
-    borderWidth: 1,
-    borderColor: '#0ea5e9',
-    borderRadius: 4,
     backgroundColor: 'rgba(14, 165, 233, 0.1)',
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: 'rgba(14, 165, 233, 0.3)',
   },
   backButtonText: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 12,
     color: '#0f172a',
-    fontWeight: 'bold',
-  },
-  placeholder: {
-    flex: 1,
+    marginLeft: 6,
   },
   title: {
     fontFamily: 'PressStart2P_400Regular',
     fontSize: 20,
     fontWeight: 'bold',
     color: '#0f172a',
-    textAlign: 'center',
     marginBottom: 20,
+    textAlign: 'left',
+    alignSelf: 'flex-start',
   },
   bannerContainer: {
     width: '100%',
@@ -212,40 +206,48 @@ const styles = StyleSheet.create({
     width: 150,
     height: 150,
   },
-  descriptionBox: {
-    width: '100%',
-    marginBottom: 30,
-  },
   description: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 12,
     color: '#0f172a',
     lineHeight: 18,
+    marginBottom: 24,
     textAlign: 'left',
+    alignSelf: 'flex-start',
   },
   activitiesTitle: {
     fontFamily: 'PressStart2P_400Regular',
     fontSize: 16,
     fontWeight: 'bold',
     color: '#0f172a',
-    textAlign: 'left',
     marginBottom: 16,
+    textAlign: 'left',
     alignSelf: 'flex-start',
   },
-  activityBox: {
-    width: '100%',
+  activityItem: {
+    backgroundColor: 'rgba(14, 165, 233, 0.05)',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(14, 165, 233, 0.2)',
+    padding: 16,
     marginBottom: 12,
-  },
-  activityContent: {
     width: '100%',
   },
   activityHeader: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'flex-start',
-    gap: 12,
-    marginBottom: 12,
+    marginBottom: 8,
   },
   activityInfo: {
+    flexDirection: 'row',
+    flex: 1,
+  },
+  activityIcon: {
+    marginRight: 12,
+    marginTop: 2,
+  },
+  activityText: {
     flex: 1,
   },
   activityName: {
@@ -260,9 +262,8 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: '#0f172a',
     lineHeight: 16,
-    opacity: 0.8,
   },
-  starButton: {
+  favoriteButton: {
     padding: 4,
   },
   activityFooter: {
@@ -270,16 +271,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  difficulty: {
+  rewardText: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 10,
-    color: '#0f172a',
-    opacity: 0.6,
-  },
-  reward: {
-    fontFamily: 'Silkscreen_400Regular',
-    fontSize: 10,
-    color: '#10b981',
+    fontSize: 12,
+    color: '#8b5cf6',
     fontWeight: 'bold',
   },
 });

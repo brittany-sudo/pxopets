@@ -6,9 +6,9 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { router } from 'expo-router';
 
 // Import the banner image
-const neonBurgerImage = require('@/assets/images/neon-burger.png');
+const totemGuyImage = require('@/assets/images/lil-totem-guy.png');
 
-export default function CrescentOasisScreen() {
+export default function BagOfStarsForestScreen() {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
 
   const toggleFavorite = (activityId: string) => {
@@ -25,68 +25,68 @@ export default function CrescentOasisScreen() {
 
   const activities = [
     {
-      id: 'atomic-diner',
-      name: 'Atomic Diner',
-      description: 'Dine at the retro 50s diner with alien waitstaff.',
-      reward: '15 Gems',
+      id: 'star-gazing',
+      name: 'Star Gazing',
+      description: 'Watch stars fall like leaves in the enchanted canopy',
+      reward: '5 Gems',
       difficulty: 'Easy',
-      icon: 'cutlery'
+      icon: 'star'
     },
     {
-      id: 'neon-gambling',
-      name: 'Neon Gambling',
-      description: 'Try your luck at the glowing slot machines.',
-      reward: '25 Gems',
+      id: 'totem-carving',
+      name: 'Totem Carving',
+      description: 'Carve mystical totems from fallen starwood',
+      reward: '8 Gems',
       difficulty: 'Medium',
-      icon: 'diamond'
+      icon: 'tree'
     },
     {
-      id: 'desert-racing',
-      name: 'Desert Racing',
-      description: 'Race hover cars across the pink sand dunes.',
-      reward: '30 Gems',
-      difficulty: 'Hard',
-      icon: 'car'
-    },
-    {
-      id: 'alien-encounter',
-      name: 'Alien Encounter',
-      description: 'Meet friendly hippie aliens from distant galaxies.',
-      reward: '20 Gems',
-      difficulty: 'Medium',
-      icon: 'rocket'
-    },
-    {
-      id: 'crystal-mining',
-      name: 'Crystal Mining',
-      description: 'Extract precious crystals from desert formations.',
-      reward: '18 Gems',
-      difficulty: 'Medium',
-      icon: 'diamond'
-    },
-    {
-      id: 'sunset-meditation',
-      name: 'Sunset Meditation',
-      description: 'Meditate as the pink sun sets over the dunes.',
+      id: 'spirit-communion',
+      name: 'Spirit Communion',
+      description: 'Connect with ancient forest spirits',
       reward: '12 Gems',
-      difficulty: 'Easy',
-      icon: 'sun-o'
-    },
-    {
-      id: 'space-port',
-      name: 'Space Port',
-      description: 'Watch alien ships arrive and depart from the spaceport.',
-      reward: '22 Gems',
-      difficulty: 'Easy',
-      icon: 'plane'
-    },
-    {
-      id: 'desert-party',
-      name: 'Desert Party',
-      description: 'Join the nightly celebration under the stars.',
-      reward: '35 Gems',
       difficulty: 'Hard',
+      icon: 'heart'
+    },
+    {
+      id: 'moonlight-dance',
+      name: 'Moonlight Dance',
+      description: 'Dance under the silver moonbeams',
+      reward: '6 Gems',
+      difficulty: 'Easy',
       icon: 'music'
+    },
+    {
+      id: 'crystal-hunting',
+      name: 'Crystal Hunting',
+      description: 'Search for fallen star crystals',
+      reward: '10 Gems',
+      difficulty: 'Medium',
+      icon: 'diamond'
+    },
+    {
+      id: 'forest-meditation',
+      name: 'Forest Meditation',
+      description: 'Find inner peace among the ancient trees',
+      reward: '7 Gems',
+      difficulty: 'Easy',
+      icon: 'leaf'
+    },
+    {
+      id: 'spirit-guide',
+      name: 'Spirit Guide',
+      description: 'Lead lost travelers through the mystical paths',
+      reward: '15 Gems',
+      difficulty: 'Hard',
+      icon: 'compass'
+    },
+    {
+      id: 'star-blessing',
+      name: 'Star Blessing',
+      description: 'Receive blessings from the falling stars',
+      reward: '9 Gems',
+      difficulty: 'Medium',
+      icon: 'magic'
     }
   ];
 
@@ -104,22 +104,22 @@ export default function CrescentOasisScreen() {
         </Pressable>
 
         {/* Title */}
-        <Text style={styles.title}>CRESCENT OASIS</Text>
+        <Text style={styles.title}>BAG OF STARS FOREST</Text>
 
         {/* Banner Image */}
         <RNView style={styles.bannerContainer}>
-          <Image source={neonBurgerImage} style={styles.bannerImage} />
+          <Image source={totemGuyImage} style={styles.bannerImage} />
         </RNView>
 
         {/* Description */}
         <Text style={styles.description}>
-          A pink desert mirage where hippie aliens and atomic 50s diners coexist in perfect harmony. 
-          Neon lights pulse against the endless dunes while hover cars zip between crystal formations. 
-          Here, the future meets the past in a kaleidoscope of color and sound.
+          An enchanted forest where stars fall like leaves from the mystical canopy. 
+          Ancient totems watch over travelers, and forest spirits guide the way through 
+          moonlit paths. Here, the boundary between earth and sky blurs in eternal twilight.
         </Text>
 
         {/* Activities Title */}
-        <Text style={styles.activitiesTitle}>OASIS ACTIVITIES</Text>
+        <Text style={styles.activitiesTitle}>FOREST ACTIVITIES</Text>
 
         {/* Activities List */}
         {activities.map((activity) => (

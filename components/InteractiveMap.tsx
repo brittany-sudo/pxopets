@@ -19,84 +19,92 @@ export default function InteractiveMap({ onRegionPress }: InteractiveMapProps) {
 
   const regions: MapRegion[] = [
     {
-      id: 'crystal-cove',
-      name: 'Foggy Harbor',
-      x: 60,
-      y: 160,
-      width: 50,
-      height: 50
+      id: 'bag-of-stars-forest',
+      name: 'Bag of Stars Forest',
+      x: 20, // Moved slightly left
+      y: 15, // Forest area (moved up even more)
+      width: 18, // Made bigger
+      height: 18 // Made bigger
     },
     {
       id: 'casino',
       name: 'Crescent Oasis',
-      x: 350,
-      y: 140,
-      width: 50,
-      height: 50
+      x: 80, // Far right
+      y: 50, // Upper area
+      width: 12,
+      height: 12
     },
     {
-      id: 'gardens',
-      name: 'Emerald Gardens',
-      x: 120,
-      y: 140,
-      width: 50,
-      height: 50
+      id: 'bag-of-stars-forest',
+      name: 'Bag of Stars Forest',
+      x: 30, // Left-center
+      y: 50, // Upper area
+      width: 12,
+      height: 12
     },
     {
       id: 'vintage-hollow',
-      name: 'Vintage Hollow',
-      x: 220,
-      y: 170,
-      width: 50,
-      height: 50
+      name: 'Barrelhaven',
+      x: 55, // Center-right
+      y: 65, // Lower area
+      width: 12,
+      height: 12
     },
     {
       id: 'pxoburbs',
       name: 'The Pxoburbs',
-      x: 300,
-      y: 100,
-      width: 50,
-      height: 40
+      x: 75, // Right area
+      y: 35, // Top area
+      width: 12,
+      height: 10
     },
     {
       id: 'mountains',
-      name: 'Mystic Mountains',
-      x: 250,
-      y: 100,
-      width: 50,
-      height: 50
+      name: 'Naptime Valley',
+      x: 65, // Right-center
+      y: 35, // Top area
+      width: 12,
+      height: 12
+    },
+    {
+      id: 'crystal-cove',
+      name: 'Foggy Harbor',
+      x: 8, // Far left
+      y: 70, // Bottom area
+      width: 12,
+      height: 12
     },
     {
       id: 'pirate-port',
-      name: 'Pirate\'s Port',
-      x: 30,
-      y: 180,
-      width: 50,
-      height: 50
+      name: 'Saltwick Pier',
+      x: 25, // Left area
+      y: 75, // Bottom area
+      width: 12,
+      height: 12
     },
     {
       id: 'artisan',
       name: 'Artisan\'s Quarter',
-      x: 180,
-      y: 120,
-      width: 50,
-      height: 50
+      x: 45, // Center
+      y: 45, // Middle
+      width: 12,
+      height: 12
     },
     {
       id: 'library',
-      name: 'Scholar\'s Library',
-      x: 380,
-      y: 160,
-      width: 50,
-      height: 40
+      name: 'Scarecrow Vale',
+      x: 90, // Far right
+      y: 60, // Lower area
+      width: 12,
+      height: 10
     },
     {
       id: 'enchanted-island',
       name: 'Enchanted Island',
-      x: 200,
-      y: 110,
-      width: 50,
-      height: 50
+      x: 50, // Center-left
+      y: 40, // Upper-middle
+      width: 12,
+      height: 12
     }
   ];
 
@@ -111,7 +119,7 @@ export default function InteractiveMap({ onRegionPress }: InteractiveMapProps) {
     <RNView style={styles.container}>
       {/* Base Map Image */}
       <Image
-        source={require('@/assets/images/placeholder-map.png')}
+        source={require('@/assets/images/main-map.png')}
         style={styles.baseMap}
         resizeMode="contain"
       />
@@ -123,10 +131,10 @@ export default function InteractiveMap({ onRegionPress }: InteractiveMapProps) {
           style={[
             styles.regionOverlay,
             {
-              left: region.x,
-              top: region.y,
-              width: region.width,
-              height: region.height,
+              left: `${region.x}%`,
+              top: `${region.y}%`,
+              width: `${region.width}%`,
+              height: `${region.height}%`,
             },
             selectedRegion === region.id && styles.selectedRegion
           ]}
@@ -144,11 +152,11 @@ const styles = StyleSheet.create({
   container: {
     position: 'relative',
     width: '100%',
-    height: 300,
+    height: 284,
   },
   baseMap: {
     width: '100%',
-    height: 300,
+    height: 284,
     position: 'absolute',
     top: 0,
     left: 0,

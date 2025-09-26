@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, Pressable } from 'react-native';
+import { StyleSheet, View, Pressable, Image } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Link, usePathname, router } from 'expo-router';
 import { Text } from '@/components/Themed';
@@ -27,12 +27,16 @@ export default function AppHeader() {
       <View style={styles.left}>
         <Pressable 
           style={[styles.iconButton, { borderColor: border }]}
-          onPress={() => router.push('/(tabs)/more')}
+          onPress={() => router.push('/more')}
         >
           <FontAwesome name="bars" size={24} color={iconColor} />
         </Pressable>
       </View>
-      <Text style={styles.logo}>pxopets</Text>
+      <Image 
+        source={require('@/assets/images/pxopets-logo.png')} 
+        style={styles.logo}
+        resizeMode="contain"
+      />
       <View style={styles.right}>
         <Pressable 
           style={[styles.iconButton, { borderColor: border }]}
@@ -56,7 +60,7 @@ export default function AppHeader() {
                 </View>
                 <View style={styles.currencyContainer}>
                   <View style={styles.coinsContainer}>
-                    <FontAwesome name="diamond" size={16} color="#8b5cf6" />
+                    <FontAwesome name="bolt" size={16} color="#f59e0b" />
                     <Text style={styles.coinsText}>{state.coins}</Text>
                   </View>
                   <View style={styles.ticketsContainer}>
@@ -84,12 +88,9 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
   },
   logo: {
-    fontFamily: 'PressStart2P_400Regular',
-    fontSize: 24, // Even larger
-    color: '#8b5cf6', // Premium purple
-    letterSpacing: -0.5, // Tighter kerning
-    textShadow: SHADOWS.halftone.textShadow,
-    marginTop: 30,
+    width: 240, // 200% bigger (120 * 2)
+    height: 120, // Made taller
+    marginTop: -15, // A half smidge higher
   },
   left: { 
     position: 'absolute', 
@@ -182,7 +183,7 @@ const styles = StyleSheet.create({
   coinsText: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: FONT_SIZES.sm,
-    color: '#0f172a', // Premium deep slate
+    color: '#f59e0b', // Amber to match lightning bolt
     fontWeight: 'bold',
   },
   ticketsContainer: {
