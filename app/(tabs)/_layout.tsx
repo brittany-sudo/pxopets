@@ -13,7 +13,7 @@ function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>['name'];
   color: string;
 }) {
-  return <FontAwesome size={ICON_SIZES.sm} style={{ marginBottom: -3 }} {...props} />;
+  return <FontAwesome size={ICON_SIZES.md} style={{ marginBottom: -3 }} {...props} />;
 }
 
 export default function TabLayout() {
@@ -31,12 +31,12 @@ export default function TabLayout() {
           marginHorizontal: 2,
         },
         tabBarStyle: {
-          height: 70,
+          height: 90,
           backgroundColor: Colors[colorScheme ?? 'light'].tabBarBackground,
           borderTopColor: Colors[colorScheme ?? 'light'].tabBarBorder,
           borderTopWidth: 2,
-          paddingTop: 4,
-          paddingBottom: 4,
+          paddingTop: 8,
+          paddingBottom: 8,
         },
         // Disable the static render of the header on web
         // to prevent a hydration error in React Navigation v6.
@@ -148,6 +148,13 @@ export default function TabLayout() {
       />
       <Tabs.Screen
         name="scarecrow-vale"
+        options={{
+          href: null, // Hide from tab bar
+        }}
+      />
+      {/* Adoption pages - hidden from tab bar but accessible via navigation */}
+      <Tabs.Screen
+        name="adoption"
         options={{
           href: null, // Hide from tab bar
         }}

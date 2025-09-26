@@ -130,7 +130,7 @@ export default function PetsScreen() {
         <RNView style={styles.petCollection}>
           {/* All Empty Pet Slots */}
           {[1, 2, 3, 4].map((index) => (
-            <Link key={index} href="/adoption" asChild>
+            <Link key={index} href="/(tabs)/adoption" asChild>
               <RNView style={styles.petSlot}>
                 <RNView style={styles.emptyPetSlot}>
                   <Text style={styles.plusIcon}>+</Text>
@@ -143,14 +143,14 @@ export default function PetsScreen() {
       </BorderedBox>
 
       <RNView style={styles.adoptButtons}>
-        <Link href="/adoption/pound" asChild>
+        <Link href="/(tabs)/adoption/pound" asChild>
           <RNView style={styles.adoptButton}>
             <FontAwesome name="heart" size={24} color="#8b5cf6" />
             <Text style={styles.adoptButtonText}>ADOPT</Text>
             <Text style={styles.adoptButtonSubtext}>From The Pound</Text>
           </RNView>
         </Link>
-        <Link href="/adoption/create" asChild>
+        <Link href="/(tabs)/adoption/create" asChild>
           <RNView style={styles.adoptButton}>
             <FontAwesome name="plus-circle" size={24} color="#8b5cf6" />
             <Text style={styles.adoptButtonText}>CREATE</Text>
@@ -449,7 +449,8 @@ const styles = StyleSheet.create({
     gap: 4,
     justifyContent: 'center',
     marginTop: 12,
-    paddingHorizontal: 4,
+    paddingHorizontal: 40,
+    width: '100%',
   },
   adoptButton: {
     flex: 1,
