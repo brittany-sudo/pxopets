@@ -4,12 +4,14 @@ import { Text, View } from '@/components/Themed';
 import { useGame } from '@/store/GameStore';
 import PixelButton from '@/components/PixelButton';
 import BorderedBox from '@/components/BorderedBox';
+import JazzyTitle from '@/components/JazzyTitle';
 
 export default function MoreScreen() {
   const { reset } = useGame();
   return (
     <View style={styles.container}>
       <BorderedBox>
+        <JazzyTitle style={styles.title}>MORE</JazzyTitle>
         <PixelButton title="Reset Progress" onPress={reset} />
         <View style={{ height: 12 }} />
         <PixelButton title="Open README" onPress={() => Linking.openURL('README.md')} />
@@ -31,6 +33,7 @@ const styles = StyleSheet.create({
     color: '#1a1a3a',
     marginTop: 8,
     marginBottom: 16,
+    textAlign: 'left',
   },
 });
 

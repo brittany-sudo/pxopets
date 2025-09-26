@@ -37,18 +37,18 @@ export function Text(props: TextProps) {
   const { style, lightColor, darkColor, ...otherProps } = props;
   const color = useThemeColor({ light: lightColor, dark: darkColor }, 'text');
 
-  // Use dark navy for text
-  const darkNavy = '#0f0f2a';
+  // Use premium deep slate for text
+  const premiumText = '#0f172a';
 
-  return <DefaultText style={[{ color: darkNavy, fontFamily: 'Silkscreen_400Regular' }, style]} {...otherProps} />;
+  return <DefaultText style={[{ color: premiumText, fontFamily: 'Silkscreen_400Regular' }, style]} {...otherProps} />;
 }
 
 export function View(props: ViewProps) {
   const { style, lightColor, darkColor, ...otherProps } = props;
   const backgroundColor = useThemeColor({ light: lightColor, dark: darkColor }, 'background');
 
-  // Use much lighter teal background
-  const lightTeal = '#e8f5f3';
+  // Use premium clean background
+  const premiumBackground = '#f8fafc';
 
-  return <DefaultView style={[{ backgroundColor: lightTeal }, style]} {...otherProps} />;
+  return <DefaultView style={[{ backgroundColor: premiumBackground }, style]} {...otherProps} />;
 }

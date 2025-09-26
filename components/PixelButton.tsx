@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
   label: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 14,
-    color: '#0f0f2a', // Darker navy
+    color: '#0f172a', // Premium deep slate
     textAlign: 'center',
   },
 });

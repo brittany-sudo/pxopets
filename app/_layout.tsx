@@ -59,6 +59,7 @@ function RootLayoutNav() {
       <GameProvider>
         <Stack>
           <Stack.Screen name="(tabs)" options={{ header: () => <AppHeader /> }} />
+          <Stack.Screen name="adoption" options={{ headerShown: false }} />
           <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
         </Stack>
       </GameProvider>

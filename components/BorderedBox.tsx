@@ -16,11 +16,11 @@ export default function BorderedBox({ children, style }: Props) {
 
 const styles = StyleSheet.create({
   container: {
-    width: '80%',
+    width: '85%',
     padding: 16,
     borderWidth: 2,
-    borderColor: '#0ecab8', // Same teal as navigation bars
-    backgroundColor: '#f5f5dc', // Off-bone white interior
+    borderColor: '#0ea5e9', // Premium rich teal-blue
+    backgroundColor: 'transparent', // No fill - just border
     marginVertical: 8,
     alignItems: 'center',
     justifyContent: 'center',
