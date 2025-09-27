@@ -27,7 +27,7 @@ export default function SaltwickPierScreen() {
       id: 'ferris-wheel',
       name: 'Ferris Wheel',
       description: 'Take a spin on the iconic pier ferris wheel.',
-      reward: '20 ⚡',
+      lightning: 20,
       difficulty: 'Easy',
       icon: 'circle'
     },
@@ -35,7 +35,7 @@ export default function SaltwickPierScreen() {
       id: 'carnival-games',
       name: 'Carnival Games',
       description: 'Test your skills at classic midway games.',
-      reward: '25 ⚡',
+      lightning: 25,
       difficulty: 'Medium',
       icon: 'gamepad'
     },
@@ -43,7 +43,7 @@ export default function SaltwickPierScreen() {
       id: 'cotton-candy',
       name: 'Cotton Candy Stand',
       description: 'Make and sell the fluffiest cotton candy.',
-      reward: '15 ⚡',
+      lightning: 15,
       difficulty: 'Easy',
       icon: 'cloud'
     },
@@ -51,7 +51,7 @@ export default function SaltwickPierScreen() {
       id: 'carousel-ride',
       name: 'Carousel Ride',
       description: 'Ride the beautifully painted carousel horses.',
-      reward: '18 ⚡',
+      lightning: 18,
       difficulty: 'Easy',
       icon: 'horse'
     },
@@ -59,7 +59,7 @@ export default function SaltwickPierScreen() {
       id: 'ring-toss',
       name: 'Ring Toss',
       description: 'Aim for the bottles in this classic game.',
-      reward: '22 ⚡',
+      lightning: 22,
       difficulty: 'Medium',
       icon: 'bullseye'
     },
@@ -67,7 +67,7 @@ export default function SaltwickPierScreen() {
       id: 'pier-walk',
       name: 'Pier Walk',
       description: 'Stroll along the wooden planks and enjoy the view.',
-      reward: '12 ⚡',
+      lightning: 12,
       difficulty: 'Easy',
       icon: 'road'
     },
@@ -75,7 +75,7 @@ export default function SaltwickPierScreen() {
       id: 'prize-booth',
       name: 'Prize Booth',
       description: 'Help distribute prizes to game winners.',
-      reward: '28 ⚡',
+      lightning: 28,
       difficulty: 'Medium',
       icon: 'gift'
     },
@@ -83,7 +83,7 @@ export default function SaltwickPierScreen() {
       id: 'sunset-photography',
       name: 'Sunset Photography',
       description: 'Capture the perfect pier sunset photo.',
-      reward: '35 ⚡',
+      lightning: 35,
       difficulty: 'Hard',
       icon: 'camera'
     }
@@ -97,7 +97,7 @@ export default function SaltwickPierScreen() {
           style={styles.backButton}
           onPress={() => router.navigate('/(tabs)/explore')}
         >
-          <FontAwesome name="arrow-left" size={16} color="#0f172a" />
+          <FontAwesome name="arrow-left" size={14} color="#0ea5e9" />
           <Text style={styles.backButtonText}>Back</Text>
         </Pressable>
 
@@ -124,11 +124,23 @@ export default function SaltwickPierScreen() {
           <RNView key={activity.id} style={styles.activityItem}>
             <RNView style={styles.activityHeader}>
               <RNView style={styles.activityInfo}>
-                <FontAwesome name={activity.icon as any} size={20} color="#8b5cf6" style={styles.activityIcon} />
-                <RNView style={styles.activityText}>
-                  <Text style={styles.activityName}>{activity.name}</Text>
-                  <Text style={styles.activityDescription}>{activity.description}</Text>
-                </RNView>
+                <FontAwesome name={activity.icon as any} size={22} color="#8b5cf6" style={styles.activityIcon} />
+                    <RNView style={styles.activityText}>
+                      <RNView style={styles.activityTitleRow}>
+                        <Text style={styles.activityName}>{activity.name}</Text>
+                        <RNView style={styles.ticketDisplay}>
+                          <FontAwesome name="bolt" size={14} color="#06b6d4" />
+                          <Text style={styles.ticketCountText}>{activity.lightning}</Text>
+                        </RNView>
+                      </RNView>
+                      <Text style={styles.activityDescription}>{activity.description}</Text>
+                    </RNView>
+              </RNView>
+            </RNView>
+            <RNView style={styles.activityFooter}>
+              <RNView style={styles.ticketDisplay}>
+                <FontAwesome name="bolt" size={20} color="#06b6d4" />
+                <Text style={styles.ticketCountText}>{activity.lightning}</Text>
               </RNView>
               <Pressable
                 style={styles.favoriteButton}
@@ -137,12 +149,9 @@ export default function SaltwickPierScreen() {
                 <FontAwesome 
                   name={favorites.has(activity.id) ? "star" : "star-o"} 
                   size={16} 
-                  color={favorites.has(activity.id) ? "#fbbf24" : "#6b7280"} 
+                  color={favorites.has(activity.id) ? "#94a3b8" : "#94a3b8"} 
                 />
               </Pressable>
-            </RNView>
-            <RNView style={styles.activityFooter}>
-              <Text style={styles.rewardText}>{activity.reward}</Text>
             </RNView>
           </RNView>
         ))}
@@ -177,7 +186,7 @@ const styles = StyleSheet.create({
   backButtonText: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 12,
-    color: '#0f172a',
+    color: '#0ea5e9',
     marginLeft: 6,
   },
   title: {
@@ -243,10 +252,11 @@ const styles = StyleSheet.create({
   },
   activityIcon: {
     marginRight: 12,
-    marginTop: 2,
+    alignSelf: 'center',
   },
   activityText: {
     flex: 1,
+    marginLeft: 8,
   },
   activityName: {
     fontFamily: 'Silkscreen_400Regular',
@@ -266,7 +276,7 @@ const styles = StyleSheet.create({
   },
   activityFooter: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
     alignItems: 'center',
   },
   rewardText: {

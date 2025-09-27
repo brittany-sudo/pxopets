@@ -17,6 +17,8 @@ const lilTotemGuyImage = require('@/assets/images/lil-totem-guy.png');
 const lilPopcornImage = require('@/assets/images/lil-popcorn.png');
 const lilScarecrowImage = require('@/assets/images/lil-scarecrow.png');
 const lilGnomeImage = require('@/assets/images/lil-gnome.png');
+const lilPotImage = require('@/assets/images/lil-pot.png');
+const loomersTinyImage = require('@/assets/images/loomers-tiny.png');
 const mapOfPxopiaImage = require('@/assets/images/mapofpxopia.png');
 
 export default function ExploreScreen() {
@@ -29,7 +31,7 @@ export default function ExploreScreen() {
       name: "The Pxoburbs",
       icon: "home",
       color: "#64748b",
-      description: "Nostalgic 90s suburban neighborhood.",
+      description: "A nostalgic suburban enclave where neon-lit arcades meet corner stores.",
       image: staticTvImage
     },
     {
@@ -37,23 +39,23 @@ export default function ExploreScreen() {
       name: "Shakespeare's Quarter",
       icon: "paint-brush",
       color: "#ec4899",
-      description: "Main village square with shops and craftspeople.",
-      image: lilPaletteImage
+      description: "An artistic district where creativity flows through cobblestone streets.",
+      image: lilPotImage
     },
     {
       id: "crystal-cove",
-      name: "Foggy Harbor",
+      name: "Loomer's Wharf",
       icon: "anchor",
       color: "#64748b",
-      description: "Dreary Maine fishing town shrouded in mist.",
-      image: lilAnchorImage
+      description: "A misty maritime port where fog dances with fishing boats.",
+      image: loomersTinyImage
     },
     {
       id: "casino",
       name: "Crescent Oasis",
       icon: "sun-o",
       color: "#f59e0b",
-      description: "Pink desert mirage with hippie aliens and atomic 50s diners.",
+      description: "A desert mirage where atomic age meets cosmic wonder.",
       image: neonBurgerImage
     },
     {
@@ -61,7 +63,7 @@ export default function ExploreScreen() {
       name: "Bag of Stars Forest",
       icon: "leaf",
       color: "#10b981",
-      description: "Enchanted forest where stars fall like leaves.",
+      description: "An enchanted woodland where celestial bodies bloom as foliage.",
       image: lilTotemGuyImage
     },
     {
@@ -69,7 +71,7 @@ export default function ExploreScreen() {
       name: "Barrelhaven",
       icon: "glass",
       color: "#8b5cf6",
-      description: "Medieval winery village in rolling hills.",
+      description: "A medieval vineyard where wine flows as freely as the rolling hills.",
       image: lilWineCasketImage
     },
     {
@@ -77,7 +79,7 @@ export default function ExploreScreen() {
       name: "Slumbering Hills",
       icon: "mountain",
       color: "#6b7280",
-      description: "Peaceful valley where sleepy creatures rest.",
+      description: "A tranquil valley where gentle giants rest beneath starlit skies.",
       image: lilGnomeImage
     },
     {
@@ -85,7 +87,7 @@ export default function ExploreScreen() {
       name: "Saltwick Pier",
       icon: "ship",
       color: "#dc2626",
-      description: "Colorful carnival with rides and games.",
+      description: "A vibrant waterfront where maritime adventure meets carnival delight.",
       image: lilPopcornImage
     },
     {
@@ -93,7 +95,7 @@ export default function ExploreScreen() {
       name: "Scarecrow Vale",
       icon: "book",
       color: "#7c3aed",
-      description: "Mysterious fields where scarecrows watch over crops.",
+      description: "A pastoral landscape where silent sentinels guard golden fields.",
       image: lilScarecrowImage
     },
     {
@@ -101,7 +103,7 @@ export default function ExploreScreen() {
       name: "Enchanted Island",
       icon: "music",
       color: "#f97316",
-      description: "Mystical Polynesian island with tiki spirits.",
+      description: "A tropical paradise where ancient tiki spirits dance with volcanic fire.",
       image: volcanoImage
     }
   ];
@@ -275,6 +277,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontStyle: 'italic',
     lineHeight: 14,
+    marginTop: -16,
     marginBottom: 16,
     paddingHorizontal: 8,
   },

@@ -21,6 +21,7 @@ const pinkGuyImage = require('@/assets/images/pink-guy.png');
 const coconutGuyImage = require('@/assets/images/coco-guy.png');
 const purpleGuyImage = require('@/assets/images/purple-guy.png');
 const robotGuyImage = require('@/assets/images/robot-guy.png');
+const sheepGuyImage = require('@/assets/images/sheep-guy.png');
 const createPetImage = require('@/assets/images/create-a-pet.png');
 
 export default function CreatePet() {
@@ -44,7 +45,8 @@ export default function CreatePet() {
     if (id === 'p3') return coconutGuyImage;
     if (id === 'p4') return purpleGuyImage;
     if (id === 'p5') return robotGuyImage;
-    // p6, p7, p8 will use placeholder icons
+    if (id === 'p6') return sheepGuyImage;
+    // p7, p8 will use placeholder icons
     return null;
   };
 
@@ -56,7 +58,7 @@ export default function CreatePet() {
           style={styles.backButton}
           onPress={() => router.back()}
         >
-          <FontAwesome name="arrow-left" size={16} color="#0f172a" />
+          <FontAwesome name="arrow-left" size={14} color="#0ea5e9" />
           <Text style={styles.backButtonText}>Back</Text>
         </Pressable>
 
@@ -81,8 +83,6 @@ export default function CreatePet() {
                       style={styles.petImage}
                       resizeMode="contain"
                     />
-                  ) : id === 'p6' ? (
-                    <FontAwesome name="star" size={40} color="#0ea5e9" />
                   ) : id === 'p7' ? (
                     <FontAwesome name="heart" size={40} color="#8b5cf6" />
                   ) : id === 'p8' ? (
@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
   backButtonText: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 12,
-    color: '#0f172a',
+    color: '#0ea5e9',
     marginLeft: 6,
   },
   titleImage: {

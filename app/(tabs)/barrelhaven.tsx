@@ -27,7 +27,7 @@ export default function BarrelhavenScreen() {
       id: 'wine-tasting',
       name: 'Wine Tasting',
       description: 'Sample the finest vintages from ancient cellars.',
-      reward: '20 Gems',
+      lightning: 20,
       difficulty: 'Easy',
       icon: 'glass'
     },
@@ -35,7 +35,7 @@ export default function BarrelhavenScreen() {
       id: 'barrel-making',
       name: 'Barrel Making',
       description: 'Craft oak barrels using traditional cooper techniques.',
-      reward: '25 Gems',
+      lightning: 25,
       difficulty: 'Hard',
       icon: 'circle'
     },
@@ -43,7 +43,7 @@ export default function BarrelhavenScreen() {
       id: 'grape-harvest',
       name: 'Grape Harvest',
       description: 'Pick grapes during the autumn harvest season.',
-      reward: '15 Gems',
+      lightning: 15,
       difficulty: 'Medium',
       icon: 'leaf'
     },
@@ -51,7 +51,7 @@ export default function BarrelhavenScreen() {
       id: 'cellar-tour',
       name: 'Cellar Tour',
       description: 'Explore the deep underground wine cellars.',
-      reward: '12 Gems',
+      lightning: 12,
       difficulty: 'Easy',
       icon: 'arrow-down'
     },
@@ -59,7 +59,7 @@ export default function BarrelhavenScreen() {
       id: 'wine-blending',
       name: 'Wine Blending',
       description: 'Create your own unique wine blend from different grapes.',
-      reward: '30 Gems',
+      lightning: 30,
       difficulty: 'Hard',
       icon: 'tint'
     },
@@ -67,7 +67,7 @@ export default function BarrelhavenScreen() {
       id: 'medieval-feast',
       name: 'Medieval Feast',
       description: 'Dine like royalty at the grand banquet hall.',
-      reward: '35 Gems',
+      lightning: 35,
       difficulty: 'Medium',
       icon: 'cutlery'
     },
@@ -75,7 +75,7 @@ export default function BarrelhavenScreen() {
       id: 'vineyard-walk',
       name: 'Vineyard Walk',
       description: 'Stroll through the rolling hills of the vineyard.',
-      reward: '10 Gems',
+      lightning: 10,
       difficulty: 'Easy',
       icon: 'road'
     },
@@ -83,7 +83,7 @@ export default function BarrelhavenScreen() {
       id: 'wine-ceremony',
       name: 'Wine Ceremony',
       description: 'Participate in ancient wine-making rituals.',
-      reward: '40 Gems',
+      lightning: 40,
       difficulty: 'Hard',
       icon: 'heart'
     }
@@ -97,7 +97,7 @@ export default function BarrelhavenScreen() {
           style={styles.backButton}
           onPress={() => router.navigate('/(tabs)/explore')}
         >
-          <FontAwesome name="arrow-left" size={16} color="#0f172a" />
+          <FontAwesome name="arrow-left" size={14} color="#0ea5e9" />
           <Text style={styles.backButtonText}>Back</Text>
         </Pressable>
 
@@ -124,11 +124,23 @@ export default function BarrelhavenScreen() {
           <RNView key={activity.id} style={styles.activityItem}>
             <RNView style={styles.activityHeader}>
               <RNView style={styles.activityInfo}>
-                <FontAwesome name={activity.icon as any} size={20} color="#8b5cf6" style={styles.activityIcon} />
-                <RNView style={styles.activityText}>
-                  <Text style={styles.activityName}>{activity.name}</Text>
-                  <Text style={styles.activityDescription}>{activity.description}</Text>
-                </RNView>
+                <FontAwesome name={activity.icon as any} size={22} color="#8b5cf6" style={styles.activityIcon} />
+                    <RNView style={styles.activityText}>
+                      <RNView style={styles.activityTitleRow}>
+                        <Text style={styles.activityName}>{activity.name}</Text>
+                        <RNView style={styles.ticketDisplay}>
+                          <FontAwesome name="bolt" size={15} color="#06b6d4" />
+                          <Text style={styles.ticketCountText}>{activity.lightning}</Text>
+                        </RNView>
+                      </RNView>
+                      <Text style={styles.activityDescription}>{activity.description}</Text>
+                    </RNView>
+              </RNView>
+            </RNView>
+            <RNView style={styles.activityFooter}>
+              <RNView style={styles.ticketDisplay}>
+                <FontAwesome name="bolt" size={20} color="#06b6d4" />
+                <Text style={styles.ticketCountText}>{activity.lightning}</Text>
               </RNView>
               <Pressable
                 style={styles.favoriteButton}
@@ -137,12 +149,9 @@ export default function BarrelhavenScreen() {
                 <FontAwesome 
                   name={favorites.has(activity.id) ? "star" : "star-o"} 
                   size={16} 
-                  color={favorites.has(activity.id) ? "#fbbf24" : "#6b7280"} 
+                  color={favorites.has(activity.id) ? "#94a3b8" : "#94a3b8"} 
                 />
               </Pressable>
-            </RNView>
-            <RNView style={styles.activityFooter}>
-              <Text style={styles.rewardText}>{activity.reward}</Text>
             </RNView>
           </RNView>
         ))}
@@ -177,7 +186,7 @@ const styles = StyleSheet.create({
   backButtonText: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 12,
-    color: '#0f172a',
+    color: '#0ea5e9',
     marginLeft: 6,
   },
   title: {
@@ -243,10 +252,11 @@ const styles = StyleSheet.create({
   },
   activityIcon: {
     marginRight: 12,
-    marginTop: 2,
+    alignSelf: 'center',
   },
   activityText: {
     flex: 1,
+    marginLeft: 8,
   },
   activityName: {
     fontFamily: 'Silkscreen_400Regular',
@@ -266,7 +276,7 @@ const styles = StyleSheet.create({
   },
   activityFooter: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
     alignItems: 'center',
   },
   rewardText: {

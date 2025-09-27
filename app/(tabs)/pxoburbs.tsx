@@ -2,10 +2,15 @@ import React, { useState } from 'react';
 import { StyleSheet, ScrollView, View as RNView, Image, Pressable } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { router } from 'expo-router';
+import { router, Link } from 'expo-router';
 
 // Import the banner image
 const staticTvImage = require('@/assets/images/static-tv.png');
+const pxoburbsSkylineImage = require('@/assets/images/pxoburbs-skyline.png');
+const chipsImage = require('@/assets/images/chips.png');
+const lilArcadeImage = require('@/assets/images/lil-arcade.png');
+const rolerImage = require('@/assets/images/roler.png');
+const makeoutHillImage = require('@/assets/images/makeout-hill.png');
 
 export default function PxoburbsScreen() {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
@@ -22,70 +27,103 @@ export default function PxoburbsScreen() {
     });
   };
 
+
   const activities = [
     {
-      id: 'bike-riding',
-      name: 'Bike Riding',
-      description: 'Cruise through the neighborhood on your trusty bike.',
-      reward: '15 ⚡',
+      id: 'corner-store',
+      name: 'Quick Stop Corner Store',
+      description: 'Shop, lottery tickets, and gas station snacks.',
+      lightning: 12,
       difficulty: 'Easy',
-      icon: 'bicycle'
+      icon: 'chips'
     },
     {
-      id: 'keycard-hunt',
-      name: 'Lost Motel Key Card Hunt',
-      description: 'Find hidden key cards in the abandoned motel.',
-      reward: '25 ⚡',
-      difficulty: 'Medium',
-      icon: 'key'
-    },
-    {
-      id: 'stamp-safari',
-      name: 'Stamp Safari',
-      description: 'Collect rare stamps from around the world.',
-      reward: '20 ⚡',
+      id: 'arcade',
+      name: 'Pxoburbs Arcade',
+      description: 'Classic arcade games and pinball machines.',
+      lightning: 5,
       difficulty: 'Easy',
-      icon: 'book'
+      icon: 'arcade'
     },
     {
-      id: 'neighborhood-watch',
-      name: 'Neighborhood Watch',
-      description: 'Keep an eye on the community and report suspicious activity.',
-      reward: '30 ⚡',
+      id: 'roller-rink',
+      name: 'Starlight Roller Rink',
+      description: 'Skate to disco hits and find lost items.',
+      lightning: 8,
       difficulty: 'Medium',
-      icon: 'eye'
+      icon: 'roler'
     },
     {
-      id: 'garage-sale',
-      name: 'Garage Sale',
-      description: 'Browse and buy treasures from your neighbors.',
-      reward: '18 ⚡',
+      id: 'makeout-hill',
+      name: 'Makeout Hill',
+      description: 'The legendary spot for romantic encounters.',
+      lightning: 15,
+      difficulty: 'Medium',
+      icon: 'makeout-hill'
+    },
+    {
+      id: 'lost-found',
+      name: 'Lost & Found Kiosk',
+      description: 'Located at the roller rink - find missing items.',
+      lightning: 10,
       difficulty: 'Easy',
-      icon: 'shopping-bag'
+      icon: 'search'
     },
     {
-      id: 'block-party',
-      name: 'Block Party',
-      description: 'Join the community celebration with games and food.',
-      reward: '35 ⚡',
+      id: 'radio-station',
+      name: 'PXO 101.7 FM',
+      description: 'Local radio station with community shows.',
+      lightning: 18,
       difficulty: 'Medium',
-      icon: 'music'
+      icon: 'microphone'
     },
     {
-      id: 'mail-delivery',
-      name: 'Mail Delivery',
-      description: 'Help deliver mail to the neighborhood residents.',
-      reward: '22 ⚡',
+      id: 'movie-theater',
+      name: 'Starlight Cinema',
+      description: 'Catch the latest blockbusters and indie films.',
+      lightning: 20,
+      difficulty: 'Easy',
+      icon: 'film'
+    },
+    {
+      id: 'post-office',
+      name: 'Pxoburbs Post Office',
+      description: 'Send mail and packages to friends.',
+      lightning: 6,
       difficulty: 'Easy',
       icon: 'envelope'
     },
     {
-      id: 'treehouse-building',
-      name: 'Treehouse Building',
-      description: 'Construct the ultimate backyard treehouse.',
-      reward: '40 ⚡',
+      id: 'pet-daycare',
+      name: 'Happy Paws Daycare',
+      description: 'Drop off your pets for fun and socialization.',
+      lightning: 14,
+      difficulty: 'Medium',
+      icon: 'paw'
+    },
+    {
+      id: 'mall-food-court',
+      name: 'Pxoburbs Mall',
+      description: 'Shop and eat at the bustling food court.',
+      lightning: 25,
+      difficulty: 'Medium',
+      icon: 'shopping-bag'
+    },
+    {
+      id: 'computer-store',
+      name: 'Tech & Tunes',
+      description: 'Computer parts and vintage record collection.',
+      lightning: 22,
       difficulty: 'Hard',
-      icon: 'home'
+      icon: 'laptop'
+    },
+    {
+      id: 'suburban-park',
+      name: 'Maple Leaf Park',
+      description: 'Quiet suburban park with playground and trails.',
+      lightning: 8,
+      difficulty: 'Easy',
+      icon: 'tree'
     }
   ];
 
@@ -97,7 +135,7 @@ export default function PxoburbsScreen() {
           style={styles.backButton}
           onPress={() => router.navigate('/(tabs)/explore')}
         >
-          <FontAwesome name="arrow-left" size={16} color="#0f172a" />
+          <FontAwesome name="arrow-left" size={14} color="#0ea5e9" />
           <Text style={styles.backButtonText}>Back</Text>
         </Pressable>
 
@@ -106,14 +144,15 @@ export default function PxoburbsScreen() {
 
         {/* Banner Image */}
         <RNView style={styles.bannerContainer}>
-          <Image source={staticTvImage} style={styles.bannerImage} />
+          <Image source={pxoburbsSkylineImage} style={styles.bannerImage} />
         </RNView>
 
         {/* Description */}
         <Text style={styles.description}>
-          A nostalgic 90s suburban neighborhood where every house tells a story. 
-          Tree-lined streets, white picket fences, and the hum of lawnmowers create 
-          the perfect backdrop for childhood adventures and community connections.
+          Welcome to The Pxoburbs! This bustling suburban district is where the action happens. 
+          From the neon-lit arcade to the local corner store, every block offers something exciting. 
+          Skate at the roller rink, catch a movie at the cinema, or grab snacks at the mall food court. 
+          It's the perfect place to hang out, explore, and make memories with friends!
         </Text>
 
         {/* Activities Title */}
@@ -122,34 +161,92 @@ export default function PxoburbsScreen() {
         {/* Activities List */}
         {activities.map((activity) => (
           <RNView key={activity.id} style={styles.activityItem}>
-            <RNView style={styles.activityHeader}>
-              <RNView style={styles.activityInfo}>
-                <FontAwesome name={activity.icon as any} size={20} color="#8b5cf6" style={styles.activityIcon} />
-                <RNView style={styles.activityText}>
-                  <Text style={styles.activityName}>{activity.name}</Text>
-                  <Text style={styles.activityDescription}>{activity.description}</Text>
+            {activity.id === 'corner-store' ? (
+              <Link href="/quickstop" asChild>
+                <Pressable style={styles.activityPressable}>
+                  <RNView style={styles.activityHeader}>
+                    <RNView style={styles.activityInfo}>
+                      {activity.id === 'corner-store' ? (
+                        <Image source={chipsImage} style={styles.activityImageIcon} />
+                      ) : (
+                        <FontAwesome name={activity.icon as any} size={32} color="#8b5cf6" style={styles.activityIcon} />
+                      )}
+                      <RNView style={styles.activityText}>
+                        <RNView style={styles.activityTitleRow}>
+                          <Text style={styles.activityName}>{activity.name}</Text>
+                          {activity.id !== 'corner-store' && (
+                            <RNView style={styles.ticketDisplay}>
+                              <FontAwesome name="bolt" size={15} color="#06b6d4" />
+                              <Text style={styles.ticketCountText}>{activity.lightning}</Text>
+                            </RNView>
+                          )}
+                        </RNView>
+                        <Text style={styles.activityDescription}>{activity.description}</Text>
+                      </RNView>
+                    </RNView>
+                  </RNView>
+                  <RNView style={styles.activityFooter}>
+                    <Pressable
+                      style={styles.favoriteButton}
+                      onPress={() => toggleFavorite(activity.id)}
+                    >
+                      <FontAwesome 
+                        name={favorites.has(activity.id) ? "star" : "star-o"} 
+                        size={16} 
+                        color={favorites.has(activity.id) ? "#94a3b8" : "#94a3b8"} 
+                      />
+                    </Pressable>
+                  </RNView>
+                </Pressable>
+              </Link>
+            ) : (
+              <>
+                <RNView style={styles.activityHeader}>
+                  <RNView style={styles.activityInfo}>
+                {activity.id === 'corner-store' ? (
+                  <Image source={chipsImage} style={styles.activityImageIcon} />
+                ) : activity.id === 'arcade' ? (
+                  <Image source={lilArcadeImage} style={styles.arcadeImageIcon} />
+                ) : activity.id === 'roller-rink' ? (
+                  <Image source={rolerImage} style={styles.activityImageIcon} />
+                ) : activity.id === 'makeout-hill' ? (
+                  <Image source={makeoutHillImage} style={styles.activityImageIcon} />
+                ) : (
+                  <FontAwesome name={activity.icon as any} size={32} color="#8b5cf6" style={styles.activityIcon} />
+                )}
+                    <RNView style={styles.activityText}>
+                      <RNView style={styles.activityTitleRow}>
+                        <Text style={styles.activityName}>{activity.name}</Text>
+                        <RNView style={styles.ticketDisplay}>
+                          <FontAwesome name="bolt" size={14} color="#06b6d4" />
+                          <Text style={styles.ticketCountText}>{activity.lightning}</Text>
+                        </RNView>
+                      </RNView>
+                      <Text style={styles.activityDescription}>{activity.description}</Text>
+                    </RNView>
+                  </RNView>
                 </RNView>
-              </RNView>
-              <Pressable
-                style={styles.favoriteButton}
-                onPress={() => toggleFavorite(activity.id)}
-              >
-                <FontAwesome 
-                  name={favorites.has(activity.id) ? "star" : "star-o"} 
-                  size={16} 
-                  color={favorites.has(activity.id) ? "#fbbf24" : "#6b7280"} 
-                />
-              </Pressable>
-            </RNView>
-            <RNView style={styles.activityFooter}>
-              <Text style={styles.rewardText}>{activity.reward}</Text>
-            </RNView>
+                <RNView style={styles.activityFooter}>
+                  <Pressable
+                    style={styles.favoriteButton}
+                    onPress={() => toggleFavorite(activity.id)}
+                  >
+                    <FontAwesome 
+                      name={favorites.has(activity.id) ? "star" : "star-o"} 
+                      size={16} 
+                      color={favorites.has(activity.id) ? "#94a3b8" : "#94a3b8"} 
+                    />
+                  </Pressable>
+                </RNView>
+              </>
+            )}
           </RNView>
         ))}
-      </ScrollView>
-    </View>
-  );
-}
+        </ScrollView>
+
+      </View>
+    );
+  }
 
 const styles = StyleSheet.create({
   container: {
@@ -177,7 +274,7 @@ const styles = StyleSheet.create({
   backButtonText: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 12,
-    color: '#0f172a',
+    color: '#0ea5e9',
     marginLeft: 6,
   },
   title: {
@@ -185,7 +282,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#0f172a',
-    marginBottom: 20,
+    marginBottom: 5,
     textAlign: 'left',
     alignSelf: 'flex-start',
   },
@@ -195,20 +292,24 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#0ea5e9',
     borderRadius: 8,
+    marginTop: 0,
     marginBottom: 20,
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
     backgroundColor: 'rgba(14, 165, 233, 0.05)',
   },
   bannerImage: {
-    width: 150,
-    height: 150,
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+    marginTop: 20,
   },
   description: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 12,
     color: '#0f172a',
     lineHeight: 18,
+    marginTop: -10,
     marginBottom: 24,
     textAlign: 'left',
     alignSelf: 'flex-start',
@@ -231,6 +332,9 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     width: '100%',
   },
+  activityPressable: {
+    width: '100%',
+  },
   activityHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -243,10 +347,32 @@ const styles = StyleSheet.create({
   },
   activityIcon: {
     marginRight: 12,
-    marginTop: 2,
+    alignSelf: 'center',
+  },
+  activityImageIcon: {
+    width: 36,
+    height: 36,
+    marginRight: 12,
+    alignSelf: 'center',
+    imageRendering: 'pixelated' as any,
+  },
+  arcadeImageIcon: {
+    width: 36,
+    height: 36,
+    marginRight: 12,
+    alignSelf: 'center',
+    imageRendering: 'pixelated' as any,
+    resizeMode: 'contain',
   },
   activityText: {
     flex: 1,
+    marginLeft: 8,
+  },
+  activityTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 4,
   },
   activityName: {
     fontFamily: 'Silkscreen_400Regular',
@@ -254,6 +380,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#0f172a',
     marginBottom: 4,
+  },
+  ticketDisplay: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
   },
   activityDescription: {
     fontFamily: 'Silkscreen_400Regular',
@@ -266,13 +397,24 @@ const styles = StyleSheet.create({
   },
   activityFooter: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
     alignItems: 'center',
+  },
+  rewardContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
   rewardText: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 12,
     color: '#8b5cf6',
+    fontWeight: 'bold',
+  },
+  ticketCountText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#06b6d4',
     fontWeight: 'bold',
   },
 });

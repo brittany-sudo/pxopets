@@ -23,10 +23,23 @@ export default function GamesScreen() {
   const { addCoins, hydrated } = useGame();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [favorites, setFavorites] = useState<Set<string>>(new Set());
   
   if (!hydrated) return <View style={styles.container}><Text>Loading...</Text></View>;
 
-  const categories = ['All', 'Adventure', 'Puzzle', 'Action', 'Simulation', 'Sports'];
+  const categories = ['All', 'Adventure', 'Puzzle', 'Action', 'Simulation', 'Sports', 'Casino', 'Favorites'];
+
+  const toggleFavorite = (gameId: string) => {
+    setFavorites(prev => {
+      const newFavorites = new Set(prev);
+      if (newFavorites.has(gameId)) {
+        newFavorites.delete(gameId);
+      } else {
+        newFavorites.add(gameId);
+      }
+      return newFavorites;
+    });
+  };
 
   const games = [
     {
@@ -189,10 +202,22 @@ export default function GamesScreen() {
     return games.filter(game => {
       const matchesSearch = game.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                            game.description.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesCategory = selectedCategory === 'All' || game.category === selectedCategory;
+      
+      let matchesCategory = false;
+      if (selectedCategory === 'All') {
+        matchesCategory = true;
+      } else if (selectedCategory === 'Favorites') {
+        matchesCategory = favorites.has(game.id);
+      } else if (selectedCategory === 'Casino') {
+        // For now, we'll treat casino as a special category - you can add casino games later
+        matchesCategory = game.category === 'Casino' || game.name.toLowerCase().includes('casino');
+      } else {
+        matchesCategory = game.category === selectedCategory;
+      }
+      
       return matchesSearch && matchesCategory;
     });
-  }, [searchQuery, selectedCategory]);
+  }, [searchQuery, selectedCategory, favorites]);
 
   const handleGamePress = (game: any) => {
     Alert.alert(
@@ -212,7 +237,7 @@ export default function GamesScreen() {
         <RNView style={styles.arcadeHeader}>
           {/* Welcome Box with High Scores */}
           <RNView style={styles.welcomeBox}>
-            <Text style={styles.welcomeTitle}>WELCOME TO THE ARCADE!</Text>
+            <Text style={styles.welcomeTitle}>WELCOME TO THE GAME ROOM</Text>
             <RNView>
               <RNView style={styles.highScoreItem}>
                 <Text style={styles.highScoreText}>1. ATOMIC SURF</Text>
@@ -254,24 +279,6 @@ export default function GamesScreen() {
           />
         </RNView>
 
-        {/* Banner Section */}
-        <RNView style={styles.bannerContainer}>
-          <Pressable style={styles.bannerButton} onPress={() => Alert.alert('Favorites', 'Your favorite games will appear here!')}>
-            <RNView style={styles.bannerContent}>
-              <FontAwesome name="heart" size={20} color="#ec4899" />
-              <Text style={styles.bannerTitle}>FAVORITES</Text>
-              <Text style={styles.bannerSubtitle}>Your saved games</Text>
-            </RNView>
-          </Pressable>
-          
-          <Pressable style={styles.bannerButton} onPress={() => Alert.alert('Casino', 'Welcome to the Pxopia Casino!')}>
-            <RNView style={styles.bannerContent}>
-              <FontAwesome name="diamond" size={20} color="#f59e0b" />
-              <Text style={styles.bannerTitle}>CASINO</Text>
-              <Text style={styles.bannerSubtitle}>Betting games</Text>
-            </RNView>
-          </Pressable>
-        </RNView>
 
         {/* Search Bar */}
         <RNView style={styles.searchContainer}>
@@ -286,27 +293,38 @@ export default function GamesScreen() {
         </RNView>
 
         {/* Categories */}
-        <BorderedBox style={styles.wideBox}>
-          <RNView style={styles.categoriesContainer}>
-            {categories.map((category) => (
-              <Pressable
-                key={category}
-                style={[
-                  styles.categoryButton,
-                  selectedCategory === category && styles.selectedCategory
-                ]}
-                onPress={() => setSelectedCategory(category)}
-              >
-                <Text style={[
-                  styles.categoryText,
-                  selectedCategory === category && styles.selectedCategoryText
-                ]}>
-                  {category}
-                </Text>
-              </Pressable>
-            ))}
+        <RNView style={styles.categoriesSection}>
+          <Text style={styles.categoriesTitle}>Categories</Text>
+          <RNView style={styles.categoriesBox}>
+            <RNView style={styles.categoriesContainer}>
+              {categories.map((category) => (
+                <Pressable
+                  key={category}
+                  style={[
+                    styles.categoryButton,
+                    selectedCategory === category && styles.selectedCategory
+                  ]}
+                  onPress={() => setSelectedCategory(category)}
+                >
+                  {category === 'Favorites' ? (
+                    <FontAwesome 
+                      name="star" 
+                      size={12} 
+                      color={selectedCategory === category ? "#ffffff" : "#8b5cf6"} 
+                    />
+                  ) : (
+                    <Text style={[
+                      styles.categoryText,
+                      selectedCategory === category && styles.selectedCategoryText
+                    ]}>
+                      {category}
+                    </Text>
+                  )}
+                </Pressable>
+              ))}
+            </RNView>
           </RNView>
-        </BorderedBox>
+        </RNView>
         
         <RNView style={styles.gamesGrid}>
             {filteredGames.map((game, index) => (
@@ -315,6 +333,22 @@ export default function GamesScreen() {
                 style={styles.gameCard}
                 onPress={() => handleGamePress(game)}
               >
+                <RNView style={styles.gameCardHeader}>
+                  <Pressable
+                    style={styles.favoriteButton}
+                    onPress={(e) => {
+                      e.stopPropagation();
+                      toggleFavorite(game.id);
+                    }}
+                  >
+                    <FontAwesome 
+                      name={favorites.has(game.id) ? "star" : "star-o"} 
+                      size={16} 
+                      color={favorites.has(game.id) ? "#8b5cf6" : "#ffffff"} 
+                    />
+                  </Pressable>
+                </RNView>
+                
                 {game.image ? (
                   <RNView style={styles.imageContainer}>
                     <Image
@@ -348,7 +382,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   arcadeHeader: {
-    width: '90%',
+    width: '95%',
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 20,
@@ -371,7 +405,7 @@ const styles = StyleSheet.create({
   welcomeTitle: {
     fontFamily: 'PressStart2P_400Regular',
     fontSize: 10,
-    color: '#0ea5e9',
+    color: '#0f172a',
     textAlign: 'center',
     marginBottom: 10,
   },
@@ -402,35 +436,23 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     marginBottom: 4,
   },
-  bannerContainer: {
-    flexDirection: 'row',
-    gap: 8,
-    marginBottom: 12,
-    width: '90%',
-    alignSelf: 'center',
+  gameCardHeader: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    zIndex: 1,
   },
-  bannerButton: {
-    flex: 1,
-    backgroundColor: 'rgba(14, 165, 233, 0.05)',
-    borderWidth: 1,
-    borderColor: '#0ea5e9',
-    borderRadius: 8,
-    padding: 12,
-  },
-  bannerContent: {
-    alignItems: 'center',
-    gap: 4,
-  },
-  bannerTitle: {
-    fontFamily: 'Silkscreen_400Regular',
-    fontSize: 12,
-    color: '#0f172a',
-    fontWeight: 'bold',
-  },
-  bannerSubtitle: {
-    fontFamily: 'Silkscreen_400Regular',
-    fontSize: 9,
-    color: '#64748b',
+  favoriteButton: {
+    padding: 6,
+    backgroundColor: 'rgba(139, 92, 246, 0.9)',
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: '#8b5cf6',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
   },
   searchContainer: {
     flexDirection: 'row',
@@ -442,15 +464,28 @@ const styles = StyleSheet.create({
     borderColor: '#0ea5e9',
     borderRadius: 4,
     backgroundColor: 'rgba(14, 165, 233, 0.05)',
-    width: '90%',
+    width: '95%',
     marginBottom: 16,
     alignSelf: 'center',
   },
-  wideBox: {
-    width: '90%',
-    alignItems: 'flex-start',
+  categoriesSection: {
+    width: '95%',
     marginBottom: 16,
     alignSelf: 'center',
+  },
+  categoriesTitle: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 7,
+    color: '#0ea5e9',
+    marginBottom: 3,
+    textAlign: 'left',
+  },
+  categoriesBox: {
+    backgroundColor: 'rgba(14, 165, 233, 0.05)',
+    borderWidth: 1,
+    borderColor: '#0ea5e9',
+    borderRadius: 6,
+    padding: 12,
   },
   searchInput: {
     flex: 1,
@@ -505,8 +540,8 @@ const styles = StyleSheet.create({
     width: '48%',
     aspectRatio: 1,
     backgroundColor: 'transparent',
-    padding: 8,
-    marginBottom: 12,
+    padding: 2,
+    marginBottom: 2,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -537,7 +572,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#0f172a',
     textAlign: 'center',
-    marginBottom: 4,
+    marginBottom: 0,
   },
 });
 

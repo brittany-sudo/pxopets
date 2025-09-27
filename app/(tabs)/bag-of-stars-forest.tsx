@@ -27,7 +27,7 @@ export default function BagOfStarsForestScreen() {
       id: 'star-gazing',
       name: 'Star Gazing',
       description: 'Watch stars fall like leaves in the enchanted canopy',
-      reward: '5 Gems',
+      lightning: 5,
       difficulty: 'Easy',
       icon: 'star'
     },
@@ -35,7 +35,7 @@ export default function BagOfStarsForestScreen() {
       id: 'totem-carving',
       name: 'Totem Carving',
       description: 'Carve mystical totems from fallen starwood',
-      reward: '8 Gems',
+      lightning: 8,
       difficulty: 'Medium',
       icon: 'tree'
     },
@@ -43,7 +43,7 @@ export default function BagOfStarsForestScreen() {
       id: 'spirit-communion',
       name: 'Spirit Communion',
       description: 'Connect with ancient forest spirits',
-      reward: '12 Gems',
+      lightning: 12,
       difficulty: 'Hard',
       icon: 'heart'
     },
@@ -51,7 +51,7 @@ export default function BagOfStarsForestScreen() {
       id: 'moonlight-dance',
       name: 'Moonlight Dance',
       description: 'Dance under the silver moonbeams',
-      reward: '6 Gems',
+      lightning: 6,
       difficulty: 'Easy',
       icon: 'music'
     },
@@ -59,7 +59,7 @@ export default function BagOfStarsForestScreen() {
       id: 'crystal-hunting',
       name: 'Crystal Hunting',
       description: 'Search for fallen star crystals',
-      reward: '10 Gems',
+      lightning: 10,
       difficulty: 'Medium',
       icon: 'diamond'
     },
@@ -67,7 +67,7 @@ export default function BagOfStarsForestScreen() {
       id: 'forest-meditation',
       name: 'Forest Meditation',
       description: 'Find inner peace among the ancient trees',
-      reward: '7 Gems',
+      lightning: 7,
       difficulty: 'Easy',
       icon: 'leaf'
     },
@@ -75,7 +75,7 @@ export default function BagOfStarsForestScreen() {
       id: 'spirit-guide',
       name: 'Spirit Guide',
       description: 'Lead lost travelers through the mystical paths',
-      reward: '15 Gems',
+      lightning: 15,
       difficulty: 'Hard',
       icon: 'compass'
     },
@@ -83,7 +83,7 @@ export default function BagOfStarsForestScreen() {
       id: 'star-blessing',
       name: 'Star Blessing',
       description: 'Receive blessings from the falling stars',
-      reward: '9 Gems',
+      lightning: 9,
       difficulty: 'Medium',
       icon: 'magic'
     }
@@ -97,7 +97,7 @@ export default function BagOfStarsForestScreen() {
           style={styles.backButton}
           onPress={() => router.navigate('/(tabs)/explore')}
         >
-          <FontAwesome name="arrow-left" size={16} color="#0f172a" />
+          <FontAwesome name="arrow-left" size={14} color="#0ea5e9" />
           <Text style={styles.backButtonText}>Back</Text>
         </Pressable>
 
@@ -124,11 +124,23 @@ export default function BagOfStarsForestScreen() {
           <RNView key={activity.id} style={styles.activityItem}>
             <RNView style={styles.activityHeader}>
               <RNView style={styles.activityInfo}>
-                <FontAwesome name={activity.icon as any} size={20} color="#8b5cf6" style={styles.activityIcon} />
-                <RNView style={styles.activityText}>
-                  <Text style={styles.activityName}>{activity.name}</Text>
-                  <Text style={styles.activityDescription}>{activity.description}</Text>
-                </RNView>
+                <FontAwesome name={activity.icon as any} size={22} color="#8b5cf6" style={styles.activityIcon} />
+                    <RNView style={styles.activityText}>
+                      <RNView style={styles.activityTitleRow}>
+                        <Text style={styles.activityName}>{activity.name}</Text>
+                        <RNView style={styles.ticketDisplay}>
+                          <FontAwesome name="bolt" size={15} color="#06b6d4" />
+                          <Text style={styles.ticketCountText}>{activity.lightning}</Text>
+                        </RNView>
+                      </RNView>
+                      <Text style={styles.activityDescription}>{activity.description}</Text>
+                    </RNView>
+              </RNView>
+            </RNView>
+            <RNView style={styles.activityFooter}>
+              <RNView style={styles.ticketDisplay}>
+                <FontAwesome name="bolt" size={20} color="#06b6d4" />
+                <Text style={styles.ticketCountText}>{activity.lightning}</Text>
               </RNView>
               <Pressable
                 style={styles.favoriteButton}
@@ -137,12 +149,9 @@ export default function BagOfStarsForestScreen() {
                 <FontAwesome 
                   name={favorites.has(activity.id) ? "star" : "star-o"} 
                   size={16} 
-                  color={favorites.has(activity.id) ? "#fbbf24" : "#6b7280"} 
+                  color={favorites.has(activity.id) ? "#94a3b8" : "#94a3b8"} 
                 />
               </Pressable>
-            </RNView>
-            <RNView style={styles.activityFooter}>
-              <Text style={styles.rewardText}>{activity.reward}</Text>
             </RNView>
           </RNView>
         ))}
@@ -177,7 +186,7 @@ const styles = StyleSheet.create({
   backButtonText: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 12,
-    color: '#0f172a',
+    color: '#0ea5e9',
     marginLeft: 6,
   },
   title: {
@@ -243,10 +252,11 @@ const styles = StyleSheet.create({
   },
   activityIcon: {
     marginRight: 12,
-    marginTop: 2,
+    alignSelf: 'center',
   },
   activityText: {
     flex: 1,
+    marginLeft: 8,
   },
   activityName: {
     fontFamily: 'Silkscreen_400Regular',
@@ -266,7 +276,7 @@ const styles = StyleSheet.create({
   },
   activityFooter: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
     alignItems: 'center',
   },
   rewardText: {

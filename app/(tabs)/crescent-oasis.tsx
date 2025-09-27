@@ -27,7 +27,7 @@ export default function CrescentOasisScreen() {
       id: 'atomic-diner',
       name: 'Atomic Diner',
       description: 'Dine at the retro 50s diner with alien waitstaff.',
-      reward: '15 Gems',
+      lightning: 15,
       difficulty: 'Easy',
       icon: 'cutlery'
     },
@@ -35,7 +35,7 @@ export default function CrescentOasisScreen() {
       id: 'neon-gambling',
       name: 'Neon Gambling',
       description: 'Try your luck at the glowing slot machines.',
-      reward: '25 Gems',
+      lightning: 25,
       difficulty: 'Medium',
       icon: 'diamond'
     },
@@ -43,7 +43,7 @@ export default function CrescentOasisScreen() {
       id: 'desert-racing',
       name: 'Desert Racing',
       description: 'Race hover cars across the pink sand dunes.',
-      reward: '30 Gems',
+      lightning: 30,
       difficulty: 'Hard',
       icon: 'car'
     },
@@ -51,7 +51,7 @@ export default function CrescentOasisScreen() {
       id: 'alien-encounter',
       name: 'Alien Encounter',
       description: 'Meet friendly hippie aliens from distant galaxies.',
-      reward: '20 Gems',
+      lightning: 20,
       difficulty: 'Medium',
       icon: 'rocket'
     },
@@ -59,7 +59,7 @@ export default function CrescentOasisScreen() {
       id: 'crystal-mining',
       name: 'Crystal Mining',
       description: 'Extract precious crystals from desert formations.',
-      reward: '18 Gems',
+      lightning: 18,
       difficulty: 'Medium',
       icon: 'diamond'
     },
@@ -67,7 +67,7 @@ export default function CrescentOasisScreen() {
       id: 'sunset-meditation',
       name: 'Sunset Meditation',
       description: 'Meditate as the pink sun sets over the dunes.',
-      reward: '12 Gems',
+      lightning: 12,
       difficulty: 'Easy',
       icon: 'sun-o'
     },
@@ -75,7 +75,7 @@ export default function CrescentOasisScreen() {
       id: 'space-port',
       name: 'Space Port',
       description: 'Watch alien ships arrive and depart from the spaceport.',
-      reward: '22 Gems',
+      lightning: 22,
       difficulty: 'Easy',
       icon: 'plane'
     },
@@ -83,7 +83,7 @@ export default function CrescentOasisScreen() {
       id: 'desert-party',
       name: 'Desert Party',
       description: 'Join the nightly celebration under the stars.',
-      reward: '35 Gems',
+      lightning: 35,
       difficulty: 'Hard',
       icon: 'music'
     }
@@ -97,7 +97,7 @@ export default function CrescentOasisScreen() {
           style={styles.backButton}
           onPress={() => router.navigate('/(tabs)/explore')}
         >
-          <FontAwesome name="arrow-left" size={16} color="#0f172a" />
+          <FontAwesome name="arrow-left" size={14} color="#0ea5e9" />
           <Text style={styles.backButtonText}>Back</Text>
         </Pressable>
 
@@ -124,12 +124,20 @@ export default function CrescentOasisScreen() {
           <RNView key={activity.id} style={styles.activityItem}>
             <RNView style={styles.activityHeader}>
               <RNView style={styles.activityInfo}>
-                <FontAwesome name={activity.icon as any} size={20} color="#8b5cf6" style={styles.activityIcon} />
-                <RNView style={styles.activityText}>
-                  <Text style={styles.activityName}>{activity.name}</Text>
-                  <Text style={styles.activityDescription}>{activity.description}</Text>
-                </RNView>
+                <FontAwesome name={activity.icon as any} size={22} color="#8b5cf6" style={styles.activityIcon} />
+                    <RNView style={styles.activityText}>
+                      <RNView style={styles.activityTitleRow}>
+                        <Text style={styles.activityName}>{activity.name}</Text>
+                        <RNView style={styles.ticketDisplay}>
+                          <FontAwesome name="bolt" size={15} color="#06b6d4" />
+                          <Text style={styles.ticketCountText}>{activity.lightning}</Text>
+                        </RNView>
+                      </RNView>
+                      <Text style={styles.activityDescription}>{activity.description}</Text>
+                    </RNView>
               </RNView>
+            </RNView>
+            <RNView style={styles.activityFooter}>
               <Pressable
                 style={styles.favoriteButton}
                 onPress={() => toggleFavorite(activity.id)}
@@ -137,12 +145,9 @@ export default function CrescentOasisScreen() {
                 <FontAwesome 
                   name={favorites.has(activity.id) ? "star" : "star-o"} 
                   size={16} 
-                  color={favorites.has(activity.id) ? "#fbbf24" : "#6b7280"} 
+                  color={favorites.has(activity.id) ? "#94a3b8" : "#94a3b8"} 
                 />
               </Pressable>
-            </RNView>
-            <RNView style={styles.activityFooter}>
-              <Text style={styles.rewardText}>{activity.reward}</Text>
             </RNView>
           </RNView>
         ))}
@@ -177,7 +182,7 @@ const styles = StyleSheet.create({
   backButtonText: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 12,
-    color: '#0f172a',
+    color: '#0ea5e9',
     marginLeft: 6,
   },
   title: {
@@ -243,10 +248,28 @@ const styles = StyleSheet.create({
   },
   activityIcon: {
     marginRight: 12,
-    marginTop: 2,
+    alignSelf: 'center',
   },
   activityText: {
     flex: 1,
+    marginLeft: 8,
+  },
+  activityTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
+  ticketDisplay: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+  },
+  ticketCountText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#06b6d4',
+    fontWeight: 'bold',
   },
   activityName: {
     fontFamily: 'Silkscreen_400Regular',
@@ -266,7 +289,7 @@ const styles = StyleSheet.create({
   },
   activityFooter: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
     alignItems: 'center',
   },
   rewardText: {

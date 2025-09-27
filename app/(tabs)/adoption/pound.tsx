@@ -37,7 +37,7 @@ export default function Pound() {
               style={styles.backButton}
               onPress={() => router.back()}
             >
-              <FontAwesome name="arrow-left" size={16} color="#0ea5e9" />
+              <FontAwesome name="arrow-left" size={14} color="#0ea5e9" />
               <Text style={styles.backButtonText}>BACK</Text>
             </Pressable>
             <Text style={styles.title}>THE POUND</Text>

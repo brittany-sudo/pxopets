@@ -5,7 +5,7 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { router } from 'expo-router';
 
 // Import the banner image
-const lilAnchorImage = require('@/assets/images/lil-anchor.png');
+const loomersBackgroundImage = require('@/assets/images/loomers-background.png');
 
 export default function FoggyHarborScreen() {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
@@ -27,7 +27,7 @@ export default function FoggyHarborScreen() {
       id: 'lobster-trap',
       name: 'Lobster Trap Master',
       description: 'Learn the ancient art of lobster trapping from weathered old salts.',
-      reward: '50 Gems',
+      lightning: 50,
       difficulty: 'Medium',
       icon: 'anchor'
     },
@@ -35,7 +35,7 @@ export default function FoggyHarborScreen() {
       id: 'fog-navigation',
       name: 'Fog Navigation',
       description: 'Master the art of navigating through thick coastal fog.',
-      reward: '75 Gems',
+      lightning: 75,
       difficulty: 'Hard',
       icon: 'compass'
     },
@@ -43,7 +43,7 @@ export default function FoggyHarborScreen() {
       id: 'tall-tales',
       name: 'Tall Tales Tavern',
       description: 'Gather around the crackling fire at the Rusty Anchor Tavern.',
-      reward: '25 Gems',
+      lightning: 25,
       difficulty: 'Easy',
       icon: 'glass'
     },
@@ -51,7 +51,7 @@ export default function FoggyHarborScreen() {
       id: 'lighthouse-keeper',
       name: 'Lighthouse Keeper',
       description: 'Tend to the ancient lighthouse that guides ships through treacherous waters.',
-      reward: '60 Gems',
+      lightning: 60,
       difficulty: 'Medium',
       icon: 'lightbulb-o'
     },
@@ -59,7 +59,7 @@ export default function FoggyHarborScreen() {
       id: 'storm-watching',
       name: 'Storm Watching',
       description: 'Experience the raw power of Atlantic storms from the harbor breakwater.',
-      reward: '30 Gems',
+      lightning: 30,
       difficulty: 'Easy',
       icon: 'cloud'
     },
@@ -67,7 +67,7 @@ export default function FoggyHarborScreen() {
       id: 'net-mending',
       name: 'Net Mending',
       description: 'Learn the traditional craft of mending fishing nets.',
-      reward: '20 Gems',
+      lightning: 20,
       difficulty: 'Easy',
       icon: 'th'
     },
@@ -75,7 +75,7 @@ export default function FoggyHarborScreen() {
       id: 'harbor-mystery',
       name: 'Harbor Mystery',
       description: 'Investigate the mysterious disappearances that have plagued the harbor.',
-      reward: '100 Gems',
+      lightning: 100,
       difficulty: 'Hard',
       icon: 'search'
     },
@@ -83,7 +83,7 @@ export default function FoggyHarborScreen() {
       id: 'fog-horn',
       name: 'Fog Horn Keeper',
       description: 'Operate the town\'s iconic fog horn that echoes across the harbor.',
-      reward: '45 Gems',
+      lightning: 45,
       difficulty: 'Medium',
       icon: 'volume-up'
     }
@@ -97,16 +97,16 @@ export default function FoggyHarborScreen() {
           style={styles.backButton}
           onPress={() => router.navigate('/(tabs)/explore')}
         >
-          <FontAwesome name="arrow-left" size={16} color="#0f172a" />
+          <FontAwesome name="arrow-left" size={14} color="#0ea5e9" />
           <Text style={styles.backButtonText}>Back</Text>
         </Pressable>
 
         {/* Title */}
-        <Text style={styles.title}>FOGGY HARBOR</Text>
+        <Text style={styles.title}>LOOMER'S WHARF</Text>
 
         {/* Banner Image */}
         <RNView style={styles.bannerContainer}>
-          <Image source={lilAnchorImage} style={styles.bannerImage} />
+          <Image source={loomersBackgroundImage} style={styles.bannerImage} />
         </RNView>
 
         {/* Description */}
@@ -124,11 +124,23 @@ export default function FoggyHarborScreen() {
           <RNView key={activity.id} style={styles.activityItem}>
             <RNView style={styles.activityHeader}>
               <RNView style={styles.activityInfo}>
-                <FontAwesome name={activity.icon as any} size={20} color="#8b5cf6" style={styles.activityIcon} />
-                <RNView style={styles.activityText}>
-                  <Text style={styles.activityName}>{activity.name}</Text>
-                  <Text style={styles.activityDescription}>{activity.description}</Text>
-                </RNView>
+                <FontAwesome name={activity.icon as any} size={22} color="#8b5cf6" style={styles.activityIcon} />
+                    <RNView style={styles.activityText}>
+                      <RNView style={styles.activityTitleRow}>
+                        <Text style={styles.activityName}>{activity.name}</Text>
+                        <RNView style={styles.ticketDisplay}>
+                          <FontAwesome name="bolt" size={15} color="#06b6d4" />
+                          <Text style={styles.ticketCountText}>{activity.lightning}</Text>
+                        </RNView>
+                      </RNView>
+                      <Text style={styles.activityDescription}>{activity.description}</Text>
+                    </RNView>
+              </RNView>
+            </RNView>
+            <RNView style={styles.activityFooter}>
+              <RNView style={styles.ticketDisplay}>
+                <FontAwesome name="bolt" size={20} color="#06b6d4" />
+                <Text style={styles.ticketCountText}>{activity.lightning}</Text>
               </RNView>
               <Pressable
                 style={styles.favoriteButton}
@@ -137,12 +149,9 @@ export default function FoggyHarborScreen() {
                 <FontAwesome 
                   name={favorites.has(activity.id) ? "star" : "star-o"} 
                   size={16} 
-                  color={favorites.has(activity.id) ? "#fbbf24" : "#6b7280"} 
+                  color={favorites.has(activity.id) ? "#94a3b8" : "#94a3b8"} 
                 />
               </Pressable>
-            </RNView>
-            <RNView style={styles.activityFooter}>
-              <Text style={styles.rewardText}>{activity.reward}</Text>
             </RNView>
           </RNView>
         ))}
@@ -177,7 +186,7 @@ const styles = StyleSheet.create({
   backButtonText: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 12,
-    color: '#0f172a',
+    color: '#0ea5e9',
     marginLeft: 6,
   },
   title: {
@@ -185,7 +194,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#0f172a',
-    marginBottom: 20,
+    marginBottom: 5,
     textAlign: 'left',
     alignSelf: 'flex-start',
   },
@@ -195,20 +204,24 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#0ea5e9',
     borderRadius: 8,
+    marginTop: 0,
     marginBottom: 20,
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
     backgroundColor: 'rgba(14, 165, 233, 0.05)',
   },
   bannerImage: {
-    width: 150,
-    height: 150,
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+    marginTop: 20,
   },
   description: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 12,
     color: '#0f172a',
     lineHeight: 18,
+    marginTop: -10,
     marginBottom: 24,
     textAlign: 'left',
     alignSelf: 'flex-start',
@@ -243,10 +256,22 @@ const styles = StyleSheet.create({
   },
   activityIcon: {
     marginRight: 12,
-    marginTop: 2,
+    alignSelf: 'center',
   },
   activityText: {
     flex: 1,
+    marginLeft: 8,
+  },
+  activityTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
+  ticketDisplay: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
   },
   activityName: {
     fontFamily: 'Silkscreen_400Regular',
@@ -261,12 +286,18 @@ const styles = StyleSheet.create({
     color: '#0f172a',
     lineHeight: 16,
   },
+  ticketCountText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#06b6d4',
+    fontWeight: 'bold',
+  },
   favoriteButton: {
     padding: 4,
   },
   activityFooter: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
     alignItems: 'center',
   },
   rewardText: {

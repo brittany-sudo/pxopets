@@ -27,7 +27,7 @@ export default function EnchantedIslandScreen() {
       id: 'volcano-dance',
       name: 'Volcano Dance',
       description: 'Dance around the sacred volcano with tiki spirits.',
-      reward: '8 Gems',
+      lightning: 8,
       difficulty: 'Easy',
       icon: 'fire'
     },
@@ -35,7 +35,7 @@ export default function EnchantedIslandScreen() {
       id: 'pearl-diving',
       name: 'Pearl Diving',
       description: 'Dive deep into crystal waters to find precious pearls.',
-      reward: '12 Gems',
+      lightning: 12,
       difficulty: 'Medium',
       icon: 'tint'
     },
@@ -43,7 +43,7 @@ export default function EnchantedIslandScreen() {
       id: 'tiki-crafting',
       name: 'Tiki Crafting',
       description: 'Carve mystical tiki masks from sacred wood.',
-      reward: '10 Gems',
+      lightning: 10,
       difficulty: 'Medium',
       icon: 'cut'
     },
@@ -51,7 +51,7 @@ export default function EnchantedIslandScreen() {
       id: 'spirit-ceremony',
       name: 'Spirit Ceremony',
       description: 'Participate in ancient Polynesian rituals.',
-      reward: '15 Gems',
+      lightning: 15,
       difficulty: 'Hard',
       icon: 'heart'
     },
@@ -59,7 +59,7 @@ export default function EnchantedIslandScreen() {
       id: 'coconut-harvest',
       name: 'Coconut Harvest',
       description: 'Climb palm trees and harvest fresh coconuts.',
-      reward: '6 Gems',
+      lightning: 6,
       difficulty: 'Easy',
       icon: 'leaf'
     },
@@ -67,7 +67,7 @@ export default function EnchantedIslandScreen() {
       id: 'hula-lessons',
       name: 'Hula Lessons',
       description: 'Learn traditional Hawaiian hula dancing.',
-      reward: '7 Gems',
+      lightning: 7,
       difficulty: 'Easy',
       icon: 'music'
     },
@@ -75,7 +75,7 @@ export default function EnchantedIslandScreen() {
       id: 'volcano-offering',
       name: 'Volcano Offering',
       description: 'Make offerings to the ancient volcano spirits.',
-      reward: '20 Gems',
+      lightning: 20,
       difficulty: 'Hard',
       icon: 'gift'
     },
@@ -83,7 +83,7 @@ export default function EnchantedIslandScreen() {
       id: 'sunset-meditation',
       name: 'Sunset Meditation',
       description: 'Meditate as the sun sets over the Pacific.',
-      reward: '9 Gems',
+      lightning: 9,
       difficulty: 'Medium',
       icon: 'sun-o'
     }
@@ -97,7 +97,7 @@ export default function EnchantedIslandScreen() {
           style={styles.backButton}
           onPress={() => router.navigate('/(tabs)/explore')}
         >
-          <FontAwesome name="arrow-left" size={16} color="#0f172a" />
+          <FontAwesome name="arrow-left" size={14} color="#0ea5e9" />
           <Text style={styles.backButtonText}>Back</Text>
         </Pressable>
 
@@ -124,11 +124,23 @@ export default function EnchantedIslandScreen() {
           <RNView key={activity.id} style={styles.activityItem}>
             <RNView style={styles.activityHeader}>
               <RNView style={styles.activityInfo}>
-                <FontAwesome name={activity.icon as any} size={20} color="#8b5cf6" style={styles.activityIcon} />
-                <RNView style={styles.activityText}>
-                  <Text style={styles.activityName}>{activity.name}</Text>
-                  <Text style={styles.activityDescription}>{activity.description}</Text>
-                </RNView>
+                <FontAwesome name={activity.icon as any} size={22} color="#8b5cf6" style={styles.activityIcon} />
+                    <RNView style={styles.activityText}>
+                      <RNView style={styles.activityTitleRow}>
+                        <Text style={styles.activityName}>{activity.name}</Text>
+                        <RNView style={styles.ticketDisplay}>
+                          <FontAwesome name="bolt" size={15} color="#06b6d4" />
+                          <Text style={styles.ticketCountText}>{activity.lightning}</Text>
+                        </RNView>
+                      </RNView>
+                      <Text style={styles.activityDescription}>{activity.description}</Text>
+                    </RNView>
+              </RNView>
+            </RNView>
+            <RNView style={styles.activityFooter}>
+              <RNView style={styles.ticketDisplay}>
+                <FontAwesome name="bolt" size={20} color="#06b6d4" />
+                <Text style={styles.ticketCountText}>{activity.lightning}</Text>
               </RNView>
               <Pressable
                 style={styles.favoriteButton}
@@ -137,12 +149,9 @@ export default function EnchantedIslandScreen() {
                 <FontAwesome 
                   name={favorites.has(activity.id) ? "star" : "star-o"} 
                   size={16} 
-                  color={favorites.has(activity.id) ? "#fbbf24" : "#6b7280"} 
+                  color={favorites.has(activity.id) ? "#94a3b8" : "#94a3b8"} 
                 />
               </Pressable>
-            </RNView>
-            <RNView style={styles.activityFooter}>
-              <Text style={styles.rewardText}>{activity.reward}</Text>
             </RNView>
           </RNView>
         ))}
@@ -177,7 +186,7 @@ const styles = StyleSheet.create({
   backButtonText: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 12,
-    color: '#0f172a',
+    color: '#0ea5e9',
     marginLeft: 6,
   },
   title: {
@@ -243,10 +252,11 @@ const styles = StyleSheet.create({
   },
   activityIcon: {
     marginRight: 12,
-    marginTop: 2,
+    alignSelf: 'center',
   },
   activityText: {
     flex: 1,
+    marginLeft: 8,
   },
   activityName: {
     fontFamily: 'Silkscreen_400Regular',
@@ -266,7 +276,7 @@ const styles = StyleSheet.create({
   },
   activityFooter: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
     alignItems: 'center',
   },
   rewardText: {

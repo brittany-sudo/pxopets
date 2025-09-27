@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, ScrollView, View as RNView, Image, Pressable } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { router } from 'expo-router';
+import { router, Link } from 'expo-router';
 
 // Import the banner image
 const shakespeareQuartImage = require('@/assets/images/shakespeare-quart.png');
@@ -26,8 +26,8 @@ export default function ArtisanQuarterScreen() {
     {
       id: 'masquerade-hall',
       name: 'Masquerade Hall',
-      description: 'Weekly balls with elegant dancing and mysterious masks.',
-      reward: '25 Gems',
+      description: 'Weekly balls with elegant dancing.',
+      lightning: 3,
       difficulty: 'Medium',
       icon: 'theater-masks'
     },
@@ -35,7 +35,7 @@ export default function ArtisanQuarterScreen() {
       id: 'pottery-workshop',
       name: 'Pottery Workshop',
       description: 'Shape clay into beautiful vessels on ancient wheels.',
-      reward: '12 Gems',
+      lightning: 12,
       difficulty: 'Medium',
       icon: 'circle'
     },
@@ -43,7 +43,7 @@ export default function ArtisanQuarterScreen() {
       id: 'weaving-circle',
       name: 'Weaving Circle',
       description: 'Learn traditional textile arts from master weavers.',
-      reward: '10 Gems',
+      lightning: 10,
       difficulty: 'Medium',
       icon: 'th'
     },
@@ -51,7 +51,7 @@ export default function ArtisanQuarterScreen() {
       id: 'jewelry-making',
       name: 'Jewelry Making',
       description: 'Craft intricate pieces from precious metals and gems.',
-      reward: '15 Gems',
+      lightning: 15,
       difficulty: 'Hard',
       icon: 'diamond'
     },
@@ -59,7 +59,7 @@ export default function ArtisanQuarterScreen() {
       id: 'painting-studio',
       name: 'Painting Studio',
       description: 'Express your creativity on canvas with master artists.',
-      reward: '8 Gems',
+      lightning: 8,
       difficulty: 'Easy',
       icon: 'paint-brush'
     },
@@ -67,7 +67,7 @@ export default function ArtisanQuarterScreen() {
       id: 'sculpture-garden',
       name: 'Sculpture Garden',
       description: 'Carve stone and wood into magnificent sculptures.',
-      reward: '18 Gems',
+      lightning: 18,
       difficulty: 'Hard',
       icon: 'cube'
     },
@@ -75,7 +75,7 @@ export default function ArtisanQuarterScreen() {
       id: 'textile-dyeing',
       name: 'Textile Dyeing',
       description: 'Create vibrant colors using natural plant dyes.',
-      reward: '9 Gems',
+      lightning: 9,
       difficulty: 'Easy',
       icon: 'tint'
     },
@@ -83,7 +83,7 @@ export default function ArtisanQuarterScreen() {
       id: 'art-gallery',
       name: 'Art Gallery',
       description: 'Display your creations in the community gallery.',
-      reward: '25 Gems',
+      lightning: 25,
       difficulty: 'Medium',
       icon: 'picture-o'
     }
@@ -97,7 +97,7 @@ export default function ArtisanQuarterScreen() {
           style={styles.backButton}
           onPress={() => router.navigate('/(tabs)/explore')}
         >
-          <FontAwesome name="arrow-left" size={16} color="#0f172a" />
+          <FontAwesome name="arrow-left" size={14} color="#0ea5e9" />
           <Text style={styles.backButtonText}>Back</Text>
         </Pressable>
 
@@ -122,28 +122,72 @@ export default function ArtisanQuarterScreen() {
         {/* Activities List */}
         {activities.map((activity) => (
           <RNView key={activity.id} style={styles.activityItem}>
-            <RNView style={styles.activityHeader}>
-              <RNView style={styles.activityInfo}>
-                <FontAwesome name={activity.icon as any} size={20} color="#8b5cf6" style={styles.activityIcon} />
-                <RNView style={styles.activityText}>
-                  <Text style={styles.activityName}>{activity.name}</Text>
-                  <Text style={styles.activityDescription}>{activity.description}</Text>
+            {activity.id === 'masquerade-hall' ? (
+              <Link href="/masquerade-hall" asChild>
+                <Pressable style={styles.activityPressable}>
+                  <RNView style={styles.activityHeader}>
+                    <RNView style={styles.activityInfo}>
+                      <Image 
+                        source={require('@/assets/images/masquerade-hall-icon.png')} 
+                        style={styles.activityImageIcon} 
+                      />
+                      <RNView style={styles.activityText}>
+                        <RNView style={styles.activityTitleRow}>
+                          <Text style={styles.activityName}>{activity.name}</Text>
+                          <RNView style={styles.ticketDisplay}>
+                            <FontAwesome name="bolt" size={14} color="#06b6d4" />
+                            <Text style={styles.ticketCountText}>{activity.lightning}</Text>
+                          </RNView>
+                        </RNView>
+                        <Text style={styles.activityDescription}>{activity.description}</Text>
+                      </RNView>
+                    </RNView>
+                  </RNView>
+                  <RNView style={styles.activityFooter}>
+                    <Pressable
+                      style={styles.favoriteButton}
+                      onPress={() => toggleFavorite(activity.id)}
+                    >
+                      <FontAwesome 
+                        name={favorites.has(activity.id) ? "star" : "star-o"} 
+                        size={16} 
+                        color={favorites.has(activity.id) ? "#94a3b8" : "#94a3b8"} 
+                      />
+                    </Pressable>
+                  </RNView>
+                </Pressable>
+              </Link>
+            ) : (
+              <>
+                <RNView style={styles.activityHeader}>
+                  <RNView style={styles.activityInfo}>
+                    <FontAwesome name={activity.icon as any} size={32} color="#8b5cf6" style={styles.activityIcon} />
+                    <RNView style={styles.activityText}>
+                      <RNView style={styles.activityTitleRow}>
+                        <Text style={styles.activityName}>{activity.name}</Text>
+                        <RNView style={styles.ticketDisplay}>
+                          <FontAwesome name="bolt" size={14} color="#06b6d4" />
+                          <Text style={styles.ticketCountText}>{activity.lightning}</Text>
+                        </RNView>
+                      </RNView>
+                      <Text style={styles.activityDescription}>{activity.description}</Text>
+                    </RNView>
+                  </RNView>
                 </RNView>
-              </RNView>
-              <Pressable
-                style={styles.favoriteButton}
-                onPress={() => toggleFavorite(activity.id)}
-              >
-                <FontAwesome 
-                  name={favorites.has(activity.id) ? "star" : "star-o"} 
-                  size={16} 
-                  color={favorites.has(activity.id) ? "#fbbf24" : "#6b7280"} 
-                />
-              </Pressable>
-            </RNView>
-            <RNView style={styles.activityFooter}>
-              <Text style={styles.rewardText}>{activity.reward}</Text>
-            </RNView>
+                <RNView style={styles.activityFooter}>
+                  <Pressable
+                    style={styles.favoriteButton}
+                    onPress={() => toggleFavorite(activity.id)}
+                  >
+                    <FontAwesome 
+                      name={favorites.has(activity.id) ? "star" : "star-o"} 
+                      size={16} 
+                      color={favorites.has(activity.id) ? "#94a3b8" : "#94a3b8"} 
+                    />
+                  </Pressable>
+                </RNView>
+              </>
+            )}
           </RNView>
         ))}
       </ScrollView>
@@ -177,7 +221,7 @@ const styles = StyleSheet.create({
   backButtonText: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 12,
-    color: '#0f172a',
+    color: '#0ea5e9',
     marginLeft: 6,
   },
   title: {
@@ -185,7 +229,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#0f172a',
-    marginBottom: 20,
+    marginBottom: 5,
     textAlign: 'left',
     alignSelf: 'flex-start',
   },
@@ -195,21 +239,24 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#0ea5e9',
     borderRadius: 8,
+    marginTop: 0,
     marginBottom: 20,
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
     backgroundColor: 'rgba(14, 165, 233, 0.05)',
   },
   bannerImage: {
     width: '100%',
     height: '100%',
     resizeMode: 'cover',
+    marginTop: 20,
   },
   description: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 12,
     color: '#0f172a',
     lineHeight: 18,
+    marginTop: -10,
     marginBottom: 24,
     textAlign: 'left',
     alignSelf: 'flex-start',
@@ -232,6 +279,9 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     width: '100%',
   },
+  activityPressable: {
+    width: '100%',
+  },
   activityHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -244,10 +294,24 @@ const styles = StyleSheet.create({
   },
   activityIcon: {
     marginRight: 12,
-    marginTop: 2,
+    alignSelf: 'center',
+  },
+  activityImageIcon: {
+    width: 36,
+    height: 36,
+    marginRight: 12,
+    alignSelf: 'center',
+    imageRendering: 'pixelated' as any,
   },
   activityText: {
     flex: 1,
+    marginLeft: 8,
+  },
+  activityTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 4,
   },
   activityName: {
     fontFamily: 'Silkscreen_400Regular',
@@ -255,6 +319,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#0f172a',
     marginBottom: 4,
+  },
+  ticketDisplay: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
   },
   activityDescription: {
     fontFamily: 'Silkscreen_400Regular',
@@ -267,13 +336,24 @@ const styles = StyleSheet.create({
   },
   activityFooter: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
     alignItems: 'center',
+  },
+  rewardContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
   rewardText: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 12,
     color: '#8b5cf6',
+    fontWeight: 'bold',
+  },
+  ticketCountText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#06b6d4',
     fontWeight: 'bold',
   },
 });
