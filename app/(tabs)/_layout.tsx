@@ -172,7 +172,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="starlight-cinema"
+        name="starlight-roller-rink"
         options={{
           href: null, // Hide from tab bar
         }}
@@ -185,6 +185,36 @@ export default function TabLayout() {
       />
       <Tabs.Screen
         name="whale-watching"
+        options={{
+          href: null, // Hide from tab bar
+        }}
+      />
+      <Tabs.Screen
+        name="old-net-pub"
+        options={{
+          href: null, // Hide from tab bar
+        }}
+      />
+      <Tabs.Screen
+        name="lowtide-pier"
+        options={{
+          href: null, // Hide from tab bar
+        }}
+      />
+      <Tabs.Screen
+        name="gossamer-midway"
+        options={{
+          href: null, // Hide from tab bar
+        }}
+      />
+      <Tabs.Screen
+        name="atomic-diner"
+        options={{
+          href: null, // Hide from tab bar
+        }}
+      />
+      <Tabs.Screen
+        name="midnight-rewind"
         options={{
           href: null, // Hide from tab bar
         }}

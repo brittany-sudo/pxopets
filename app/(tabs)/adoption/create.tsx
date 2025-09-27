@@ -7,7 +7,7 @@ import { useGame } from '@/store/GameStore';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { router } from 'expo-router';
 
-const petIds = ['p1','p2','p3','p4','p5','p6','p7','p8'];
+const petIds = ['p1','p2','p3','p4','p5','p6','p7','p8','p9'];
 
 const randomNames = [
   'clio', 'jonesy', 'bite', 'malone', 'hekate', 'jimmy', 'addison', 
@@ -22,6 +22,9 @@ const coconutGuyImage = require('@/assets/images/coco-guy.png');
 const purpleGuyImage = require('@/assets/images/purple-guy.png');
 const robotGuyImage = require('@/assets/images/robot-guy.png');
 const sheepGuyImage = require('@/assets/images/sheep-guy.png');
+const bullGuyImage = require('@/assets/images/bull-guy.png');
+const stormGuyImage = require('@/assets/images/storm-guy.png');
+const fishGuysImage = require('@/assets/images/fish-guys.png');
 const createPetImage = require('@/assets/images/create-a-pet.png');
 
 export default function CreatePet() {
@@ -46,7 +49,9 @@ export default function CreatePet() {
     if (id === 'p4') return purpleGuyImage;
     if (id === 'p5') return robotGuyImage;
     if (id === 'p6') return sheepGuyImage;
-    // p7, p8 will use placeholder icons
+    if (id === 'p7') return bullGuyImage;
+    if (id === 'p8') return stormGuyImage;
+    if (id === 'p9') return fishGuysImage;
     return null;
   };
 
@@ -83,10 +88,6 @@ export default function CreatePet() {
                       style={styles.petImage}
                       resizeMode="contain"
                     />
-                  ) : id === 'p7' ? (
-                    <FontAwesome name="heart" size={40} color="#8b5cf6" />
-                  ) : id === 'p8' ? (
-                    <FontAwesome name="diamond" size={40} color="#f59e0b" />
                   ) : (
                     <Text style={styles.petText}>{id.toUpperCase()}</Text>
                   )}
@@ -99,6 +100,7 @@ export default function CreatePet() {
                      id === 'p6' ? 'DOPPIO' :
                      id === 'p7' ? 'CURSIVE' :
                      id === 'p8' ? 'LEMENTO' :
+                     id === 'p9' ? 'GUPTROIS' :
                      id.toUpperCase()}
                   </Text>
                 </RNView>

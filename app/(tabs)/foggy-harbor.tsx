@@ -24,6 +24,14 @@ export default function FoggyHarborScreen() {
 
   const activities = [
     {
+      id: 'old-net-pub',
+      name: 'The Old Net Pub',
+      description: 'A cozy harbor pub where sailors gather to share stories and drinks.',
+      lightning: 25,
+      difficulty: 'Easy',
+      icon: 'lil-oldnet'
+    },
+    {
       id: 'whale-watching',
       name: 'Harbor Watch',
       description: 'Venture out to sea three times daily to spot whales and log your sightings.',
@@ -40,20 +48,12 @@ export default function FoggyHarborScreen() {
       icon: 'anchor'
     },
     {
-      id: 'fog-navigation',
-      name: 'Fog Navigation',
-      description: 'Master the art of navigating through thick coastal fog.',
-      lightning: 75,
-      difficulty: 'Hard',
-      icon: 'compass'
-    },
-    {
-      id: 'tall-tales',
-      name: 'Tall Tales Tavern',
-      description: 'Gather around the crackling fire at the Rusty Anchor Tavern.',
-      lightning: 25,
+      id: 'lowtide-pier',
+      name: 'Lowtide Pier',
+      description: 'A scenic pier where you can watch the ocean and discover rare events.',
+      lightning: 0,
       difficulty: 'Easy',
-      icon: 'glass'
+      icon: 'anchor'
     },
     {
       id: 'lighthouse-keeper',
@@ -135,6 +135,10 @@ export default function FoggyHarborScreen() {
             onPress={() => {
               if (activity.id === 'whale-watching') {
                 router.navigate('/(tabs)/whale-watching');
+              } else if (activity.id === 'old-net-pub') {
+                router.navigate('/(tabs)/old-net-pub');
+              } else if (activity.id === 'lowtide-pier') {
+                router.navigate('/(tabs)/lowtide-pier');
               }
             }}
           >
@@ -143,6 +147,11 @@ export default function FoggyHarborScreen() {
                 {activity.icon === 'lil-whale' ? (
                   <Image 
                     source={require('@/assets/images/lil-whale.png')} 
+                    style={styles.activityImageIcon} 
+                  />
+                ) : activity.icon === 'lil-oldnet' ? (
+                  <Image 
+                    source={require('@/assets/images/lil-oldnet.png')} 
                     style={styles.activityImageIcon} 
                   />
                 ) : (

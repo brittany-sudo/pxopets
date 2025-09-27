@@ -4,8 +4,18 @@ import { Text, View } from '@/components/Themed';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { router } from 'expo-router';
 
-// Import the banner image
+// Import activity icons
 const neonBurgerImage = require('@/assets/images/neon-burger.png');
+const lilAtomicDinerImage = require('@/assets/images/lil-atomic-diner.png');
+
+// Image mapping for activities
+const activityImageMap: { [key: string]: any } = {
+  'neon-burger.png': neonBurgerImage,
+  'lil-atomic-diner.png': lilAtomicDinerImage,
+};
+
+// Import the banner image
+const crescentBackgroundImage = require('@/assets/images/crescent-background.png');
 
 export default function CrescentOasisScreen() {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
@@ -29,7 +39,7 @@ export default function CrescentOasisScreen() {
       description: 'Dine at the retro 50s diner with alien waitstaff.',
       lightning: 15,
       difficulty: 'Easy',
-      icon: 'cutlery'
+      icon: 'lil-atomic-diner.png'
     },
     {
       id: 'neon-gambling',
@@ -37,7 +47,7 @@ export default function CrescentOasisScreen() {
       description: 'Try your luck at the glowing slot machines.',
       lightning: 25,
       difficulty: 'Medium',
-      icon: 'diamond'
+      icon: 'neon-burger.png'
     },
     {
       id: 'desert-racing',
@@ -45,7 +55,7 @@ export default function CrescentOasisScreen() {
       description: 'Race hover cars across the pink sand dunes.',
       lightning: 30,
       difficulty: 'Hard',
-      icon: 'car'
+      icon: 'neon-burger.png'
     },
     {
       id: 'alien-encounter',
@@ -53,7 +63,7 @@ export default function CrescentOasisScreen() {
       description: 'Meet friendly hippie aliens from distant galaxies.',
       lightning: 20,
       difficulty: 'Medium',
-      icon: 'rocket'
+      icon: 'neon-burger.png'
     },
     {
       id: 'crystal-mining',
@@ -61,7 +71,7 @@ export default function CrescentOasisScreen() {
       description: 'Extract precious crystals from desert formations.',
       lightning: 18,
       difficulty: 'Medium',
-      icon: 'diamond'
+      icon: 'neon-burger.png'
     },
     {
       id: 'sunset-meditation',
@@ -69,7 +79,7 @@ export default function CrescentOasisScreen() {
       description: 'Meditate as the pink sun sets over the dunes.',
       lightning: 12,
       difficulty: 'Easy',
-      icon: 'sun-o'
+      icon: 'neon-burger.png'
     },
     {
       id: 'space-port',
@@ -77,7 +87,7 @@ export default function CrescentOasisScreen() {
       description: 'Watch alien ships arrive and depart from the spaceport.',
       lightning: 22,
       difficulty: 'Easy',
-      icon: 'plane'
+      icon: 'neon-burger.png'
     },
     {
       id: 'desert-party',
@@ -85,7 +95,7 @@ export default function CrescentOasisScreen() {
       description: 'Join the nightly celebration under the stars.',
       lightning: 35,
       difficulty: 'Hard',
-      icon: 'music'
+      icon: 'neon-burger.png'
     }
   ];
 
@@ -106,7 +116,7 @@ export default function CrescentOasisScreen() {
 
         {/* Banner Image */}
         <RNView style={styles.bannerContainer}>
-          <Image source={neonBurgerImage} style={styles.bannerImage} />
+          <Image source={crescentBackgroundImage} style={styles.bannerImage} />
         </RNView>
 
         {/* Description */}
@@ -121,10 +131,18 @@ export default function CrescentOasisScreen() {
 
         {/* Activities List */}
         {activities.map((activity) => (
-          <RNView key={activity.id} style={styles.activityItem}>
+          <Pressable 
+            key={activity.id} 
+            style={styles.activityItem}
+            onPress={() => {
+              if (activity.id === 'atomic-diner') {
+                router.navigate('/(tabs)/atomic-diner');
+              }
+            }}
+          >
             <RNView style={styles.activityHeader}>
               <RNView style={styles.activityInfo}>
-                <FontAwesome name={activity.icon as any} size={22} color="#8b5cf6" style={styles.activityIcon} />
+                <Image source={activityImageMap[activity.icon]} style={styles.activityIcon} />
                     <RNView style={styles.activityText}>
                       <RNView style={styles.activityTitleRow}>
                         <Text style={styles.activityName}>{activity.name}</Text>
@@ -149,7 +167,7 @@ export default function CrescentOasisScreen() {
                 />
               </Pressable>
             </RNView>
-          </RNView>
+          </Pressable>
         ))}
       </ScrollView>
     </View>
@@ -190,7 +208,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#0f172a',
-    marginBottom: 20,
+    marginBottom: 5,
     textAlign: 'left',
     alignSelf: 'flex-start',
   },
@@ -201,19 +219,20 @@ const styles = StyleSheet.create({
     borderColor: '#0ea5e9',
     borderRadius: 8,
     marginBottom: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
+    overflow: 'hidden',
     backgroundColor: 'rgba(14, 165, 233, 0.05)',
   },
   bannerImage: {
-    width: 150,
-    height: 150,
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
   },
   description: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 12,
     color: '#0f172a',
     lineHeight: 18,
+    marginTop: -10,
     marginBottom: 24,
     textAlign: 'left',
     alignSelf: 'flex-start',
@@ -247,6 +266,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   activityIcon: {
+    width: 31,
+    height: 31,
     marginRight: 12,
     alignSelf: 'center',
   },

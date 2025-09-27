@@ -17,7 +17,9 @@ const lilTotemGuyImage = require('@/assets/images/lil-totem-guy.png');
 const lilPopcornImage = require('@/assets/images/lil-popcorn.png');
 const lilScarecrowImage = require('@/assets/images/lil-scarecrow.png');
 const lilGnomeImage = require('@/assets/images/lil-gnome.png');
+const lilTentGossImage = require('@/assets/images/lil-tent-goss.png');
 const lilPotImage = require('@/assets/images/lil-pot.png');
+const lilTrailerImage = require('@/assets/images/lil-trailer.png');
 const loomersTinyImage = require('@/assets/images/loomers-tiny.png');
 const mapOfPxopiaImage = require('@/assets/images/mapofpxopia.png');
 
@@ -56,7 +58,7 @@ export default function ExploreScreen() {
       icon: "sun-o",
       color: "#f59e0b",
       description: "A desert mirage where atomic age meets cosmic wonder.",
-      image: neonBurgerImage
+      image: lilTrailerImage
     },
     {
       id: "bag-of-stars-forest",
@@ -83,12 +85,12 @@ export default function ExploreScreen() {
       image: lilGnomeImage
     },
     {
-      id: "pirate-port",
-      name: "Saltwick Pier",
-      icon: "ship",
+      id: "gossamer-midway",
+      name: "Gossamer Midway",
+      icon: "star",
       color: "#dc2626",
-      description: "A vibrant waterfront where maritime adventure meets carnival delight.",
-      image: lilPopcornImage
+      description: "A surreal traveling carnival that only appears under certain moons.",
+      image: lilTentGossImage
     },
     {
       id: "library",
@@ -132,9 +134,9 @@ export default function ExploreScreen() {
     } else if (world.id === 'pxoburbs') {
       console.log('Navigating to The Pxoburbs from list...');
       router.navigate('/(tabs)/pxoburbs');
-    } else if (world.id === 'pirate-port') {
-      console.log('Navigating to Saltwick Pier from list...');
-      router.navigate('/(tabs)/saltwick-pier');
+    } else if (world.id === 'gossamer-midway') {
+      console.log('Navigating to Gossamer Midway from list...');
+      router.navigate('/(tabs)/gossamer-midway');
     } else if (world.id === 'library') {
       console.log('Navigating to Scarecrow Vale from list...');
       router.navigate('/(tabs)/scarecrow-vale');

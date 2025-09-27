@@ -69,7 +69,7 @@ export default function AppHeader() {
                     <Text style={styles.coinsText}>{state.coins}</Text>
                   </View>
                   <View style={styles.ticketsContainer}>
-                    <FontAwesome name="ticket" size={16} color="#06b6d4" />
+                    <FontAwesome name="ticket" size={16} color="#8b5cf6" />
                     <Text style={styles.ticketsText}>0</Text>
                   </View>
                 </View>
@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
   ticketsText: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: FONT_SIZES.sm,
-    color: '#0f172a', // Premium deep slate
+    color: '#8b5cf6', // Purple to match ticket icon
     fontWeight: 'bold',
   },
 });

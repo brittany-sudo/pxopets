@@ -10,6 +10,7 @@ const pxoburbsSkylineImage = require('@/assets/images/pxoburbs-skyline.png');
 const chipsImage = require('@/assets/images/chips.png');
 const lilArcadeImage = require('@/assets/images/lil-arcade.png');
 const lilMovieReelImage = require('@/assets/images/lil-movie-reel.png');
+const rolerImage = require('@/assets/images/roler.png');
 const makeoutHillImage = require('@/assets/images/makeout-hill.png');
 
 export default function PxoburbsScreen() {
@@ -46,12 +47,12 @@ export default function PxoburbsScreen() {
       icon: 'arcade'
     },
     {
-      id: 'movie-theater',
-      name: 'Starlight Cinema',
-      description: 'Catch the latest blockbusters and indie films.',
+      id: 'roller-rink',
+      name: 'Starlight Roller Rink',
+      description: 'Skate under the disco lights and neon stars.',
       lightning: 20,
       difficulty: 'Easy',
-      icon: 'lil-movie-reel'
+      icon: 'roler'
     },
     {
       id: 'makeout-hill',
@@ -62,12 +63,12 @@ export default function PxoburbsScreen() {
       icon: 'makeout-hill'
     },
     {
-      id: 'lost-found',
-      name: 'Lost & Found Kiosk',
-      description: 'Find missing items and lost treasures.',
+      id: 'midnight-rewind',
+      name: 'Midnight Rewind',
+      description: 'Rent classic movies and rare video tapes.',
       lightning: 10,
       difficulty: 'Easy',
-      icon: 'search'
+      icon: 'lil-movie-reel.png'
     },
     {
       id: 'radio-station',
@@ -191,13 +192,13 @@ export default function PxoburbsScreen() {
                   </RNView>
                 </Pressable>
               </Link>
-           ) : activity.id === 'movie-theater' ? (
-             <Link href="/(tabs)/starlight-cinema" asChild>
+           ) : activity.id === 'roller-rink' ? (
+             <Link href="/(tabs)/starlight-roller-rink" asChild>
                <Pressable style={styles.activityPressable}>
                  <RNView style={styles.activityHeader}>
                    <RNView style={styles.activityInfo}>
-                     {activity.id === 'movie-theater' ? (
-                       <Image source={lilMovieReelImage} style={styles.activityImageIcon} />
+                     {activity.id === 'roller-rink' ? (
+                       <Image source={rolerImage} style={styles.activityImageIcon} />
                      ) : (
                        <FontAwesome name={activity.icon as any} size={32} color="#8b5cf6" style={styles.activityIcon} />
                      )}
@@ -263,6 +264,39 @@ export default function PxoburbsScreen() {
                  </RNView>
                </Pressable>
              </Link>
+           ) : activity.id === 'midnight-rewind' ? (
+             <Pressable 
+               style={styles.activityPressable}
+               onPress={() => router.navigate('/(tabs)/midnight-rewind')}
+             >
+               <RNView style={styles.activityHeader}>
+                 <RNView style={styles.activityInfo}>
+                   <Image source={lilMovieReelImage} style={styles.activityImageIcon} />
+                   <RNView style={styles.activityText}>
+                     <RNView style={styles.activityTitleRow}>
+                       <Text style={styles.activityName}>{activity.name}</Text>
+                       <RNView style={styles.ticketDisplay}>
+                         <FontAwesome name="bolt" size={15} color="#06b6d4" />
+                         <Text style={styles.ticketCountText}>{activity.lightning}</Text>
+                       </RNView>
+                     </RNView>
+                     <Text style={styles.activityDescription}>{activity.description}</Text>
+                   </RNView>
+                 </RNView>
+               </RNView>
+               <RNView style={styles.activityFooter}>
+                 <Pressable
+                   style={styles.favoriteButton}
+                   onPress={() => toggleFavorite(activity.id)}
+                 >
+                   <FontAwesome 
+                     name={favorites.has(activity.id) ? "star" : "star-o"} 
+                     size={16} 
+                     color={favorites.has(activity.id) ? "#94a3b8" : "#94a3b8"} 
+                   />
+                 </Pressable>
+               </RNView>
+             </Pressable>
            ) : (
               <>
                 <RNView style={styles.activityHeader}>
@@ -273,8 +307,8 @@ export default function PxoburbsScreen() {
                   <Image source={lilArcadeImage} style={styles.arcadeImageIcon} />
                 ) : activity.id === 'makeout-hill' ? (
                   <Image source={makeoutHillImage} style={styles.activityImageIcon} />
-                ) : activity.id === 'movie-theater' ? (
-                  <Image source={lilMovieReelImage} style={styles.activityImageIcon} />
+                ) : activity.id === 'roller-rink' ? (
+                  <Image source={rolerImage} style={styles.activityImageIcon} />
                 ) : (
                   <FontAwesome name={activity.icon as any} size={32} color="#8b5cf6" style={styles.activityIcon} />
                 )}

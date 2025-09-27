@@ -17,14 +17,14 @@ export default function AdoptionLayout() {
         <Stack.Screen 
           name="create" 
           options={{ 
-            header: () => <AppHeader />,
+            headerShown: false,
             title: 'Create Pet'
           }} 
         />
         <Stack.Screen 
           name="pound" 
           options={{ 
-            header: () => <AppHeader />,
+            headerShown: false,
             title: 'The Pound'
           }} 
         />
