@@ -11,9 +11,13 @@ const chipsImage = require('@/assets/images/chips.png');
 const cupnoddleImage = require('@/assets/images/cupnoddle.png');
 const chocolateImage = require('@/assets/images/chocolate.png');
 const pouchdrinkImage = require('@/assets/images/pouchdrink.png');
+const sludgeImage = require('@/assets/images/sludge.png');
+const hotchipsImage = require('@/assets/images/hotchips.png');
+const gumballsImage = require('@/assets/images/gumballs.png');
 
 export default function ShopScreen() {
   const [shopkeeperSaying, setShopkeeperSaying] = useState("Welcome to QuickStop! Best prices in Pxoburbs!");
+  const [countdown, setCountdown] = useState(3600); // 1 hour in seconds
   const [playerInventory, setPlayerInventory] = useState([
     { id: '1', name: 'Golden Star', price: 15, image: 'chips' },
     { id: '2', name: 'Magic Leaf', price: 8, image: 'cupnoddle' },
@@ -23,40 +27,67 @@ export default function ShopScreen() {
 
   // Limited time items that can only be bought with tickets
   const [limitedItems, setLimitedItems] = useState([
-    { id: 'l1', name: 'Rare Trophy', price: 50, image: 'pouchdrink', tickets: 3 },
-    { id: 'l2', name: 'Magic Potion', price: 75, image: 'pouchdrink', tickets: 5 },
-    { id: 'l3', name: 'Golden Crown', price: 100, image: 'pouchdrink', tickets: 7 },
-    { id: 'l4', name: 'Crystal Sword', price: 125, image: 'pouchdrink', tickets: 10 },
+    { id: 'l1', name: 'Space Bubblegum', price: 50, image: 'gumballs', tickets: 3 },
+    { id: 'l2', name: 'Potatoe Chips', price: 75, image: 'pouchdrink', tickets: 5 },
+    { id: 'l3', name: 'Punch Pouch', price: 100, image: 'pouchdrink', tickets: 7 },
+    { id: 'l4', name: 'Energy Drink', price: 125, image: 'pouchdrink', tickets: 10 },
   ]);
 
   // Shop inventory that changes every few hours
   const [shopInventory, setShopInventory] = useState([
     { id: 's1', name: 'Energy Drink', price: 5, stock: 3, image: 'chips' },
-    { id: 's2', name: 'Lucky Charm', price: 18, stock: 1, image: 'cupnoddle' },
-    { id: 's3', name: 'Mystery Box', price: 12, stock: 5, image: 'chocolate' },
-    { id: 's4', name: 'Healing Potion', price: 20, stock: 2, image: 'chips' },
-    { id: 's5', name: 'Speed Boost', price: 15, stock: 4, image: 'cupnoddle' },
-    { id: 's6', name: 'Rare Gem', price: 35, stock: 1, image: 'chocolate' },
+    { id: 's2', name: 'Hot Chips', price: 18, stock: 1, image: 'hotchips' },
+    { id: 's3', name: 'Choco-Protein Bar', price: 12, stock: 5, image: 'chocolate' },
+    { id: 's4', name: 'Sludge', price: 20, stock: 2, image: 'sludge' },
+    { id: 's5', name: 'Cupa Noodles', price: 15, stock: 4, image: 'cupnoddle' },
+    { id: 's6', name: 'Energy Drink', price: 35, stock: 1, image: 'chocolate' },
   ]);
 
-  const shopkeeperSayings = [
-    "Welcome to QuickStop! Best prices in Pxoburbs!",
-    "Fresh stock just arrived! Don't miss out!",
-    "Looking for something special? I might have it!",
-    "Prices are negotiable for the right customer!",
-    "Got some items to sell? I'm always buying!",
-    "New inventory every few hours - check back soon!",
-  ];
-
+  // Countdown timer effect
   useEffect(() => {
-    // Change shopkeeper saying every 30 seconds
+    const timer = setInterval(() => {
+      setCountdown(prev => {
+        if (prev <= 1) {
+          return 3600; // Reset to 1 hour
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  // Time-based shopkeeper sayings
+  useEffect(() => {
+    const getTimeBasedSaying = () => {
+      const hour = new Date().getHours();
+      if (hour >= 6 && hour < 12) {
+        return "Good morning! Fresh stock just arrived!";
+      } else if (hour >= 12 && hour < 18) {
+        return "Afternoon! Best deals are right here!";
+      } else if (hour >= 18 && hour < 22) {
+        return "Evening! Last chance for today's specials!";
+      } else {
+        return "Late night shopping? I'm here for you!";
+      }
+    };
+
+    setShopkeeperSaying(getTimeBasedSaying());
+    
     const interval = setInterval(() => {
-      const randomSaying = shopkeeperSayings[Math.floor(Math.random() * shopkeeperSayings.length)];
-      setShopkeeperSaying(randomSaying);
-    }, 30000);
+      setShopkeeperSaying(getTimeBasedSaying());
+    }, 60000); // Update every minute
 
     return () => clearInterval(interval);
   }, []);
+
+  const formatTime = (seconds: number) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
 
   const handleBuy = (item: any) => {
     if (item.stock > 0) {
@@ -136,26 +167,28 @@ export default function ShopScreen() {
           <Text style={styles.backButtonText}>Back</Text>
         </Pressable>
 
-        {/* Shop Title */}
-        <Text style={styles.title}>QUICKSTOP</Text>
+        {/* Welcome Title */}
+        <Text style={styles.welcomeTitle}>Welcome to QuickStop!</Text>
 
         {/* Marty Image */}
         <RNView style={styles.martyContainer}>
           <Image source={martyImage} style={styles.martyImage} />
+          <Text style={styles.shopkeeperName}>Marty the Shopkeeper</Text>
         </RNView>
 
-        {/* Shopkeeper */}
-        <RNView style={styles.shopkeeperSection}>
-          <RNView style={styles.shopkeeperInfo}>
-            <RNView style={styles.shopkeeperText}>
-              <Text style={styles.shopkeeperName}>Marty the Shopkeeper</Text>
-              <Text style={styles.shopkeeperSaying}>"{shopkeeperSaying}"</Text>
-            </RNView>
-          </RNView>
+        {/* Chat Bubble */}
+        <RNView style={styles.chatBubble}>
+          <Text style={styles.dialogueText}>
+            <Text style={styles.characterName}>Marty the Shopkeeper:</Text> (cheerful) {shopkeeperSaying}
+          </Text>
         </RNView>
 
         {/* Shop Inventory */}
         <BorderedBox>
+          <RNView style={styles.stockHeader}>
+            <Text style={styles.stockTitle}>CURRENT STOCK</Text>
+            <Text style={styles.countdownText}>REFRESHES IN {formatTime(countdown)}</Text>
+          </RNView>
           <RNView style={styles.chipsGrid}>
             {shopInventory.map((item) => (
               <RNView key={item.id} style={styles.chipsItem}>
@@ -163,6 +196,8 @@ export default function ShopScreen() {
                   source={
                     item.image === 'chips' ? chipsImage :
                     item.image === 'cupnoddle' ? cupnoddleImage :
+                    item.image === 'hotchips' ? hotchipsImage :
+                    item.image === 'sludge' ? sludgeImage :
                     chocolateImage
                   } 
                   style={styles.chipsImage} 
@@ -172,7 +207,7 @@ export default function ShopScreen() {
                 <Text style={styles.chipsStock}>Stock: {item.stock}</Text>
                 <RNView style={styles.chipsActions}>
                   <Pressable 
-                    style={[styles.actionButton, styles.buyButton]}
+                    style={[styles.actionButton, styles.shopBuyButton]}
                     onPress={() => handleBuy(item)}
                     disabled={item.stock === 0}
                   >
@@ -192,23 +227,30 @@ export default function ShopScreen() {
         </BorderedBox>
 
         {/* Limited Time Items */}
-        <Text style={styles.sectionTitle}>LIMITED TIME ITEMS</Text>
         <BorderedBox>
+          <Text style={styles.sectionTitle}>LIMITED TIME ITEMS</Text>
           <RNView style={styles.chipsGrid}>
             {limitedItems.map((item) => (
               <RNView key={item.id} style={styles.chipsItem}>
                 <Image 
-                  source={pouchdrinkImage} 
+                  source={
+                    item.image === 'gumballs' ? gumballsImage :
+                    pouchdrinkImage
+                  } 
                   style={styles.chipsImage} 
                 />
                 <Text style={styles.chipsName}>{item.name}</Text>
-                <Text style={styles.ticketPrice}>{item.tickets} 🎫</Text>
-                <Pressable 
-                  style={[styles.actionButton, styles.buyButton]}
-                  onPress={() => handleBuy(item)}
-                >
-                  <Text style={styles.buyButtonText}>BUY</Text>
-                </Pressable>
+                <RNView style={styles.chipsActions}>
+                  <Pressable 
+                    style={[styles.actionButton, styles.buyButton]}
+                    onPress={() => handleBuy(item)}
+                  >
+                    <RNView style={styles.buttonTicketDisplay}>
+                      <FontAwesome name="ticket" size={12} color="#ffffff" />
+                      <Text style={styles.buttonTicketText}>{item.tickets}</Text>
+                    </RNView>
+                  </Pressable>
+                </RNView>
               </RNView>
             ))}
           </RNView>
@@ -272,7 +314,7 @@ const styles = StyleSheet.create({
     height: 172,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 20,
+    marginBottom: 24,
   },
   martyImage: {
     width: '115%',
@@ -281,7 +323,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontFamily: 'PressStart2P_400Regular',
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 'bold',
     color: '#0f172a',
     marginTop: 20,
@@ -322,19 +364,20 @@ const styles = StyleSheet.create({
   chipsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    padding: 16,
-    gap: 12,
+    justifyContent: 'space-evenly',
+    padding: 8,
+    alignItems: 'flex-start',
   },
   chipsItem: {
-    width: '30%',
+    width: '31%',
     alignItems: 'center',
-    marginBottom: 20,
-    padding: 8,
+    marginBottom: 12,
+    padding: 4,
+    minHeight: 120,
   },
   chipsImage: {
-    width: 50,
-    height: 50,
+    width: 30,
+    height: 30,
     marginBottom: 6,
     imageRendering: 'pixelated' as any,
   },
@@ -344,7 +387,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#0f172a',
     textAlign: 'center',
-    marginBottom: 3,
+    marginBottom: 1,
+    height: 24,
+    lineHeight: 12,
   },
   chipsPrice: {
     fontFamily: 'Silkscreen_400Regular',
@@ -361,7 +406,7 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   chipsActions: {
-    flexDirection: 'row',
+    flexDirection: 'column',
     gap: 6,
     justifyContent: 'center',
   },
@@ -413,13 +458,17 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     flex: 1,
+    minWidth: 60,
     paddingVertical: 6,
     paddingHorizontal: 8,
     borderRadius: 4,
     alignItems: 'center',
   },
   buyButton: {
-    backgroundColor: '#10b981',
+    backgroundColor: '#ff1493',
+  },
+  shopBuyButton: {
+    backgroundColor: '#14b8a6',
   },
   buyButtonText: {
     fontFamily: 'Silkscreen_400Regular',
@@ -461,5 +510,80 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: '#0f172a',
     marginBottom: 4,
+  },
+  welcomeTitle: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 20,
+    color: '#0f172a',
+    fontFamily: 'PressStart2P_400Regular',
+  },
+  stockHeader: {
+    alignItems: 'center',
+    marginBottom: 8,
+    paddingBottom: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e2e8f0',
+  },
+  stockTitle: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#0f172a',
+    marginBottom: 4,
+  },
+  countdownText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#14b8a6',
+    textAlign: 'center',
+    marginTop: 4,
+  },
+  chatBubble: {
+    marginTop: -30,
+    marginBottom: 8,
+    marginHorizontal: 40,
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 2,
+    borderColor: '#0ea5e9',
+    backgroundColor: '#ffffff',
+  },
+  dialogueText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#0f172a',
+    textAlign: 'left',
+    lineHeight: 14,
+  },
+  characterName: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#8b5cf6',
+    fontWeight: 'bold',
+  },
+  ticketDisplay: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  ticketCountText: {
+    fontSize: 10,
+    color: '#0ea5e9',
+    marginLeft: 4,
+    fontWeight: 'bold',
+    fontFamily: 'Silkscreen_400Regular',
+  },
+  buttonTicketDisplay: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  buttonTicketText: {
+    fontSize: 10,
+    color: '#ffffff',
+    marginLeft: 4,
+    fontWeight: 'bold',
+    fontFamily: 'Silkscreen_400Regular',
   },
 });

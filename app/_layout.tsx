@@ -11,6 +11,7 @@ import { GameProvider } from '@/store/GameStore';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/components/useColorScheme';
+import { ColorSchemeProvider } from '@/components/ColorSchemeContext';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -55,24 +56,26 @@ function RootLayoutNav() {
   const colorScheme = useColorScheme();
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <GameProvider>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ header: () => <AppHeader /> }} />
-          <Stack.Screen name="adoption" options={{ headerShown: false }} />
-          <Stack.Screen name="enchanted-island" options={{ headerShown: false }} />
-          <Stack.Screen name="artisan-quarter" options={{ headerShown: false }} />
-          <Stack.Screen name="crescent-oasis" options={{ headerShown: false }} />
-          <Stack.Screen name="foggy-harbor" options={{ headerShown: false }} />
-          <Stack.Screen name="barrelhaven" options={{ headerShown: false }} />
-          <Stack.Screen name="bag-of-stars-forest" options={{ headerShown: false }} />
-          <Stack.Screen name="pxoburbs" options={{ headerShown: false }} />
-          <Stack.Screen name="saltwick-pier" options={{ headerShown: false }} />
-          <Stack.Screen name="scarecrow-vale" options={{ headerShown: false }} />
-          <Stack.Screen name="more" options={{ header: () => <AppHeader /> }} />
-          <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-        </Stack>
-      </GameProvider>
-    </ThemeProvider>
+    <ColorSchemeProvider>
+      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+        <GameProvider>
+          <Stack>
+            <Stack.Screen name="(tabs)" options={{ header: () => <AppHeader /> }} />
+            <Stack.Screen name="adoption" options={{ headerShown: false }} />
+            <Stack.Screen name="enchanted-island" options={{ headerShown: false }} />
+            <Stack.Screen name="artisan-quarter" options={{ headerShown: false }} />
+            <Stack.Screen name="crescent-oasis" options={{ headerShown: false }} />
+            <Stack.Screen name="foggy-harbor" options={{ headerShown: false }} />
+            <Stack.Screen name="barrelhaven" options={{ headerShown: false }} />
+            <Stack.Screen name="bag-of-stars-forest" options={{ headerShown: false }} />
+            <Stack.Screen name="pxoburbs" options={{ headerShown: false }} />
+            <Stack.Screen name="saltwick-pier" options={{ headerShown: false }} />
+            <Stack.Screen name="scarecrow-vale" options={{ headerShown: false }} />
+            <Stack.Screen name="more" options={{ header: () => <AppHeader /> }} />
+            <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+          </Stack>
+        </GameProvider>
+      </ThemeProvider>
+    </ColorSchemeProvider>
   );
 }

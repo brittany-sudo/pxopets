@@ -18,6 +18,8 @@ export default function PetsScreen() {
   const [selectedFood, setSelectedFood] = useState(null);
   const [equippedWeapon, setEquippedWeapon] = useState('none');
   const [equippedAccessory, setEquippedAccessory] = useState('none');
+  const [showFeedSuccess, setShowFeedSuccess] = useState(false);
+  const [lastFedStamina, setLastFedStamina] = useState(0);
   
   const pets = {
     juno: {
@@ -128,32 +130,14 @@ export default function PetsScreen() {
 
   const feedSelectedFood = () => {
     if (selectedFood) {
-      Alert.alert(
-        `Feed ${selectedFood.name}?`,
-        `This will restore ${selectedFood.stamina} stamina.`,
-        [
-          { text: 'Cancel', style: 'cancel' },
-          { 
-            text: 'Feed!', 
-            onPress: () => {
-              // In a real app, you'd update the food quantity and pet stamina here
-              Alert.alert(
-                'Yum! 🍽️', 
-                `${pets[activePet].name} loved the ${selectedFood.name}!\n\n+${selectedFood.stamina} ⚡ Stamina restored!`,
-                [
-                  {
-                    text: 'Awesome!',
-                    onPress: () => {
-                      setSelectedFood(null);
-                      setShowFeedModal(false);
-                    }
-                  }
-                ]
-              );
-            }
-          }
-        ]
-      );
+      setShowFeedModal(false);
+      setShowFeedSuccess(true);
+      setSelectedFood(null);
+      
+      // Hide success message after 2 seconds
+      setTimeout(() => {
+        setShowFeedSuccess(false);
+      }, 2000);
     }
   };
 
@@ -580,7 +564,6 @@ export default function PetsScreen() {
         <View style={styles.modalContainer}>
           <RNView style={styles.modalContentWrapper}>
             <RNView style={styles.modalHeader}>
-              <Text style={styles.inventoryTitle}>INVENTORY</Text>
               <Pressable 
                 style={styles.closeButton}
                 onPress={() => setShowFeedModal(false)}
@@ -590,51 +573,47 @@ export default function PetsScreen() {
             </RNView>
             
             <RNView style={styles.paginationContainer}>
-              {/* Left Arrow */}
-              <Pressable 
-                style={[styles.arrowButton, currentPage === 0 && styles.arrowButtonDisabled]}
-                onPress={prevPage}
-                disabled={currentPage === 0}
-              >
-                <FontAwesome name="chevron-left" size={18} color={currentPage === 0 ? "#94a3b8" : "#14b8a6"} />
-              </Pressable>
-
-              {/* Food Grid */}
-              <RNView style={styles.foodGrid}>
-                {currentPageItems.map((food) => (
-                  <Pressable
-                    key={food.id}
-                    style={[
-                      styles.foodCard,
-                      selectedFood?.id === food.id && styles.selectedFoodCard
-                    ]}
-                    onPress={() => selectFood(food)}
-                  >
-                    <Text style={styles.foodQuantity}>x{food.quantity}</Text>
-                    <RNView style={styles.foodInfo}>
-                      <Image source={food.image} style={styles.foodImage} />
-                      <Text style={styles.foodName}>{food.name}</Text>
-                      <RNView style={styles.staminaContainer}>
-                        <Text style={styles.foodStamina}>+{food.stamina}</Text>
-                        <FontAwesome name="bolt" size={8} color="#fbbf24" />
+              {/* Food Grid and Arrow Row */}
+              <RNView style={styles.foodAndArrowRow}>
+                <RNView style={styles.foodGrid}>
+                  {currentPageItems.map((food) => (
+                    <Pressable
+                      key={food.id}
+                      style={[
+                        styles.foodCard,
+                        selectedFood?.id === food.id && styles.selectedFoodCard
+                      ]}
+                      onPress={() => selectFood(food)}
+                    >
+                      <Text style={styles.foodQuantity}>x{food.quantity}</Text>
+                      <RNView style={styles.foodInfo}>
+                        <Image source={food.image} style={styles.foodImage} />
+                        <Text style={styles.foodName}>{food.name}</Text>
+                        <RNView style={styles.staminaContainer}>
+                          <Text style={styles.foodStamina}>+{food.stamina}</Text>
+                          <FontAwesome name="bolt" size={8} color="#fbbf24" />
+                        </RNView>
                       </RNView>
-                    </RNView>
+                    </Pressable>
+                  ))}
+                </RNView>
+
+                {/* Single Arrow - Right when on first page, Left when on other pages */}
+                {totalPages > 1 && (
+                  <Pressable 
+                    style={styles.arrowButton}
+                    onPress={currentPage === 0 ? nextPage : prevPage}
+                  >
+                    <FontAwesome 
+                      name={currentPage === 0 ? "chevron-right" : "chevron-left"} 
+                      size={18} 
+                      color="#14b8a6" 
+                    />
                   </Pressable>
-                ))}
+                )}
               </RNView>
 
-              {/* Right Arrow */}
-              <Pressable 
-                style={[styles.arrowButton, currentPage === totalPages - 1 && styles.arrowButtonDisabled]}
-                onPress={nextPage}
-                disabled={currentPage === totalPages - 1}
-              >
-                <FontAwesome name="chevron-right" size={18} color={currentPage === totalPages - 1 ? "#94a3b8" : "#14b8a6"} />
-              </Pressable>
-            </RNView>
-
-            {/* Feed Pet Button */}
-            <RNView style={styles.feedButtonContainer}>
+              {/* Feed Pet Button - Centered with inventory */}
               <Pressable 
                 style={[
                   styles.feedButton,
@@ -643,7 +622,6 @@ export default function PetsScreen() {
                 onPress={feedSelectedFood}
                 disabled={!selectedFood}
               >
-                <FontAwesome name="cutlery" size={16} color={selectedFood ? "#ffffff" : "#94a3b8"} />
                 <Text style={[
                   styles.feedButtonText,
                   !selectedFood && styles.feedButtonTextDisabled
@@ -655,6 +633,16 @@ export default function PetsScreen() {
           </RNView>
         </View>
       </Modal>
+
+      {/* Feed Success Message */}
+      {showFeedSuccess && (
+        <View style={styles.successOverlay}>
+          <View style={styles.successMessage}>
+            <Text style={styles.successText}>Pet Fed!</Text>
+            <Text style={styles.successStamina}>+{selectedFood?.stamina || 0} ⚡</Text>
+          </View>
+        </View>
+      )}
     </View>
   );
 }
@@ -1189,11 +1177,17 @@ const styles = StyleSheet.create({
     },
     paginationContainer: {
       flex: 1,
-      flexDirection: 'row',
+      flexDirection: 'column',
       alignItems: 'center',
-      justifyContent: 'space-between',
+      justifyContent: 'center',
       paddingHorizontal: 12,
       paddingVertical: 8,
+      gap: 12,
+    },
+    foodAndArrowRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
       gap: 12,
     },
     arrowButton: {
@@ -1355,21 +1349,21 @@ const styles = StyleSheet.create({
       backgroundColor: 'rgba(251, 191, 36, 0.1)',
     },
     feedButtonContainer: {
-      padding: 12,
+      padding: 4,
       alignItems: 'center',
     },
     feedButton: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
-      backgroundColor: '#14b8a6',
+      backgroundColor: '#8b5cf6',
       paddingHorizontal: 24,
       paddingVertical: 12,
       borderRadius: 8,
       borderWidth: 2,
-      borderColor: '#14b8a6',
+      borderColor: '#8b5cf6',
       gap: 8,
-      shadowColor: '#14b8a6',
+      shadowColor: '#8b5cf6',
       shadowOffset: { width: 0, height: 3 },
       shadowOpacity: 0.4,
       shadowRadius: 6,
@@ -1425,6 +1419,41 @@ const styles = StyleSheet.create({
       color: '#0f172a',
       textAlign: 'center',
       marginTop: 2,
+    },
+    successOverlay: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      justifyContent: 'center',
+      alignItems: 'center',
+      zIndex: 1000,
+    },
+    successMessage: {
+      backgroundColor: '#8b5cf6',
+      padding: 20,
+      borderRadius: 12,
+      borderWidth: 2,
+      borderColor: '#8b5cf6',
+      alignItems: 'center',
+      shadowColor: '#8b5cf6',
+      shadowOffset: { width: 0, height: 3 },
+      shadowOpacity: 0.4,
+      shadowRadius: 6,
+      elevation: 6,
+    },
+    successText: {
+      color: '#ffffff',
+      fontSize: 16,
+      fontWeight: 'bold',
+      marginBottom: 8,
+    },
+    successStamina: {
+      color: '#ffffff',
+      fontSize: 14,
+      fontWeight: 'bold',
     },
   });
 

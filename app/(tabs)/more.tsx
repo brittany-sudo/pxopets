@@ -1,10 +1,14 @@
 import React from 'react';
-import { StyleSheet, ScrollView, View as RNView } from 'react-native';
+import { StyleSheet, ScrollView, View as RNView, Pressable } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import BorderedBox from '@/components/BorderedBox';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { useColorSchemeContext } from '@/components/ColorSchemeContext';
+import BottomNavigation from '@/components/BottomNavigation';
 
 export default function MoreScreen() {
+  const { colorScheme, toggleColorScheme, isDark } = useColorSchemeContext();
+
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -13,6 +17,16 @@ export default function MoreScreen() {
             <FontAwesome name="cog" size={20} color="#0ea5e9" />
             <Text style={styles.menuText}>Settings</Text>
           </RNView>
+
+          <Pressable style={styles.menuItem} onPress={toggleColorScheme}>
+            <FontAwesome name={isDark ? "sun-o" : "moon-o"} size={20} color="#0ea5e9" />
+            <Text style={styles.menuText}>Dark Mode</Text>
+            <RNView style={styles.toggleContainer}>
+              <RNView style={[styles.toggle, isDark && styles.toggleActive]}>
+                <RNView style={[styles.toggleThumb, isDark && styles.toggleThumbActive]} />
+              </RNView>
+            </RNView>
+          </Pressable>
 
           <RNView style={styles.menuItem}>
             <FontAwesome name="user" size={20} color="#0ea5e9" />
@@ -35,6 +49,7 @@ export default function MoreScreen() {
           </RNView>
         </BorderedBox>
       </ScrollView>
+      <BottomNavigation />
     </View>
   );
 }
@@ -74,5 +89,36 @@ const styles = StyleSheet.create({
   },
   signOutText: {
     color: '#ef4444',
+  },
+  toggleContainer: {
+    marginLeft: 'auto',
+  },
+  toggle: {
+    width: 50,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#e5e7eb',
+    borderWidth: 1,
+    borderColor: '#d1d5db',
+    justifyContent: 'center',
+    paddingHorizontal: 2,
+  },
+  toggleActive: {
+    backgroundColor: '#0ea5e9',
+    borderColor: '#0ea5e9',
+  },
+  toggleThumb: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: '#ffffff',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  toggleThumbActive: {
+    transform: [{ translateX: 22 }],
   },
 });

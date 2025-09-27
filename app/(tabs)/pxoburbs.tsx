@@ -9,7 +9,7 @@ const staticTvImage = require('@/assets/images/static-tv.png');
 const pxoburbsSkylineImage = require('@/assets/images/pxoburbs-skyline.png');
 const chipsImage = require('@/assets/images/chips.png');
 const lilArcadeImage = require('@/assets/images/lil-arcade.png');
-const rolerImage = require('@/assets/images/roler.png');
+const lilMovieReelImage = require('@/assets/images/lil-movie-reel.png');
 const makeoutHillImage = require('@/assets/images/makeout-hill.png');
 
 export default function PxoburbsScreen() {
@@ -46,14 +46,6 @@ export default function PxoburbsScreen() {
       icon: 'arcade'
     },
     {
-      id: 'roller-rink',
-      name: 'Starlight Roller Rink',
-      description: 'Skate to disco hits and find lost items.',
-      lightning: 8,
-      difficulty: 'Medium',
-      icon: 'roler'
-    },
-    {
       id: 'makeout-hill',
       name: 'Makeout Hill',
       description: 'The legendary spot for romantic encounters.',
@@ -64,7 +56,7 @@ export default function PxoburbsScreen() {
     {
       id: 'lost-found',
       name: 'Lost & Found Kiosk',
-      description: 'Located at the roller rink - find missing items.',
+      description: 'Find missing items and lost treasures.',
       lightning: 10,
       difficulty: 'Easy',
       icon: 'search'
@@ -83,7 +75,7 @@ export default function PxoburbsScreen() {
       description: 'Catch the latest blockbusters and indie films.',
       lightning: 20,
       difficulty: 'Easy',
-      icon: 'film'
+      icon: 'lil-movie-reel'
     },
     {
       id: 'post-office',
@@ -151,7 +143,7 @@ export default function PxoburbsScreen() {
         <Text style={styles.description}>
           Welcome to The Pxoburbs! This bustling suburban district is where the action happens. 
           From the neon-lit arcade to the local corner store, every block offers something exciting. 
-          Skate at the roller rink, catch a movie at the cinema, or grab snacks at the mall food court. 
+          Catch a movie at the cinema, grab snacks at the mall food court, or explore the arcade. 
           It's the perfect place to hang out, explore, and make memories with friends!
         </Text>
 
@@ -207,10 +199,10 @@ export default function PxoburbsScreen() {
                   <Image source={chipsImage} style={styles.activityImageIcon} />
                 ) : activity.id === 'arcade' ? (
                   <Image source={lilArcadeImage} style={styles.arcadeImageIcon} />
-                ) : activity.id === 'roller-rink' ? (
-                  <Image source={rolerImage} style={styles.activityImageIcon} />
                 ) : activity.id === 'makeout-hill' ? (
                   <Image source={makeoutHillImage} style={styles.activityImageIcon} />
+                ) : activity.id === 'movie-theater' ? (
+                  <Image source={lilMovieReelImage} style={styles.activityImageIcon} />
                 ) : (
                   <FontAwesome name={activity.icon as any} size={32} color="#8b5cf6" style={styles.activityIcon} />
                 )}
