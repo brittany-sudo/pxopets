@@ -18,7 +18,7 @@ const gumballsImage = require('@/assets/images/gumballs.png');
 export default function ShopScreen() {
   const [shopkeeperSaying, setShopkeeperSaying] = useState("Welcome to QuickStop! Best prices in Pxoburbs!");
   const [countdown, setCountdown] = useState(3600); // 1 hour in seconds
-  const glowAnimation = useRef(new Animated.Value(0.3)).current;
+  const glowAnimation = useRef(new Animated.Value(0.2)).current;
   const [playerInventory, setPlayerInventory] = useState([
     { id: '1', name: 'Golden Star', price: 15, image: 'chips' },
     { id: '2', name: 'Magic Leaf', price: 8, image: 'cupnoddle' },
@@ -108,7 +108,7 @@ export default function ShopScreen() {
           useNativeDriver: true,
         }),
         Animated.timing(glowAnimation, {
-          toValue: 0.3,
+          toValue: 0.2,
           duration: 1500,
           useNativeDriver: true,
         }),
@@ -333,8 +333,8 @@ export default function ShopScreen() {
                 opacity: glowAnimation,
                 transform: [{
                   scale: glowAnimation.interpolate({
-                    inputRange: [0.3, 1],
-                    outputRange: [1, 1.05],
+                    inputRange: [0.2, 1],
+                    outputRange: [1, 1.03],
                   })
                 }]
               }
@@ -345,13 +345,13 @@ export default function ShopScreen() {
               styles.limitedTimeBorder,
               {
                 borderColor: glowAnimation.interpolate({
-                  inputRange: [0.3, 1],
-                  outputRange: ['#ffd700', '#ffed4e'],
+                  inputRange: [0.2, 1],
+                  outputRange: ['#ff69b4', '#ffb6c1'],
                 })
               }
             ]}
           >
-            <Text style={styles.sectionTitle}>⭐ LIMITED TIME ITEMS ⭐</Text>
+            <Text style={styles.sectionTitle}>LIMITED TIME ITEMS</Text>
             <RNView style={styles.chipsGrid}>
               {limitedItems.map((item) => (
                 <RNView key={item.id} style={styles.chipsItem}>
@@ -823,24 +823,24 @@ const styles = StyleSheet.create({
     left: -4,
     right: -4,
     bottom: -4,
-    backgroundColor: 'rgba(255, 215, 0, 0.3)',
+    backgroundColor: 'rgba(255, 192, 203, 0.15)',
     borderRadius: 12,
-    shadowColor: '#ffd700',
+    shadowColor: '#ff69b4',
     shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.8,
-    shadowRadius: 8,
-    elevation: 8,
+    shadowOpacity: 0.4,
+    shadowRadius: 6,
+    elevation: 4,
   },
   limitedTimeBorder: {
-    backgroundColor: '#fff8dc',
+    backgroundColor: '#fff0f5',
     borderRadius: 8,
-    borderWidth: 3,
-    borderColor: '#ffd700',
+    borderWidth: 2,
+    borderColor: '#ff69b4',
     padding: 16,
-    shadowColor: '#ffd700',
+    shadowColor: '#ff69b4',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.4,
-    shadowRadius: 4,
-    elevation: 4,
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 2,
   },
 });
