@@ -73,7 +73,6 @@ function RootLayoutNav() {
             <Stack.Screen name="scarecrow-vale" options={{ headerShown: false }} />
             <Stack.Screen name="more" options={{ header: () => <AppHeader /> }} />
             <Stack.Screen name="quickstop" options={{ headerShown: false }} />
-            <Stack.Screen name="starlight-cinema" options={{ headerShown: false }} />
             <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
           </Stack>
         </GameProvider>

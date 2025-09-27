@@ -5,7 +5,7 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { router } from 'expo-router';
 
 // Import the banner image
-const loomersBackgroundImage = require('@/assets/images/loomers-background.png');
+const loomersBackgroundImage = require('@/assets/images/loomers-wharf-main.png');
 
 export default function FoggyHarborScreen() {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
@@ -23,6 +23,14 @@ export default function FoggyHarborScreen() {
   };
 
   const activities = [
+    {
+      id: 'whale-watching',
+      name: 'Harbor Watch',
+      description: 'Venture out to sea three times daily to spot whales and log your sightings.',
+      lightning: 35,
+      difficulty: 'Easy',
+      icon: 'lil-whale'
+    },
     {
       id: 'lobster-trap',
       name: 'Lobster Trap Master',
@@ -121,27 +129,34 @@ export default function FoggyHarborScreen() {
 
         {/* Activities List */}
         {activities.map((activity) => (
-          <RNView key={activity.id} style={styles.activityItem}>
+          <Pressable 
+            key={activity.id} 
+            style={styles.activityItem}
+            onPress={() => {
+              if (activity.id === 'whale-watching') {
+                router.navigate('/(tabs)/whale-watching');
+              }
+            }}
+          >
             <RNView style={styles.activityHeader}>
               <RNView style={styles.activityInfo}>
-                <FontAwesome name={activity.icon as any} size={22} color="#8b5cf6" style={styles.activityIcon} />
+                {activity.icon === 'lil-whale' ? (
+                  <Image 
+                    source={require('@/assets/images/lil-whale.png')} 
+                    style={styles.activityImageIcon} 
+                  />
+                ) : (
+                  <FontAwesome name={activity.icon as any} size={28} color="#8b5cf6" style={styles.activityIcon} />
+                )}
                     <RNView style={styles.activityText}>
                       <RNView style={styles.activityTitleRow}>
                         <Text style={styles.activityName}>{activity.name}</Text>
-                        <RNView style={styles.ticketDisplay}>
-                          <FontAwesome name="bolt" size={15} color="#06b6d4" />
-                          <Text style={styles.ticketCountText}>{activity.lightning}</Text>
-                        </RNView>
                       </RNView>
                       <Text style={styles.activityDescription}>{activity.description}</Text>
                     </RNView>
               </RNView>
             </RNView>
             <RNView style={styles.activityFooter}>
-              <RNView style={styles.ticketDisplay}>
-                <FontAwesome name="bolt" size={20} color="#06b6d4" />
-                <Text style={styles.ticketCountText}>{activity.lightning}</Text>
-              </RNView>
               <Pressable
                 style={styles.favoriteButton}
                 onPress={() => toggleFavorite(activity.id)}
@@ -153,7 +168,7 @@ export default function FoggyHarborScreen() {
                 />
               </Pressable>
             </RNView>
-          </RNView>
+          </Pressable>
         ))}
       </ScrollView>
     </View>
@@ -255,6 +270,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   activityIcon: {
+    marginRight: 12,
+    alignSelf: 'center',
+  },
+  activityImageIcon: {
+    width: 35,
+    height: 35,
     marginRight: 12,
     alignSelf: 'center',
   },

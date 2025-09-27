@@ -4,7 +4,6 @@ import { Text, View } from '@/components/Themed';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { router } from 'expo-router';
 import BorderedBox from '@/components/BorderedBox';
-import BottomNavigation from '@/components/BottomNavigation';
 
 // Import the Starlight Cinema image
 const starlightCinemaImage = require('@/assets/images/starlight-cinema-im.png');
@@ -81,9 +80,6 @@ export default function StarlightCinemaScreen() {
           <Text style={styles.backButtonText}>Back</Text>
         </Pressable>
 
-        {/* Cinema Title */}
-        <Text style={styles.cinemaTitle}>Starlight Cinema</Text>
-
         {/* Cinema Image */}
         <RNView style={styles.cinemaImageContainer}>
           <Image source={starlightCinemaImage} style={styles.cinemaImage} />
@@ -150,7 +146,6 @@ export default function StarlightCinemaScreen() {
           </RNView>
         </BorderedBox>
       </ScrollView>
-      <BottomNavigation />
     </View>
   );
 }

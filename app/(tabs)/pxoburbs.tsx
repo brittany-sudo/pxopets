@@ -46,6 +46,14 @@ export default function PxoburbsScreen() {
       icon: 'arcade'
     },
     {
+      id: 'movie-theater',
+      name: 'Starlight Cinema',
+      description: 'Catch the latest blockbusters and indie films.',
+      lightning: 20,
+      difficulty: 'Easy',
+      icon: 'lil-movie-reel'
+    },
+    {
       id: 'makeout-hill',
       name: 'Makeout Hill',
       description: 'The legendary spot for romantic encounters.',
@@ -68,14 +76,6 @@ export default function PxoburbsScreen() {
       lightning: 18,
       difficulty: 'Medium',
       icon: 'microphone'
-    },
-    {
-      id: 'movie-theater',
-      name: 'Starlight Cinema',
-      description: 'Catch the latest blockbusters and indie films.',
-      lightning: 20,
-      difficulty: 'Easy',
-      icon: 'lil-movie-reel'
     },
     {
       id: 'post-office',
@@ -191,43 +191,79 @@ export default function PxoburbsScreen() {
                   </RNView>
                 </Pressable>
               </Link>
-            ) : activity.id === 'movie-theater' ? (
-              <Link href="/starlight-cinema" asChild>
-                <Pressable style={styles.activityPressable}>
-                  <RNView style={styles.activityHeader}>
-                    <RNView style={styles.activityInfo}>
-                      {activity.id === 'movie-theater' ? (
-                        <Image source={lilMovieReelImage} style={styles.activityImageIcon} />
-                      ) : (
-                        <FontAwesome name={activity.icon as any} size={32} color="#8b5cf6" style={styles.activityIcon} />
-                      )}
-                      <RNView style={styles.activityText}>
-                        <RNView style={styles.activityTitleRow}>
-                          <Text style={styles.activityName}>{activity.name}</Text>
-                          <RNView style={styles.ticketDisplay}>
-                            <FontAwesome name="bolt" size={15} color="#06b6d4" />
-                            <Text style={styles.ticketCountText}>{activity.lightning}</Text>
-                          </RNView>
-                        </RNView>
-                        <Text style={styles.activityDescription}>{activity.description}</Text>
-                      </RNView>
-                    </RNView>
-                  </RNView>
-                  <RNView style={styles.activityFooter}>
-                    <Pressable
-                      style={styles.favoriteButton}
-                      onPress={() => toggleFavorite(activity.id)}
-                    >
-                      <FontAwesome 
-                        name={favorites.has(activity.id) ? "star" : "star-o"} 
-                        size={16} 
-                        color={favorites.has(activity.id) ? "#94a3b8" : "#94a3b8"} 
-                      />
-                    </Pressable>
-                  </RNView>
-                </Pressable>
-              </Link>
-            ) : (
+           ) : activity.id === 'movie-theater' ? (
+             <Link href="/(tabs)/starlight-cinema" asChild>
+               <Pressable style={styles.activityPressable}>
+                 <RNView style={styles.activityHeader}>
+                   <RNView style={styles.activityInfo}>
+                     {activity.id === 'movie-theater' ? (
+                       <Image source={lilMovieReelImage} style={styles.activityImageIcon} />
+                     ) : (
+                       <FontAwesome name={activity.icon as any} size={32} color="#8b5cf6" style={styles.activityIcon} />
+                     )}
+                     <RNView style={styles.activityText}>
+                       <RNView style={styles.activityTitleRow}>
+                         <Text style={styles.activityName}>{activity.name}</Text>
+                         <RNView style={styles.ticketDisplay}>
+                           <FontAwesome name="bolt" size={15} color="#06b6d4" />
+                           <Text style={styles.ticketCountText}>{activity.lightning}</Text>
+                         </RNView>
+                       </RNView>
+                       <Text style={styles.activityDescription}>{activity.description}</Text>
+                     </RNView>
+                   </RNView>
+                 </RNView>
+                 <RNView style={styles.activityFooter}>
+                   <Pressable
+                     style={styles.favoriteButton}
+                     onPress={() => toggleFavorite(activity.id)}
+                   >
+                     <FontAwesome
+                       name={favorites.has(activity.id) ? "star" : "star-o"}
+                       size={16}
+                       color={favorites.has(activity.id) ? "#94a3b8" : "#94a3b8"}
+                     />
+                   </Pressable>
+                 </RNView>
+               </Pressable>
+             </Link>
+           ) : activity.id === 'makeout-hill' ? (
+             <Link href="/(tabs)/makeout-hill" asChild>
+               <Pressable style={styles.activityPressable}>
+                 <RNView style={styles.activityHeader}>
+                   <RNView style={styles.activityInfo}>
+                     {activity.id === 'makeout-hill' ? (
+                       <Image source={makeoutHillImage} style={styles.activityImageIcon} />
+                     ) : (
+                       <FontAwesome name={activity.icon as any} size={32} color="#8b5cf6" style={styles.activityIcon} />
+                     )}
+                     <RNView style={styles.activityText}>
+                       <RNView style={styles.activityTitleRow}>
+                         <Text style={styles.activityName}>{activity.name}</Text>
+                         <RNView style={styles.ticketDisplay}>
+                           <FontAwesome name="bolt" size={15} color="#06b6d4" />
+                           <Text style={styles.ticketCountText}>{activity.lightning}</Text>
+                         </RNView>
+                       </RNView>
+                       <Text style={styles.activityDescription}>{activity.description}</Text>
+                     </RNView>
+                   </RNView>
+                 </RNView>
+                 <RNView style={styles.activityFooter}>
+                   <Pressable
+                     style={styles.favoriteButton}
+                     onPress={() => toggleFavorite(activity.id)}
+                   >
+                     <FontAwesome
+                       name={favorites.has(activity.id) ? "star" : "star-o"}
+                       size={16}
+                       color={favorites.has(activity.id) ? "#94a3b8" : "#94a3b8"}
+                     />
+                   </Pressable>
+                 </RNView>
+               </Pressable>
+             </Link>
+           ) : (
               <>
                 <RNView style={styles.activityHeader}>
                   <RNView style={styles.activityInfo}>
