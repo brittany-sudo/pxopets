@@ -33,6 +33,46 @@ export default function ShopScreen() {
     { id: 'l4', name: 'Energy Drink', price: 125, image: 'pouchdrink', tickets: 10 },
   ]);
 
+  // Lottery tickets with different variations
+  const [lotteryTickets, setLotteryTickets] = useState([
+    { 
+      id: 'lot1', 
+      name: 'Quick Pick', 
+      price: 5, 
+      description: 'Instant win chance!',
+      odds: '1 in 3',
+      prizes: ['5 tickets', '10 tickets', '25 tickets', '50 tickets'],
+      image: 'chips'
+    },
+    { 
+      id: 'lot2', 
+      name: 'Lucky Draw', 
+      price: 15, 
+      description: 'Better odds, bigger prizes!',
+      odds: '1 in 5',
+      prizes: ['25 tickets', '50 tickets', '100 tickets', 'Rare Item'],
+      image: 'chocolate'
+    },
+    { 
+      id: 'lot3', 
+      name: 'Mega Jackpot', 
+      price: 50, 
+      description: 'Huge prizes, rare chance!',
+      odds: '1 in 20',
+      prizes: ['100 tickets', '500 tickets', '1000 tickets', 'Legendary Pet'],
+      image: 'gumballs'
+    },
+    { 
+      id: 'lot4', 
+      name: 'Daily Special', 
+      price: 10, 
+      description: 'Limited daily lottery!',
+      odds: '1 in 4',
+      prizes: ['15 tickets', '30 tickets', '60 tickets', 'Special Item'],
+      image: 'hotchips'
+    },
+  ]);
+
   // Shop inventory that changes every few hours
   const [shopInventory, setShopInventory] = useState([
     { id: 's1', name: 'Energy Drink', price: 5, stock: 3, image: 'chips' },
@@ -155,6 +195,42 @@ export default function ShopScreen() {
     );
   };
 
+  const handleLotteryPurchase = (lottery: any) => {
+    Alert.alert(
+      "Buy Lottery Ticket",
+      `Buy a ${lottery.name} ticket for ${lottery.price} ⚡?\n\nOdds: ${lottery.odds}\nPrizes: ${lottery.prizes.join(', ')}`,
+      [
+        { text: "Cancel", style: "cancel" },
+        { text: "Buy Ticket", onPress: () => {
+          // Simulate lottery draw based on odds
+          let winChance = 0;
+          switch (lottery.odds) {
+            case '1 in 3': winChance = 1/3; break;
+            case '1 in 4': winChance = 1/4; break;
+            case '1 in 5': winChance = 1/5; break;
+            case '1 in 20': winChance = 1/20; break;
+            default: winChance = 0.1;
+          }
+          
+          const won = Math.random() < winChance;
+          
+          if (won) {
+            const randomPrize = lottery.prizes[Math.floor(Math.random() * lottery.prizes.length)];
+            Alert.alert(
+              "🎉 WINNER! 🎉", 
+              `Congratulations! You won: ${randomPrize}!\n\nYour ${lottery.name} ticket was a winner!`
+            );
+          } else {
+            Alert.alert(
+              "Better Luck Next Time", 
+              `Your ${lottery.name} ticket didn't win this time.\n\nTry again for another chance!`
+            );
+          }
+        }}
+      ]
+    );
+  };
+
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -256,6 +332,37 @@ export default function ShopScreen() {
           </RNView>
         </BorderedBox>
 
+        {/* Lottery Tickets */}
+        <BorderedBox>
+          <Text style={styles.sectionTitle}>🎰 LOTTERY TICKETS 🎰</Text>
+          <RNView style={styles.lotteryGrid}>
+            {lotteryTickets.map((lottery) => (
+              <RNView key={lottery.id} style={styles.lotteryItem}>
+                <Image 
+                  source={
+                    lottery.image === 'chips' ? chipsImage :
+                    lottery.image === 'chocolate' ? chocolateImage :
+                    lottery.image === 'gumballs' ? gumballsImage :
+                    lottery.image === 'hotchips' ? hotchipsImage :
+                    chipsImage
+                  } 
+                  style={styles.lotteryImage} 
+                />
+                <Text style={styles.lotteryName}>{lottery.name}</Text>
+                <Text style={styles.lotteryDescription}>{lottery.description}</Text>
+                <Text style={styles.lotteryOdds}>Odds: {lottery.odds}</Text>
+                <Text style={styles.lotteryPrice}>{lottery.price} ⚡</Text>
+                <Pressable 
+                  style={[styles.actionButton, styles.lotteryButton]}
+                  onPress={() => handleLotteryPurchase(lottery)}
+                >
+                  <Text style={styles.lotteryButtonText}>BUY TICKET</Text>
+                </Pressable>
+              </RNView>
+            ))}
+          </RNView>
+        </BorderedBox>
+
 
         {/* Shop Info */}
         <BorderedBox>
@@ -265,6 +372,8 @@ export default function ShopScreen() {
             <Text style={styles.infoText}>• Haggle for better prices (70% success rate)</Text>
             <Text style={styles.infoText}>• Sell items for 70% of their value</Text>
             <Text style={styles.infoText}>• Limited stock - first come, first served!</Text>
+            <Text style={styles.infoText}>• 🎰 Lottery tickets offer instant prizes!</Text>
+            <Text style={styles.infoText}>• Higher price = better odds & bigger prizes</Text>
           </RNView>
         </BorderedBox>
       </ScrollView>
@@ -585,5 +694,74 @@ const styles = StyleSheet.create({
     marginLeft: 4,
     fontWeight: 'bold',
     fontFamily: 'Silkscreen_400Regular',
+  },
+  lotteryGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-evenly',
+    padding: 8,
+    alignItems: 'flex-start',
+  },
+  lotteryItem: {
+    width: '48%',
+    alignItems: 'center',
+    marginBottom: 16,
+    padding: 8,
+    backgroundColor: 'rgba(139, 92, 246, 0.05)',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.2)',
+    minHeight: 160,
+  },
+  lotteryImage: {
+    width: 32,
+    height: 32,
+    marginBottom: 6,
+    imageRendering: 'pixelated' as any,
+  },
+  lotteryName: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    fontWeight: 'bold',
+    color: '#0f172a',
+    textAlign: 'center',
+    marginBottom: 2,
+  },
+  lotteryDescription: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 8,
+    color: '#64748b',
+    textAlign: 'center',
+    marginBottom: 4,
+    fontStyle: 'italic',
+  },
+  lotteryOdds: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 8,
+    color: '#f59e0b',
+    textAlign: 'center',
+    marginBottom: 2,
+    fontWeight: 'bold',
+  },
+  lotteryPrice: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 9,
+    color: '#06b6d4',
+    textAlign: 'center',
+    marginBottom: 8,
+    fontWeight: 'bold',
+  },
+  lotteryButton: {
+    backgroundColor: '#8b5cf6',
+    width: '100%',
+    paddingVertical: 6,
+    paddingHorizontal: 8,
+    borderRadius: 4,
+  },
+  lotteryButtonText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 8,
+    color: '#ffffff',
+    fontWeight: 'bold',
   },
 });
