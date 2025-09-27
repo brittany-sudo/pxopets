@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, ScrollView, View as RNView, Image, Pressable, Alert } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { StyleSheet, ScrollView, View as RNView, Image, Pressable, Alert, Animated } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { router } from 'expo-router';
@@ -18,6 +18,7 @@ const gumballsImage = require('@/assets/images/gumballs.png');
 export default function ShopScreen() {
   const [shopkeeperSaying, setShopkeeperSaying] = useState("Welcome to QuickStop! Best prices in Pxoburbs!");
   const [countdown, setCountdown] = useState(3600); // 1 hour in seconds
+  const glowAnimation = useRef(new Animated.Value(0.3)).current;
   const [playerInventory, setPlayerInventory] = useState([
     { id: '1', name: 'Golden Star', price: 15, image: 'chips' },
     { id: '2', name: 'Magic Leaf', price: 8, image: 'cupnoddle' },
@@ -96,6 +97,27 @@ export default function ShopScreen() {
 
     return () => clearInterval(timer);
   }, []);
+
+  // Pulsing glow animation for limited time items
+  useEffect(() => {
+    const pulseAnimation = Animated.loop(
+      Animated.sequence([
+        Animated.timing(glowAnimation, {
+          toValue: 1,
+          duration: 1500,
+          useNativeDriver: true,
+        }),
+        Animated.timing(glowAnimation, {
+          toValue: 0.3,
+          duration: 1500,
+          useNativeDriver: true,
+        }),
+      ])
+    );
+    pulseAnimation.start();
+
+    return () => pulseAnimation.stop();
+  }, [glowAnimation]);
 
   // Time-based shopkeeper sayings
   useEffect(() => {
@@ -303,34 +325,60 @@ export default function ShopScreen() {
         </BorderedBox>
 
         {/* Limited Time Items */}
-        <BorderedBox>
-          <Text style={styles.sectionTitle}>LIMITED TIME ITEMS</Text>
-          <RNView style={styles.chipsGrid}>
-            {limitedItems.map((item) => (
-              <RNView key={item.id} style={styles.chipsItem}>
-                <Image 
-                  source={
-                    item.image === 'gumballs' ? gumballsImage :
-                    pouchdrinkImage
-                  } 
-                  style={styles.chipsImage} 
-                />
-                <Text style={styles.chipsName}>{item.name}</Text>
-                <RNView style={styles.chipsActions}>
-                  <Pressable 
-                    style={[styles.actionButton, styles.buyButton]}
-                    onPress={() => handleBuy(item)}
-                  >
-                    <RNView style={styles.buttonTicketDisplay}>
-                      <FontAwesome name="ticket" size={12} color="#ffffff" />
-                      <Text style={styles.buttonTicketText}>{item.tickets}</Text>
-                    </RNView>
-                  </Pressable>
+        <RNView style={styles.limitedTimeContainer}>
+          <Animated.View 
+            style={[
+              styles.limitedTimeGlow,
+              {
+                opacity: glowAnimation,
+                transform: [{
+                  scale: glowAnimation.interpolate({
+                    inputRange: [0.3, 1],
+                    outputRange: [1, 1.05],
+                  })
+                }]
+              }
+            ]} 
+          />
+          <Animated.View 
+            style={[
+              styles.limitedTimeBorder,
+              {
+                borderColor: glowAnimation.interpolate({
+                  inputRange: [0.3, 1],
+                  outputRange: ['#ffd700', '#ffed4e'],
+                })
+              }
+            ]}
+          >
+            <Text style={styles.sectionTitle}>⭐ LIMITED TIME ITEMS ⭐</Text>
+            <RNView style={styles.chipsGrid}>
+              {limitedItems.map((item) => (
+                <RNView key={item.id} style={styles.chipsItem}>
+                  <Image 
+                    source={
+                      item.image === 'gumballs' ? gumballsImage :
+                      pouchdrinkImage
+                    } 
+                    style={styles.chipsImage} 
+                  />
+                  <Text style={styles.chipsName}>{item.name}</Text>
+                  <RNView style={styles.chipsActions}>
+                    <Pressable 
+                      style={[styles.actionButton, styles.buyButton]}
+                      onPress={() => handleBuy(item)}
+                    >
+                      <RNView style={styles.buttonTicketDisplay}>
+                        <FontAwesome name="ticket" size={12} color="#ffffff" />
+                        <Text style={styles.buttonTicketText}>{item.tickets}</Text>
+                      </RNView>
+                    </Pressable>
+                  </RNView>
                 </RNView>
-              </RNView>
-            ))}
-          </RNView>
-        </BorderedBox>
+              ))}
+            </RNView>
+          </Animated.View>
+        </RNView>
 
         {/* Lottery Tickets */}
         <BorderedBox>
@@ -763,5 +811,36 @@ const styles = StyleSheet.create({
     fontSize: 8,
     color: '#ffffff',
     fontWeight: 'bold',
+  },
+  limitedTimeContainer: {
+    position: 'relative',
+    marginVertical: 16,
+    marginHorizontal: 20,
+  },
+  limitedTimeGlow: {
+    position: 'absolute',
+    top: -4,
+    left: -4,
+    right: -4,
+    bottom: -4,
+    backgroundColor: 'rgba(255, 215, 0, 0.3)',
+    borderRadius: 12,
+    shadowColor: '#ffd700',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.8,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  limitedTimeBorder: {
+    backgroundColor: '#fff8dc',
+    borderRadius: 8,
+    borderWidth: 3,
+    borderColor: '#ffd700',
+    padding: 16,
+    shadowColor: '#ffd700',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.4,
+    shadowRadius: 4,
+    elevation: 4,
   },
 });
