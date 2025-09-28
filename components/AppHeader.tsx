@@ -87,9 +87,9 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
   },
   logo: {
-    width: 240, // 200% bigger (120 * 2)
-    height: 120, // Made taller
-    marginTop: -15, // A half smidge higher
+    width: 280, // Made bigger
+    height: 140, // Made taller
+    marginTop: -25, // Moved up more
   },
   left: { 
     position: 'absolute', 

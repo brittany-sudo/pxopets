@@ -12,6 +12,12 @@ const lilArcadeImage = require('@/assets/images/lil-arcade.png');
 const lilMovieReelImage = require('@/assets/images/lil-movie-reel.png');
 const rolerImage = require('@/assets/images/roler.png');
 const makeoutHillImage = require('@/assets/images/makeout-hill.png');
+const lilRadioImage = require('@/assets/images/lil-radio.png');
+const lilMailImage = require('@/assets/images/lil-mail.png');
+const lilMallImage = require('@/assets/images/lil-mall.png');
+const lilPxosupplyImage = require('@/assets/images/lil-pxosupply.png');
+const lilRubberduckImage = require('@/assets/images/lil-rubberduck.png');
+const lilComputer90Image = require('@/assets/images/lil-computer90.png');
 
 export default function PxoburbsScreen() {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
@@ -56,7 +62,7 @@ export default function PxoburbsScreen() {
     },
     {
       id: 'makeout-hill',
-      name: 'Makeout Hill',
+      name: 'Lovers Hill',
       description: 'The legendary spot for romantic encounters.',
       lightning: 15,
       difficulty: 'Medium',
@@ -72,7 +78,7 @@ export default function PxoburbsScreen() {
     },
     {
       id: 'radio-station',
-      name: 'PXO 101.7 FM',
+      name: 'PXO 101.8 FM',
       description: 'Local radio station with community shows.',
       lightning: 18,
       difficulty: 'Medium',
@@ -87,9 +93,9 @@ export default function PxoburbsScreen() {
       icon: 'envelope'
     },
     {
-      id: 'pet-daycare',
-      name: 'Happy Paws Daycare',
-      description: 'Drop off your pets for fun and socialization.',
+      id: 'pet-supply',
+      name: 'PXOPET SUPPLY CO.',
+      description: 'Everything your pets need for a happy life.',
       lightning: 14,
       difficulty: 'Medium',
       icon: 'paw'
@@ -104,16 +110,16 @@ export default function PxoburbsScreen() {
     },
     {
       id: 'computer-store',
-      name: 'Tech & Tunes',
-      description: 'Computer parts and vintage record collection.',
+      name: 'Byte Size',
+      description: 'Computer parts, tech accessories, and digital gadgets.',
       lightning: 22,
       difficulty: 'Hard',
       icon: 'laptop'
     },
     {
-      id: 'suburban-park',
-      name: 'Maple Leaf Park',
-      description: 'Quiet suburban park with playground and trails.',
+      id: 'community-pool',
+      name: 'Pxoburbs Community Pool',
+      description: 'Swimming, diving, and poolside relaxation.',
       lightning: 8,
       difficulty: 'Easy',
       icon: 'tree'
@@ -264,11 +270,32 @@ export default function PxoburbsScreen() {
                  </RNView>
                </Pressable>
              </Link>
-           ) : activity.id === 'midnight-rewind' ? (
-             <Pressable 
-               style={styles.activityPressable}
-               onPress={() => router.navigate('/(tabs)/midnight-rewind')}
-             >
+          ) : activity.id === 'radio-station' ? (
+            <Pressable 
+              style={styles.activityPressable}
+              onPress={() => router.navigate('/(tabs)/pxo-radio')}
+            >
+              <RNView style={styles.activityHeader}>
+                <RNView style={styles.activityInfo}>
+                  <Image source={lilRadioImage} style={styles.activityImageIcon} />
+                  <RNView style={styles.activityText}>
+                    <RNView style={styles.activityTitleRow}>
+                      <Text style={styles.activityName}>{activity.name}</Text>
+                      <RNView style={styles.ticketDisplay}>
+                        <FontAwesome name="bolt" size={15} color="#06b6d4" />
+                        <Text style={styles.ticketCountText}>{activity.lightning}</Text>
+                      </RNView>
+                    </RNView>
+                    <Text style={styles.activityDescription}>{activity.description}</Text>
+                  </RNView>
+                </RNView>
+              </RNView>
+            </Pressable>
+          ) : activity.id === 'midnight-rewind' ? (
+            <Pressable 
+              style={styles.activityPressable}
+              onPress={() => router.navigate('/(tabs)/midnight-rewind')}
+            >
                <RNView style={styles.activityHeader}>
                  <RNView style={styles.activityInfo}>
                    <Image source={lilMovieReelImage} style={styles.activityImageIcon} />
@@ -296,8 +323,20 @@ export default function PxoburbsScreen() {
                    />
                  </Pressable>
                </RNView>
-             </Pressable>
-           ) : (
+            </Pressable>
+          ) : (
+            <Pressable 
+              style={styles.activityPressable}
+              onPress={() => {
+                if (activity.id === 'post-office') {
+                  router.navigate('/(tabs)/post-office');
+                } else if (activity.id === 'pet-supply') {
+                  router.navigate('/(tabs)/pxopet-supply');
+                } else if (activity.id === 'community-pool') {
+                  router.navigate('/(tabs)/community-pool');
+                }
+              }}
+            >
               <>
                 <RNView style={styles.activityHeader}>
                   <RNView style={styles.activityInfo}>
@@ -309,6 +348,16 @@ export default function PxoburbsScreen() {
                   <Image source={makeoutHillImage} style={styles.activityImageIcon} />
                 ) : activity.id === 'roller-rink' ? (
                   <Image source={rolerImage} style={styles.activityImageIcon} />
+                ) : activity.id === 'post-office' ? (
+                  <Image source={lilMailImage} style={styles.activityImageIcon} />
+                ) : activity.id === 'mall-food-court' ? (
+                  <Image source={lilMallImage} style={styles.activityImageIcon} />
+                ) : activity.id === 'pet-supply' ? (
+                  <Image source={lilPxosupplyImage} style={styles.activityImageIcon} />
+                ) : activity.id === 'community-pool' ? (
+                  <Image source={lilRubberduckImage} style={styles.activityImageIcon} />
+                ) : activity.id === 'computer-store' ? (
+                  <Image source={lilComputer90Image} style={styles.activityImageIcon} />
                 ) : (
                   <FontAwesome name={activity.icon as any} size={32} color="#8b5cf6" style={styles.activityIcon} />
                 )}
@@ -337,6 +386,7 @@ export default function PxoburbsScreen() {
                   </Pressable>
                 </RNView>
               </>
+            </Pressable>
             )}
           </RNView>
         ))}
@@ -429,6 +479,8 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 12,
     width: '100%',
+    height: 100,
+    justifyContent: 'center',
   },
   activityPressable: {
     width: '100%',

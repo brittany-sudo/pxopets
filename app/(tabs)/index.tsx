@@ -218,11 +218,11 @@ export default function HomeScreen() {
                         <RNView style={styles.priceContainer}>
                           <RNView style={styles.currentPriceRow}>
                             <Text style={styles.bannerPrice}>50</Text>
-                            <FontAwesome name="ticket" size={12} color="#0ea5e9" />
+                            <FontAwesome name="ticket" size={12} color="#8b5cf6" />
                           </RNView>
                           <RNView style={styles.originalPriceRow}>
                             <Text style={styles.bannerOriginalPrice}>75</Text>
-                            <FontAwesome name="ticket" size={10} color="#94a3b8" />
+                            <FontAwesome name="ticket" size={10} color="#8b5cf6" />
                           </RNView>
                         </RNView>
                         <Text style={[
@@ -234,20 +234,14 @@ export default function HomeScreen() {
                   </RNView>
                 </RNView>
 
-                <BorderedBox>
-                  <JazzyTitle style={styles.newsHeader}>DAILY GAZETTE</JazzyTitle>
-                  <RNView style={styles.weatherBox}>
-                    <FontAwesome name="sun-o" size={14} color="#f59e0b" style={styles.weatherIcon} />
-                    <Text style={styles.weatherText}>72°</Text>
-                  </RNView>
-                  
-                  {/* Daily Gazette Image */}
-                  <RNView style={styles.imageContainer}>
-                    <Image
-                      source={require('@/assets/images/daily-gazette.png')}
-                      style={styles.dailyGazetteImage}
-                    />
-                  </RNView>
+                {/* Daily Gazette Image */}
+                <RNView style={styles.dailyGazzContainer}>
+                  <Image
+                    source={require('@/assets/images/daily-gazz.png')}
+                    style={styles.dailyGazzImage}
+                    resizeMode="contain"
+                  />
+                </RNView>
                   
                   <Text style={styles.dateText}>January 1, 1991</Text>
 
@@ -322,8 +316,6 @@ export default function HomeScreen() {
                     <FontAwesome name="ticket" size={16} color="#ff1493" style={styles.lotteryIcon} />
                     <Text style={styles.lotteryText}>Today's Lottery: 12 • 19 • 04 • 07</Text>
                   </RNView>
-
-                </BorderedBox>
 
                 {/* Daily Quests Section */}
                 <BorderedBox>
@@ -485,7 +477,7 @@ const styles = StyleSheet.create({
             textAlign: 'center',
             flex: 1,
             marginTop: 8,
-            marginBottom: 8,
+            marginBottom: 16,
             paddingTop: 4,
             paddingBottom: 4,
           },
@@ -521,24 +513,15 @@ const styles = StyleSheet.create({
             textAlign: 'center',
             marginBottom: 8,
           },
-          imageContainer: {
+          dailyGazzContainer: {
             width: '90%',
-            height: 300,
-            marginTop: 2,
-            marginBottom: 16,
             alignSelf: 'center',
-            borderWidth: 2,
-            borderColor: '#0ea5e9',
-            borderRadius: 8,
-            overflow: 'hidden',
-            justifyContent: 'flex-end',
+            marginBottom: 20,
             alignItems: 'center',
           },
-          dailyGazetteImage: {
+          dailyGazzImage: {
             width: '100%',
-            height: '120%',
-            imageRendering: 'pixelated' as any,
-            resizeMode: 'cover',
+            height: 200,
           },
   section: {
     flexDirection: 'row',
@@ -873,16 +856,15 @@ const styles = StyleSheet.create({
           },
           // Premium Banner Styles
           premiumBanner: {
+            width: '80%',
+            alignSelf: 'center',
             marginBottom: 4,
             borderRadius: 12,
             overflow: 'visible', // Keep visible for animation
             borderWidth: 2,
             borderColor: '#8b5cf6',
             position: 'relative',
-            width: '95%',
-            alignSelf: 'center',
             marginTop: 8, // Reduced margin
-            marginBottom: 8, // Reduced margin
             zIndex: 5, // Ensure banner is above other content
           },
           bannerGradient: {
@@ -909,15 +891,13 @@ const styles = StyleSheet.create({
           bannerIconContainer: {
             width: 60,
             height: 60,
-            borderRadius: 30,
-            backgroundColor: 'rgba(251, 191, 36, 0.1)',
             alignItems: 'center',
             justifyContent: 'center',
             marginRight: 16,
           },
           bannerImage: {
-            width: 50,
-            height: 50,
+            width: 55,
+            height: 55,
           },
           bannerText: {
             flex: 1,
@@ -991,7 +971,12 @@ const styles = StyleSheet.create({
             fontSize: 9,
             color: '#ffffff', // White text for dark background
             fontWeight: 'bold',
-            backgroundColor: 'rgba(255, 255, 255, 0.2)', // Light background for contrast
+            backgroundColor: 'rgba(139, 92, 246, 0.3)', // Purple shimmer background
+            shadowColor: '#8b5cf6', // Purple shadow
+            shadowOffset: { width: 0, height: 0 },
+            shadowOpacity: 0.8,
+            shadowRadius: 4,
+            elevation: 4,
             paddingHorizontal: 8,
             paddingVertical: 2,
             borderRadius: 4,

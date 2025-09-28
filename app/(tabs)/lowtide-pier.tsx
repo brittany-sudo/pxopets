@@ -70,7 +70,7 @@ export default function LowtidePierScreen() {
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Back Button */}
+        {/* Back Button - Fixed Position */}
         <Pressable 
           style={styles.backButton}
           onPress={() => router.navigate('/(tabs)/foggy-harbor')}
@@ -78,6 +78,11 @@ export default function LowtidePierScreen() {
           <FontAwesome name="arrow-left" size={14} color="#0ea5e9" />
           <Text style={styles.backButtonText}>Back</Text>
         </Pressable>
+
+        {/* Header Row */}
+        <RNView style={styles.headerRow}>
+          <Text style={styles.locationTitle}>LOWTIDE PIER</Text>
+        </RNView>
 
         {/* Pier Image */}
         <Image 
@@ -180,15 +185,41 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingTop: 60,
   },
+  headerRow: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+    paddingHorizontal: 4,
+    height: 40,
+  },
   backButton: {
+    position: 'absolute',
+    top: 20, // Higher up, below the status bar
+    left: 20,
+    zIndex: 1000,
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
-    paddingVertical: 8,
     paddingHorizontal: 12,
+    paddingVertical: 8,
     backgroundColor: 'rgba(14, 165, 233, 0.1)',
-    borderRadius: 8,
-    alignSelf: 'flex-start',
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: 'rgba(14, 165, 233, 0.3)',
+  },
+  titleContainer: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  locationTitle: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 12,
+    color: '#0f172a',
+    fontWeight: 'bold',
+    letterSpacing: 1,
+    textAlign: 'center',
+  },
+  spacer: {
+    width: 80, // Same width as back button to balance the layout
   },
   backButtonText: {
     fontFamily: 'Silkscreen_400Regular',

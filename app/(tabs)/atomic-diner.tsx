@@ -117,7 +117,7 @@ export default function AtomicDinerScreen() {
   return (
     <View style={styles.container}>
       <ScrollView style={styles.scrollView}>
-        {/* Back Button */}
+        {/* Back Button - Fixed Position */}
         <Pressable 
           style={styles.backButton}
           onPress={() => router.navigate('/(tabs)/crescent-oasis')}
@@ -125,6 +125,11 @@ export default function AtomicDinerScreen() {
           <FontAwesome name="arrow-left" size={14} color="#0ea5e9" />
           <Text style={styles.backButtonText}>Back</Text>
         </Pressable>
+
+        {/* Header Row */}
+        <RNView style={styles.headerRow}>
+          <Text style={styles.locationTitle}>ATOMIC DINER</Text>
+        </RNView>
 
         {/* Diner Image */}
         <RNView style={styles.dinerImageContainer}>
@@ -203,17 +208,34 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 50,
   },
+  headerRow: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+    paddingHorizontal: 4,
+    height: 40,
+  },
   backButton: {
+    position: 'absolute',
+    top: 20, // Higher up, below the status bar
+    left: 20,
+    zIndex: 1000,
     flexDirection: 'row',
     alignItems: 'center',
-    alignSelf: 'flex-start',
-    marginBottom: 20,
     paddingHorizontal: 12,
     paddingVertical: 8,
     backgroundColor: 'rgba(14, 165, 233, 0.1)',
     borderRadius: 6,
     borderWidth: 1,
     borderColor: 'rgba(14, 165, 233, 0.3)',
+  },
+  locationTitle: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 12,
+    color: '#0f172a',
+    fontWeight: 'bold',
+    letterSpacing: 1,
+    textAlign: 'center',
   },
   backButtonText: {
     fontFamily: 'Silkscreen_400Regular',

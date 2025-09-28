@@ -259,7 +259,7 @@ export default function ShopScreen() {
         {/* Back Button */}
         <Pressable 
           style={styles.backButton}
-          onPress={() => router.push('/(tabs)/pxoburbs')}
+          onPress={() => router.navigate('/(tabs)/pxoburbs')}
         >
           <FontAwesome name="arrow-left" size={14} color="#0ea5e9" />
           <Text style={styles.backButtonText}>Back</Text>

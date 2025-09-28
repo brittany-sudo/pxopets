@@ -5,7 +5,7 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { router } from 'expo-router';
 
 // Import the video store image
-const midnightRewindImage = require('@/assets/images/midnight-rewind-main.png');
+const midnightRewindImage = require('@/assets/images/midnight-rewind.png');
 const lilMovieReelImage = require('@/assets/images/lil-movie-reel.png');
 const lilVhsImage = require('@/assets/images/lil-vhs.png');
 const vinnieShopkeeperImage = require('@/assets/images/vinnie-shopkeeper.png');
@@ -62,8 +62,34 @@ export default function MidnightRewindScreen() {
   const [lastResult, setLastResult] = useState('');
   const [showRentalSelection, setShowRentalSelection] = useState(false);
   const [isSpinning, setIsSpinning] = useState(false);
+  const [vinnieDialogue, setVinnieDialogue] = useState('');
   
   const spinAnimation = useRef(new Animated.Value(0)).current;
+
+  // NYC-style Vinnie dialogue
+  const vinnieQuotes = [
+    "Yo, what's good? Welcome to Midnight Rewind, the last real video store in the city!",
+    "Ayy, you lookin' for some classics? We got everything from the 80s to the 2000s, my guy!",
+    "Listen, I been runnin' this joint for 15 years. I know movies better than I know my own family!",
+    "Yo, you want the real deal? Skip the mainstream stuff, I got some hidden gems that'll blow your mind!",
+    "Ayy, welcome to the neighborhood! This place is like a time capsule of cinema history, you feel me?",
+    "Yo, you look like you got good taste. Let me hook you up with something that'll change your life!",
+    "Listen, I don't just rent movies, I curate experiences. Every tape here tells a story, you know?",
+    "Ayy, you from around here? This place has been my baby since I was a kid. It's got soul!",
+    "Yo, you want some real cinema? None of that streaming garbage. We got the authentic stuff!",
+    "Listen, I'm not just a clerk, I'm a film historian. Every recommendation comes from the heart!",
+    "Ayy, you lookin' for something specific? I got connections all over the city for rare finds!",
+    "Yo, this place is like my second home. I know every movie, every director, every hidden detail!",
+    "Listen, I been in this business long enough to know what's real and what's just hype!",
+    "Ayy, you want the full experience? Grab some snacks, pick a movie, and let me blow your mind!",
+    "Yo, welcome to the last standing video store! We keep the dream alive, one rental at a time!"
+  ];
+
+  // Generate random dialogue on component mount
+  React.useEffect(() => {
+    const randomQuote = vinnieQuotes[Math.floor(Math.random() * vinnieQuotes.length)];
+    setVinnieDialogue(randomQuote);
+  }, []);
 
   const toggleFavorite = (itemId: string) => {
     setFavorites(prev => {
@@ -386,8 +412,8 @@ export default function MidnightRewindScreen() {
   return (
     <View style={styles.container}>
       <ScrollView style={styles.scrollView}>
-        {/* Back Button */}
-        <Pressable 
+        {/* Back Button - Fixed Position */}
+        <Pressable
           style={styles.backButton}
           onPress={() => router.navigate('/(tabs)/pxoburbs')}
         >
@@ -395,8 +421,11 @@ export default function MidnightRewindScreen() {
           <Text style={styles.backButtonText}>Back</Text>
         </Pressable>
 
-        {/* Title */}
-        <Text style={styles.title}>MIDNIGHT REWIND</Text>
+        {/* Header Row */}
+        <RNView style={styles.headerRow}>
+          <Text style={styles.locationTitle}>MIDNIGHT REWIND</Text>
+        </RNView>
+
 
         {/* Store Image */}
         <RNView style={styles.storeImageContainer}>
@@ -407,9 +436,9 @@ export default function MidnightRewindScreen() {
         <RNView style={styles.vinnieContainer}>
           <Image source={vinnieShopkeeperImage} style={styles.vinnieImage} />
           <RNView style={styles.speechBubble}>
+            <Text style={styles.characterName}>VINNIE</Text>
             <Text style={styles.speechText}>
-              "Welcome to Midnight Rewind! I'm Vinnie, your friendly video store clerk. 
-              We've got the best collection of classic movies and rare tapes in town!"
+              {vinnieDialogue}
             </Text>
           </RNView>
         </RNView>
@@ -619,18 +648,34 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 10,
   },
+  headerRow: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+    paddingHorizontal: 4,
+    height: 40,
+  },
   backButton: {
+    position: 'absolute',
+    top: 20, // Higher up, below the status bar
+    left: 20,
+    zIndex: 1000,
     flexDirection: 'row',
     alignItems: 'center',
-    alignSelf: 'flex-start',
-    marginBottom: 20,
-    marginTop: 8,
     paddingHorizontal: 12,
     paddingVertical: 8,
     backgroundColor: 'rgba(14, 165, 233, 0.1)',
     borderRadius: 6,
     borderWidth: 1,
     borderColor: 'rgba(14, 165, 233, 0.3)',
+  },
+  locationTitle: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 12,
+    color: '#0f172a',
+    fontWeight: 'bold',
+    letterSpacing: 1,
+    textAlign: 'center',
   },
   backButtonText: {
     fontFamily: 'Silkscreen_400Regular',
@@ -649,24 +694,20 @@ const styles = StyleSheet.create({
   },
   storeImageContainer: {
     width: '100%',
-    height: 400,
-    borderWidth: 2,
-    borderColor: '#0ea5e9',
-    borderRadius: 8,
-    marginBottom: 20,
-    overflow: 'hidden',
-    backgroundColor: 'rgba(14, 165, 233, 0.05)',
+    marginBottom: 10,
+    marginTop: -10,
   },
   storeImage: {
     width: '100%',
-    height: '100%',
-    resizeMode: 'cover',
+    height: 250,
+    resizeMode: 'contain',
   },
   vinnieContainer: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: 24,
-    marginTop: 8,
+    marginTop: -10,
   },
   vinnieImage: {
     width: 58,
@@ -675,17 +716,24 @@ const styles = StyleSheet.create({
   },
   speechBubble: {
     flex: 1,
-    backgroundColor: 'rgba(14, 165, 233, 0.1)',
-    borderRadius: 12,
+    borderRadius: 16,
     padding: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(14, 165, 233, 0.3)',
+    borderWidth: 2,
+    borderColor: '#0ea5e9',
+    backgroundColor: '#ffffff',
   },
   speechText: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 10,
     color: '#0f172a',
     lineHeight: 14,
+  },
+  characterName: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#8b5cf6',
+    fontWeight: 'bold',
+    marginBottom: 4,
   },
   pubActivitiesContainer: {
     marginBottom: 24,

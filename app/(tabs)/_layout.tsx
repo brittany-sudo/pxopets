@@ -178,6 +178,18 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="pxo-radio"
+        options={{
+          href: null, // Hide from tab bar
+        }}
+      />
+      <Tabs.Screen
+        name="post-office"
+        options={{
+          href: null, // Hide from tab bar
+        }}
+      />
+      <Tabs.Screen
         name="makeout-hill"
         options={{
           href: null, // Hide from tab bar
@@ -215,6 +227,18 @@ export default function TabLayout() {
       />
       <Tabs.Screen
         name="midnight-rewind"
+        options={{
+          href: null, // Hide from tab bar
+        }}
+      />
+      <Tabs.Screen
+        name="pxopet-supply"
+        options={{
+          href: null, // Hide from tab bar
+        }}
+      />
+      <Tabs.Screen
+        name="community-pool"
         options={{
           href: null, // Hide from tab bar
         }}

@@ -2,8 +2,14 @@ import React from 'react';
 import { Stack } from 'expo-router';
 import AppHeader from '@/components/AppHeader';
 import BottomNavigation from '@/components/BottomNavigation';
+import { usePathname } from 'expo-router';
 
 export default function AdoptionLayout() {
+  const pathname = usePathname();
+  
+  // Only show bottom navigation on the main adoption index page
+  const showBottomNav = pathname === '/adoption' || pathname === '/adoption/';
+  
   return (
     <>
       <Stack>
@@ -29,7 +35,7 @@ export default function AdoptionLayout() {
           }} 
         />
       </Stack>
-      <BottomNavigation />
+      {showBottomNav && <BottomNavigation />}
     </>
   );
 }

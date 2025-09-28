@@ -61,7 +61,7 @@ export default function CreatePet() {
         {/* Back Button */}
         <Pressable 
           style={styles.backButton}
-          onPress={() => router.back()}
+          onPress={() => router.navigate('/(tabs)/adoption')}
         >
           <FontAwesome name="arrow-left" size={14} color="#0ea5e9" />
           <Text style={styles.backButtonText}>Back</Text>

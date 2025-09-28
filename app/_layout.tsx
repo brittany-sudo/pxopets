@@ -71,6 +71,8 @@ function RootLayoutNav() {
             <Stack.Screen name="pxoburbs" options={{ headerShown: false }} />
             <Stack.Screen name="saltwick-pier" options={{ headerShown: false }} />
             <Stack.Screen name="scarecrow-vale" options={{ headerShown: false }} />
+            <Stack.Screen name="pxopet-supply" options={{ headerShown: false }} />
+            <Stack.Screen name="community-pool" options={{ headerShown: false }} />
             <Stack.Screen name="more" options={{ header: () => <AppHeader /> }} />
             <Stack.Screen name="quickstop" options={{ headerShown: false }} />
             <Stack.Screen name="modal" options={{ presentation: 'modal' }} />

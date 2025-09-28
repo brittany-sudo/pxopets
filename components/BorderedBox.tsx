@@ -18,11 +18,12 @@ const styles = StyleSheet.create({
   container: {
     width: '85%',
     padding: 16,
-    borderWidth: 2,
-    borderColor: '#10b981', // Teal
+    borderWidth: 1,
+    borderColor: '#06b6d4', // Cyan blue
     backgroundColor: 'transparent', // No fill - just border
     marginVertical: 8,
     alignItems: 'center',
     justifyContent: 'center',
+    borderRadius: 2,
   },
 });
