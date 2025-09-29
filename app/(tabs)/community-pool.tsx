@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { StyleSheet, ScrollView, View as RNView, Image, Pressable, Dimensions } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, ScrollView, View as RNView, Image, Pressable, Dimensions, Modal, Alert } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { router } from 'expo-router';
@@ -8,29 +8,101 @@ import { usePathname } from 'expo-router';
 // Import the community pool main image
 const communityPoolMainImage = require('@/assets/images/community-pool-main.png');
 const lilRubberduckImage = require('@/assets/images/lil-rubberduck.png');
+const pooldolphinImage = require('@/assets/images/pooldolphin.png');
+const poolAttendantImage = require('@/assets/images/pool-attendant.png');
+const pooldogImage = require('@/assets/images/pooldog.png');
+const pooldonutImage = require('@/assets/images/pooldonut.png');
+const flamingoburgerImage = require('@/assets/images/flamingoburger.png');
+const poolfloatImage = require('@/assets/images/poolfloat.png');
 
 const { width } = Dimensions.get('window');
+
+// Pool Dolphin NPC messages
+const POOL_DOLPHIN_GREETINGS = [
+  "Hey there, water warrior! Ready to make some waves?",
+  "Welcome to the pool, dude! The water's perfect today.",
+  "Nice to see you back! Ready for some chill swimming?",
+  "Hey! The lanes are all yours - go crush those laps!",
+  "What's up, swimmer? Ready to get your flow on?",
+  "Welcome back to the pool! Time to make some magic happen.",
+  "Hey there! The water's calling your name today.",
+  "Ready to dive in? The pool's got your back, bro!",
+  "Welcome! Let's make today's swim absolutely legendary.",
+  "Hey! Ready to show the water what you're made of?"
+];
 
 export default function CommunityPoolScreen() {
   const [poolActivities, setPoolActivities] = useState<Array<{id: string, name: string, completed: boolean}>>([
     { id: 'swimming-laps', name: 'SWIMMING LAPS', completed: false },
-    { id: 'diving-board', name: 'DIVING BOARD', completed: false },
     { id: 'poolside-sunbathing', name: 'POOLSIDE SUNBATHING', completed: false },
-    { id: 'pool-volleyball', name: 'POOL VOLLEYBALL', completed: false }
+    { id: 'pool-volleyball', name: 'POOL VOLLEYBALL', completed: false },
+    { id: 'snack-bar', name: 'SNACK BAR', completed: false }
   ]);
 
   const [poolTemperature, setPoolTemperature] = useState(78);
   const [weather, setWeather] = useState('Sunny');
   const [crowdLevel, setCrowdLevel] = useState('Moderate');
+  const [npcMessage, setNpcMessage] = useState('');
+  const [showNpcMessage, setShowNpcMessage] = useState(false);
+  const [showSnackModal, setShowSnackModal] = useState(false);
+  const [selectedSnack, setSelectedSnack] = useState(null);
+
+  // Pool snack bar inventory
+  const [snackInventory, setSnackInventory] = useState([
+    { id: 's1', name: 'Pool Dog', price: 4, stock: 4, description: 'Classic pool hot dog', image: pooldogImage },
+    { id: 's2', name: 'Pool Donut', price: 3, stock: 6, description: 'Sweet pool donut', image: pooldonutImage },
+    { id: 's3', name: 'Flamingo Burger', price: 6, stock: 2, description: 'Tropical flamingo burger', image: flamingoburgerImage },
+    { id: 's4', name: 'Pool Float', price: 8, stock: 3, description: 'Fun pool float toy', image: poolfloatImage },
+  ]);
+
+  // Show NPC greeting on mount
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const randomGreeting = POOL_DOLPHIN_GREETINGS[Math.floor(Math.random() * POOL_DOLPHIN_GREETINGS.length)];
+      setNpcMessage(randomGreeting);
+      setShowNpcMessage(true);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleActivityPress = (activityId: string) => {
-    setPoolActivities(prev => 
-      prev.map(activity => 
-        activity.id === activityId 
-          ? { ...activity, completed: !activity.completed }
-          : activity
-      )
-    );
+    if (activityId === 'snack-bar') {
+      setShowSnackModal(true);
+    } else {
+      setPoolActivities(prev => 
+        prev.map(activity => 
+          activity.id === activityId 
+            ? { ...activity, completed: !activity.completed }
+            : activity
+        )
+      );
+    }
+  };
+
+  const handleSnackPurchase = (snack: any) => {
+    if (snack.stock > 0) {
+      Alert.alert(
+        "Purchase Snack",
+        `Buy ${snack.name} for ${snack.price} tickets?`,
+        [
+          { text: "Cancel", style: "cancel" },
+          { text: "Buy", onPress: () => {
+            // Update stock
+            setSnackInventory(prev => 
+              prev.map(snackItem => 
+                snackItem.id === snack.id 
+                  ? { ...snackItem, stock: snackItem.stock - 1 }
+                  : snackItem
+              )
+            );
+            Alert.alert("Success!", `You bought ${snack.name}!`);
+          }}
+        ]
+      );
+    } else {
+      Alert.alert("Out of Stock", "This snack is currently unavailable.");
+    }
   };
 
   const completedActivities = poolActivities.filter(activity => activity.completed).length;
@@ -83,6 +155,29 @@ export default function CommunityPoolScreen() {
           </RNView>
         </RNView>
 
+        {/* Pool Dolphin NPC */}
+        {showNpcMessage && (
+          <RNView style={styles.attendantContainer}>
+            <Pressable onPress={() => {
+              const randomGreeting = POOL_DOLPHIN_GREETINGS[Math.floor(Math.random() * POOL_DOLPHIN_GREETINGS.length)];
+              setNpcMessage(randomGreeting);
+            }}>
+              <RNView style={styles.speechBubble}>
+                <Text style={styles.characterName}>ECHO THE LIFEGUARD:</Text>
+                <Text style={styles.speechText}>
+                  {npcMessage}
+                </Text>
+              </RNView>
+            </Pressable>
+            <Pressable onPress={() => {
+              const randomGreeting = POOL_DOLPHIN_GREETINGS[Math.floor(Math.random() * POOL_DOLPHIN_GREETINGS.length)];
+              setNpcMessage(randomGreeting);
+            }}>
+              <Image source={pooldolphinImage} style={styles.echoImage} />
+            </Pressable>
+          </RNView>
+        )}
+
         {/* Pool Activities Wall Sign */}
         <RNView style={styles.wallSignContainer}>
           <Text style={styles.wallSignTitle}>POOL ACTIVITIES</Text>
@@ -91,7 +186,15 @@ export default function CommunityPoolScreen() {
               <Pressable
                 key={activity.id}
                 style={[styles.wallSignItem, activity.completed && styles.wallSignItemCompleted]}
-                onPress={() => handleActivityPress(activity.id)}
+                onPress={() => {
+                  if (activity.id === 'swimming-laps') {
+                    router.navigate('/(tabs)/lap-trainer');
+                  } else if (activity.id === 'pool-volleyball') {
+                    router.navigate('/(tabs)/pool-volleyball');
+                  } else {
+                    handleActivityPress(activity.id);
+                  }
+                }}
               >
                 <Text style={styles.wallSignItemText}>
                   {activity.name}
@@ -119,25 +222,72 @@ export default function CommunityPoolScreen() {
           <Text style={styles.ruleItem}>• Pool closes at 9:00 PM</Text>
         </RNView>
 
-        {/* Progress Summary */}
-        {completedActivities > 0 && (
-          <RNView style={styles.progressContainer}>
-            <Text style={styles.progressTitle}>Pool Session Progress</Text>
-            <Text style={styles.progressText}>
-              You've completed {completedActivities} out of {poolActivities.length} activities!
-            </Text>
-            <RNView style={styles.progressBar}>
-              <RNView 
-                style={[
-                  styles.progressFill, 
-                  { width: `${(completedActivities / poolActivities.length) * 100}%` }
-                ]} 
-              />
-            </RNView>
-          </RNView>
-        )}
 
       </ScrollView>
+
+      {/* Snack Bar Modal */}
+      <Modal
+        visible={showSnackModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowSnackModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <RNView style={styles.modalContainer}>
+            <RNView style={styles.modalHeader}>
+              <RNView style={styles.snackBarSign}>
+                <Text style={styles.modalTitle}>POOL SNACK BAR</Text>
+              </RNView>
+              <Pressable 
+                style={styles.closeButton}
+                onPress={() => setShowSnackModal(false)}
+              >
+                <FontAwesome name="times" size={16} color="#0f172a" />
+              </Pressable>
+            </RNView>
+
+            {/* Pool Attendant Norm */}
+            <RNView style={styles.attendantContainer}>
+              <RNView style={styles.speechBubble}>
+                <Text style={styles.characterName}>NORM THE POOL ATTENDANT:</Text>
+                <Text style={styles.speechText}>
+                  Welcome to the snack bar! Grab something to fuel your pool fun!
+                </Text>
+              </RNView>
+              <Image source={poolAttendantImage} style={styles.attendantImage} />
+            </RNView>
+            
+            <RNView style={styles.snackGrid}>
+              {snackInventory.map((snack) => (
+                <Pressable
+                  key={snack.id}
+                  style={[styles.snackItem, snack.stock === 0 && styles.snackItemOutOfStock]}
+                  onPress={() => handleSnackPurchase(snack)}
+                  disabled={snack.stock === 0}
+                >
+                  <RNView style={styles.snackIconContainer}>
+                    <Image source={snack.image} style={styles.snackImage} />
+                  </RNView>
+                  <Text style={[styles.snackName, snack.stock === 0 && styles.snackNameOutOfStock]}>
+                    {snack.name}
+                  </Text>
+                  <Text style={[styles.snackDescription, snack.stock === 0 && styles.snackDescriptionOutOfStock]}>
+                    {snack.description}
+                  </Text>
+                  <RNView style={styles.snackFooter}>
+                    <Text style={[styles.snackPrice, snack.stock === 0 && styles.snackPriceOutOfStock]}>
+                      {snack.price} 🎫
+                    </Text>
+                    <Text style={[styles.snackStock, snack.stock === 0 && styles.snackStockOutOfStock]}>
+                      Stock: {snack.stock}
+                    </Text>
+                  </RNView>
+                </Pressable>
+              ))}
+            </RNView>
+          </RNView>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -212,6 +362,40 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: 'center',
   },
+  attendantContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'center',
+    marginBottom: 20,
+    paddingHorizontal: 20,
+  },
+  speechBubble: {
+    backgroundColor: 'rgba(20, 184, 166, 0.1)',
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(20, 184, 166, 0.3)',
+    maxWidth: 250,
+  },
+  characterName: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 8,
+    color: '#14b8a6',
+    marginBottom: 4,
+    textAlign: 'center',
+  },
+  speechText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#0f172a',
+    textAlign: 'center',
+  },
+  echoImage: {
+    width: 61,
+    height: 61,
+    marginLeft: 16,
+    imageRendering: 'pixelated' as any,
+  },
   statusContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
@@ -244,9 +428,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    width: '100%',
+    width: '80%',
     marginTop: 8,
-    marginBottom: -8,
+    marginBottom: 8,
+    alignSelf: 'center',
   },
   sectionTitle: {
     fontFamily: 'PressStart2P_400Regular',
@@ -321,9 +506,11 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 16,
     marginBottom: 20,
-    width: '100%',
+    width: '80%',
     borderWidth: 1,
     borderColor: 'rgba(14, 165, 233, 0.2)',
+    alignSelf: 'center',
+    marginTop: -8,
   },
   ruleItem: {
     fontFamily: 'Silkscreen_400Regular',
@@ -332,37 +519,140 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     lineHeight: 16,
   },
-  progressContainer: {
-    backgroundColor: 'rgba(16, 185, 129, 0.1)',
-    borderRadius: 8,
-    padding: 16,
-    width: '100%',
-    borderWidth: 1,
-    borderColor: 'rgba(16, 185, 129, 0.3)',
+  // Modal styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  progressTitle: {
+  modalContainer: {
+    backgroundColor: '#f0f9ff',
+    borderRadius: 12,
+    borderWidth: 3,
+    borderColor: '#14b8a6',
+    width: '90%',
+    maxHeight: '80%',
+    padding: 20,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  snackBarSign: {
+    backgroundColor: '#0d9488',
+    borderRadius: 12,
+    borderWidth: 4,
+    borderColor: '#14b8a6',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+    flex: 1,
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  modalTitle: {
     fontFamily: 'PressStart2P_400Regular',
-    fontSize: 12,
-    color: '#10b981',
-    marginBottom: 8,
+    fontSize: 16,
+    color: '#ffffff',
+    fontWeight: 'bold',
     textAlign: 'center',
+    letterSpacing: 2,
   },
-  progressText: {
-    fontFamily: 'Silkscreen_400Regular',
-    fontSize: 11,
-    color: '#0f172a',
+  closeButton: {
+    padding: 8,
+    borderRadius: 4,
+    backgroundColor: 'rgba(20, 184, 166, 0.1)',
+  },
+  snackGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-evenly',
+    padding: 8,
+    alignItems: 'flex-start',
+  },
+  snackItem: {
+    width: '31%',
+    alignItems: 'center',
     marginBottom: 12,
+    padding: 8,
+    backgroundColor: 'rgba(20, 184, 166, 0.05)',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(20, 184, 166, 0.2)',
+    minHeight: 140,
+  },
+  snackItemOutOfStock: {
+    backgroundColor: 'rgba(100, 116, 139, 0.05)',
+    borderColor: 'rgba(100, 116, 139, 0.2)',
+  },
+  snackIconContainer: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: 'rgba(20, 184, 166, 0.15)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 8,
+  },
+  snackImage: {
+    width: 35,
+    height: 35,
+    imageRendering: 'pixelated' as any,
+    resizeMode: 'contain',
+  },
+  snackName: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 7,
+    color: '#0f172a',
     textAlign: 'center',
+    marginBottom: 4,
   },
-  progressBar: {
-    height: 8,
-    backgroundColor: 'rgba(16, 185, 129, 0.2)',
-    borderRadius: 4,
-    overflow: 'hidden',
+  snackNameOutOfStock: {
+    color: '#64748b',
   },
-  progressFill: {
-    height: '100%',
-    backgroundColor: '#10b981',
-    borderRadius: 4,
+  snackDescription: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 6,
+    color: '#64748b',
+    textAlign: 'center',
+    marginBottom: 8,
+    lineHeight: 8,
+  },
+  snackDescriptionOutOfStock: {
+    color: '#9ca3af',
+  },
+  snackFooter: {
+    alignItems: 'center',
+  },
+  snackPrice: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 8,
+    color: '#14b8a6',
+    fontWeight: 'bold',
+    marginBottom: 2,
+  },
+  snackPriceOutOfStock: {
+    color: '#64748b',
+  },
+  snackStock: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 6,
+    color: '#0f172a',
+  },
+  snackStockOutOfStock: {
+    color: '#64748b',
+  },
+  attendantImage: {
+    width: 55,
+    height: 55,
+    marginLeft: 12,
+    imageRendering: 'pixelated' as any,
   },
 });

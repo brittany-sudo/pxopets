@@ -279,6 +279,18 @@ export default function TabLayout() {
           href: null, // Hide from tab bar
         }}
       />
+    <Tabs.Screen
+      name="lap-trainer"
+      options={{
+        href: null, // Hide from tab bar
+      }}
+    />
+    <Tabs.Screen
+      name="pool-volleyball"
+      options={{
+        href: null, // Hide from tab bar
+      }}
+    />
     </Tabs>
   );
 }
