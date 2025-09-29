@@ -10,7 +10,7 @@ export default {
     tabIconDefault: '#9ca3af', // Muted gray for inactive states
     tabIconSelected: tintColorLight,
     tabActive: '#374151', // Charcoal for active states
-    tabInactive: 'rgba(167, 139, 250, 0.8)', // Soft lavender with 80% opacity
+    tabInactive: '#a78bfa', // Soft lavender with 100% opacity
     tabBarBackground: '#fefefe', // Warm white background
     tabBarBorder: '#10b981', // Teal border
     accent1: '#0ea5e9', // Primary accent - blue
@@ -33,7 +33,7 @@ export default {
     tabIconDefault: '#6b7280', // Muted gray for inactive states
     tabIconSelected: tintColorDark,
     tabActive: '#f9fafb', // Soft white for active states
-    tabInactive: 'rgba(167, 139, 250, 0.8)', // Soft lavender with 80% opacity
+    tabInactive: '#a78bfa', // Soft lavender with 100% opacity
     tabBarBackground: '#1f2937', // Warm dark gray background
     tabBarBorder: '#a78bfa', // Soft lavender border
     accent1: '#0ea5e9', // Primary accent - blue

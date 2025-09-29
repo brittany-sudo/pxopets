@@ -5,10 +5,33 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { router } from 'expo-router';
 
 // Import the banner image
-const lilPopcornImage = require('@/assets/images/lil-popcorn.png');
+const gossamerMidwayMainImage = require('@/assets/images/gossamer-midway-main.png');
+const gossamerTwinsImage = require('@/assets/images/gossamer-twins.png');
 
 export default function GossamerMidwayScreen() {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
+  const [tickets, setTickets] = useState(150);
+  const [energy, setEnergy] = useState(100);
+  const [carnivalTokens, setCarnivalTokens] = useState(25);
+  const [twinsGreeting, setTwinsGreeting] = useState('');
+
+  // Generate twins greeting on mount
+  React.useEffect(() => {
+    const greetings = [
+      "We... we don't usually talk to living people... but welcome to our carnival!",
+      "The last person who visited our midway... well, they're still here somewhere...",
+      "Our rides are perfectly safe! We've only had three... no, four... incidents this week.",
+      "Don't mind the screams you hear - that's just our haunted house working properly!",
+      "We've been running this carnival for 200 years... time moves differently here...",
+      "The cotton candy is made from real clouds! And maybe some other things...",
+      "Our fortune teller predicted you'd come today... she's been right 47 times in a row...",
+      "The carousel horses are real... they just... stopped moving after a while...",
+      "We hope you enjoy your stay! Most people do... eventually...",
+      "The mirrors in our funhouse show your true reflection... if you dare to look..."
+    ];
+    const randomGreeting = greetings[Math.floor(Math.random() * greetings.length)];
+    setTwinsGreeting(randomGreeting);
+  }, []);
 
   const toggleFavorite = (activityId: string) => {
     setFavorites(prev => {
@@ -22,70 +45,71 @@ export default function GossamerMidwayScreen() {
     });
   };
 
+
   const activities = [
     {
-      id: 'moonlight-carousel',
-      name: 'Moonlight Carousel',
-      description: 'Ride ethereal horses that glow under the lunar light.',
-      lightning: 30,
-      difficulty: 'Easy',
-      icon: 'star'
-    },
-    {
-      id: 'fortune-teller',
-      name: 'Mystic Fortune Teller',
-      description: 'Have your future read by the mysterious Madame Luna.',
-      lightning: 40,
-      difficulty: 'Medium',
-      icon: 'eye'
-    },
-    {
-      id: 'phantom-ferris',
-      name: 'Phantom Ferris Wheel',
-      description: 'Soar through the night sky on this ghostly ride.',
+      id: 'moonlit-ferris',
+      name: 'Moonlit Ferris Wheel',
+      description: 'Soar through the starry sky on this ethereal wheel that glows with lunar magic.',
       lightning: 35,
       difficulty: 'Medium',
       icon: 'circle'
     },
     {
-      id: 'crystal-maze',
-      name: 'Crystal Mirror Maze',
-      description: 'Navigate through an endless maze of reflections.',
-      lightning: 45,
-      difficulty: 'Hard',
+      id: 'house-mirrors',
+      name: 'House of Mirrors',
+      description: 'Navigate through infinite reflections where reality bends and twists.',
+      lightning: 25,
+      difficulty: 'Easy',
       icon: 'square'
     },
     {
-      id: 'moon-cakes',
-      name: 'Lunar Treats Stand',
-      description: 'Sample otherworldly confections that shimmer like stardust.',
-      lightning: 25,
+      id: 'fortune-teller-tent',
+      name: 'Fortune Teller Tent',
+      description: 'Have your future read by Madame Luna in her mystical tent.',
+      lightning: 30,
+      difficulty: 'Medium',
+      icon: 'eye'
+    },
+    {
+      id: 'zodiac-carousel',
+      name: 'Zodiac Carousel',
+      description: 'Ride celestial creatures representing the twelve zodiac signs.',
+      lightning: 40,
+      difficulty: 'Medium',
+      icon: 'star'
+    },
+    {
+      id: 'star-candy-booth',
+      name: 'Star Candy Booth',
+      description: 'Watch as they whip stars into cotton candy and celestial sweets.',
+      lightning: 20,
       difficulty: 'Easy',
       icon: 'heart'
     },
     {
-      id: 'shadow-puppets',
-      name: 'Shadow Puppet Theater',
-      description: 'Watch stories unfold in dancing shadows.',
-      lightning: 20,
+      id: 'celestial-mask-shop',
+      name: 'Celestial Mask Shop',
+      description: 'Try on masks that transform you into cosmic beings.',
+      lightning: 15,
       difficulty: 'Easy',
-      icon: 'play'
+      icon: 'user'
     },
     {
-      id: 'cosmic-games',
+      id: 'celestial-menagerie',
+      name: 'Celestial Menagerie',
+      description: 'Pet and play with tiny celestial sprites in this magical petting zoo.',
+      lightning: 25,
+      difficulty: 'Easy',
+      icon: 'paw'
+    },
+    {
+      id: 'cosmic-ring-toss',
       name: 'Cosmic Ring Toss',
-      description: 'Toss rings at floating planets and stars.',
-      lightning: 38,
+      description: 'Toss rings at floating planets, stars, and celestial objects.',
+      lightning: 30,
       difficulty: 'Medium',
       icon: 'bullseye'
-    },
-    {
-      id: 'midnight-photography',
-      name: 'Midnight Photography',
-      description: 'Capture the carnival\'s ethereal beauty under the moon.',
-      lightning: 50,
-      difficulty: 'Hard',
-      icon: 'camera'
     }
   ];
 
@@ -97,7 +121,7 @@ export default function GossamerMidwayScreen() {
           style={styles.backButton}
           onPress={() => router.navigate('/(tabs)/explore')}
         >
-          <FontAwesome name="arrow-left" size={14} color="#0ea5e9" />
+          <FontAwesome name="arrow-left" size={12} color="#8b5cf6" />
           <Text style={styles.backButtonText}>Back</Text>
         </Pressable>
 
@@ -106,22 +130,80 @@ export default function GossamerMidwayScreen() {
           <Text style={styles.locationTitle}>GOSSAMER MIDWAY</Text>
         </RNView>
 
-        {/* Title */}
-        <Text style={styles.title}>GOSSAMER MIDWAY</Text>
-
         {/* Banner Image */}
         <RNView style={styles.bannerContainer}>
-          <Image source={lilPopcornImage} style={styles.bannerImage} />
+          <Image source={gossamerMidwayMainImage} style={styles.bannerImage} />
         </RNView>
 
         {/* Description */}
         <Text style={styles.description}>
-          A surreal traveling carnival that only appears under certain moons. 
-          Step into a world where reality bends and magic flows through every attraction.
+          Welcome to the most magical carnival in all of Pxopia! Step into a world where 
+          stars become cotton candy, celestial creatures roam free, and every ride takes you 
+          on a journey through the cosmos. This traveling wonder only appears under the 
+          brightest moons, bringing joy and enchantment to all who visit.
         </Text>
 
+        {/* Status Bar */}
+        <RNView style={styles.statusBar}>
+          <RNView style={styles.statusItem}>
+            <FontAwesome name="ticket" size={14} color="#8b5cf6" />
+            <Text style={styles.statusText}>{tickets}</Text>
+          </RNView>
+          <RNView style={styles.statusItem}>
+            <FontAwesome name="bolt" size={14} color="#f59e0b" />
+            <Text style={styles.statusText}>{energy}</Text>
+          </RNView>
+          <RNView style={styles.statusItem}>
+            <FontAwesome name="star" size={14} color="#fbbf24" />
+            <Text style={styles.statusText}>{favorites.size}</Text>
+          </RNView>
+          <RNView style={styles.statusItem}>
+            <FontAwesome name="diamond" size={14} color="#ec4899" />
+            <Text style={styles.statusText}>{carnivalTokens}</Text>
+          </RNView>
+        </RNView>
+
+        {/* Gossamer Twins */}
+        <RNView style={styles.attendantContainer}>
+          <RNView style={styles.speechBubble}>
+            <Text style={styles.characterName}>GOSSAMER TWINS:</Text>
+            <Text style={styles.speechText}>{twinsGreeting}</Text>
+          </RNView>
+          <Image source={gossamerTwinsImage} style={styles.twinsImage} />
+        </RNView>
+
+        {/* Carnival Tokens Section */}
+        <RNView style={styles.tokensSection}>
+          <Text style={styles.tokensTitle}>CARNIVAL TOKENS</Text>
+          <Text style={styles.tokensDescription}>
+            Earn tokens by playing games! Spend them at the booths below.
+          </Text>
+          <RNView style={styles.boothContainer}>
+            <RNView style={styles.boothItem}>
+              <FontAwesome name="gift" size={20} color="#ec4899" />
+              <Text style={styles.boothName}>Prize Booth</Text>
+              <Text style={styles.boothCost}>5 tokens</Text>
+            </RNView>
+            <RNView style={styles.boothItem}>
+              <FontAwesome name="heart" size={20} color="#ec4899" />
+              <Text style={styles.boothName}>Cotton Candy</Text>
+              <Text style={styles.boothCost}>3 tokens</Text>
+            </RNView>
+            <RNView style={styles.boothItem}>
+              <FontAwesome name="star" size={20} color="#ec4899" />
+              <Text style={styles.boothName}>Stardust</Text>
+              <Text style={styles.boothCost}>2 tokens</Text>
+            </RNView>
+            <RNView style={styles.boothItem}>
+              <FontAwesome name="magic" size={20} color="#ec4899" />
+              <Text style={styles.boothName}>Magic Potion</Text>
+              <Text style={styles.boothCost}>8 tokens</Text>
+            </RNView>
+          </RNView>
+        </RNView>
+
         {/* Activities Title */}
-        <Text style={styles.activitiesTitle}>CARNIVAL ATTRACTIONS</Text>
+        <Text style={styles.activitiesTitle}>MAGICAL ATTRACTIONS</Text>
 
         {/* Activities List */}
         {activities.map((activity) => (
@@ -129,23 +211,15 @@ export default function GossamerMidwayScreen() {
             <RNView style={styles.activityHeader}>
               <RNView style={styles.activityInfo}>
                 <FontAwesome name={activity.icon as any} size={22} color="#8b5cf6" style={styles.activityIcon} />
-                    <RNView style={styles.activityText}>
-                      <RNView style={styles.activityTitleRow}>
-                        <Text style={styles.activityName}>{activity.name}</Text>
-                        <RNView style={styles.ticketDisplay}>
-                          <FontAwesome name="bolt" size={14} color="#06b6d4" />
-                          <Text style={styles.ticketCountText}>{activity.lightning}</Text>
-                        </RNView>
-                      </RNView>
-                      <Text style={styles.activityDescription}>{activity.description}</Text>
-                    </RNView>
+                <RNView style={styles.activityText}>
+                  <RNView style={styles.activityTitleRow}>
+                    <Text style={styles.activityName}>{activity.name}</Text>
+                  </RNView>
+                  <Text style={styles.activityDescription}>{activity.description}</Text>
+                </RNView>
               </RNView>
             </RNView>
             <RNView style={styles.activityFooter}>
-              <RNView style={styles.ticketDisplay}>
-                <FontAwesome name="bolt" size={20} color="#06b6d4" />
-                <Text style={styles.ticketCountText}>{activity.lightning}</Text>
-              </RNView>
               <Pressable
                 style={styles.favoriteButton}
                 onPress={() => toggleFavorite(activity.id)}
@@ -153,7 +227,7 @@ export default function GossamerMidwayScreen() {
                 <FontAwesome 
                   name={favorites.has(activity.id) ? "star" : "star-o"} 
                   size={16} 
-                  color={favorites.has(activity.id) ? "#94a3b8" : "#94a3b8"} 
+                  color={favorites.has(activity.id) ? "#fbbf24" : "rgba(139, 92, 246, 0.3)"} 
                 />
               </Pressable>
             </RNView>
@@ -172,29 +246,31 @@ const styles = StyleSheet.create({
   scrollContent: {
     alignItems: 'center',
     justifyContent: 'flex-start',
-    padding: 20,
+    paddingTop: 0,
+    paddingHorizontal: 20,
     paddingBottom: 100,
   },
   headerRow: {
     alignItems: 'center',
     justifyContent: 'center',
+    marginTop: 20,
     marginBottom: 20,
     paddingHorizontal: 4,
     height: 40,
   },
   backButton: {
     position: 'absolute',
-    top: 20, // Higher up, below the status bar
+    top: 20,
     left: 20,
     zIndex: 1000,
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 12,
     paddingVertical: 8,
-    backgroundColor: 'rgba(14, 165, 233, 0.1)',
+    backgroundColor: 'rgba(139, 92, 246, 0.1)',
     borderRadius: 6,
     borderWidth: 1,
-    borderColor: 'rgba(14, 165, 233, 0.3)',
+    borderColor: 'rgba(139, 92, 246, 0.3)',
   },
   locationTitle: {
     fontFamily: 'PressStart2P_400Regular',
@@ -207,32 +283,25 @@ const styles = StyleSheet.create({
   backButtonText: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 12,
-    color: '#0ea5e9',
+    color: '#8b5cf6',
     marginLeft: 6,
-  },
-  title: {
-    fontFamily: 'PressStart2P_400Regular',
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#0f172a',
-    marginBottom: 20,
-    textAlign: 'left',
-    alignSelf: 'flex-start',
   },
   bannerContainer: {
     width: '100%',
     height: 200,
     borderWidth: 2,
-    borderColor: '#0ea5e9',
+    borderColor: '#8b5cf6',
     borderRadius: 8,
-    marginBottom: 20,
+    marginBottom: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(14, 165, 233, 0.05)',
+    backgroundColor: 'rgba(139, 92, 246, 0.05)',
   },
   bannerImage: {
-    width: 150,
-    height: 150,
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+    borderRadius: 6,
   },
   description: {
     fontFamily: 'Silkscreen_400Regular',
@@ -252,14 +321,140 @@ const styles = StyleSheet.create({
     textAlign: 'left',
     alignSelf: 'flex-start',
   },
-  activityItem: {
-    backgroundColor: 'rgba(14, 165, 233, 0.05)',
+  statusBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    backgroundColor: 'rgba(59, 130, 246, 0.08)',
+    borderRadius: 6,
+    padding: 8,
+    marginTop: -10,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(59, 130, 246, 0.2)',
+    width: '90%',
+    alignSelf: 'center',
+  },
+  statusItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  statusText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 12,
+    color: '#0f172a',
+    fontWeight: 'bold',
+  },
+  attendantContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'center',
+    marginBottom: 20,
+    paddingHorizontal: 20,
+  },
+  speechBubble: {
+    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+    borderColor: 'rgba(139, 92, 246, 0.3)',
+    borderRadius: 6,
+    borderWidth: 1,
+    padding: 12,
+    maxWidth: 300,
+    marginRight: 5,
+  },
+  characterName: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 8,
+    color: '#8b5cf6',
+    marginBottom: 4,
+    textAlign: 'center',
+  },
+  speechText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#0f172a',
+    lineHeight: 14,
+    textAlign: 'center',
+  },
+  twinsImage: {
+    width: 72,
+    height: 72,
+    resizeMode: 'contain',
+    marginLeft: 5,
+  },
+  tokensSection: {
+    backgroundColor: 'rgba(236, 72, 153, 0.05)',
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: 'rgba(14, 165, 233, 0.2)',
+    borderColor: 'rgba(236, 72, 153, 0.2)',
+    padding: 16,
+    marginBottom: 20,
+    width: '100%',
+    shadowColor: '#ec4899',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  tokensTitle: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 12,
+    color: '#ec4899',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  tokensDescription: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#0f172a',
+    textAlign: 'center',
+    marginBottom: 12,
+    lineHeight: 14,
+  },
+  boothContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    gap: 8,
+  },
+  boothItem: {
+    backgroundColor: 'rgba(236, 72, 153, 0.1)',
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: 'rgba(236, 72, 153, 0.3)',
+    padding: 8,
+    alignItems: 'center',
+    width: '48%',
+    minHeight: 60,
+    justifyContent: 'center',
+  },
+  boothName: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 9,
+    color: '#0f172a',
+    textAlign: 'center',
+    marginTop: 4,
+    marginBottom: 2,
+  },
+  boothCost: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 8,
+    color: '#ec4899',
+    textAlign: 'center',
+    fontWeight: 'bold',
+  },
+  activityItem: {
+    backgroundColor: 'rgba(139, 92, 246, 0.05)',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.2)',
     padding: 16,
     marginBottom: 12,
     width: '100%',
+    shadowColor: '#8b5cf6',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   activityHeader: {
     flexDirection: 'row',
@@ -299,11 +494,5 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-end',
     alignItems: 'center',
-  },
-  rewardText: {
-    fontFamily: 'Silkscreen_400Regular',
-    fontSize: 12,
-    color: '#8b5cf6',
-    fontWeight: 'bold',
   },
 });

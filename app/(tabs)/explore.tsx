@@ -10,16 +10,18 @@ import { router } from 'expo-router';
 const volcanoImage = require('@/assets/images/tiny-volcano.png');
 const staticTvImage = require('@/assets/images/static-tv.png');
 const lilPaletteImage = require('@/assets/images/lil-palette.png');
-const neonBurgerImage = require('@/assets/images/neon-burger.png');
+const cosmicBurgerImage = require('@/assets/images/cosmicburger.png');
 const lilAnchorImage = require('@/assets/images/lil-anchor.png');
 const lilWineCasketImage = require('@/assets/images/lil-wine-casket.png');
 const lilTotemGuyImage = require('@/assets/images/lil-totem-guy.png');
 const lilPopcornImage = require('@/assets/images/lil-popcorn.png');
 const lilScarecrowImage = require('@/assets/images/lil-scarecrow.png');
 const lilGnomeImage = require('@/assets/images/lil-gnome.png');
+const lilGnomehatImage = require('@/assets/images/lil-gnomehat.png');
 const lilTentGossImage = require('@/assets/images/lil-tent-goss.png');
 const lilPotImage = require('@/assets/images/lil-pot.png');
 const lilTrailerImage = require('@/assets/images/lil-trailer.png');
+const lilBayouImage = require('@/assets/images/lil-bayou.png');
 const loomersTinyImage = require('@/assets/images/loomers-tiny.png');
 const mapOfPxopiaImage = require('@/assets/images/mapofpxopia.png');
 
@@ -77,12 +79,12 @@ export default function ExploreScreen() {
       image: lilWineCasketImage
     },
     {
-      id: "mountains",
-      name: "Slumbering Hills",
-      icon: "mountain",
+      id: "lullaby-downs",
+      name: "Lullaby Downs",
+      icon: "moon-o",
       color: "#6b7280",
-      description: "A tranquil valley where gentle giants rest beneath starlit skies.",
-      image: lilGnomeImage
+      description: "A dreamy valley where sleepy melodies drift through moonlit meadows.",
+      image: lilGnomehatImage
     },
     {
       id: "gossamer-midway",
@@ -94,11 +96,35 @@ export default function ExploreScreen() {
     },
     {
       id: "library",
-      name: "Scarecrow Vale",
+      name: "Thistledown",
       icon: "book",
       color: "#7c3aed",
       description: "A pastoral landscape where silent sentinels guard golden fields.",
       image: lilScarecrowImage
+    },
+    {
+      id: "bayou-nocturne",
+      name: "Bayou Nocturne",
+      icon: "moon-o",
+      color: "#1f2937",
+      description: "A mysterious swamp where fireflies dance with ancient spirits under moonlit cypress trees.",
+      image: lilBayouImage
+    },
+    {
+      id: "midwinter-crossing",
+      name: "Midwinter Crossing",
+      icon: "snowflake-o",
+      color: "#e5e7eb",
+      description: "A frozen crossroads where winter's breath creates crystalline bridges between worlds.",
+      image: lilGnomeImage
+    },
+    {
+      id: "lumen-bazaar",
+      name: "Lumen Bazaar",
+      icon: "lightbulb-o",
+      color: "#fbbf24",
+      description: "A glowing marketplace where merchants trade in pure light and luminous curiosities.",
+      image: lilTentGossImage
     },
     {
       id: "enchanted-island",
@@ -138,8 +164,20 @@ export default function ExploreScreen() {
       console.log('Navigating to Gossamer Midway from list...');
       router.navigate('/(tabs)/gossamer-midway');
     } else if (world.id === 'library') {
-      console.log('Navigating to Scarecrow Vale from list...');
+      console.log('Navigating to Thistledown from list...');
       router.navigate('/(tabs)/scarecrow-vale');
+    } else if (world.id === 'bayou-nocturne') {
+      console.log('Navigating to Bayou Nocturne from list...');
+      router.navigate('/(tabs)/bayou-nocturne');
+    } else if (world.id === 'midwinter-crossing') {
+      console.log('Navigating to Midwinter Crossing from list...');
+      router.navigate('/(tabs)/midwinter-crossing');
+    } else if (world.id === 'lumen-bazaar') {
+      console.log('Navigating to Lumen Bazaar from list...');
+      router.navigate('/(tabs)/lumen-bazaar');
+    } else if (world.id === 'lullaby-downs') {
+      console.log('Navigating to Lullaby Downs from list...');
+      router.navigate('/(tabs)/lullaby-downs');
     } else {
       Alert.alert(
         `Welcome to ${world.name}!`,
@@ -157,23 +195,23 @@ export default function ExploreScreen() {
       {/* Second Top Navigation */}
       <RNView style={styles.secondNavContainer}>
         <Pressable style={styles.navButton} onPress={() => Alert.alert('Battle', 'Battle system coming soon!')}>
-          <FontAwesome name="sword" size={20} color="#ef4444" />
+          <FontAwesome name="gamepad" size={20} color="#8b5cf6" />
           <Text style={styles.navButtonText}>BATTLE</Text>
         </Pressable>
         <Pressable style={styles.navButton} onPress={() => Alert.alert('Trade', 'Trading system coming soon!')}>
-          <FontAwesome name="exchange" size={20} color="#f59e0b" />
+          <FontAwesome name="exchange" size={20} color="#8b5cf6" />
           <Text style={styles.navButtonText}>TRADE</Text>
         </Pressable>
         <Pressable style={styles.navButton} onPress={() => Alert.alert('User Shop', 'User shops coming soon!')}>
-          <FontAwesome name="store" size={20} color="#8b5cf6" />
+          <FontAwesome name="shopping-cart" size={20} color="#8b5cf6" />
           <Text style={styles.navButtonText}>SHOP</Text>
         </Pressable>
         <Pressable style={styles.navButton} onPress={() => Alert.alert('Contest', 'Contests coming soon!')}>
-          <FontAwesome name="trophy" size={20} color="#fbbf24" />
+          <FontAwesome name="trophy" size={20} color="#8b5cf6" />
           <Text style={styles.navButtonText}>CONTEST</Text>
         </Pressable>
         <Pressable style={styles.navButton} onPress={() => Alert.alert('Dailies', 'Daily quests coming soon!')}>
-          <FontAwesome name="calendar" size={20} color="#10b981" />
+          <FontAwesome name="calendar" size={20} color="#8b5cf6" />
           <Text style={styles.navButtonText}>DAILIES</Text>
         </Pressable>
       </RNView>
@@ -220,9 +258,9 @@ const styles = StyleSheet.create({
   },
   secondNavContainer: {
     flexDirection: 'row',
-    backgroundColor: 'rgba(14, 165, 233, 0.1)',
+    backgroundColor: 'rgba(139, 92, 246, 0.1)',
     borderBottomWidth: 2,
-    borderBottomColor: '#0ea5e9',
+    borderBottomColor: '#8b5cf6',
     paddingVertical: 8,
     paddingHorizontal: 4,
     justifyContent: 'space-around',
@@ -230,15 +268,18 @@ const styles = StyleSheet.create({
   },
   navButton: {
     alignItems: 'center',
-    paddingVertical: 6,
-    paddingHorizontal: 4,
-    borderRadius: 6,
+    paddingVertical: 8,
+    paddingHorizontal: 6,
+    borderRadius: 8,
     minWidth: 60,
+    backgroundColor: 'rgba(139, 92, 246, 0.05)',
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.2)',
   },
   navButtonText: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 8,
-    color: '#0f172a',
+    color: '#8b5cf6',
     fontWeight: 'bold',
     marginTop: 2,
     textAlign: 'center',

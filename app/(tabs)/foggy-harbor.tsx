@@ -100,14 +100,6 @@ export default function FoggyHarborScreen() {
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Back Button */}
-        <Pressable 
-          style={styles.backButton}
-          onPress={() => router.navigate('/(tabs)/explore')}
-        >
-          <FontAwesome name="arrow-left" size={14} color="#0ea5e9" />
-          <Text style={styles.backButtonText}>Back</Text>
-        </Pressable>
 
         {/* Title */}
         <Text style={styles.title}>LOOMER'S WHARF</Text>

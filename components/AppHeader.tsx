@@ -13,6 +13,43 @@ export default function AppHeader() {
   const bg = Colors[colorScheme].tabBarBackground;
   const border = Colors[colorScheme].tabBarBorder;
   const { state } = useGame();
+  
+  // Dynamic temperature and weather with random weather symbols and colors
+  const getCurrentWeather = () => {
+    const hour = new Date().getHours();
+    
+    // Temperature varies throughout the day: cooler at night, warmer during day
+    let temp;
+    if (hour >= 6 && hour < 12) {
+      temp = 72 + Math.floor(Math.random() * 6); // Morning: 72-77°F
+    } else if (hour >= 12 && hour < 18) {
+      temp = 78 + Math.floor(Math.random() * 8); // Afternoon: 78-85°F
+    } else if (hour >= 18 && hour < 22) {
+      temp = 74 + Math.floor(Math.random() * 6); // Evening: 74-79°F
+    } else {
+      temp = 68 + Math.floor(Math.random() * 6); // Night: 68-73°F
+    }
+    
+    // Random weather symbols with corresponding colors
+    const weatherOptions = [
+      { icon: 'sun-o', color: '#f59e0b' }, // Yellow for sun
+      { icon: 'cloud', color: '#6b7280' }, // Gray for cloud
+      { icon: 'cloud-sun-o', color: '#fbbf24' }, // Light yellow for partly cloudy
+      { icon: 'tint', color: '#3b82f6' }, // Blue for rain
+      { icon: 'flash', color: '#ef4444' }, // Red for lightning
+      { icon: 'snowflake-o', color: '#3b82f6' }, // Blue for snow
+      { icon: 'moon-o', color: '#8b5cf6' }, // Purple for moon
+      { icon: 'star', color: '#fbbf24' }, // Gold for star
+      { icon: 'heart', color: '#ec4899' }, // Pink for heart
+      { icon: 'leaf', color: '#10b981' } // Green for leaf
+    ];
+    
+    const weather = weatherOptions[Math.floor(Math.random() * weatherOptions.length)];
+    
+    return { temp, weatherIcon: weather.icon, weatherColor: weather.color };
+  };
+  
+  const { temp: temperature, weatherIcon, weatherColor } = getCurrentWeather();
 
           const pathname = usePathname();
           const isHome = pathname === '/(tabs)/home' || pathname === '/home';
@@ -33,7 +70,7 @@ export default function AppHeader() {
         </Pressable>
       </View>
       <Image 
-        source={require('@/assets/images/pxopets-logo.png')} 
+        source={require('@/assets/images/pxopets-logo-2.png')} 
         style={styles.logo}
         resizeMode="contain"
       />
@@ -57,11 +94,15 @@ export default function AppHeader() {
                     style={styles.mailContainer}
                     onPress={() => router.push('/(tabs)/mail')}
                   >
-                    <FontAwesome name="envelope" size={16} color="#f59e0b" />
+                    <FontAwesome name="envelope" size={16} color="#06b6d4" />
                     {state.coins > 0 && ( // Using coins as a placeholder for mail count - you can change this logic
                       <View style={styles.mailDot} />
                     )}
                   </Pressable>
+                  <View style={styles.temperatureContainer}>
+                    <FontAwesome name={weatherIcon as any} size={14} color={weatherColor} />
+                    <Text style={styles.temperatureText}>{temperature}°F</Text>
+                  </View>
                 </View>
                 <View style={styles.currencyContainer}>
                   <View style={styles.coinsContainer}>
@@ -87,9 +128,9 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
   },
   logo: {
-    width: 280, // Made bigger
-    height: 140, // Made taller
-    marginTop: -25, // Moved up more
+    width: 220, // Made smaller
+    height: 110, // Made smaller
+    marginTop: -10, // Moved down
   },
   left: { 
     position: 'absolute', 
@@ -150,6 +191,23 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZES.sm,
     color: '#0f172a', // Premium deep slate
   },
+  temperatureContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.2)',
+  },
+  temperatureText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#8b5cf6',
+    fontWeight: 'bold',
+  },
   mailContainer: {
     position: 'relative',
     padding: 4,
@@ -162,8 +220,8 @@ const styles = StyleSheet.create({
     width: 5,
     height: 5,
     borderRadius: 2.5,
-    backgroundColor: '#10b981',
-    shadowColor: '#10b981',
+    backgroundColor: '#8b5cf6',
+    shadowColor: '#8b5cf6',
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.8,
     shadowRadius: 2.5,

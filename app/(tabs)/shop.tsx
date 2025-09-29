@@ -5,17 +5,19 @@ import PixelButton from '@/components/PixelButton';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useGame } from '@/store/GameStore';
 
+// Import lunchbox image
+const lunchboxImage = require('@/assets/images/lunchbox-hill.png');
+
 export default function ShopScreen() {
   const { state, addCoins, spendCoins } = useGame();
-  const [selectedCategory, setSelectedCategory] = useState('premium');
+  const [selectedCategory, setSelectedCategory] = useState('tickets');
 
   const categories = [
-    { id: 'premium', name: 'PREMIUM', icon: 'diamond' },
+    { id: 'tickets', name: 'TICKETS', icon: 'ticket' },
     { id: 'foods', name: 'FOODS', icon: 'cutlery' },
     { id: 'backgrounds', name: 'BACKGROUNDS', icon: 'image' },
-    { id: 'tickets', name: 'TICKETS', icon: 'ticket' },
-    { id: 'boosters', name: 'BOOSTERS', icon: 'bolt' },
-    { id: 'cosmetics', name: 'COSMETICS', icon: 'star' },
+    { id: 'event-passes', name: 'EVENT PASSES', icon: 'calendar' },
+    { id: 'special-items', name: 'SPECIAL ITEMS', icon: 'gift' },
   ];
 
   const premiumItems = [
@@ -234,46 +236,56 @@ export default function ShopScreen() {
     },
   ];
 
-  const boosterItems = [
+  const specialItems = [
     {
-      id: 'speed_boost',
-      name: 'SPEED BOOST',
+      id: 'mystery_lunchbox',
+      name: 'MYSTERY LUNCHBOX',
+      price: 25,
+      currency: 'tickets',
+      icon: 'gift',
+      color: '#8b5cf6',
+      description: 'Contains random food items',
+      rarity: 'common',
+    },
+    {
+      id: 'premium_lunchbox',
+      name: 'PREMIUM LUNCHBOX',
       price: 50,
       currency: 'tickets',
-      icon: 'bolt',
-      color: '#f97316',
-      description: '2x speed for 1 hour',
-      duration: '1h',
+      icon: 'gift',
+      color: '#f59e0b',
+      description: 'Contains rare food items',
+      rarity: 'rare',
     },
     {
-      id: 'coin_multiplier',
-      name: 'COIN MULTIPLIER',
-      price: 75,
+      id: 'golden_lunchbox',
+      name: 'GOLDEN LUNCHBOX',
+      price: 100,
       currency: 'tickets',
-      icon: 'money',
+      icon: 'gift',
       color: '#fbbf24',
-      description: '3x coins for 2 hours',
-      duration: '2h',
+      description: 'Contains epic food items',
+      rarity: 'epic',
     },
     {
-      id: 'xp_boost',
-      name: 'XP BOOST',
-      price: 60,
+      id: 'legendary_lunchbox',
+      name: 'LEGENDARY LUNCHBOX',
+      price: 200,
       currency: 'tickets',
-      icon: 'level-up',
-      color: '#10b981',
-      description: '2x XP for 1 hour',
-      duration: '1h',
+      icon: 'gift',
+      color: '#dc2626',
+      description: 'Contains legendary food items',
+      rarity: 'legendary',
     },
   ];
 
   const getCurrentItems = () => {
     switch (selectedCategory) {
-      case 'premium': return premiumItems;
+      case 'tickets': return premiumItems;
       case 'foods': return foodItems;
       case 'backgrounds': return backgroundItems;
-      case 'tickets': return ticketItems;
-      case 'boosters': return boosterItems;
+      case 'event-passes': return ticketItems;
+      case 'special-items': return specialItems;
       default: return premiumItems;
     }
   };
@@ -314,79 +326,90 @@ export default function ShopScreen() {
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
+        {/* Category Tabs */}
+        <RNView style={styles.categoryTabs}>
+          {categories.map((category) => (
+            <Pressable
+              key={category.id}
+              style={[
+                styles.categoryTab,
+                selectedCategory === category.id && styles.categoryTabActive
+              ]}
+              onPress={() => setSelectedCategory(category.id)}
+            >
+              <FontAwesome 
+                name={category.icon as any} 
+                size={16} 
+                color={selectedCategory === category.id ? '#0f172a' : '#8b5cf6'} 
+              />
+              <Text style={[
+                styles.categoryText,
+                selectedCategory === category.id && styles.categoryTextActive
+              ]}>
+                {category.name}
+              </Text>
+            </Pressable>
+          ))}
+        </RNView>
 
-          {/* Category Tabs */}
-          <RNView style={styles.categoryTabs}>
-            {categories.map((category) => (
-              <Pressable
-                key={category.id}
-                style={[
-                  styles.categoryTab,
-                  selectedCategory === category.id && styles.categoryTabActive
-                ]}
-                onPress={() => setSelectedCategory(category.id)}
-              >
-                <FontAwesome 
-                  name={category.icon as any} 
-                  size={16} 
-                  color={selectedCategory === category.id ? '#0f172a' : 'rgba(139, 92, 246, 0.8)'} 
-                />
-                <Text style={[
-                  styles.categoryText,
-                  selectedCategory === category.id && styles.categoryTextActive
-                ]}>
-                  {category.name}
-                </Text>
-              </Pressable>
-            ))}
-          </RNView>
+        {/* Shop Title */}
+        <Text style={styles.shopTitle}>PXOPETS SHOP</Text>
 
-          {/* Items Grid */}
-          <RNView style={styles.itemsGrid}>
-            {getCurrentItems().map((item) => (
-              <Pressable
-                key={item.id}
-                style={[
-                  styles.itemCard,
-                  item.popular && styles.popularCard,
-                  item.rarity && { borderColor: getRarityColor(item.rarity) }
-                ]}
-                onPress={() => handlePurchase(item)}
-              >
-                {item.popular && (
-                  <RNView style={styles.popularBadge}>
-                    <Text style={styles.popularText}>POPULAR</Text>
-                  </RNView>
-                )}
-                {item.bonus && (
-                  <RNView style={styles.bonusBadge}>
-                    <Text style={styles.bonusText}>{item.bonus}</Text>
-                  </RNView>
-                )}
-                <RNView style={[styles.itemIcon, { backgroundColor: item.color + '20' }]}>
-                  <FontAwesome name={item.icon as any} size={24} color={item.color} />
+        {/* Items Grid */}
+        <RNView style={styles.itemsGrid}>
+          {getCurrentItems().map((item) => (
+            <Pressable
+              key={item.id}
+              style={[
+                styles.itemCard,
+                item.popular && styles.popularCard,
+                item.rarity && { borderColor: getRarityColor(item.rarity) }
+              ]}
+              onPress={() => handlePurchase(item)}
+            >
+              {item.popular && (
+                <RNView style={styles.popularBadge}>
+                  <Text style={styles.popularText}>POPULAR</Text>
                 </RNView>
-                <Text style={styles.itemName}>{item.name}</Text>
-                <Text style={styles.itemDescription}>{item.description}</Text>
-                {item.stamina && (
-                  <RNView style={styles.staminaContainer}>
-                    <FontAwesome name="heart" size={12} color="#ec4899" />
-                    <Text style={styles.staminaText}>{item.stamina} Stamina</Text>
-                  </RNView>
-                )}
-                <RNView style={styles.priceContainer}>
-                  <Text style={styles.price}>
-                    {item.currency === 'USD' ? '$' : ''}{item.price}
-                    {item.currency === 'stamina' && ' ⚡'}
-                    {item.currency === 'tickets' && ' 🎫'}
-                  </Text>
-                  {item.duration && (
-                    <Text style={styles.duration}>{item.duration}</Text>
+              )}
+              {item.bonus && (
+                <RNView style={styles.bonusBadge}>
+                  <Text style={styles.bonusText}>{item.bonus}</Text>
+                </RNView>
+              )}
+              <RNView style={styles.activityHeader}>
+                <RNView style={styles.activityIconContainer}>
+                  {selectedCategory === 'special-items' ? (
+                    <Image source={lunchboxImage} style={styles.lunchboxIcon} />
+                  ) : (
+                    <FontAwesome name={item.icon as any} size={16} color={item.color} />
                   )}
                 </RNView>
-              </Pressable>
-            ))}
-          </RNView>
+              </RNView>
+              <Text style={styles.itemName}>{item.name}</Text>
+              <Text style={styles.itemDescription}>{item.description}</Text>
+              {item.stamina && (
+                <RNView style={styles.staminaContainer}>
+                  <Text style={styles.staminaText}>⚡ {item.stamina}</Text>
+                </RNView>
+              )}
+              <RNView style={styles.activityFooter}>
+                <RNView style={styles.ticketPriceContainer}>
+                  <Text style={styles.activityPrice}>
+                    {item.currency === 'USD' ? '$' : ''}{item.price}
+                    {item.currency === 'stamina' && ' ⚡'}
+                  </Text>
+                  {item.currency === 'tickets' && (
+                    <FontAwesome name="ticket" size={10} color="#8b5cf6" />
+                  )}
+                </RNView>
+                {item.duration && (
+                  <Text style={styles.duration}>{item.duration}</Text>
+                )}
+              </RNView>
+            </Pressable>
+          ))}
+        </RNView>
       </ScrollView>
     </View>
   );
@@ -395,12 +418,14 @@ export default function ShopScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#f0f9ff',
   },
   scrollContent: {
     alignItems: 'center',
     justifyContent: 'flex-start',
-    padding: 20,
-    flexGrow: 1,
+    paddingTop: 20,
+    paddingHorizontal: 20,
+    paddingBottom: 100,
   },
   categoryTabs: {
     flexDirection: 'row',
@@ -427,25 +452,35 @@ const styles = StyleSheet.create({
   categoryText: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 10,
-    color: 'rgba(139, 92, 246, 0.8)',
+    color: '#8b5cf6',
   },
   categoryTextActive: {
     color: '#0f172a',
     fontWeight: 'bold',
   },
+  shopTitle: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 16,
+    color: '#0f172a',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 16,
+  },
   itemsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
+    width: '100%',
     gap: 12,
   },
   itemCard: {
     width: '45%',
     backgroundColor: 'rgba(14, 165, 233, 0.05)',
-    borderRadius: 8,
+    borderRadius: 4,
     borderWidth: 2,
-    borderColor: '#0ea5e9',
-    padding: 12,
+    borderColor: '#1e3a8a',
+    padding: 16,
+    marginBottom: 16,
     alignItems: 'center',
     position: 'relative',
   },
@@ -485,63 +520,72 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
   },
-  itemIcon: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+  activityHeader: {
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 8,
   },
+  activityIconContainer: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: 'rgba(14, 165, 233, 0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  lunchboxIcon: {
+    width: 40,
+    height: 40,
+    resizeMode: 'contain',
+  },
   itemName: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 12,
-    fontWeight: 'bold',
     color: '#0f172a',
+    fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 4,
   },
   itemDescription: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 9,
-    color: '#0f172a',
+    color: '#64748b',
+    lineHeight: 12,
     textAlign: 'center',
-    opacity: 0.7,
     marginBottom: 8,
   },
-  priceContainer: {
+  activityFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
+    width: '100%',
   },
-  price: {
+  ticketPriceContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  activityPrice: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 14,
+    fontSize: 10,
+    color: '#8b5cf6',
     fontWeight: 'bold',
-    color: '#0f172a',
   },
   duration: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 8,
     color: '#0f172a',
     opacity: 0.6,
-    marginTop: 2,
   },
   staminaContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: 4,
-    marginVertical: 4,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    backgroundColor: 'rgba(236, 72, 153, 0.1)',
-    borderRadius: 4,
-    borderWidth: 1,
-    borderColor: 'rgba(236, 72, 153, 0.3)',
   },
   staminaText: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 10,
-    color: '#ec4899',
+    color: '#fbbf24',
     fontWeight: 'bold',
   },
 });

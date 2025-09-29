@@ -24,7 +24,7 @@ export default function TabLayout() {
       initialRouteName="index"
               screenOptions={{
                 tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tabActive,
-                tabBarInactiveTintColor: 'rgba(139, 92, 246, 0.8)', // Purple with 80% opacity
+                tabBarInactiveTintColor: Colors[colorScheme ?? 'light'].tabInactive, // Purple with 100% opacity
         tabBarLabelStyle: { fontFamily: 'Silkscreen_400Regular', fontSize: FONT_SIZES.xs, paddingBottom: 0, marginTop: 6 },
         tabBarItemStyle: { 
           paddingVertical: SPACING.xs,
@@ -239,6 +239,42 @@ export default function TabLayout() {
       />
       <Tabs.Screen
         name="community-pool"
+        options={{
+          href: null, // Hide from tab bar
+        }}
+      />
+      <Tabs.Screen
+        name="pxoburbs-mall"
+        options={{
+          href: null, // Hide from tab bar
+        }}
+      />
+      <Tabs.Screen
+        name="bayou-nocturne"
+        options={{
+          href: null, // Hide from tab bar
+        }}
+      />
+      <Tabs.Screen
+        name="midwinter-crossing"
+        options={{
+          href: null, // Hide from tab bar
+        }}
+      />
+      <Tabs.Screen
+        name="lumen-bazaar"
+        options={{
+          href: null, // Hide from tab bar
+        }}
+      />
+      <Tabs.Screen
+        name="lullaby-downs"
+        options={{
+          href: null, // Hide from tab bar
+        }}
+      />
+      <Tabs.Screen
+        name="frog-market-thrift"
         options={{
           href: null, // Hide from tab bar
         }}

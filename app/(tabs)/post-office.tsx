@@ -69,7 +69,7 @@ export default function PostOfficeScreen() {
           style={styles.backButton}
           onPress={() => router.navigate('/(tabs)/pxoburbs')}
         >
-          <FontAwesome name="arrow-left" size={14} color="#0ea5e9" />
+          <FontAwesome name="arrow-left" size={12} color="#8b5cf6" />
           <Text style={styles.backButtonText}>Back</Text>
         </Pressable>
 
@@ -187,10 +187,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 12,
     paddingVertical: 8,
-    backgroundColor: 'rgba(14, 165, 233, 0.1)',
+    backgroundColor: 'rgba(139, 92, 246, 0.1)',
     borderRadius: 6,
     borderWidth: 1,
-    borderColor: 'rgba(14, 165, 233, 0.3)',
+    borderColor: 'rgba(139, 92, 246, 0.3)',
   },
   locationTitle: {
     fontFamily: 'PressStart2P_400Regular',
@@ -203,7 +203,7 @@ const styles = StyleSheet.create({
   backButtonText: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 12,
-    color: '#0ea5e9',
+    color: '#8b5cf6',
     marginLeft: 6,
   },
   headerContainer: {

@@ -92,17 +92,19 @@ export default function BarrelhavenScreen() {
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Back Button */}
+        {/* Back Button - Fixed Position */}
         <Pressable 
           style={styles.backButton}
           onPress={() => router.navigate('/(tabs)/explore')}
         >
-          <FontAwesome name="arrow-left" size={14} color="#0ea5e9" />
+          <FontAwesome name="arrow-left" size={12} color="#8b5cf6" />
           <Text style={styles.backButtonText}>Back</Text>
         </Pressable>
 
-        {/* Title */}
-        <Text style={styles.title}>BARRELHAVEN</Text>
+        {/* Header Row */}
+        <RNView style={styles.headerRow}>
+          <Text style={styles.locationTitle}>BARRELHAVEN</Text>
+        </RNView>
 
         {/* Banner Image */}
         <RNView style={styles.bannerContainer}>
@@ -168,35 +170,45 @@ const styles = StyleSheet.create({
   scrollContent: {
     alignItems: 'center',
     justifyContent: 'flex-start',
-    padding: 20,
+    paddingTop: 0,
+    paddingHorizontal: 20,
     paddingBottom: 100,
   },
   backButton: {
+    position: 'absolute',
+    top: 20,
+    left: 20,
+    zIndex: 1000,
     flexDirection: 'row',
     alignItems: 'center',
-    alignSelf: 'flex-start',
-    marginBottom: 20,
     paddingHorizontal: 12,
     paddingVertical: 8,
-    backgroundColor: 'rgba(14, 165, 233, 0.1)',
+    backgroundColor: 'rgba(139, 92, 246, 0.1)',
     borderRadius: 6,
     borderWidth: 1,
-    borderColor: 'rgba(14, 165, 233, 0.3)',
+    borderColor: 'rgba(139, 92, 246, 0.3)',
   },
   backButtonText: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 12,
-    color: '#0ea5e9',
+    color: '#8b5cf6',
     marginLeft: 6,
   },
-  title: {
-    fontFamily: 'PressStart2P_400Regular',
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#0f172a',
+  headerRow: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 20,
     marginBottom: 20,
-    textAlign: 'left',
-    alignSelf: 'flex-start',
+    paddingHorizontal: 4,
+    height: 40,
+  },
+  locationTitle: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 12,
+    color: '#0f172a',
+    fontWeight: 'bold',
+    letterSpacing: 1,
+    textAlign: 'center',
   },
   bannerContainer: {
     width: '100%',

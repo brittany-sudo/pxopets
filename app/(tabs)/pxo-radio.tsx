@@ -87,7 +87,7 @@ export default function PXORadioScreen() {
           style={styles.backButton}
           onPress={() => router.navigate('/(tabs)/pxoburbs')}
         >
-          <FontAwesome name="arrow-left" size={14} color="#0ea5e9" />
+          <FontAwesome name="arrow-left" size={12} color="#8b5cf6" />
           <Text style={styles.backButtonText}>Back</Text>
         </Pressable>
 

@@ -37,7 +37,7 @@ export default function Pound() {
               style={styles.backButton}
               onPress={() => router.navigate('/(tabs)/adoption')}
             >
-              <FontAwesome name="arrow-left" size={14} color="#0ea5e9" />
+              <FontAwesome name="arrow-left" size={12} color="#8b5cf6" />
               <Text style={styles.backButtonText}>BACK</Text>
             </Pressable>
             <Text style={styles.title}>THE POUND</Text>
@@ -97,14 +97,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderWidth: 1,
-    borderColor: '#0ea5e9',
-    backgroundColor: 'rgba(14, 165, 233, 0.1)',
+    borderColor: '#8b5cf6',
+    backgroundColor: 'rgba(139, 92, 246, 0.1)',
     borderRadius: 4,
   },
   backButtonText: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 10,
-    color: '#0ea5e9',
+    color: '#8b5cf6',
     fontWeight: 'bold',
   },
   placeholder: {

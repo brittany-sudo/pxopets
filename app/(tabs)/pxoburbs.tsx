@@ -8,6 +8,7 @@ import { router, Link } from 'expo-router';
 const staticTvImage = require('@/assets/images/static-tv.png');
 const pxoburbsSkylineImage = require('@/assets/images/pxoburbs-skyline.png');
 const chipsImage = require('@/assets/images/chips.png');
+const sludgeImage = require('@/assets/images/sludge.png');
 const lilArcadeImage = require('@/assets/images/lil-arcade.png');
 const lilMovieReelImage = require('@/assets/images/lil-movie-reel.png');
 const rolerImage = require('@/assets/images/roler.png');
@@ -17,6 +18,7 @@ const lilMailImage = require('@/assets/images/lil-mail.png');
 const lilMallImage = require('@/assets/images/lil-mall.png');
 const lilPxosupplyImage = require('@/assets/images/lil-pxosupply.png');
 const lilRubberduckImage = require('@/assets/images/lil-rubberduck.png');
+const lilTagImage = require('@/assets/images/lil-tag.png');
 const lilComputer90Image = require('@/assets/images/lil-computer90.png');
 
 export default function PxoburbsScreen() {
@@ -37,20 +39,20 @@ export default function PxoburbsScreen() {
 
   const activities = [
     {
+      id: 'mall-food-court',
+      name: 'Pxoburbs Mall',
+      description: 'Shop and eat at the bustling food court.',
+      lightning: 25,
+      difficulty: 'Medium',
+      icon: 'shopping-bag'
+    },
+    {
       id: 'corner-store',
-      name: 'Quick Stop Corner Store',
+      name: 'Quickstop Corner Store',
       description: 'Shop, lottery tickets, and gas station snacks.',
       lightning: 12,
       difficulty: 'Easy',
       icon: 'chips'
-    },
-    {
-      id: 'arcade',
-      name: 'Pxoburbs Arcade',
-      description: 'Classic arcade games and pinball machines.',
-      lightning: 5,
-      difficulty: 'Easy',
-      icon: 'arcade'
     },
     {
       id: 'roller-rink',
@@ -101,45 +103,40 @@ export default function PxoburbsScreen() {
       icon: 'paw'
     },
     {
-      id: 'mall-food-court',
-      name: 'Pxoburbs Mall',
-      description: 'Shop and eat at the bustling food court.',
-      lightning: 25,
-      difficulty: 'Medium',
-      icon: 'shopping-bag'
-    },
-    {
-      id: 'computer-store',
-      name: 'Byte Size',
-      description: 'Computer parts, tech accessories, and digital gadgets.',
-      lightning: 22,
-      difficulty: 'Hard',
-      icon: 'laptop'
-    },
-    {
       id: 'community-pool',
       name: 'Pxoburbs Community Pool',
       description: 'Swimming, diving, and poolside relaxation.',
       lightning: 8,
       difficulty: 'Easy',
       icon: 'tree'
+    },
+    {
+      id: 'frog-market-thrift',
+      name: 'Frog Market Thrift',
+      description: 'Vintage finds and second-hand treasures.',
+      lightning: 16,
+      difficulty: 'Easy',
+      image: 'lil-tag'
     }
   ];
 
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Back Button */}
+
+        {/* Back Button - Fixed Position */}
         <Pressable 
           style={styles.backButton}
           onPress={() => router.navigate('/(tabs)/explore')}
         >
-          <FontAwesome name="arrow-left" size={14} color="#0ea5e9" />
+          <FontAwesome name="arrow-left" size={12} color="#8b5cf6" />
           <Text style={styles.backButtonText}>Back</Text>
         </Pressable>
 
-        {/* Title */}
-        <Text style={styles.title}>THE PXOBURBS</Text>
+        {/* Header Row */}
+        <RNView style={styles.headerRow}>
+          <Text style={styles.locationTitle}>THE PXOBURBS</Text>
+        </RNView>
 
         {/* Banner Image */}
         <RNView style={styles.bannerContainer}>
@@ -154,6 +151,7 @@ export default function PxoburbsScreen() {
           It's the perfect place to hang out, explore, and make memories with friends!
         </Text>
 
+
         {/* Activities Title */}
         <Text style={styles.activitiesTitle}>NEIGHBORHOOD ACTIVITIES</Text>
 
@@ -166,19 +164,41 @@ export default function PxoburbsScreen() {
                   <RNView style={styles.activityHeader}>
                     <RNView style={styles.activityInfo}>
                       {activity.id === 'corner-store' ? (
-                        <Image source={chipsImage} style={styles.activityImageIcon} />
+                        <Image source={sludgeImage} style={styles.activityImageIcon} />
                       ) : (
                         <FontAwesome name={activity.icon as any} size={32} color="#8b5cf6" style={styles.activityIcon} />
                       )}
                       <RNView style={styles.activityText}>
                         <RNView style={styles.activityTitleRow}>
                           <Text style={styles.activityName}>{activity.name}</Text>
-                          {activity.id !== 'corner-store' && (
-                            <RNView style={styles.ticketDisplay}>
-                              <FontAwesome name="bolt" size={15} color="#06b6d4" />
-                              <Text style={styles.ticketCountText}>{activity.lightning}</Text>
-                            </RNView>
-                          )}
+                        </RNView>
+                        <Text style={styles.activityDescription}>{activity.description}</Text>
+                      </RNView>
+                    </RNView>
+                  </RNView>
+                  <RNView style={styles.activityFooter}>
+                    <Pressable
+                      style={styles.favoriteButton}
+                      onPress={() => toggleFavorite(activity.id)}
+                    >
+                      <FontAwesome 
+                        name={favorites.has(activity.id) ? "star" : "star-o"} 
+                        size={16} 
+                        color={favorites.has(activity.id) ? "#94a3b8" : "#94a3b8"} 
+                      />
+                    </Pressable>
+                  </RNView>
+                </Pressable>
+              </Link>
+            ) : activity.id === 'frog-market-thrift' ? (
+              <Link href="/frog-market-thrift" asChild>
+                <Pressable style={styles.activityPressable}>
+                  <RNView style={styles.activityHeader}>
+                    <RNView style={styles.activityInfo}>
+                      <Image source={lilTagImage} style={styles.activityImageIcon} />
+                      <RNView style={styles.activityText}>
+                        <RNView style={styles.activityTitleRow}>
+                          <Text style={styles.activityName}>{activity.name}</Text>
                         </RNView>
                         <Text style={styles.activityDescription}>{activity.description}</Text>
                       </RNView>
@@ -211,10 +231,6 @@ export default function PxoburbsScreen() {
                      <RNView style={styles.activityText}>
                        <RNView style={styles.activityTitleRow}>
                          <Text style={styles.activityName}>{activity.name}</Text>
-                         <RNView style={styles.ticketDisplay}>
-                           <FontAwesome name="bolt" size={15} color="#06b6d4" />
-                           <Text style={styles.ticketCountText}>{activity.lightning}</Text>
-                         </RNView>
                        </RNView>
                        <Text style={styles.activityDescription}>{activity.description}</Text>
                      </RNView>
@@ -228,7 +244,7 @@ export default function PxoburbsScreen() {
                      <FontAwesome
                        name={favorites.has(activity.id) ? "star" : "star-o"}
                        size={16}
-                       color={favorites.has(activity.id) ? "#94a3b8" : "#94a3b8"}
+                       color={favorites.has(activity.id) ? "#8b5cf6" : "rgba(139, 92, 246, 0.3)"}
                      />
                    </Pressable>
                  </RNView>
@@ -247,10 +263,6 @@ export default function PxoburbsScreen() {
                      <RNView style={styles.activityText}>
                        <RNView style={styles.activityTitleRow}>
                          <Text style={styles.activityName}>{activity.name}</Text>
-                         <RNView style={styles.ticketDisplay}>
-                           <FontAwesome name="bolt" size={15} color="#06b6d4" />
-                           <Text style={styles.ticketCountText}>{activity.lightning}</Text>
-                         </RNView>
                        </RNView>
                        <Text style={styles.activityDescription}>{activity.description}</Text>
                      </RNView>
@@ -264,7 +276,7 @@ export default function PxoburbsScreen() {
                      <FontAwesome
                        name={favorites.has(activity.id) ? "star" : "star-o"}
                        size={16}
-                       color={favorites.has(activity.id) ? "#94a3b8" : "#94a3b8"}
+                       color={favorites.has(activity.id) ? "#8b5cf6" : "rgba(139, 92, 246, 0.3)"}
                      />
                    </Pressable>
                  </RNView>
@@ -281,14 +293,22 @@ export default function PxoburbsScreen() {
                   <RNView style={styles.activityText}>
                     <RNView style={styles.activityTitleRow}>
                       <Text style={styles.activityName}>{activity.name}</Text>
-                      <RNView style={styles.ticketDisplay}>
-                        <FontAwesome name="bolt" size={15} color="#06b6d4" />
-                        <Text style={styles.ticketCountText}>{activity.lightning}</Text>
-                      </RNView>
                     </RNView>
                     <Text style={styles.activityDescription}>{activity.description}</Text>
                   </RNView>
                 </RNView>
+              </RNView>
+              <RNView style={styles.activityFooter}>
+                <Pressable
+                  style={styles.favoriteButton}
+                  onPress={() => toggleFavorite(activity.id)}
+                >
+                  <FontAwesome 
+                    name={favorites.has(activity.id) ? "star" : "star-o"} 
+                    size={16} 
+                    color={favorites.has(activity.id) ? "#8b5cf6" : "rgba(139, 92, 246, 0.3)"} 
+                  />
+                </Pressable>
               </RNView>
             </Pressable>
           ) : activity.id === 'midnight-rewind' ? (
@@ -302,10 +322,6 @@ export default function PxoburbsScreen() {
                    <RNView style={styles.activityText}>
                      <RNView style={styles.activityTitleRow}>
                        <Text style={styles.activityName}>{activity.name}</Text>
-                       <RNView style={styles.ticketDisplay}>
-                         <FontAwesome name="bolt" size={15} color="#06b6d4" />
-                         <Text style={styles.ticketCountText}>{activity.lightning}</Text>
-                       </RNView>
                      </RNView>
                      <Text style={styles.activityDescription}>{activity.description}</Text>
                    </RNView>
@@ -319,10 +335,39 @@ export default function PxoburbsScreen() {
                    <FontAwesome 
                      name={favorites.has(activity.id) ? "star" : "star-o"} 
                      size={16} 
-                     color={favorites.has(activity.id) ? "#94a3b8" : "#94a3b8"} 
+                     color={favorites.has(activity.id) ? "#8b5cf6" : "rgba(139, 92, 246, 0.3)"} 
                    />
                  </Pressable>
                </RNView>
+            </Pressable>
+          ) : activity.id === 'mall-food-court' ? (
+            <Pressable 
+              style={styles.activityPressable}
+              onPress={() => router.navigate('/(tabs)/pxoburbs-mall')}
+            >
+              <RNView style={styles.activityHeader}>
+                <RNView style={styles.activityInfo}>
+                  <Image source={lilMallImage} style={styles.activityImageIcon} />
+                  <RNView style={styles.activityText}>
+                    <RNView style={styles.activityTitleRow}>
+                      <Text style={styles.activityName}>{activity.name}</Text>
+                    </RNView>
+                    <Text style={styles.activityDescription}>{activity.description}</Text>
+                  </RNView>
+                </RNView>
+              </RNView>
+              <RNView style={styles.activityFooter}>
+                <Pressable
+                  style={styles.favoriteButton}
+                  onPress={() => toggleFavorite(activity.id)}
+                >
+                  <FontAwesome 
+                    name={favorites.has(activity.id) ? "star" : "star-o"} 
+                    size={16} 
+                    color={favorites.has(activity.id) ? "#8b5cf6" : "rgba(139, 92, 246, 0.3)"} 
+                  />
+                </Pressable>
+              </RNView>
             </Pressable>
           ) : (
             <Pressable 
@@ -341,7 +386,7 @@ export default function PxoburbsScreen() {
                 <RNView style={styles.activityHeader}>
                   <RNView style={styles.activityInfo}>
                 {activity.id === 'corner-store' ? (
-                  <Image source={chipsImage} style={styles.activityImageIcon} />
+                  <Image source={sludgeImage} style={styles.activityImageIcon} />
                 ) : activity.id === 'arcade' ? (
                   <Image source={lilArcadeImage} style={styles.arcadeImageIcon} />
                 ) : activity.id === 'makeout-hill' ? (
@@ -356,18 +401,14 @@ export default function PxoburbsScreen() {
                   <Image source={lilPxosupplyImage} style={styles.activityImageIcon} />
                 ) : activity.id === 'community-pool' ? (
                   <Image source={lilRubberduckImage} style={styles.activityImageIcon} />
-                ) : activity.id === 'computer-store' ? (
-                  <Image source={lilComputer90Image} style={styles.activityImageIcon} />
+                ) : activity.id === 'frog-market-thrift' ? (
+                  <Image source={lilTagImage} style={styles.activityImageIcon} />
                 ) : (
                   <FontAwesome name={activity.icon as any} size={32} color="#8b5cf6" style={styles.activityIcon} />
                 )}
                     <RNView style={styles.activityText}>
                       <RNView style={styles.activityTitleRow}>
                         <Text style={styles.activityName}>{activity.name}</Text>
-                        <RNView style={styles.ticketDisplay}>
-                          <FontAwesome name="bolt" size={14} color="#06b6d4" />
-                          <Text style={styles.ticketCountText}>{activity.lightning}</Text>
-                        </RNView>
                       </RNView>
                       <Text style={styles.activityDescription}>{activity.description}</Text>
                     </RNView>
@@ -381,7 +422,7 @@ export default function PxoburbsScreen() {
                     <FontAwesome 
                       name={favorites.has(activity.id) ? "star" : "star-o"} 
                       size={16} 
-                      color={favorites.has(activity.id) ? "#94a3b8" : "#94a3b8"} 
+                      color={favorites.has(activity.id) ? "#8b5cf6" : "rgba(139, 92, 246, 0.3)"} 
                     />
                   </Pressable>
                 </RNView>
@@ -405,34 +446,47 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'flex-start',
     padding: 20,
+    paddingTop: 80,
     paddingBottom: 100,
   },
   backButton: {
+    position: 'absolute',
+    top: 20,
+    left: 20,
+    zIndex: 1000,
     flexDirection: 'row',
     alignItems: 'center',
-    alignSelf: 'flex-start',
-    marginBottom: 20,
     paddingHorizontal: 12,
     paddingVertical: 8,
-    backgroundColor: 'rgba(14, 165, 233, 0.1)',
+    backgroundColor: 'rgba(139, 92, 246, 0.1)',
     borderRadius: 6,
     borderWidth: 1,
-    borderColor: 'rgba(14, 165, 233, 0.3)',
+    borderColor: 'rgba(139, 92, 246, 0.3)',
   },
   backButtonText: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 12,
-    color: '#0ea5e9',
+    color: '#8b5cf6',
     marginLeft: 6,
   },
-  title: {
+  headerRow: {
+    position: 'absolute',
+    top: 20,
+    left: 0,
+    right: 0,
+    zIndex: 999,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 4,
+    height: 40,
+  },
+  locationTitle: {
     fontFamily: 'PressStart2P_400Regular',
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 12,
     color: '#0f172a',
-    marginBottom: 5,
-    textAlign: 'left',
-    alignSelf: 'flex-start',
+    fontWeight: 'bold',
+    letterSpacing: 1,
+    textAlign: 'center',
   },
   bannerContainer: {
     width: '100%',
@@ -467,9 +521,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: '#0f172a',
-    marginBottom: 16,
+    marginBottom: 12,
     textAlign: 'left',
     alignSelf: 'flex-start',
+    width: '100%',
   },
   activityItem: {
     backgroundColor: 'rgba(14, 165, 233, 0.05)',
@@ -487,13 +542,15 @@ const styles = StyleSheet.create({
   },
   activityHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
     marginBottom: 8,
   },
   activityInfo: {
     flexDirection: 'row',
     flex: 1,
+    justifyContent: 'flex-start',
+    alignItems: 'center',
   },
   activityIcon: {
     marginRight: 12,
@@ -517,11 +574,12 @@ const styles = StyleSheet.create({
   activityText: {
     flex: 1,
     marginLeft: 8,
+    alignItems: 'flex-start',
   },
   activityTitleRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
     marginBottom: 4,
   },
   activityName: {
@@ -530,17 +588,14 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#0f172a',
     marginBottom: 4,
-  },
-  ticketDisplay: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 2,
+    textAlign: 'left',
   },
   activityDescription: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 11,
     color: '#0f172a',
     lineHeight: 16,
+    textAlign: 'left',
   },
   favoriteButton: {
     padding: 4,
@@ -559,12 +614,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 12,
     color: '#8b5cf6',
-    fontWeight: 'bold',
-  },
-  ticketCountText: {
-    fontFamily: 'Silkscreen_400Regular',
-    fontSize: 10,
-    color: '#06b6d4',
     fontWeight: 'bold',
   },
 });

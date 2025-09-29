@@ -5,16 +5,18 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { router } from 'expo-router';
 import { usePathname } from 'expo-router';
 
+// Import the community pool main image
+const communityPoolMainImage = require('@/assets/images/community-pool-main.png');
+const lilRubberduckImage = require('@/assets/images/lil-rubberduck.png');
+
 const { width } = Dimensions.get('window');
 
 export default function CommunityPoolScreen() {
   const [poolActivities, setPoolActivities] = useState<Array<{id: string, name: string, completed: boolean}>>([
-    { id: 'swimming-laps', name: 'Swimming Laps', completed: false },
-    { id: 'diving-board', name: 'Diving Board', completed: false },
-    { id: 'poolside-sunbathing', name: 'Poolside Sunbathing', completed: false },
-    { id: 'water-aerobics', name: 'Water Aerobics', completed: false },
-    { id: 'pool-volleyball', name: 'Pool Volleyball', completed: false },
-    { id: 'relaxation', name: 'Relaxation Time', completed: false }
+    { id: 'swimming-laps', name: 'SWIMMING LAPS', completed: false },
+    { id: 'diving-board', name: 'DIVING BOARD', completed: false },
+    { id: 'poolside-sunbathing', name: 'POOLSIDE SUNBATHING', completed: false },
+    { id: 'pool-volleyball', name: 'POOL VOLLEYBALL', completed: false }
   ]);
 
   const [poolTemperature, setPoolTemperature] = useState(78);
@@ -41,7 +43,7 @@ export default function CommunityPoolScreen() {
           style={styles.backButton}
           onPress={() => router.navigate('/(tabs)/pxoburbs')}
         >
-          <FontAwesome name="arrow-left" size={14} color="#0ea5e9" />
+          <FontAwesome name="arrow-left" size={12} color="#8b5cf6" />
           <Text style={styles.backButtonText}>Back</Text>
         </Pressable>
 
@@ -52,8 +54,7 @@ export default function CommunityPoolScreen() {
 
         {/* Pool Banner */}
         <RNView style={styles.bannerContainer}>
-          <FontAwesome name="tint" size={60} color="#0ea5e9" />
-          <Text style={styles.bannerText}>Community Pool</Text>
+          <Image source={communityPoolMainImage} style={styles.bannerImage} />
         </RNView>
 
         {/* Pool Description */}
@@ -82,38 +83,32 @@ export default function CommunityPoolScreen() {
           </RNView>
         </RNView>
 
-        {/* Pool Activities */}
-        <Text style={styles.sectionTitle}>POOL ACTIVITIES</Text>
-        
-        <RNView style={styles.activitiesGrid}>
-          {poolActivities.map((activity) => (
-            <Pressable
-              key={activity.id}
-              style={[styles.activityCard, activity.completed && styles.activityCardCompleted]}
-              onPress={() => handleActivityPress(activity.id)}
-            >
-              <RNView style={styles.activityHeader}>
-                <RNView style={styles.activityIconContainer}>
-                  {activity.id === 'swimming-laps' && <FontAwesome name="tint" size={20} color="#0ea5e9" />}
-                  {activity.id === 'diving-board' && <FontAwesome name="arrow-down" size={20} color="#0ea5e9" />}
-                  {activity.id === 'poolside-sunbathing' && <FontAwesome name="sun-o" size={20} color="#f59e0b" />}
-                  {activity.id === 'water-aerobics' && <FontAwesome name="heart" size={20} color="#ef4444" />}
-                  {activity.id === 'pool-volleyball' && <FontAwesome name="circle" size={20} color="#8b5cf6" />}
-                  {activity.id === 'relaxation' && <FontAwesome name="leaf" size={20} color="#10b981" />}
-                </RNView>
-                <RNView style={styles.activityText}>
-                  <Text style={styles.activityName}>{activity.name}</Text>
-                  {activity.completed && (
-                    <FontAwesome name="check-circle" size={16} color="#10b981" />
-                  )}
-                </RNView>
-              </RNView>
-            </Pressable>
-          ))}
+        {/* Pool Activities Wall Sign */}
+        <RNView style={styles.wallSignContainer}>
+          <Text style={styles.wallSignTitle}>POOL ACTIVITIES</Text>
+          <RNView style={styles.wallSignContent}>
+            {poolActivities.map((activity, index) => (
+              <Pressable
+                key={activity.id}
+                style={[styles.wallSignItem, activity.completed && styles.wallSignItemCompleted]}
+                onPress={() => handleActivityPress(activity.id)}
+              >
+                <Text style={styles.wallSignItemText}>
+                  {activity.name}
+                </Text>
+                {activity.completed && (
+                  <FontAwesome name="check" size={16} color="#10b981" style={styles.checkIcon} />
+                )}
+              </Pressable>
+            ))}
+          </RNView>
         </RNView>
 
         {/* Pool Rules */}
-        <Text style={styles.sectionTitle}>POOL RULES</Text>
+        <RNView style={styles.rulesSection}>
+          <Text style={styles.sectionTitle}>POOL RULES</Text>
+          <Image source={lilRubberduckImage} style={styles.rubberDuckImage} />
+        </RNView>
         
         <RNView style={styles.rulesContainer}>
           <Text style={styles.ruleItem}>• No running on the pool deck</Text>
@@ -167,15 +162,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 12,
     paddingVertical: 8,
-    backgroundColor: 'rgba(14, 165, 233, 0.1)',
+    backgroundColor: 'rgba(139, 92, 246, 0.1)',
     borderRadius: 6,
     borderWidth: 1,
-    borderColor: 'rgba(14, 165, 233, 0.3)',
+    borderColor: 'rgba(139, 92, 246, 0.3)',
   },
   backButtonText: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 12,
-    color: '#0ea5e9',
+    color: '#8b5cf6',
     marginLeft: 6,
   },
   headerRow: {
@@ -195,21 +190,19 @@ const styles = StyleSheet.create({
   },
   bannerContainer: {
     width: '100%',
-    height: 120,
-    backgroundColor: 'rgba(14, 165, 233, 0.1)',
-    borderRadius: 8,
+    height: 200,
     borderWidth: 2,
-    borderColor: '#0ea5e9',
-    alignItems: 'center',
-    justifyContent: 'center',
+    borderColor: '#14b8a6',
+    borderRadius: 8,
     marginBottom: 20,
+    overflow: 'hidden',
+    backgroundColor: 'rgba(20, 184, 166, 0.05)',
   },
-  bannerText: {
-    fontFamily: 'PressStart2P_400Regular',
-    fontSize: 16,
-    color: '#0ea5e9',
-    marginTop: 8,
-    textAlign: 'center',
+  bannerImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+    borderRadius: 6,
   },
   description: {
     fontFamily: 'Silkscreen_400Regular',
@@ -247,55 +240,81 @@ const styles = StyleSheet.create({
     color: '#0f172a',
     fontWeight: 'bold',
   },
+  rulesSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginTop: 8,
+    marginBottom: -8,
+  },
   sectionTitle: {
     fontFamily: 'PressStart2P_400Regular',
     fontSize: 16,
     fontWeight: 'bold',
     color: '#0f172a',
-    marginBottom: 16,
     textAlign: 'left',
-    alignSelf: 'flex-start',
+    flex: 1,
   },
-  activitiesGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
+  rubberDuckImage: {
+    width: 40,
+    height: 40,
+    marginLeft: 12,
+  },
+  wallSignContainer: {
     width: '100%',
-    marginBottom: 24,
+    backgroundColor: '#0d9488',
+    borderRadius: 8,
+    borderWidth: 4,
+    borderColor: '#14b8a6',
+    marginBottom: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
   },
-  activityCard: {
-    width: '45%',
-    backgroundColor: 'rgba(14, 165, 233, 0.05)',
-    borderRadius: 4,
-    borderWidth: 2,
-    borderColor: '#1e3a8a',
-    padding: 16,
-    marginBottom: 16,
+  wallSignTitle: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#ffffff',
+    textAlign: 'center',
+    paddingVertical: 16,
+    backgroundColor: '#14b8a6',
+    borderTopLeftRadius: 4,
+    borderTopRightRadius: 4,
+    letterSpacing: 2,
+  },
+  wallSignContent: {
+    padding: 20,
+  },
+  wallSignItem: {
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    marginBottom: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 6,
+    borderWidth: 2,
+    borderColor: 'rgba(20, 184, 166, 0.3)',
   },
-  activityCardCompleted: {
-    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+  wallSignItemCompleted: {
+    backgroundColor: 'rgba(16, 185, 129, 0.2)',
     borderColor: '#10b981',
   },
-  activityHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 8,
-  },
-  activityIconContainer: {
-    marginRight: 12,
-  },
-  activityText: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  activityName: {
-    fontFamily: 'Silkscreen_400Regular',
-    fontSize: 12,
+  wallSignItemText: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 14,
     fontWeight: 'bold',
-    color: '#0f172a',
-    textAlign: 'center',
+    color: '#ffffff',
+    flex: 1,
+    letterSpacing: 1,
+  },
+  checkIcon: {
+    marginLeft: 8,
   },
   rulesContainer: {
     backgroundColor: 'rgba(14, 165, 233, 0.05)',

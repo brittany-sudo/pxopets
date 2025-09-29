@@ -5,12 +5,12 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { router } from 'expo-router';
 
 // Import activity icons
-const neonBurgerImage = require('@/assets/images/neon-burger.png');
+const cosmicBurgerImage = require('@/assets/images/cosmicburger.png');
 const lilAtomicDinerImage = require('@/assets/images/lil-atomic-diner.png');
 
 // Image mapping for activities
 const activityImageMap: { [key: string]: any } = {
-  'neon-burger.png': neonBurgerImage,
+  'cosmicburger.png': cosmicBurgerImage,
   'lil-atomic-diner.png': lilAtomicDinerImage,
 };
 
@@ -42,72 +42,73 @@ export default function CrescentOasisScreen() {
       icon: 'lil-atomic-diner.png'
     },
     {
-      id: 'neon-gambling',
-      name: 'Neon Gambling',
-      description: 'Try your luck at the glowing slot machines.',
+      id: 'neon-casino',
+      name: 'Neon Casino',
+      description: 'Try your luck at the glowing slot machines and cosmic card tables.',
       lightning: 25,
       difficulty: 'Medium',
-      icon: 'neon-burger.png'
+      icon: 'cosmicburger.png'
     },
     {
-      id: 'desert-racing',
-      name: 'Desert Racing',
-      description: 'Race hover cars across the pink sand dunes.',
+      id: 'hovercar-speedway',
+      name: 'Hovercar Speedway',
+      description: 'Race hover cars across the pink sand dunes at breakneck speeds.',
       lightning: 30,
       difficulty: 'Hard',
-      icon: 'neon-burger.png'
+      icon: 'cosmicburger.png'
     },
     {
-      id: 'alien-encounter',
-      name: 'Alien Encounter',
-      description: 'Meet friendly hippie aliens from distant galaxies.',
+      id: 'hippie-alien-radio',
+      name: 'Visit Zephyr',
+      description: 'Hang out with Zephyr, the groovy alien DJ who broadcasts cosmic tunes from his airstream.',
       lightning: 20,
-      difficulty: 'Medium',
-      icon: 'neon-burger.png'
+      difficulty: 'Easy',
+      icon: 'cosmicburger.png'
     },
     {
-      id: 'crystal-mining',
-      name: 'Crystal Mining',
-      description: 'Extract precious crystals from desert formations.',
+      id: 'cosmic-gas-station',
+      name: 'Cosmic Gas Station',
+      description: 'Fuel up your hovercar with stardust and grab space snacks.',
       lightning: 18,
-      difficulty: 'Medium',
-      icon: 'neon-burger.png'
+      difficulty: 'Easy',
+      icon: 'cosmicburger.png'
     },
     {
-      id: 'sunset-meditation',
-      name: 'Sunset Meditation',
-      description: 'Meditate as the pink sun sets over the dunes.',
+      id: 'moonbeam-motel',
+      name: 'Moonbeam Motel',
+      description: 'Stay at the sketchy motel where neon signs flicker all night.',
+      lightning: 22,
+      difficulty: 'Medium',
+      icon: 'cosmicburger.png'
+    },
+    {
+      id: 'cosmic-drive-in',
+      name: 'Cosmic Drive-In',
+      description: 'Watch alien movies under the stars from your hovercar.',
+      lightning: 28,
+      difficulty: 'Medium',
+      icon: 'cosmicburger.png'
+    },
+    {
+      id: 'sunset-rest-stop',
+      name: 'Sunset Rest Stop',
+      description: 'Meditate as the pink sun sets over the dunes at this peaceful oasis.',
       lightning: 12,
       difficulty: 'Easy',
-      icon: 'neon-burger.png'
-    },
-    {
-      id: 'space-port',
-      name: 'Space Port',
-      description: 'Watch alien ships arrive and depart from the spaceport.',
-      lightning: 22,
-      difficulty: 'Easy',
-      icon: 'neon-burger.png'
-    },
-    {
-      id: 'desert-party',
-      name: 'Desert Party',
-      description: 'Join the nightly celebration under the stars.',
-      lightning: 35,
-      difficulty: 'Hard',
-      icon: 'neon-burger.png'
+      icon: 'cosmicburger.png'
     }
   ];
 
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
+
         {/* Back Button - Fixed Position */}
         <Pressable 
           style={styles.backButton}
           onPress={() => router.navigate('/(tabs)/explore')}
         >
-          <FontAwesome name="arrow-left" size={14} color="#0ea5e9" />
+          <FontAwesome name="arrow-left" size={12} color="#8b5cf6" />
           <Text style={styles.backButtonText}>Back</Text>
         </Pressable>
 
@@ -115,9 +116,6 @@ export default function CrescentOasisScreen() {
         <RNView style={styles.headerRow}>
           <Text style={styles.locationTitle}>CRESCENT OASIS</Text>
         </RNView>
-
-        {/* Title */}
-        <Text style={styles.title}>CRESCENT OASIS</Text>
 
         {/* Banner Image */}
         <RNView style={styles.bannerContainer}>
@@ -188,6 +186,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'flex-start',
     padding: 20,
+    paddingTop: 80,
     paddingBottom: 100,
   },
   headerRow: {
@@ -199,17 +198,17 @@ const styles = StyleSheet.create({
   },
   backButton: {
     position: 'absolute',
-    top: 20, // Higher up, below the status bar
+    top: 20,
     left: 20,
     zIndex: 1000,
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 12,
     paddingVertical: 8,
-    backgroundColor: 'rgba(14, 165, 233, 0.1)',
+    backgroundColor: 'rgba(139, 92, 246, 0.1)',
     borderRadius: 6,
     borderWidth: 1,
-    borderColor: 'rgba(14, 165, 233, 0.3)',
+    borderColor: 'rgba(139, 92, 246, 0.3)',
   },
   locationTitle: {
     fontFamily: 'PressStart2P_400Regular',
@@ -222,17 +221,27 @@ const styles = StyleSheet.create({
   backButtonText: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 12,
-    color: '#0ea5e9',
+    color: '#8b5cf6',
     marginLeft: 6,
   },
-  title: {
+  headerRow: {
+    position: 'absolute',
+    top: 20,
+    left: 0,
+    right: 0,
+    zIndex: 999,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 4,
+    height: 40,
+  },
+  locationTitle: {
     fontFamily: 'PressStart2P_400Regular',
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 12,
     color: '#0f172a',
-    marginBottom: 5,
-    textAlign: 'left',
-    alignSelf: 'flex-start',
+    fontWeight: 'bold',
+    letterSpacing: 1,
+    textAlign: 'center',
   },
   bannerContainer: {
     width: '100%',

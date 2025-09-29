@@ -14,6 +14,7 @@ const pouchdrinkImage = require('@/assets/images/pouchdrink.png');
 const sludgeImage = require('@/assets/images/sludge.png');
 const hotchipsImage = require('@/assets/images/hotchips.png');
 const gumballsImage = require('@/assets/images/gumballs.png');
+const chocodonutImage = require('@/assets/images/chocodonut.png');
 
 export default function ShopScreen() {
   const [shopkeeperSaying, setShopkeeperSaying] = useState("Welcome to QuickStop! Best prices in Pxoburbs!");
@@ -31,7 +32,7 @@ export default function ShopScreen() {
     { id: 'l1', name: 'Space Bubblegum', price: 50, image: 'gumballs', tickets: 3 },
     { id: 'l2', name: 'Potatoe Chips', price: 75, image: 'pouchdrink', tickets: 5 },
     { id: 'l3', name: 'Punch Pouch', price: 100, image: 'pouchdrink', tickets: 7 },
-    { id: 'l4', name: 'Energy Drink', price: 125, image: 'pouchdrink', tickets: 10 },
+    { id: 'l4', name: 'Choco-Donut', price: 125, image: 'chocodonut', tickets: 10 },
   ]);
 
   // Lottery tickets with different variations
@@ -261,7 +262,7 @@ export default function ShopScreen() {
           style={styles.backButton}
           onPress={() => router.navigate('/(tabs)/pxoburbs')}
         >
-          <FontAwesome name="arrow-left" size={14} color="#0ea5e9" />
+          <FontAwesome name="arrow-left" size={12} color="#8b5cf6" />
           <Text style={styles.backButtonText}>Back</Text>
         </Pressable>
 
@@ -358,6 +359,7 @@ export default function ShopScreen() {
                   <Image 
                     source={
                       item.image === 'gumballs' ? gumballsImage :
+                      item.image === 'chocodonut' ? chocodonutImage :
                       pouchdrinkImage
                     } 
                     style={styles.chipsImage} 
@@ -447,15 +449,15 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     paddingHorizontal: 12,
     paddingVertical: 8,
-    backgroundColor: 'rgba(14, 165, 233, 0.1)',
+    backgroundColor: 'rgba(139, 92, 246, 0.1)',
     borderRadius: 6,
     borderWidth: 1,
-    borderColor: 'rgba(14, 165, 233, 0.3)',
+    borderColor: 'rgba(139, 92, 246, 0.3)',
   },
   backButtonText: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 12,
-    color: '#0ea5e9',
+    color: '#8b5cf6',
     marginLeft: 6,
   },
   title: {
