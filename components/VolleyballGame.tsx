@@ -43,6 +43,9 @@ export default function VolleyballGame() {
     stamina: 0,
   });
 
+  // Timeout ref for miss detection
+  const missTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   // Animation values
   const ballX = useRef(new Animated.Value(PET_X)).current;
   const ballY = useRef(new Animated.Value(GROUND_Y - BALL_RADIUS)).current;
@@ -60,6 +63,13 @@ export default function VolleyballGame() {
 
     // Start pet bobbing animation
     startPetBobbing();
+
+    // Cleanup timeout on unmount
+    return () => {
+      if (missTimeoutRef.current) {
+        clearTimeout(missTimeoutRef.current);
+      }
+    };
   }, []);
 
   // Pet bobbing animation
@@ -82,7 +92,7 @@ export default function VolleyballGame() {
   };
 
   // Animate ball arc
-  const animateBallArc = (fromX: number, fromY: number, toX: number, toY: number, duration: number) => {
+  const animateBallArc = (fromX: number, fromY: number, toX: number, toY: number, duration: number, targetLeg: 'toPlayer' | 'toNPC') => {
     // Reset ball position
     ballX.setValue(fromX);
     ballY.setValue(fromY);
@@ -128,17 +138,24 @@ export default function VolleyballGame() {
         useNativeDriver: false,
       }),
     ]).start(() => {
-      // Animation complete
-      if (gameState.ballLeg === 'toPlayer') {
-        // Ball reached player - check for miss
-        if (!gameState.isMatchActive) {
-          handleMiss();
+      // Animation complete - update ball leg
+      setGameState(prev => ({ ...prev, ballLeg: targetLeg }));
+      
+      if (targetLeg === 'toPlayer') {
+        // Ball reached player - set up miss timeout
+        if (missTimeoutRef.current) {
+          clearTimeout(missTimeoutRef.current);
         }
-      } else if (gameState.ballLeg === 'toNPC') {
-        // Ball reached NPC - start return to player
+        missTimeoutRef.current = setTimeout(() => {
+          if (gameState.isMatchActive && gameState.ballLeg === 'toPlayer') {
+            handleMiss();
+          }
+        }, 2000); // 2 seconds to return the ball
+      } else if (targetLeg === 'toNPC') {
+        // Ball reached NPC - start return to player after delay
         setTimeout(() => {
           setGameState(prev => ({ ...prev, ballLeg: 'toPlayer' }));
-          animateBallArc(NPC_X, GROUND_Y - BALL_RADIUS, PET_X, GROUND_Y - BALL_RADIUS, 1000);
+          animateBallArc(NPC_X, GROUND_Y - BALL_RADIUS, PET_X, GROUND_Y - BALL_RADIUS, 1000, 'toPlayer');
         }, 500);
       }
     });
@@ -159,12 +176,18 @@ export default function VolleyballGame() {
     }));
 
     // Start with ball coming to player
-    animateBallArc(NPC_X, GROUND_Y - BALL_RADIUS, PET_X, GROUND_Y - BALL_RADIUS, 1000);
+    animateBallArc(NPC_X, GROUND_Y - BALL_RADIUS, PET_X, GROUND_Y - BALL_RADIUS, 1000, 'toPlayer');
   };
 
   // Handle return
   const handleReturn = () => {
     if (!gameState.isMatchActive || gameState.ballLeg !== 'toPlayer') return;
+
+    // Clear miss timeout since player is returning
+    if (missTimeoutRef.current) {
+      clearTimeout(missTimeoutRef.current);
+      missTimeoutRef.current = null;
+    }
 
     // Check if ball is in return window (position-based)
     const ballXValue = ballX._value;
@@ -221,7 +244,7 @@ export default function VolleyballGame() {
       }));
 
       // Animate ball to NPC
-      animateBallArc(PET_X, GROUND_Y - BALL_RADIUS, NPC_X, GROUND_Y - BALL_RADIUS, 1000);
+      animateBallArc(PET_X, GROUND_Y - BALL_RADIUS, NPC_X, GROUND_Y - BALL_RADIUS, 1000, 'toNPC');
     }
   };
 
