@@ -2,6 +2,7 @@ import React from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Link, Tabs } from 'expo-router';
 import { Pressable } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
@@ -12,31 +13,41 @@ import { FONT_SIZES, SPACING, ICON_SIZES } from '@/constants/Styles';
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>['name'];
   color: string;
+  focused: boolean;
 }) {
   return <FontAwesome size={ICON_SIZES.md} style={{ marginBottom: -3 }} {...props} />;
 }
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const insets = useSafeAreaInsets();
 
   return (
     <Tabs
       initialRouteName="index"
-              screenOptions={{
-                tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tabActive,
-                tabBarInactiveTintColor: Colors[colorScheme ?? 'light'].tabInactive, // Purple with 100% opacity
-        tabBarLabelStyle: { fontFamily: 'Silkscreen_400Regular', fontSize: FONT_SIZES.xs, paddingBottom: 0, marginTop: 6 },
+      screenOptions={{
+        tabBarActiveTintColor: colorScheme === 'dark' ? '#ffffff' : '#000000',
+        tabBarInactiveTintColor: colorScheme === 'dark' ? '#666666' : '#999999',
+        tabBarLabelStyle: { 
+          fontFamily: 'Silkscreen_400Regular', 
+          fontSize: 9, 
+          fontWeight: '500',
+          marginTop: 2,
+          marginBottom: 0,
+          color: colorScheme === 'dark' ? '#ffffff' : '#000000',
+        },
         tabBarItemStyle: { 
-          paddingVertical: SPACING.xs,
-          marginHorizontal: 2,
+          paddingVertical: 6,
+          paddingHorizontal: 4,
         },
         tabBarStyle: {
-          height: 90,
-          backgroundColor: Colors[colorScheme ?? 'light'].tabBarBackground,
-          borderTopColor: Colors[colorScheme ?? 'light'].tabBarBorder,
-          borderTopWidth: 2,
-          paddingTop: 8,
-          paddingBottom: 8,
+          height: 90 + insets.bottom,
+          backgroundColor: colorScheme === 'dark' ? '#1a1a1a' : '#ffffff',
+          borderTopColor: colorScheme === 'dark' ? '#333333' : '#e5e5e5',
+          borderTopWidth: 1,
+          paddingTop: 12,
+          paddingBottom: insets.bottom + 8,
+          paddingHorizontal: 16,
         },
         // Disable the static render of the header on web
         // to prevent a hydration error in React Navigation v6.
@@ -46,49 +57,55 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'News',
-          tabBarIcon: ({ color }) => <TabBarIcon name="newspaper-o" color={color} />,
+          tabBarIcon: ({ color, focused }) => <TabBarIcon name="newspaper-o" color={color} focused={focused} />,
         }}
       />
       <Tabs.Screen
         name="explore"
         options={{
           title: 'Explore',
-          tabBarIcon: ({ color }) => <TabBarIcon name="map" color={color} />,
+          tabBarIcon: ({ color, focused }) => <TabBarIcon name="map" color={color} focused={focused} />,
         }}
       />
       <Tabs.Screen
         name="games"
         options={{
           title: 'Games',
-          tabBarIcon: ({ color }) => <TabBarIcon name="gamepad" color={color} />,
+          tabBarIcon: ({ color, focused }) => <TabBarIcon name="gamepad" color={color} focused={focused} />,
         }}
       />
       <Tabs.Screen
         name="shop"
         options={{
           title: 'Shop',
-          tabBarIcon: ({ color }) => <TabBarIcon name="shopping-cart" color={color} />,
+          tabBarIcon: ({ color, focused }) => <TabBarIcon name="shopping-cart" color={color} focused={focused} />,
         }}
       />
       <Tabs.Screen
         name="pets"
         options={{
           title: 'Pets',
-          tabBarIcon: ({ color }) => <TabBarIcon name="heart" color={color} />,
+          tabBarIcon: ({ color, focused }) => <TabBarIcon name="heart" color={color} focused={focused} />,
         }}
       />
-              <Tabs.Screen
-                name="mail"
-                options={{
-                  title: 'Mail',
-                  tabBarIcon: ({ color }) => <TabBarIcon name="envelope" color={color} />,
-                }}
-              />
+      <Tabs.Screen
+        name="mail"
+        options={{
+          title: 'Mail',
+          tabBarIcon: ({ color, focused }) => <TabBarIcon name="envelope" color={color} focused={focused} />,
+        }}
+      />
       <Tabs.Screen
         name="home"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
+          tabBarIcon: ({ color, focused }) => <TabBarIcon name="home" color={color} focused={focused} />,
+        }}
+      />
+      <Tabs.Screen
+        name="simple-home"
+        options={{
+          href: null, // Hide from tab bar
         }}
       />
       {/* Hidden pages - use built-in tab bar but don't show in tab bar */}
@@ -226,6 +243,18 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="neon-casino"
+        options={{
+          href: null, // Hide from tab bar
+        }}
+      />
+      <Tabs.Screen
+        name="lucky-strike-speedway"
+        options={{
+          href: null, // Hide from tab bar
+        }}
+      />
+      <Tabs.Screen
         name="midnight-rewind"
         options={{
           href: null, // Hide from tab bar
@@ -279,18 +308,18 @@ export default function TabLayout() {
           href: null, // Hide from tab bar
         }}
       />
-    <Tabs.Screen
-      name="lap-trainer"
-      options={{
-        href: null, // Hide from tab bar
-      }}
-    />
-    <Tabs.Screen
-      name="pool-volleyball"
-      options={{
-        href: null, // Hide from tab bar
-      }}
-    />
+      <Tabs.Screen
+        name="lap-trainer"
+        options={{
+          href: null, // Hide from tab bar
+        }}
+      />
+      <Tabs.Screen
+        name="pool-volleyball"
+        options={{
+          href: null, // Hide from tab bar
+        }}
+      />
     </Tabs>
   );
 }

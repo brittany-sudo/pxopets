@@ -12,6 +12,33 @@ const bayouMainImage = require('@/assets/images/bayou-nocture.png');
 export default function BayouNocturneScreen() {
   const { hydrated } = useGame();
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
+  const [lanternGuySaying, setLanternGuySaying] = useState<string>('');
+
+  // Lantern Guy's Quiet, Mysterious Personality
+  const getLanternGuyGreeting = () => {
+    const greetings = [
+      "The bayou watches...",
+      "Fireflies carry secrets...",
+      "Not all who wander are lost...",
+      "The lanterns remember...",
+      "Listen to the water...",
+      "The spirits are restless tonight...",
+      "Beware the mist...",
+      "Ancient magic flows here...",
+      "The cypress trees whisper...",
+      "Some secrets are better left buried..."
+    ];
+    return greetings[Math.floor(Math.random() * greetings.length)];
+  };
+
+  const handleLanternGuyInteraction = () => {
+    setLanternGuySaying(getLanternGuyGreeting());
+  };
+
+  // Initialize Lantern Guy's greeting on component mount
+  React.useEffect(() => {
+    setLanternGuySaying(getLanternGuyGreeting());
+  }, []);
 
   const toggleFavorite = (activityId: string) => {
     setFavorites(prev => {
@@ -103,6 +130,19 @@ export default function BayouNocturneScreen() {
           The bayou whispers secrets to those brave enough to listen, while glowing orbs guide lost souls 
           through the misty waters.
         </Text>
+
+        {/* Lantern Guy NPC */}
+        <RNView style={styles.npcContainer}>
+          <RNView style={styles.npcSpeechBubble}>
+            <Text style={styles.npcCharacterName}>KEEPER OF LANTERNS:</Text>
+            <Text style={styles.npcSpeechText}>
+              {lanternGuySaying}
+            </Text>
+          </RNView>
+          <Pressable onPress={handleLanternGuyInteraction}>
+            <Image source={require('@/assets/images/lantern-guy.png')} style={styles.npcImage} />
+          </Pressable>
+        </RNView>
 
         {/* Activities Title */}
         <Text style={styles.activitiesTitle}>BAYOU ADVENTURES</Text>
@@ -297,5 +337,41 @@ const styles = StyleSheet.create({
   },
   favoriteButton: {
     padding: 4,
+  },
+  // Lantern Guy NPC Styles
+  npcContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+    paddingHorizontal: 20,
+  },
+  npcSpeechBubble: {
+    backgroundColor: 'rgba(31, 41, 55, 0.1)',
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(31, 41, 55, 0.3)',
+    maxWidth: 300,
+    marginRight: -10,
+  },
+  npcCharacterName: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 8,
+    color: '#1f2937',
+    marginBottom: 4,
+    textAlign: 'left',
+  },
+  npcSpeechText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#0f172a',
+    textAlign: 'left',
+    fontStyle: 'italic',
+  },
+  npcImage: {
+    width: 72,
+    height: 72,
+    resizeMode: 'contain',
   },
 });

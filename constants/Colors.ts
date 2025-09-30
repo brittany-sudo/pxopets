@@ -1,52 +1,52 @@
-// Modern pastel color palette - chic and sophisticated
-const tintColorLight = '#0ea5e9'; // Blue
-const tintColorDark = '#a78bfa'; // Soft lavender
+// Co-Star inspired clean color palette - minimal and elegant
+const tintColorLight = '#000000'; // Pure black for active states
+const tintColorDark = '#ffffff'; // Pure white for active states
 
 export default {
   light: {
-    text: '#374151', // Charcoal - softer than deep slate
-    background: '#fefefe', // Warm white
+    text: '#000000', // Pure black text
+    background: '#ffffff', // Pure white background
     tint: tintColorLight,
-    tabIconDefault: '#9ca3af', // Muted gray for inactive states
+    tabIconDefault: '#999999', // Muted gray for inactive states
     tabIconSelected: tintColorLight,
-    tabActive: '#374151', // Charcoal for active states
-    tabInactive: '#a78bfa', // Soft lavender with 100% opacity
-    tabBarBackground: '#fefefe', // Warm white background
-    tabBarBorder: '#10b981', // Teal border
-    accent1: '#0ea5e9', // Primary accent - blue
-    accent2: '#a78bfa', // Secondary accent - soft lavender
-    accent3: '#10b981', // Tertiary accent - sage (keeping this)
-    accentPurple: '#a78bfa', // Soft lavender for buttons
+    tabActive: '#000000', // Pure black for active states
+    tabInactive: '#999999', // Muted gray for inactive states
+    tabBarBackground: '#ffffff', // Pure white background
+    tabBarBorder: '#e5e5e5', // Light gray border
+    accent1: '#0ea5e9', // Blue for gems
+    accent2: '#8b5cf6', // Purple for tickets
+    accent3: '#f59e0b', // Amber for stamina
+    accentPurple: '#8b5cf6', // Purple for buttons
     accentPurpleBg: '#f9fafb', // Very subtle gray background
-    titleColor: '#374151', // Charcoal for titles
-    // Modern pastel colors
+    titleColor: '#000000', // Pure black for titles
+    // Co-Star inspired minimal colors
     premiumTeal: '#10b981', // Sage green
-    premiumBlue: '#a78bfa', // Soft lavender
-    premiumPurple: '#0ea5e9', // Blue
-    premiumGray: '#9ca3af', // Muted gray
-    premiumBackground: '#fefefe', // Warm white
+    premiumBlue: '#0ea5e9', // Blue
+    premiumPurple: '#8b5cf6', // Purple
+    premiumGray: '#999999', // Muted gray
+    premiumBackground: '#ffffff', // Pure white
   },
   dark: {
-    text: '#f9fafb', // Soft white
-    background: '#1f2937', // Warm dark gray
+    text: '#ffffff', // Pure white text
+    background: '#1a1a1a', // Dark background
     tint: tintColorDark,
-    tabIconDefault: '#6b7280', // Muted gray for inactive states
+    tabIconDefault: '#666666', // Muted gray for inactive states
     tabIconSelected: tintColorDark,
-    tabActive: '#f9fafb', // Soft white for active states
-    tabInactive: '#a78bfa', // Soft lavender with 100% opacity
-    tabBarBackground: '#1f2937', // Warm dark gray background
-    tabBarBorder: '#a78bfa', // Soft lavender border
-    accent1: '#0ea5e9', // Primary accent - blue
-    accent2: '#a78bfa', // Secondary accent - soft lavender
-    accent3: '#10b981', // Tertiary accent - sage
-    accentPurple: '#a78bfa', // Soft lavender for buttons
-    accentPurpleBg: '#374151', // Charcoal background for purple elements
-    titleColor: '#f9fafb', // Soft white for titles
-    // Modern pastel colors (dark mode)
+    tabActive: '#ffffff', // Pure white for active states
+    tabInactive: '#666666', // Muted gray for inactive states
+    tabBarBackground: '#1a1a1a', // Dark background
+    tabBarBorder: '#333333', // Dark gray border
+    accent1: '#0ea5e9', // Blue for gems
+    accent2: '#8b5cf6', // Purple for tickets
+    accent3: '#f59e0b', // Amber for stamina
+    accentPurple: '#8b5cf6', // Purple for buttons
+    accentPurpleBg: '#2a2a2a', // Dark gray background for purple elements
+    titleColor: '#ffffff', // Pure white for titles
+    // Co-Star inspired minimal colors (dark mode)
     premiumTeal: '#10b981', // Sage green
-    premiumBlue: '#a78bfa', // Soft lavender
-    premiumPurple: '#0ea5e9', // Blue
-    premiumGray: '#6b7280', // Muted gray
-    premiumBackground: '#1f2937', // Warm dark gray
+    premiumBlue: '#0ea5e9', // Blue
+    premiumPurple: '#8b5cf6', // Purple
+    premiumGray: '#666666', // Muted gray
+    premiumBackground: '#1a1a1a', // Dark background
   },
 };

@@ -343,8 +343,8 @@ export default function GamesScreen() {
                   >
                     <FontAwesome 
                       name={favorites.has(game.id) ? "star" : "star-o"} 
-                      size={16} 
-                      color={favorites.has(game.id) ? "#8b5cf6" : "#ffffff"} 
+                      size={14} 
+                      color={favorites.has(game.id) ? "#8b5cf6" : "#999999"} 
                     />
                   </Pressable>
                 </RNView>
@@ -443,16 +443,16 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   favoriteButton: {
-    padding: 6,
-    backgroundColor: 'rgba(139, 92, 246, 0.9)',
-    borderRadius: 16,
-    borderWidth: 2,
-    borderColor: '#8b5cf6',
+    padding: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.3)',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 5,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
   searchContainer: {
     flexDirection: 'row',

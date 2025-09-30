@@ -9,7 +9,7 @@ import { useGame } from '@/store/GameStore';
 const lunchboxImage = require('@/assets/images/lunchbox-hill.png');
 
 export default function ShopScreen() {
-  const { state, addCoins, spendCoins } = useGame();
+  const { state, addCoins, spendCoins, addTickets, spendTickets, addStamina, spendStamina, addFood } = useGame();
   const [selectedCategory, setSelectedCategory] = useState('tickets');
 
   const categories = [
@@ -27,7 +27,7 @@ export default function ShopScreen() {
       price: 0.99,
       currency: 'USD',
       icon: 'ticket',
-      color: '#0ea5e9',
+      color: '#8b5cf6',
       description: 'Perfect starter pack!',
       popular: true,
     },
@@ -37,7 +37,7 @@ export default function ShopScreen() {
       price: 4.99,
       currency: 'USD',
       icon: 'ticket',
-      color: '#0ea5e9',
+      color: '#8b5cf6',
       description: 'Best value! 10% bonus',
       popular: false,
       bonus: '+10%',
@@ -48,7 +48,7 @@ export default function ShopScreen() {
       price: 9.99,
       currency: 'USD',
       icon: 'ticket',
-      color: '#0ea5e9',
+      color: '#8b5cf6',
       description: 'Most popular! 20% bonus',
       popular: true,
       bonus: '+20%',
@@ -59,7 +59,7 @@ export default function ShopScreen() {
       price: 19.99,
       currency: 'USD',
       icon: 'ticket',
-      color: '#0ea5e9',
+      color: '#8b5cf6',
       description: 'Ultimate pack! 30% bonus',
       popular: false,
       bonus: '+30%',
@@ -68,70 +68,59 @@ export default function ShopScreen() {
 
   const foodItems = [
     {
-      id: 'cupcake',
-      name: 'CUPCAKE',
-      price: 5,
+      id: 'apple',
+      name: 'APPLE',
+      price: 10,
       currency: 'stamina',
-      icon: 'birthday-cake',
-      color: '#ec4899',
-      description: 'Gives +20 stamina',
-      stamina: '+20',
+      icon: 'apple',
+      color: '#ef4444',
+      description: 'Gives +5 stamina',
+      stamina: '+5',
       rarity: 'common',
     },
     {
-      id: 'pizza_slice',
-      name: 'PIZZA SLICE',
-      price: 8,
+      id: 'sandwich',
+      name: 'SANDWICH',
+      price: 25,
       currency: 'stamina',
       icon: 'cutlery',
       color: '#f97316',
-      description: 'Gives +35 stamina',
-      stamina: '+35',
+      description: 'Gives +15 stamina',
+      stamina: '+15',
       rarity: 'common',
     },
     {
-      id: 'sushi_roll',
-      name: 'SUSHI ROLL',
-      price: 15,
-      currency: 'stamina',
-      icon: 'circle',
-      color: '#10b981',
-      description: 'Gives +50 stamina',
-      stamina: '+50',
-      rarity: 'rare',
-    },
-    {
-      id: 'chocolate_bar',
-      name: 'CHOCOLATE BAR',
-      price: 12,
-      currency: 'stamina',
-      icon: 'square',
-      color: '#8b5cf6',
-      description: 'Gives +40 stamina',
-      stamina: '+40',
-      rarity: 'uncommon',
-    },
-    {
-      id: 'ice_cream',
-      name: 'ICE CREAM',
-      price: 6,
+      id: 'energy_drink',
+      name: 'ENERGY DRINK',
+      price: 50,
       currency: 'stamina',
       icon: 'tint',
-      color: '#06b6d4',
+      color: '#10b981',
       description: 'Gives +25 stamina',
       stamina: '+25',
-      rarity: 'common',
+      rarity: 'rare',
     },
     {
       id: 'golden_apple',
       name: 'GOLDEN APPLE',
-      price: 25,
+      price: 100,
       currency: 'stamina',
       icon: 'apple',
-      color: '#fbbf24',
-      description: 'Gives +100 stamina',
-      stamina: '+100',
-      rarity: 'epic',
+      color: '#f59e0b',
+      description: 'Gives +50 stamina',
+      stamina: '+50',
+      rarity: 'legendary',
+    },
+    {
+      id: 'pizza_slice',
+      name: 'PIZZA SLICE',
+      price: 30,
+      currency: 'stamina',
+      icon: 'cutlery',
+      color: '#06b6d4',
+      description: 'Gives +20 stamina',
+      stamina: '+20',
+      rarity: 'common',
     },
   ];
 
@@ -142,7 +131,7 @@ export default function ShopScreen() {
       price: 20,
       currency: 'tickets',
       icon: 'calendar',
-      color: '#10b981',
+      color: '#8b5cf6',
       description: 'Access to daily events',
       duration: '24h',
       rarity: 'common',
@@ -164,7 +153,7 @@ export default function ShopScreen() {
       price: 50,
       currency: 'tickets',
       icon: 'star',
-      color: '#f59e0b',
+      color: '#8b5cf6',
       description: 'One-time special event access',
       duration: '1 use',
       rarity: 'epic',
@@ -175,7 +164,7 @@ export default function ShopScreen() {
       price: 150,
       currency: 'tickets',
       icon: 'trophy',
-      color: '#dc2626',
+      color: '#8b5cf6',
       description: 'Access to tournaments',
       duration: '1 week',
       rarity: 'legendary',
@@ -186,7 +175,7 @@ export default function ShopScreen() {
       price: 200,
       currency: 'tickets',
       icon: 'crown',
-      color: '#fbbf24',
+      color: '#8b5cf6',
       description: 'VIP area access',
       duration: '1 month',
       rarity: 'legendary',
@@ -297,18 +286,37 @@ export default function ShopScreen() {
         `Purchase ${item.name} for $${item.price}?`,
         [
           { text: 'Cancel', style: 'cancel' },
-          { text: 'Buy Now', onPress: () => {
+          { text: 'Test Purchase', onPress: () => {
             // In real app, this would trigger payment
-            Alert.alert('Success!', 'Purchase completed!');
+            // For demo, add tickets based on the item
+            const ticketAmount = parseInt(item.name.split(' ')[0]);
+            addTickets(ticketAmount);
+            Alert.alert('Success!', `Test purchase completed! You received ${ticketAmount} tickets!`);
           }}
         ]
       );
+    } else if (item.currency === 'tickets') {
+      if (state.tickets >= item.price) {
+        spendTickets(item.price);
+        Alert.alert('Purchased!', `You bought ${item.name}!`);
+      } else {
+        Alert.alert('Not enough tickets!', 'You need more tickets to buy this item.');
+      }
+    } else if (item.currency === 'stamina') {
+      if (state.stamina >= item.price) {
+        spendStamina(item.price);
+        addFood(item.id, 1);
+        Alert.alert('Purchased!', `You bought ${item.name}! It's been added to your food inventory.`);
+      } else {
+        Alert.alert('Not enough stamina!', 'You need more stamina to buy this item.');
+      }
     } else {
+      // Legacy coin currency
       if (state.coins >= item.price) {
         spendCoins(item.price);
         Alert.alert('Purchased!', `You bought ${item.name}!`);
       } else {
-        Alert.alert('Not enough gems!', 'You need more gems to buy this item.');
+        Alert.alert('Not enough coins!', 'You need more coins to buy this item.');
       }
     }
   };
@@ -326,6 +334,44 @@ export default function ShopScreen() {
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
+        {/* Premium Shop Banner */}
+        <RNView style={styles.premiumBanner}>
+          <RNView style={styles.bannerGradient}>
+            <RNView style={styles.bannerContent}>
+              <RNView style={styles.bannerLeft}>
+                <RNView style={styles.bannerIconContainer}>
+                  <Image 
+                    source={require('@/assets/images/milkshakes.png')} 
+                    style={styles.bannerImage}
+                    resizeMode="contain"
+                  />
+                </RNView>
+                <RNView style={styles.bannerText}>
+                  <Text style={styles.bannerTitle}>PREMIUM OFFER</Text>
+                  <Text style={styles.bannerSubtitle}>Cosmic Milkshakes</Text>
+                  <RNView style={styles.bannerReward}>
+                    <Text style={styles.bannerRewardText}>200</Text>
+                    <FontAwesome name="bolt" size={12} color="#f59e0b" />
+                  </RNView>
+                </RNView>
+              </RNView>
+              <RNView style={styles.bannerRight}>
+                <RNView style={styles.priceContainer}>
+                  <RNView style={styles.currentPriceRow}>
+                    <Text style={styles.bannerPrice}>50</Text>
+                    <FontAwesome name="ticket" size={12} color="#8b5cf6" />
+                  </RNView>
+                  <RNView style={styles.originalPriceRow}>
+                    <Text style={styles.bannerOriginalPrice}>75</Text>
+                    <FontAwesome name="ticket" size={10} color="#8b5cf6" />
+                  </RNView>
+                </RNView>
+                <Text style={styles.bannerTimer}>2h 15m left</Text>
+              </RNView>
+            </RNView>
+          </RNView>
+        </RNView>
+
         {/* Category Tabs */}
         <RNView style={styles.categoryTabs}>
           {categories.map((category) => (
@@ -352,8 +398,6 @@ export default function ShopScreen() {
           ))}
         </RNView>
 
-        {/* Shop Title */}
-        <Text style={styles.shopTitle}>PXOPETS SHOP</Text>
 
         {/* Items Grid */}
         <RNView style={styles.itemsGrid}>
@@ -370,11 +414,6 @@ export default function ShopScreen() {
               {item.popular && (
                 <RNView style={styles.popularBadge}>
                   <Text style={styles.popularText}>POPULAR</Text>
-                </RNView>
-              )}
-              {item.bonus && (
-                <RNView style={styles.bonusBadge}>
-                  <Text style={styles.bonusText}>{item.bonus}</Text>
                 </RNView>
               )}
               <RNView style={styles.activityHeader}>
@@ -406,6 +445,11 @@ export default function ShopScreen() {
                 {item.duration && (
                   <Text style={styles.duration}>{item.duration}</Text>
                 )}
+                {item.bonus && (
+                  <RNView style={styles.bonusBadgeBottomRight}>
+                    <Text style={styles.bonusText}>{item.bonus}</Text>
+                  </RNView>
+                )}
               </RNView>
             </Pressable>
           ))}
@@ -419,6 +463,124 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f0f9ff',
+  },
+  premiumBanner: {
+    width: '80%',
+    alignSelf: 'center',
+    marginBottom: 20,
+    borderRadius: 12,
+    overflow: 'visible',
+    borderWidth: 2,
+    borderColor: '#8b5cf6',
+    position: 'relative',
+    marginTop: 8,
+    zIndex: 5,
+  },
+  bannerGradient: {
+    backgroundColor: '#ffffff',
+    padding: 2,
+    position: 'relative',
+    zIndex: 10,
+    borderRadius: 10,
+  },
+  bannerContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    backgroundColor: '#1e1b4b',
+    borderRadius: 10,
+  },
+  bannerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  bannerIconContainer: {
+    width: 60,
+    height: 60,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 16,
+  },
+  bannerImage: {
+    width: 50,
+    height: 50,
+  },
+  bannerText: {
+    flex: 1,
+  },
+  bannerTitle: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 8,
+    fontWeight: 'bold',
+    color: '#8b5cf6',
+    marginBottom: 4,
+    letterSpacing: 1,
+  },
+  bannerSubtitle: {
+    fontFamily: 'monospace',
+    fontSize: 14,
+    color: '#ffffff',
+    fontWeight: '500',
+    marginBottom: 2,
+  },
+  bannerReward: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 2,
+  },
+  bannerRewardText: {
+    fontFamily: 'monospace',
+    fontSize: 12,
+    color: '#f59e0b',
+    fontWeight: '500',
+    marginRight: 4,
+  },
+  bannerRight: {
+    alignItems: 'flex-end',
+  },
+  priceContainer: {
+    flexDirection: 'column',
+    alignItems: 'flex-end',
+    marginBottom: 4,
+  },
+  currentPriceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  originalPriceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  bannerPrice: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#10b981',
+    marginRight: 4,
+  },
+  bannerOriginalPrice: {
+    fontFamily: 'monospace',
+    fontSize: 12,
+    color: '#94a3b8',
+    textDecorationLine: 'line-through',
+  },
+  bannerTimer: {
+    fontFamily: 'monospace',
+    fontSize: 9,
+    color: '#ffffff',
+    fontWeight: '500',
+    backgroundColor: 'rgba(139, 92, 246, 0.3)',
+    shadowColor: '#8b5cf6',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.8,
+    shadowRadius: 4,
+    elevation: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
   },
   scrollContent: {
     alignItems: 'center',
@@ -514,6 +676,16 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     zIndex: 1,
   },
+  bonusBadgeBottomRight: {
+    position: 'absolute',
+    bottom: 4,
+    right: 4,
+    backgroundColor: '#8b5cf6',
+    paddingHorizontal: 4,
+    paddingVertical: 2,
+    borderRadius: 4,
+    zIndex: 1,
+  },
   bonusText: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 8,
@@ -548,12 +720,13 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   itemDescription: {
-    fontFamily: 'Silkscreen_400Regular',
+    fontFamily: 'monospace',
     fontSize: 9,
     color: '#64748b',
     lineHeight: 12,
     textAlign: 'center',
     marginBottom: 8,
+    fontWeight: '400',
   },
   activityFooter: {
     flexDirection: 'row',

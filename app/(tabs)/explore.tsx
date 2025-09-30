@@ -39,14 +39,6 @@ export default function ExploreScreen() {
       image: staticTvImage
     },
     {
-      id: "artisan",
-      name: "Shakespeare's Quarter",
-      icon: "paint-brush",
-      color: "#ec4899",
-      description: "An artistic district where creativity flows through cobblestone streets.",
-      image: lilPotImage
-    },
-    {
       id: "crystal-cove",
       name: "Loomer's Wharf",
       icon: "anchor",
@@ -63,20 +55,20 @@ export default function ExploreScreen() {
       image: lilTrailerImage
     },
     {
+      id: "artisan",
+      name: "Shakespeare's Quarter",
+      icon: "paint-brush",
+      color: "#ec4899",
+      description: "An artistic district where creativity flows through cobblestone streets.",
+      image: lilPotImage
+    },
+    {
       id: "bag-of-stars-forest",
       name: "Bag of Stars Forest",
       icon: "leaf",
       color: "#10b981",
       description: "An enchanted woodland where celestial bodies bloom as foliage.",
       image: lilTotemGuyImage
-    },
-    {
-      id: "vintage-hollow",
-      name: "Barrelhaven",
-      icon: "glass",
-      color: "#8b5cf6",
-      description: "A medieval vineyard where wine flows as freely as the rolling hills.",
-      image: lilWineCasketImage
     },
     {
       id: "lullaby-downs",
@@ -111,14 +103,6 @@ export default function ExploreScreen() {
       image: lilBayouImage
     },
     {
-      id: "midwinter-crossing",
-      name: "Midwinter Crossing",
-      icon: "snowflake-o",
-      color: "#e5e7eb",
-      description: "A frozen crossroads where winter's breath creates crystalline bridges between worlds.",
-      image: lilGnomeImage
-    },
-    {
       id: "lumen-bazaar",
       name: "Lumen Bazaar",
       icon: "lightbulb-o",
@@ -128,11 +112,27 @@ export default function ExploreScreen() {
     },
     {
       id: "enchanted-island",
-      name: "Enchanted Island",
+      name: "Twilight Atoll",
       icon: "music",
       color: "#f97316",
       description: "A tropical paradise where ancient tiki spirits dance with volcanic fire.",
       image: volcanoImage
+    },
+    {
+      id: "vintage-hollow",
+      name: "Barrelhaven",
+      icon: "glass",
+      color: "#8b5cf6",
+      description: "A medieval vineyard where wine flows as freely as the rolling hills.",
+      image: lilWineCasketImage
+    },
+    {
+      id: "midwinter-crossing",
+      name: "Midwinter Crossing",
+      icon: "snowflake-o",
+      color: "#e5e7eb",
+      description: "A frozen crossroads where winter's breath creates crystalline bridges between worlds.",
+      image: lilGnomeImage
     }
   ];
 
@@ -140,7 +140,7 @@ export default function ExploreScreen() {
   const handleWorldPress = (world: any) => {
     console.log('World pressed:', world.id, world.name);
     if (world.id === 'enchanted-island') {
-      console.log('Navigating to Enchanted Island from list...');
+      console.log('Navigating to Twilight Atoll from list...');
       router.navigate('/(tabs)/enchanted-island');
     } else if (world.id === 'artisan') {
       console.log('Navigating to Artisan\'s Quarter from list...');
@@ -224,11 +224,6 @@ export default function ExploreScreen() {
             style={styles.mapOfPxopiaImage}
             resizeMode="contain"
           />
-          <Text style={styles.pxopiaBlurb}>
-            Welcome to Pxopia, a magical realm where pixelated adventures await! 
-            Explore diverse worlds, meet quirky characters, and discover hidden treasures 
-            in this vibrant digital universe.
-          </Text>
           {worlds.map((world, index) => (
             <Pressable 
               key={index} 
@@ -259,8 +254,10 @@ const styles = StyleSheet.create({
   secondNavContainer: {
     flexDirection: 'row',
     backgroundColor: 'rgba(139, 92, 246, 0.1)',
-    borderBottomWidth: 2,
-    borderBottomColor: '#8b5cf6',
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(139, 92, 246, 0.3)',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(139, 92, 246, 0.3)',
     paddingVertical: 8,
     paddingHorizontal: 4,
     justifyContent: 'space-around',
@@ -309,20 +306,26 @@ const styles = StyleSheet.create({
   mapOfPxopiaImage: {
     width: '100%',
     height: 134, // 40% bigger than 96px (96 * 1.4 = 134.4, rounded to 134)
-    marginTop: -16, // Negative margin to counteract BorderedBox padding
-    marginBottom: 0,
+    marginTop: -24, // Increased negative margin to remove more top padding
+    marginBottom: -16, // Increased negative margin to remove more space below
     alignSelf: 'center',
   },
   pxopiaBlurb: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 10,
-    color: '#64748b',
+    fontSize: 9, // Reduced from 10
+    color: '#8b5cf6', // Purple color to match UI
     textAlign: 'center',
-    fontStyle: 'italic',
-    lineHeight: 14,
-    marginTop: -16,
-    marginBottom: 16,
-    paddingHorizontal: 8,
+    fontWeight: 'bold',
+    lineHeight: 12, // Reduced from 14
+    marginTop: 4,
+    marginBottom: 16, // Reduced from 20
+    paddingHorizontal: 12, // Reduced from 16
+    paddingVertical: 6, // Reduced from 8
+    backgroundColor: 'rgba(139, 92, 246, 0.1)', // Light purple background
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.3)', // Purple border
+    borderRadius: 6, // Reduced from 8
+    letterSpacing: 0.4, // Reduced from 0.5
   },
   worldItem: {
     flexDirection: 'row',
@@ -360,10 +363,12 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   worldDescription: {
-    fontFamily: 'Silkscreen_400Regular',
-    fontSize: 11,
+    fontFamily: 'monospace',
+    fontSize: 11, // Reduced from 12
     color: '#0f172a',
-    lineHeight: 16,
+    lineHeight: 16, // Reduced from 18
+    fontWeight: '400',
+    letterSpacing: 0.3, // Added letter spacing
   },
 });
 

@@ -6,256 +6,239 @@ import { Text } from '@/components/Themed';
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
 import { SPACING, FONT_SIZES, BORDER_RADIUS, ICON_SIZES, SHADOWS } from '@/constants/Styles';
-import { useGame } from '@/store/GameStore';
+import { useSimpleGame } from '@/store/SimpleGameStore';
 
 export default function AppHeader() {
   const colorScheme = useColorScheme() ?? 'light';
-  const bg = Colors[colorScheme].tabBarBackground;
-  const border = Colors[colorScheme].tabBarBorder;
-  const { state } = useGame();
+  const { state } = useSimpleGame();
   
-  // Dynamic temperature and weather with random weather symbols and colors
+  // Weather that changes 2-3 times per day based on time periods
   const getCurrentWeather = () => {
     const hour = new Date().getHours();
+    const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
     
-    // Temperature varies throughout the day: cooler at night, warmer during day
+    // Use day of year as seed for consistent weather per day
+    const weatherSeed = (dayOfYear * 7) % 100; // Changes every ~14 days
+    
+    // Temperature varies realistically throughout the day
     let temp;
     if (hour >= 6 && hour < 12) {
-      temp = 72 + Math.floor(Math.random() * 6); // Morning: 72-77°F
+      temp = 72 + (weatherSeed % 6); // Morning: 72-77°F
     } else if (hour >= 12 && hour < 18) {
-      temp = 78 + Math.floor(Math.random() * 8); // Afternoon: 78-85°F
+      temp = 78 + (weatherSeed % 8); // Afternoon: 78-85°F
     } else if (hour >= 18 && hour < 22) {
-      temp = 74 + Math.floor(Math.random() * 6); // Evening: 74-79°F
+      temp = 74 + (weatherSeed % 6); // Evening: 74-79°F
     } else {
-      temp = 68 + Math.floor(Math.random() * 6); // Night: 68-73°F
+      temp = 68 + (weatherSeed % 6); // Night: 68-73°F
     }
     
-    // Random weather symbols with corresponding colors
-    const weatherOptions = [
-      { icon: 'sun-o', color: '#f59e0b' }, // Yellow for sun
-      { icon: 'cloud', color: '#6b7280' }, // Gray for cloud
-      { icon: 'cloud-sun-o', color: '#fbbf24' }, // Light yellow for partly cloudy
-      { icon: 'tint', color: '#3b82f6' }, // Blue for rain
-      { icon: 'flash', color: '#ef4444' }, // Red for lightning
-      { icon: 'snowflake-o', color: '#3b82f6' }, // Blue for snow
-      { icon: 'moon-o', color: '#8b5cf6' }, // Purple for moon
-      { icon: 'star', color: '#fbbf24' }, // Gold for star
-      { icon: 'heart', color: '#ec4899' }, // Pink for heart
-      { icon: 'leaf', color: '#10b981' } // Green for leaf
-    ];
+    // Weather changes 2-3 times per day based on time periods
+    let weatherIcon, weatherColor;
+    if (hour >= 6 && hour < 12) {
+      // Morning: usually sunny or partly cloudy
+      if (weatherSeed < 30) {
+        weatherIcon = 'cloud-sun-o';
+        weatherColor = '#fbbf24';
+      } else {
+        weatherIcon = 'sun-o';
+        weatherColor = '#f59e0b';
+      }
+    } else if (hour >= 12 && hour < 18) {
+      // Afternoon: sunny or occasional clouds
+      if (weatherSeed < 20) {
+        weatherIcon = 'cloud';
+        weatherColor = '#6b7280';
+      } else {
+        weatherIcon = 'sun-o';
+        weatherColor = '#f59e0b';
+      }
+    } else if (hour >= 18 && hour < 22) {
+      // Evening: sunset colors
+      weatherIcon = 'sun-o';
+      weatherColor = '#f97316';
+    } else {
+      // Night: moon or stars
+      if (weatherSeed < 50) {
+        weatherIcon = 'moon-o';
+        weatherColor = '#8b5cf6';
+      } else {
+        weatherIcon = 'star';
+        weatherColor = '#fbbf24';
+      }
+    }
     
-    const weather = weatherOptions[Math.floor(Math.random() * weatherOptions.length)];
-    
-    return { temp, weatherIcon: weather.icon, weatherColor: weather.color };
+    return { temp, weatherIcon, weatherColor };
   };
   
   const { temp: temperature, weatherIcon, weatherColor } = getCurrentWeather();
 
-          const pathname = usePathname();
-          const isHome = pathname === '/(tabs)/home' || pathname === '/home';
-          const iconColor = isHome ? '#8b5cf6' : '#8b5cf6'; // Always purple with full opacity
+  const pathname = usePathname();
+  const isHome = pathname === '/(tabs)/home' || pathname === '/home';
 
   const handleRefresh = () => {
     router.replace(router.pathname);
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: bg, borderBottomColor: border }]}> 
-      <View style={styles.left}>
+    <View style={[styles.container, { backgroundColor: colorScheme === 'dark' ? '#1a1a1a' : '#ffffff' }]}> 
+      {/* Top Navigation Bar */}
+      <View style={styles.topBar}>
         <Pressable 
-          style={[styles.iconButton, { borderColor: border }]}
+          style={styles.iconButton}
           onPress={() => router.push('/more')}
         >
-          <FontAwesome name="bars" size={24} color={iconColor} />
+          <FontAwesome name="bars" size={20} color={colorScheme === 'dark' ? '#ffffff' : '#000000'} />
         </Pressable>
-      </View>
-      <Image 
-        source={require('@/assets/images/pxopets-logo-2.png')} 
-        style={styles.logo}
-        resizeMode="contain"
-      />
-      <View style={styles.right}>
+        
+        <View style={styles.logoContainer}>
+          <Image 
+            source={require('@/assets/images/pxopets-logo-2.png')} 
+            style={styles.logo}
+            resizeMode="contain"
+          />
+        </View>
+        
         <Pressable 
-          style={[styles.iconButton, { borderColor: border }]}
+          style={styles.iconButton}
           onPress={handleRefresh}
         >
-          <FontAwesome name="refresh" size={24} color={iconColor} />
+          <FontAwesome name="refresh" size={20} color={colorScheme === 'dark' ? '#ffffff' : '#000000'} />
         </Pressable>
       </View>
       
-      {/* Subtle line with drop shadow */}
-      <View style={[styles.divider, { backgroundColor: border }]} />
+      {/* Stylized divider under logo and buttons */}
+      <View style={[styles.divider, { backgroundColor: colorScheme === 'dark' ? '#333333' : '#e5e5e5' }]} />
       
-              {/* User greeting and coins */}
-              <View style={styles.userBar}>
-                <View style={styles.leftSection}>
-                  <Text style={styles.greeting}>Hello, PxopetMaster!</Text>
-                  <Pressable 
-                    style={styles.mailContainer}
-                    onPress={() => router.push('/(tabs)/mail')}
-                  >
-                    <FontAwesome name="envelope" size={16} color="#06b6d4" />
-                    {state.coins > 0 && ( // Using coins as a placeholder for mail count - you can change this logic
-                      <View style={styles.mailDot} />
-                    )}
-                  </Pressable>
-                  <View style={styles.temperatureContainer}>
-                    <FontAwesome name={weatherIcon as any} size={14} color={weatherColor} />
-                    <Text style={styles.temperatureText}>{temperature}°F</Text>
-                  </View>
-                </View>
-                <View style={styles.currencyContainer}>
-                  <View style={styles.coinsContainer}>
-                    <FontAwesome name="bolt" size={16} color="#f59e0b" />
-                    <Text style={styles.coinsText}>{state.coins}</Text>
-                  </View>
-                  <View style={styles.ticketsContainer}>
-                    <FontAwesome name="ticket" size={16} color="#8b5cf6" />
-                    <Text style={styles.ticketsText}>0</Text>
-                  </View>
-                </View>
-              </View>
+      {/* User Info and Currency Bar */}
+      <View style={styles.userBar}>
+        <View style={styles.leftSection}>
+          <Text style={[styles.greeting, { color: colorScheme === 'dark' ? '#ffffff' : '#000000' }]}>
+            Hello, PxopetMaster
+          </Text>
+          <View style={styles.weatherContainer}>
+            <FontAwesome name={weatherIcon as any} size={14} color={weatherColor} />
+            <Text style={[styles.temperatureText, { color: colorScheme === 'dark' ? '#ffffff' : '#000000' }]}>
+              {temperature}°
+            </Text>
+          </View>
+        </View>
+        
+        <View style={styles.currencyContainer}>
+          <View style={styles.currencyItem}>
+            <FontAwesome name="bolt" size={16} color="#f59e0b" />
+            <Text style={[styles.currencyText, { color: colorScheme === 'dark' ? '#ffffff' : '#000000' }]}>
+              {state.stamina}
+            </Text>
+          </View>
+          <View style={styles.currencyItem}>
+            <FontAwesome name="ticket" size={16} color="#8b5cf6" />
+            <Text style={[styles.currencyText, { color: colorScheme === 'dark' ? '#ffffff' : '#000000' }]}>
+              {state.tickets}
+            </Text>
+          </View>
+          <View style={styles.currencyItem}>
+            <FontAwesome name="diamond" size={16} color="#0ea5e9" />
+            <Text style={[styles.currencyText, { color: '#0ea5e9' }]}>
+              {state.coins}
+            </Text>
+          </View>
+        </View>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    height: 140, // Increased to accommodate new elements
-    borderBottomWidth: 2,
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    flexDirection: 'column',
+    paddingTop: 0, // No top padding
+    paddingBottom: 0, // No bottom padding
+    borderBottomWidth: 1,
+    borderBottomColor: '#e5e5e5',
   },
-  logo: {
-    width: 220, // Made smaller
-    height: 110, // Made smaller
-    marginTop: -10, // Moved down
-  },
-  left: { 
-    position: 'absolute', 
-    left: 12,
-    top: 18,
+  topBar: {
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-  },
-  right: { 
-    position: 'absolute', 
-    right: 12,
-    top: 18,
-    alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 0, // No vertical padding
+    paddingTop: 0, // No top padding
+    marginTop: -10, // Reduced negative margin
   },
   iconButton: {
     width: 40,
     height: 40,
-    borderRadius: BORDER_RADIUS.xl, // Slightly curved corners
-    borderWidth: 1,
+    borderRadius: 20,
     backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: '#e5e5e5',
     alignItems: 'center',
     justifyContent: 'center',
-    boxShadow: SHADOWS.halftone.boxShadow,
-    elevation: 4, // Android shadow
   },
-  divider: {
-    position: 'absolute',
-    bottom: 45,
-    left: 0,
-    right: 0,
-    height: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+  logoContainer: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  logo: {
+    width: 280,
+    height: 100,
   },
   userBar: {
-    position: 'absolute',
-    bottom: 8,
-    left: 0,
-    right: 0,
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    minHeight: 24,
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 8, // Increased for more breathing room
+    paddingTop: 12, // Extra top padding
+    paddingBottom: 12, // Extra bottom padding
   },
   leftSection: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: 20, // Increased from 16 for more spacing
     flex: 1,
   },
   greeting: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: FONT_SIZES.sm,
-    color: '#0f172a', // Premium deep slate
+    fontSize: 14,
+    fontWeight: '500',
   },
-  temperatureContainer: {
+  weatherContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: 'rgba(139, 92, 246, 0.1)',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-    borderWidth: 1,
-    borderColor: 'rgba(139, 92, 246, 0.2)',
+    backgroundColor: 'rgba(0, 0, 0, 0.05)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
   },
   temperatureText: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 10,
-    color: '#8b5cf6',
-    fontWeight: 'bold',
-  },
-  mailContainer: {
-    position: 'relative',
-    padding: 4,
-    borderRadius: 4,
-  },
-  mailDot: {
-    position: 'absolute',
-    top: 3,
-    right: 2,
-    width: 5,
-    height: 5,
-    borderRadius: 2.5,
-    backgroundColor: '#8b5cf6',
-    shadowColor: '#8b5cf6',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.8,
-    shadowRadius: 2.5,
-    elevation: 4,
-    zIndex: 1,
+    fontSize: 12,
+    fontWeight: '500',
   },
   currencyContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
-    flexShrink: 0,
+    gap: 20, // Increased from 16 for more spacing
   },
-  coinsContainer: {
+  currencyItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: 6,
   },
-  coinsText: {
+  currencyText: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: FONT_SIZES.sm,
-    color: '#f59e0b', // Amber to match lightning bolt
-    fontWeight: 'bold',
+    fontSize: 14,
+    fontWeight: '600',
   },
-  ticketsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  ticketsText: {
-    fontFamily: 'Silkscreen_400Regular',
-    fontSize: FONT_SIZES.sm,
-    color: '#8b5cf6', // Purple to match ticket icon
-    fontWeight: 'bold',
+  divider: {
+    height: 1,
+    marginHorizontal: 0,
+    marginVertical: 4, // Reduced from 8
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 1,
+    elevation: 1,
   },
 });
-
-

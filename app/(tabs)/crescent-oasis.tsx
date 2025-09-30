@@ -7,11 +7,13 @@ import { router } from 'expo-router';
 // Import activity icons
 const cosmicBurgerImage = require('@/assets/images/cosmicburger.png');
 const lilAtomicDinerImage = require('@/assets/images/lil-atomic-diner.png');
+const lilChipImage = require('@/assets/images/lil-chip.png');
 
 // Image mapping for activities
 const activityImageMap: { [key: string]: any } = {
   'cosmicburger.png': cosmicBurgerImage,
   'lil-atomic-diner.png': lilAtomicDinerImage,
+  'lil-chip.png': lilChipImage,
 };
 
 // Import the banner image
@@ -47,11 +49,11 @@ export default function CrescentOasisScreen() {
       description: 'Try your luck at the glowing slot machines and cosmic card tables.',
       lightning: 25,
       difficulty: 'Medium',
-      icon: 'cosmicburger.png'
+      icon: 'lil-chip.png'
     },
     {
       id: 'hovercar-speedway',
-      name: 'Hovercar Speedway',
+      name: 'Lucky Strike Speedway',
       description: 'Race hover cars across the pink sand dunes at breakneck speeds.',
       lightning: 30,
       difficulty: 'Hard',
@@ -140,6 +142,10 @@ export default function CrescentOasisScreen() {
             onPress={() => {
               if (activity.id === 'atomic-diner') {
                 router.navigate('/(tabs)/atomic-diner');
+              } else if (activity.id === 'neon-casino') {
+                router.navigate('/(tabs)/neon-casino');
+              } else if (activity.id === 'hovercar-speedway') {
+                router.navigate('/(tabs)/lucky-strike-speedway');
               }
             }}
           >
@@ -297,8 +303,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   activityIcon: {
-    width: 31,
-    height: 31,
+    width: 40,
+    height: 40,
     marginRight: 12,
     alignSelf: 'center',
   },

@@ -7,8 +7,8 @@ import { router, Link } from 'expo-router';
 // Import the banner image
 const staticTvImage = require('@/assets/images/static-tv.png');
 const pxoburbsSkylineImage = require('@/assets/images/pxoburbs-skyline.png');
-const chipsImage = require('@/assets/images/chips.png');
-const sludgeImage = require('@/assets/images/sludge.png');
+const cosmicBurgerImage = require('@/assets/images/cosmicburger.png');
+const lilSodaImage = require('@/assets/images/lil-soda.png');
 const lilArcadeImage = require('@/assets/images/lil-arcade.png');
 const lilMovieReelImage = require('@/assets/images/lil-movie-reel.png');
 const rolerImage = require('@/assets/images/roler.png');
@@ -164,7 +164,7 @@ export default function PxoburbsScreen() {
                   <RNView style={styles.activityHeader}>
                     <RNView style={styles.activityInfo}>
                       {activity.id === 'corner-store' ? (
-                        <Image source={sludgeImage} style={styles.activityImageIcon} />
+                        <Image source={cosmicBurgerImage} style={styles.activityImageIcon} />
                       ) : (
                         <FontAwesome name={activity.icon as any} size={32} color="#8b5cf6" style={styles.activityIcon} />
                       )}
@@ -386,7 +386,7 @@ export default function PxoburbsScreen() {
                 <RNView style={styles.activityHeader}>
                   <RNView style={styles.activityInfo}>
                 {activity.id === 'corner-store' ? (
-                  <Image source={sludgeImage} style={styles.activityImageIcon} />
+                  <Image source={cosmicBurgerImage} style={styles.activityImageIcon} />
                 ) : activity.id === 'arcade' ? (
                   <Image source={lilArcadeImage} style={styles.arcadeImageIcon} />
                 ) : activity.id === 'makeout-hill' ? (

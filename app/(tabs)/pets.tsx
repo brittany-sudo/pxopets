@@ -85,14 +85,14 @@ export default function PetsScreen() {
 
   // Food inventory system (QuickStop store items)
   const foodInventory = {
-    chips: { id: 'chips', name: 'Chips', stamina: 12, quantity: 2, image: require('@/assets/images/chips.png') },
+    cosmicburger: { id: 'cosmicburger', name: 'Cosmic Burger', stamina: 12, quantity: 2, image: require('@/assets/images/cosmicburger.png') },
     cupnoddle: { id: 'cupnoddle', name: 'Cup Noodles', stamina: 18, quantity: 1, image: require('@/assets/images/cupnoddle.png') },
     chocolate: { id: 'chocolate', name: 'Chocolate', stamina: 15, quantity: 3, image: require('@/assets/images/chocolate.png') },
     pouchdrink: { id: 'pouchdrink', name: 'Energy Drink', stamina: 22, quantity: 1, image: require('@/assets/images/pouchdrink.png') },
-    coffee: { id: 'coffee', name: 'Coffee', stamina: 8, quantity: 4, image: require('@/assets/images/chips.png') }, // placeholder
-    donut: { id: 'donut', name: 'Donut', stamina: 20, quantity: 2, image: require('@/assets/images/chips.png') }, // placeholder
-    sandwich: { id: 'sandwich', name: 'Sandwich', stamina: 25, quantity: 1, image: require('@/assets/images/chips.png') }, // placeholder
-    soda: { id: 'soda', name: 'Soda', stamina: 10, quantity: 3, image: require('@/assets/images/chips.png') } // placeholder
+    coffee: { id: 'coffee', name: 'Coffee', stamina: 8, quantity: 4, image: require('@/assets/images/cosmicburger.png') }, // placeholder
+    donut: { id: 'donut', name: 'Donut', stamina: 20, quantity: 2, image: require('@/assets/images/cosmicburger.png') }, // placeholder
+    sandwich: { id: 'sandwich', name: 'Sandwich', stamina: 25, quantity: 1, image: require('@/assets/images/cosmicburger.png') }, // placeholder
+    soda: { id: 'soda', name: 'Soda', stamina: 10, quantity: 3, image: require('@/assets/images/cosmicburger.png') } // placeholder
   };
 
   const getBackgroundImage = (bgId: string) => {
@@ -843,11 +843,11 @@ const styles = StyleSheet.create({
       elevation: 6,
     },
     actionLabel: {
-      fontFamily: 'Silkscreen_400Regular',
+      fontFamily: 'monospace',
       fontSize: 12,
       color: '#14b8a6',
       textAlign: 'center',
-      fontWeight: 'bold',
+      fontWeight: '500',
     },
   petImage: {
     width: 110,

@@ -22,7 +22,7 @@ import BorderedBox from '@/components/BorderedBox';
  */
 
 // Import the mall image
-const pxoburbsMallImage = require('@/assets/images/pxoburbs-mall-main.png');
+const pxoburbsMallImage = require('@/assets/images/pxoburbs-mall.png');
 const pxoburbsMallFountainImage = require('@/assets/images/pxoburbs-mall-fountain.png');
 const lilComputer90Image = require('@/assets/images/lil-computer90.png');
 const janitorJerryImage = require('@/assets/images/janitor-jerry-pxomall.png');
@@ -278,18 +278,16 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   imageContainer: {
-    width: '90%',
-    height: 400,
+    width: '80%',
+    height: 300,
     borderRadius: 12,
     overflow: 'hidden',
     marginBottom: 20,
-    borderWidth: 2,
-    borderColor: '#0ea5e9',
   },
   mallImage: {
     width: '100%',
     height: '100%',
-    resizeMode: 'cover',
+    resizeMode: 'contain',
   },
   fountainContainer: {
     width: '100%',

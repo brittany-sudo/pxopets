@@ -8,6 +8,7 @@ import AppHeader from '@/components/AppHeader';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import { GameProvider } from '@/store/GameStore';
+import { SimpleGameProvider } from '@/store/SimpleGameStore';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/components/useColorScheme';
@@ -59,24 +60,26 @@ function RootLayoutNav() {
     <ColorSchemeProvider>
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
         <GameProvider>
-          <Stack>
-            <Stack.Screen name="(tabs)" options={{ header: () => <AppHeader /> }} />
-            <Stack.Screen name="adoption" options={{ headerShown: false }} />
-            <Stack.Screen name="enchanted-island" options={{ headerShown: false }} />
-            <Stack.Screen name="artisan-quarter" options={{ headerShown: false }} />
-            <Stack.Screen name="crescent-oasis" options={{ headerShown: false }} />
-            <Stack.Screen name="foggy-harbor" options={{ headerShown: false }} />
-            <Stack.Screen name="barrelhaven" options={{ headerShown: false }} />
-            <Stack.Screen name="bag-of-stars-forest" options={{ headerShown: false }} />
-            <Stack.Screen name="pxoburbs" options={{ headerShown: false }} />
-            <Stack.Screen name="saltwick-pier" options={{ headerShown: false }} />
-            <Stack.Screen name="scarecrow-vale" options={{ headerShown: false }} />
-            <Stack.Screen name="pxopet-supply" options={{ headerShown: false }} />
-            <Stack.Screen name="community-pool" options={{ headerShown: false }} />
-            <Stack.Screen name="more" options={{ header: () => <AppHeader /> }} />
-            <Stack.Screen name="quickstop" options={{ headerShown: false }} />
-            <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-          </Stack>
+          <SimpleGameProvider>
+            <Stack>
+              <Stack.Screen name="(tabs)" options={{ header: () => <AppHeader /> }} />
+              <Stack.Screen name="adoption" options={{ headerShown: false }} />
+              <Stack.Screen name="enchanted-island" options={{ headerShown: false }} />
+              <Stack.Screen name="artisan-quarter" options={{ headerShown: false }} />
+              <Stack.Screen name="crescent-oasis" options={{ headerShown: false }} />
+              <Stack.Screen name="foggy-harbor" options={{ headerShown: false }} />
+              <Stack.Screen name="barrelhaven" options={{ headerShown: false }} />
+              <Stack.Screen name="bag-of-stars-forest" options={{ headerShown: false }} />
+              <Stack.Screen name="pxoburbs" options={{ headerShown: false }} />
+              <Stack.Screen name="saltwick-pier" options={{ headerShown: false }} />
+              <Stack.Screen name="scarecrow-vale" options={{ headerShown: false }} />
+              <Stack.Screen name="pxopet-supply" options={{ headerShown: false }} />
+              <Stack.Screen name="community-pool" options={{ headerShown: false }} />
+              <Stack.Screen name="more" options={{ header: () => <AppHeader /> }} />
+              <Stack.Screen name="quickstop" options={{ headerShown: false }} />
+              <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+            </Stack>
+          </SimpleGameProvider>
         </GameProvider>
       </ThemeProvider>
     </ColorSchemeProvider>

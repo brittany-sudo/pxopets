@@ -5,33 +5,38 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { router } from 'expo-router';
 import BorderedBox from '@/components/BorderedBox';
 
-// Import the Marty image
-const martyImage = require('@/assets/images/marty-quickstop.png');
-const chipsImage = require('@/assets/images/chips.png');
+// Import the Marty image and main image
+const martyImage = require('@/assets/images/quickstop-marty.png');
+const quickstopMainImage = require('@/assets/images/quickstop-main.png');
+const cosmicBurgerImage = require('@/assets/images/cosmicburger.png');
 const cupnoddleImage = require('@/assets/images/cupnoddle.png');
 const chocolateImage = require('@/assets/images/chocolate.png');
 const pouchdrinkImage = require('@/assets/images/pouchdrink.png');
-const sludgeImage = require('@/assets/images/sludge.png');
+const lilSodaImage = require('@/assets/images/lil-soda.png');
 const hotchipsImage = require('@/assets/images/hotchips.png');
 const gumballsImage = require('@/assets/images/gumballs.png');
 const chocodonutImage = require('@/assets/images/chocodonut.png');
+const lilTagImage = require('@/assets/images/lil-tag.png');
+const regularHotdogImage = require('@/assets/images/regularhotdog.png');
+const milkshakesImage = require('@/assets/images/milkshakes.png');
+const glowcornImage = require('@/assets/images/glowcorn.png');
 
 export default function ShopScreen() {
   const [shopkeeperSaying, setShopkeeperSaying] = useState("Welcome to QuickStop! Best prices in Pxoburbs!");
   const [countdown, setCountdown] = useState(3600); // 1 hour in seconds
   const glowAnimation = useRef(new Animated.Value(0.2)).current;
   const [playerInventory, setPlayerInventory] = useState([
-    { id: '1', name: 'Golden Star', price: 15, image: 'chips' },
+    { id: '1', name: 'Golden Star', price: 15, image: 'cosmicburger' },
     { id: '2', name: 'Magic Leaf', price: 8, image: 'cupnoddle' },
     { id: '3', name: 'Blue Crystal', price: 25, image: 'chocolate' },
-    { id: '4', name: 'Love Token', price: 12, image: 'chips' },
+    { id: '4', name: 'Love Token', price: 12, image: 'gumballs' },
   ]);
 
   // Limited time items that can only be bought with tickets
   const [limitedItems, setLimitedItems] = useState([
     { id: 'l1', name: 'Space Bubblegum', price: 50, image: 'gumballs', tickets: 3 },
-    { id: 'l2', name: 'Potatoe Chips', price: 75, image: 'pouchdrink', tickets: 5 },
-    { id: 'l3', name: 'Punch Pouch', price: 100, image: 'pouchdrink', tickets: 7 },
+    { id: 'l2', name: 'Cosmic Burger Deluxe', price: 75, image: 'cosmicburger', tickets: 5 },
+    { id: 'l3', name: 'Premium Soda', price: 100, image: 'lil-soda', tickets: 7 },
     { id: 'l4', name: 'Choco-Donut', price: 125, image: 'chocodonut', tickets: 10 },
   ]);
 
@@ -44,7 +49,7 @@ export default function ShopScreen() {
       description: 'Instant win chance!',
       odds: '1 in 3',
       prizes: ['5 tickets', '10 tickets', '25 tickets', '50 tickets'],
-      image: 'chips'
+      image: 'lil-tag'
     },
     { 
       id: 'lot2', 
@@ -53,7 +58,7 @@ export default function ShopScreen() {
       description: 'Better odds, bigger prizes!',
       odds: '1 in 5',
       prizes: ['25 tickets', '50 tickets', '100 tickets', 'Rare Item'],
-      image: 'chocolate'
+      image: 'lil-tag'
     },
     { 
       id: 'lot3', 
@@ -62,7 +67,7 @@ export default function ShopScreen() {
       description: 'Huge prizes, rare chance!',
       odds: '1 in 20',
       prizes: ['100 tickets', '500 tickets', '1000 tickets', 'Legendary Pet'],
-      image: 'gumballs'
+      image: 'lil-tag'
     },
     { 
       id: 'lot4', 
@@ -71,18 +76,20 @@ export default function ShopScreen() {
       description: 'Limited daily lottery!',
       odds: '1 in 4',
       prizes: ['15 tickets', '30 tickets', '60 tickets', 'Special Item'],
-      image: 'hotchips'
+      image: 'lil-tag'
     },
   ]);
 
   // Shop inventory that changes every few hours
   const [shopInventory, setShopInventory] = useState([
-    { id: 's1', name: 'Energy Drink', price: 5, stock: 3, image: 'chips' },
+    { id: 's1', name: 'Cosmic Burger', price: 8, stock: 3, image: 'cosmicburger' },
     { id: 's2', name: 'Hot Chips', price: 18, stock: 1, image: 'hotchips' },
     { id: 's3', name: 'Choco-Protein Bar', price: 12, stock: 5, image: 'chocolate' },
-    { id: 's4', name: 'Sludge', price: 20, stock: 2, image: 'sludge' },
+    { id: 's4', name: 'Lil Soda', price: 20, stock: 2, image: 'lil-soda' },
     { id: 's5', name: 'Cupa Noodles', price: 15, stock: 4, image: 'cupnoddle' },
-    { id: 's6', name: 'Energy Drink', price: 35, stock: 1, image: 'chocolate' },
+    { id: 's6', name: 'Gas Station Dog', price: 25, stock: 2, image: 'regularhotdog' },
+    { id: 's7', name: 'Cosmic Milkshake', price: 30, stock: 1, image: 'milkshakes' },
+    { id: 's8', name: 'Glowcorn', price: 14, stock: 3, image: 'glowcorn' },
   ]);
 
   // Countdown timer effect
@@ -121,20 +128,20 @@ export default function ShopScreen() {
   }, [glowAnimation]);
 
   // Time-based shopkeeper sayings
-  useEffect(() => {
-    const getTimeBasedSaying = () => {
-      const hour = new Date().getHours();
-      if (hour >= 6 && hour < 12) {
-        return "Good morning! Fresh stock just arrived!";
-      } else if (hour >= 12 && hour < 18) {
-        return "Afternoon! Best deals are right here!";
-      } else if (hour >= 18 && hour < 22) {
-        return "Evening! Last chance for today's specials!";
-      } else {
-        return "Late night shopping? I'm here for you!";
-      }
-    };
+  const getTimeBasedSaying = () => {
+    const hour = new Date().getHours();
+    if (hour >= 6 && hour < 12) {
+      return "Good morning! Fresh stock just arrived!";
+    } else if (hour >= 12 && hour < 18) {
+      return "Afternoon! Best deals are right here!";
+    } else if (hour >= 18 && hour < 22) {
+      return "Evening! Last chance for today's specials!";
+    } else {
+      return "Late night shopping? I'm here for you!";
+    }
+  };
 
+  useEffect(() => {
     setShopkeeperSaying(getTimeBasedSaying());
     
     const interval = setInterval(() => {
@@ -266,20 +273,23 @@ export default function ShopScreen() {
           <Text style={styles.backButtonText}>Back</Text>
         </Pressable>
 
-        {/* Welcome Title */}
-        <Text style={styles.welcomeTitle}>Welcome to QuickStop!</Text>
-
-        {/* Marty Image */}
-        <RNView style={styles.martyContainer}>
-          <Image source={martyImage} style={styles.martyImage} />
-          <Text style={styles.shopkeeperName}>Marty the Shopkeeper</Text>
+        {/* Header Row */}
+        <RNView style={styles.headerRow}>
+          <Text style={styles.locationTitle}>QUICKSTOP</Text>
         </RNView>
 
-        {/* Chat Bubble */}
-        <RNView style={styles.chatBubble}>
-          <Text style={styles.dialogueText}>
-            <Text style={styles.characterName}>Marty the Shopkeeper:</Text> (cheerful) {shopkeeperSaying}
-          </Text>
+        {/* Main Image */}
+        <Image source={quickstopMainImage} style={styles.mainImage} />
+
+        {/* Marty the Shopkeeper */}
+        <RNView style={styles.npcContainer}>
+          <RNView style={styles.speechBubble}>
+            <Text style={styles.characterName}>MARTY:</Text>
+            <Text style={styles.speechText}>{shopkeeperSaying}</Text>
+          </RNView>
+          <Pressable onPress={() => setShopkeeperSaying(getTimeBasedSaying())}>
+            <Image source={martyImage} style={styles.martyImage} />
+          </Pressable>
         </RNView>
 
         {/* Shop Inventory */}
@@ -293,10 +303,13 @@ export default function ShopScreen() {
               <RNView key={item.id} style={styles.chipsItem}>
                 <Image 
                   source={
-                    item.image === 'chips' ? chipsImage :
+                    item.image === 'cosmicburger' ? cosmicBurgerImage :
                     item.image === 'cupnoddle' ? cupnoddleImage :
                     item.image === 'hotchips' ? hotchipsImage :
-                    item.image === 'sludge' ? sludgeImage :
+                    item.image === 'lil-soda' ? lilSodaImage :
+                    item.image === 'regularhotdog' ? regularHotdogImage :
+                    item.image === 'milkshakes' ? milkshakesImage :
+                    item.image === 'glowcorn' ? glowcornImage :
                     chocolateImage
                   } 
                   style={styles.chipsImage} 
@@ -360,6 +373,8 @@ export default function ShopScreen() {
                     source={
                       item.image === 'gumballs' ? gumballsImage :
                       item.image === 'chocodonut' ? chocodonutImage :
+                      item.image === 'cosmicburger' ? cosmicBurgerImage :
+                      item.image === 'lil-soda' ? lilSodaImage :
                       pouchdrinkImage
                     } 
                     style={styles.chipsImage} 
@@ -384,17 +399,17 @@ export default function ShopScreen() {
 
         {/* Lottery Tickets */}
         <BorderedBox>
-          <Text style={styles.sectionTitle}>🎰 LOTTERY TICKETS 🎰</Text>
+          <Text style={styles.sectionTitle}>LOTTERY TICKETS</Text>
           <RNView style={styles.lotteryGrid}>
             {lotteryTickets.map((lottery) => (
               <RNView key={lottery.id} style={styles.lotteryItem}>
                 <Image 
                   source={
-                    lottery.image === 'chips' ? chipsImage :
+                    lottery.image === 'lil-tag' ? lilTagImage :
                     lottery.image === 'chocolate' ? chocolateImage :
                     lottery.image === 'gumballs' ? gumballsImage :
                     lottery.image === 'hotchips' ? hotchipsImage :
-                    chipsImage
+                    lilTagImage
                   } 
                   style={styles.lotteryImage} 
                 />
@@ -443,10 +458,12 @@ const styles = StyleSheet.create({
     paddingBottom: 100,
   },
   backButton: {
+    position: 'absolute',
+    top: 20,
+    left: 20,
+    zIndex: 1000,
     flexDirection: 'row',
     alignItems: 'center',
-    alignSelf: 'flex-start',
-    marginBottom: 20,
     paddingHorizontal: 12,
     paddingVertical: 8,
     backgroundColor: 'rgba(139, 92, 246, 0.1)',
@@ -468,16 +485,66 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: 'center',
   },
-  martyContainer: {
-    width: '100%',
-    height: 172,
+  headerRow: {
+    position: 'absolute',
+    top: 20,
+    left: 0,
+    right: 0,
+    zIndex: 999,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 24,
+    paddingHorizontal: 4,
+    height: 40,
+  },
+  locationTitle: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#0f172a',
+    letterSpacing: 1,
+    textAlign: 'center',
+  },
+  mainImage: {
+    width: '100%',
+    height: 250,
+    resizeMode: 'contain',
+    borderRadius: 12,
+    marginTop: 60,
+    marginBottom: 0,
+  },
+  npcContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'center',
+    marginTop: 8,
+    marginBottom: 20,
+    paddingHorizontal: 20,
+  },
+  speechBubble: {
+    backgroundColor: 'rgba(14, 165, 233, 0.1)',
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(14, 165, 233, 0.3)',
+    maxWidth: 300,
+    marginRight: 8,
+  },
+  characterName: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#0ea5e9',
+    marginBottom: 4,
+    textAlign: 'left',
+  },
+  speechText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#0f172a',
+    textAlign: 'left',
   },
   martyImage: {
-    width: '115%',
-    height: '115%',
+    width: 60,
+    height: 60,
     resizeMode: 'contain',
   },
   sectionTitle: {
@@ -524,21 +591,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-evenly',
-    padding: 8,
+    padding: 4,
     alignItems: 'flex-start',
   },
   chipsItem: {
     width: '31%',
     alignItems: 'center',
-    marginBottom: 12,
-    padding: 4,
-    minHeight: 120,
+    marginBottom: 8,
+    padding: 2,
+    minHeight: 100,
   },
   chipsImage: {
     width: 30,
     height: 30,
     marginBottom: 6,
-    imageRendering: 'pixelated' as any,
   },
   chipsName: {
     fontFamily: 'Silkscreen_400Regular',
@@ -546,16 +612,16 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#0f172a',
     textAlign: 'center',
-    marginBottom: 1,
-    height: 24,
-    lineHeight: 12,
+    marginBottom: 0,
+    height: 14,
+    lineHeight: 10,
   },
   chipsPrice: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 8,
     color: '#06b6d4',
     textAlign: 'center',
-    marginBottom: 2,
+    marginBottom: 0,
   },
   chipsStock: {
     fontFamily: 'Silkscreen_400Regular',
@@ -624,10 +690,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   buyButton: {
-    backgroundColor: '#ff1493',
+    backgroundColor: '#8b5cf6',
   },
   shopBuyButton: {
-    backgroundColor: '#14b8a6',
+    backgroundColor: '#8b5cf6',
   },
   buyButtonText: {
     fontFamily: 'Silkscreen_400Regular',
@@ -670,34 +736,25 @@ const styles = StyleSheet.create({
     color: '#0f172a',
     marginBottom: 4,
   },
-  welcomeTitle: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 20,
-    color: '#0f172a',
-    fontFamily: 'PressStart2P_400Regular',
-  },
   stockHeader: {
     alignItems: 'center',
     marginBottom: 8,
     paddingBottom: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e2e8f0',
   },
   stockTitle: {
-    fontFamily: 'PressStart2P_400Regular',
-    fontSize: 14,
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 16,
     fontWeight: 'bold',
     color: '#0f172a',
     marginBottom: 4,
   },
   countdownText: {
-    fontFamily: 'Silkscreen_400Regular',
+    fontFamily: 'monospace',
     fontSize: 10,
-    color: '#14b8a6',
+    color: '#64748b',
     textAlign: 'center',
     marginTop: 4,
+    letterSpacing: 0.5,
   },
   chatBubble: {
     marginTop: -30,
@@ -715,12 +772,6 @@ const styles = StyleSheet.create({
     color: '#0f172a',
     textAlign: 'left',
     lineHeight: 14,
-  },
-  characterName: {
-    fontFamily: 'Silkscreen_400Regular',
-    fontSize: 10,
-    color: '#8b5cf6',
-    fontWeight: 'bold',
   },
   ticketDisplay: {
     flexDirection: 'row',
@@ -767,7 +818,6 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     marginBottom: 6,
-    imageRendering: 'pixelated' as any,
   },
   lotteryName: {
     fontFamily: 'Silkscreen_400Regular',
@@ -816,7 +866,7 @@ const styles = StyleSheet.create({
   },
   limitedTimeContainer: {
     position: 'relative',
-    marginVertical: 16,
+    marginVertical: 8,
     marginHorizontal: 20,
   },
   limitedTimeGlow: {
@@ -838,7 +888,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 2,
     borderColor: '#ff69b4',
-    padding: 16,
+    padding: 8,
     shadowColor: '#ff69b4',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,

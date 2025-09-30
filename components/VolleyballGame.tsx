@@ -2,13 +2,15 @@ import React, { useState, useEffect, useRef } from 'react';
 import { StyleSheet, Dimensions, Pressable, Alert, Animated, Image } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { useGame } from '@/store/GameStore';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
 // Constants
 const MAX_MATCHES_PER_DAY = 3;
 const VOLLEYS_TO_WIN = 10;
-const STAMINA_REWARD = 5;
+const STAMINA_COST = 5;
+const STAMINA_REWARD = 3;
 const BALL_RADIUS = 12;
 const PET_SIZE = 40;
 const COURT_WIDTH = screenWidth - 40;
@@ -29,10 +31,11 @@ interface GameState {
   isMatchActive: boolean;
   ballLeg: 'toPlayer' | 'toNPC' | 'idle';
   dayKey: string;
-  stamina: number;
 }
 
 export default function VolleyballGame() {
+  const { state, spendStamina, addBonusStamina } = useGame();
+  
   // Game state
   const [gameState, setGameState] = useState<GameState>({
     matchesToday: 0,
@@ -40,7 +43,6 @@ export default function VolleyballGame() {
     isMatchActive: false,
     ballLeg: 'idle',
     dayKey: '',
-    stamina: 0,
   });
 
   // Timeout ref for miss detection
@@ -168,6 +170,13 @@ export default function VolleyballGame() {
       return;
     }
 
+    const totalStamina = state.dailyStamina + state.bonusStamina;
+    if (totalStamina < STAMINA_COST) {
+      Alert.alert("Not Enough Stamina", `You need ${STAMINA_COST} stamina to play a match!`);
+      return;
+    }
+
+    spendStamina(STAMINA_COST);
     setGameState(prev => ({
       ...prev,
       isMatchActive: true,
@@ -216,8 +225,8 @@ export default function VolleyballGame() {
     ]).start();
 
     if (newVolleys >= VOLLEYS_TO_WIN) {
-      // Match won!
-      const newStamina = gameState.stamina + STAMINA_REWARD;
+      // Match won! Give bonus stamina (permanent)
+      addBonusStamina(STAMINA_REWARD);
       const newMatches = gameState.matchesToday + 1;
       
       setGameState(prev => ({
@@ -225,7 +234,6 @@ export default function VolleyballGame() {
         isMatchActive: false,
         ballLeg: 'idle',
         volleysInMatch: 0,
-        stamina: newStamina,
         matchesToday: newMatches,
       }));
 
@@ -303,7 +311,7 @@ export default function VolleyballGame() {
       <View style={styles.hud}>
         <Text style={styles.hudText}>Volleys: {gameState.volleysInMatch} / {VOLLEYS_TO_WIN}</Text>
         <Text style={styles.hudText}>Matches Today: {gameState.matchesToday} / {MAX_MATCHES_PER_DAY}</Text>
-        <Text style={styles.hudText}>Stamina: {gameState.stamina}</Text>
+        <Text style={styles.hudText}>Stamina: {state.dailyStamina + state.bonusStamina} ({state.dailyStamina}+{state.bonusStamina})</Text>
       </View>
 
       {/* Game Canvas */}

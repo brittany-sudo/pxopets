@@ -14,7 +14,7 @@ const vinnieShopkeeperImage = require('@/assets/images/vinnie-shopkeeper.png');
 const popcornImage = require('@/assets/images/lil-popcorn.png');
 const gumballsImage = require('@/assets/images/gumballs.png');
 const iceCreamSandwichImage = require('@/assets/images/icecreamsandwich.png');
-const chipsImage = require('@/assets/images/chips.png');
+const cosmicBurgerImage = require('@/assets/images/cosmicburger.png');
 const chocolateImage = require('@/assets/images/chocolate.png');
 const cupNoddleImage = require('@/assets/images/cupnoddle.png');
 const hotChipsImage = require('@/assets/images/hotchips.png');
@@ -45,7 +45,7 @@ const snackImageMap: { [key: string]: any } = {
   'lil-popcorn.png': popcornImage,
   'gumballs.png': gumballsImage,
   'icecreamsandwich.png': iceCreamSandwichImage,
-  'chips.png': chipsImage,
+  'cosmicburger.png': cosmicBurgerImage,
   'chocolate.png': chocolateImage,
   'cupnoddle.png': cupNoddleImage,
   'hotchips.png': hotChipsImage,
@@ -276,7 +276,7 @@ export default function MidnightRewindScreen() {
       description: 'Crispy potato chips',
       price: 1,
       stamina: 4,
-      icon: 'chips.png'
+      icon: 'cosmicburger.png'
     },
     {
       id: 'chocolate',
