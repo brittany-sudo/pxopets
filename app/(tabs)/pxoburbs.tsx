@@ -49,7 +49,7 @@ export default function PxoburbsScreen() {
     {
       id: 'corner-store',
       name: 'Quickstop Corner Store',
-      description: 'Shop, lottery tickets, and gas station snacks.',
+      description: 'Marty\'s corner store with snacks, lottery tickets, special imports, and free coffee!',
       lightning: 12,
       difficulty: 'Easy',
       icon: 'chips'
@@ -521,7 +521,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: '#0f172a',
-    marginBottom: 12,
+    marginBottom: 20,
+    marginTop: 8,
     textAlign: 'left',
     alignSelf: 'flex-start',
     width: '100%',
@@ -532,9 +533,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(14, 165, 233, 0.2)',
     padding: 16,
-    marginBottom: 12,
+    marginBottom: 16,
     width: '100%',
-    height: 100,
+    minHeight: 100,
     justifyContent: 'center',
   },
   activityPressable: {
@@ -544,7 +545,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-start',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 12,
   },
   activityInfo: {
     flexDirection: 'row',
@@ -580,7 +581,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-start',
-    marginBottom: 4,
+    marginBottom: 6,
   },
   activityName: {
     fontFamily: 'Silkscreen_400Regular',

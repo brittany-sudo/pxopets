@@ -10,6 +10,7 @@ const martyImage = require('@/assets/images/quickstop-marty.png');
 const quickstopMainImage = require('@/assets/images/quickstop-main.png');
 const cosmicBurgerImage = require('@/assets/images/cosmicburger.png');
 const cupnoddleImage = require('@/assets/images/cupnoddle.png');
+const cupnoodleImage = require('@/assets/images/cupnoodle.png');
 const chocolateImage = require('@/assets/images/chocolate.png');
 const pouchdrinkImage = require('@/assets/images/pouchdrink.png');
 const lilSodaImage = require('@/assets/images/lil-soda.png');
@@ -20,10 +21,21 @@ const lilTagImage = require('@/assets/images/lil-tag.png');
 const regularHotdogImage = require('@/assets/images/regularhotdog.png');
 const milkshakesImage = require('@/assets/images/milkshakes.png');
 const glowcornImage = require('@/assets/images/glowcorn.png');
+const saturnsodaImage = require('@/assets/images/saturnsoda.png');
+const potatochompsImage = require('@/assets/images/potatochomps.png');
+const slusheeImage = require('@/assets/images/slushee.png');
+const nuggetsImage = require('@/assets/images/nuggets.png');
+const scratchoff1Image = require('@/assets/images/scratchoff1.png');
+const scratchoff2Image = require('@/assets/images/scratchoff2.png');
+const scratchoff3Image = require('@/assets/images/scratchoff3.png');
+const scratchoff4Image = require('@/assets/images/scratchoff4.png');
+const moonpetalTeaImage = require('@/assets/images/moonpetal-tea.png');
 
 export default function ShopScreen() {
   const [shopkeeperSaying, setShopkeeperSaying] = useState("Welcome to QuickStop! Best prices in Pxoburbs!");
   const [countdown, setCountdown] = useState(3600); // 1 hour in seconds
+  const [showCoffeePopup, setShowCoffeePopup] = useState(false);
+  const [showSlusheePopup, setShowSlusheePopup] = useState(false);
   const glowAnimation = useRef(new Animated.Value(0.2)).current;
   const [playerInventory, setPlayerInventory] = useState([
     { id: '1', name: 'Golden Star', price: 15, image: 'cosmicburger' },
@@ -35,61 +47,62 @@ export default function ShopScreen() {
   // Limited time items that can only be bought with tickets
   const [limitedItems, setLimitedItems] = useState([
     { id: 'l1', name: 'Space Bubblegum', price: 50, image: 'gumballs', tickets: 3 },
-    { id: 'l2', name: 'Cosmic Burger Deluxe', price: 75, image: 'cosmicburger', tickets: 5 },
-    { id: 'l3', name: 'Premium Soda', price: 100, image: 'lil-soda', tickets: 7 },
+    { id: 'l2', name: 'Cosmic Burger', price: 75, image: 'cosmicburger', tickets: 5 },
+    { id: 'l3', name: 'Punch Pouch', price: 100, image: 'pouchdrink', tickets: 7 },
     { id: 'l4', name: 'Choco-Donut', price: 125, image: 'chocodonut', tickets: 10 },
   ]);
 
-  // Lottery tickets with different variations
+  // Scratch-off tickets with different variations
   const [lotteryTickets, setLotteryTickets] = useState([
     { 
       id: 'lot1', 
-      name: 'Quick Pick', 
+      name: 'Cash Match', 
       price: 5, 
-      description: 'Instant win chance!',
+      description: 'Match 3 to win!',
       odds: '1 in 3',
       prizes: ['5 tickets', '10 tickets', '25 tickets', '50 tickets'],
-      image: 'lil-tag'
+      image: 'scratchoff1'
     },
     { 
       id: 'lot2', 
-      name: 'Lucky Draw', 
+      name: 'Lucky 7s', 
       price: 15, 
-      description: 'Better odds, bigger prizes!',
+      description: 'Find 3 lucky 7s!',
       odds: '1 in 5',
       prizes: ['25 tickets', '50 tickets', '100 tickets', 'Rare Item'],
-      image: 'lil-tag'
+      image: 'scratchoff2'
     },
     { 
       id: 'lot3', 
-      name: 'Mega Jackpot', 
+      name: 'Mega Money', 
       price: 50, 
-      description: 'Huge prizes, rare chance!',
+      description: 'Scratch to reveal your prize!',
       odds: '1 in 20',
       prizes: ['100 tickets', '500 tickets', '1000 tickets', 'Legendary Pet'],
-      image: 'lil-tag'
+      image: 'scratchoff3'
     },
     { 
       id: 'lot4', 
-      name: 'Daily Special', 
+      name: 'Win Big', 
       price: 10, 
-      description: 'Limited daily lottery!',
+      description: 'Instant winner guaranteed!',
       odds: '1 in 4',
       prizes: ['15 tickets', '30 tickets', '60 tickets', 'Special Item'],
-      image: 'lil-tag'
+      image: 'scratchoff4'
     },
   ]);
 
   // Shop inventory that changes every few hours
   const [shopInventory, setShopInventory] = useState([
-    { id: 's1', name: 'Cosmic Burger', price: 8, stock: 3, image: 'cosmicburger' },
+    { id: 's1', name: 'Protein Bar', price: 8, stock: 3, image: 'chocolate' },
     { id: 's2', name: 'Hot Chips', price: 18, stock: 1, image: 'hotchips' },
-    { id: 's3', name: 'Choco-Protein Bar', price: 12, stock: 5, image: 'chocolate' },
+    { id: 's3', name: 'Slushee', price: 12, stock: 5, image: 'slushee' },
     { id: 's4', name: 'Lil Soda', price: 20, stock: 2, image: 'lil-soda' },
-    { id: 's5', name: 'Cupa Noodles', price: 15, stock: 4, image: 'cupnoddle' },
+    { id: 's5', name: "Cup O'Noodle", price: 15, stock: 4, image: 'cupnoodle' },
     { id: 's6', name: 'Gas Station Dog', price: 25, stock: 2, image: 'regularhotdog' },
-    { id: 's7', name: 'Cosmic Milkshake', price: 30, stock: 1, image: 'milkshakes' },
-    { id: 's8', name: 'Glowcorn', price: 14, stock: 3, image: 'glowcorn' },
+    { id: 's7', name: 'Potato Chomps', price: 30, stock: 1, image: 'potatochomps' },
+    { id: 's8', name: 'Saturn Soda', price: 14, stock: 3, image: 'saturnsoda' },
+    { id: 's9', name: 'Nuggets', price: 16, stock: 4, image: 'nuggets' },
   ]);
 
   // Countdown timer effect
@@ -261,6 +274,36 @@ export default function ShopScreen() {
     );
   };
 
+  const handleFreeCoffee = () => {
+    setShowCoffeePopup(true);
+  };
+
+  const handleTakeCoffee = () => {
+    setPlayerInventory(prev => [...prev, { 
+      id: Date.now().toString(), 
+      name: 'Cup of Coffee', 
+      price: 0, 
+      image: 'moonpetal-tea' 
+    }]);
+    setShowCoffeePopup(false);
+  };
+
+  const handleMonthlySlushee = () => {
+    setShowSlusheePopup(true);
+  };
+
+  const handlePurchaseSlushee = () => {
+    // Check if player has enough tickets (assuming they have tickets in inventory)
+    // For now, we'll just add the slushee and close the popup
+    setPlayerInventory(prev => [...prev, { 
+      id: Date.now().toString(), 
+      name: 'Monthly Slushee', 
+      price: 1, 
+      image: 'slushee' 
+    }]);
+    setShowSlusheePopup(false);
+  };
+
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -292,6 +335,30 @@ export default function ShopScreen() {
           </Pressable>
         </RNView>
 
+        {/* Free Options List */}
+        <RNView style={styles.freeOptionsList}>
+          <Pressable 
+            style={styles.freeOptionItem}
+            onPress={handleFreeCoffee}
+          >
+            <Text style={styles.freeOptionItemText}>Free Coffee</Text>
+          </Pressable>
+          
+          <Pressable 
+            style={styles.freeOptionItem}
+            onPress={() => Alert.alert("Coming Soon", "Pxogulp Refill feature coming soon!")}
+          >
+            <Text style={styles.freeOptionItemText}>Pxogulp Refill</Text>
+          </Pressable>
+          
+          <Pressable 
+            style={styles.freeOptionItem}
+            onPress={handleMonthlySlushee}
+          >
+            <Text style={styles.freeOptionItemText}>Monthly Slushee</Text>
+          </Pressable>
+        </RNView>
+
         {/* Shop Inventory */}
         <BorderedBox>
           <RNView style={styles.stockHeader}>
@@ -303,11 +370,16 @@ export default function ShopScreen() {
               <RNView key={item.id} style={styles.chipsItem}>
                 <Image 
                   source={
-                    item.image === 'cosmicburger' ? cosmicBurgerImage :
+                    item.image === 'chocolate' ? chocolateImage :
+                    item.image === 'cupnoodle' ? cupnoodleImage :
                     item.image === 'cupnoddle' ? cupnoddleImage :
                     item.image === 'hotchips' ? hotchipsImage :
                     item.image === 'lil-soda' ? lilSodaImage :
                     item.image === 'regularhotdog' ? regularHotdogImage :
+                    item.image === 'potatochomps' ? potatochompsImage :
+                    item.image === 'saturnsoda' ? saturnsodaImage :
+                    item.image === 'slushee' ? slusheeImage :
+                    item.image === 'nuggets' ? nuggetsImage :
                     item.image === 'milkshakes' ? milkshakesImage :
                     item.image === 'glowcorn' ? glowcornImage :
                     chocolateImage
@@ -338,7 +410,10 @@ export default function ShopScreen() {
           </RNView>
         </BorderedBox>
 
-        {/* Limited Time Items */}
+        {/* Special Imports */}
+        <RNView style={styles.stockHeader}>
+          <Text style={styles.stockTitle}>MARTY'S IMPORTS</Text>
+        </RNView>
         <RNView style={styles.limitedTimeContainer}>
           <Animated.View 
             style={[
@@ -365,16 +440,16 @@ export default function ShopScreen() {
               }
             ]}
           >
-            <Text style={styles.sectionTitle}>LIMITED TIME ITEMS</Text>
             <RNView style={styles.chipsGrid}>
               {limitedItems.map((item) => (
-                <RNView key={item.id} style={styles.chipsItem}>
+                <RNView key={item.id} style={[styles.chipsItem, { width: '48%' }]}>
                   <Image 
                     source={
                       item.image === 'gumballs' ? gumballsImage :
                       item.image === 'chocodonut' ? chocodonutImage :
                       item.image === 'cosmicburger' ? cosmicBurgerImage :
                       item.image === 'lil-soda' ? lilSodaImage :
+                      item.image === 'pouchdrink' ? pouchdrinkImage :
                       pouchdrinkImage
                     } 
                     style={styles.chipsImage} 
@@ -385,10 +460,7 @@ export default function ShopScreen() {
                       style={[styles.actionButton, styles.buyButton]}
                       onPress={() => handleBuy(item)}
                     >
-                      <RNView style={styles.buttonTicketDisplay}>
-                        <FontAwesome name="ticket" size={12} color="#ffffff" />
-                        <Text style={styles.buttonTicketText}>{item.tickets}</Text>
-                      </RNView>
+                      <Text style={styles.buyButtonText}>Buy</Text>
                     </Pressable>
                   </RNView>
                 </RNView>
@@ -398,18 +470,23 @@ export default function ShopScreen() {
         </RNView>
 
         {/* Lottery Tickets */}
-        <BorderedBox>
-          <Text style={styles.sectionTitle}>LOTTERY TICKETS</Text>
-          <RNView style={styles.lotteryGrid}>
+        <RNView style={[styles.stockHeader, { marginTop: 16 }]}>
+          <Text style={styles.stockTitle}>SCRATCH-OFF TICKETS</Text>
+        </RNView>
+        <RNView style={styles.lotteryGrid}>
             {lotteryTickets.map((lottery) => (
-              <RNView key={lottery.id} style={styles.lotteryItem}>
+              <RNView key={lottery.id} style={[styles.lotteryItem, { width: '48%' }]}>
                 <Image 
                   source={
+                    lottery.image === 'scratchoff1' ? scratchoff1Image :
+                    lottery.image === 'scratchoff2' ? scratchoff2Image :
+                    lottery.image === 'scratchoff3' ? scratchoff3Image :
+                    lottery.image === 'scratchoff4' ? scratchoff4Image :
                     lottery.image === 'lil-tag' ? lilTagImage :
                     lottery.image === 'chocolate' ? chocolateImage :
                     lottery.image === 'gumballs' ? gumballsImage :
                     lottery.image === 'hotchips' ? hotchipsImage :
-                    lilTagImage
+                    scratchoff1Image
                   } 
                   style={styles.lotteryImage} 
                 />
@@ -425,23 +502,55 @@ export default function ShopScreen() {
                 </Pressable>
               </RNView>
             ))}
-          </RNView>
-        </BorderedBox>
+        </RNView>
 
-
-        {/* Shop Info */}
-        <BorderedBox>
-          <RNView style={styles.shopInfo}>
-            <Text style={styles.infoTitle}>SHOP INFO</Text>
-            <Text style={styles.infoText}>• Inventory refreshes every few hours</Text>
-            <Text style={styles.infoText}>• Haggle for better prices (70% success rate)</Text>
-            <Text style={styles.infoText}>• Sell items for 70% of their value</Text>
-            <Text style={styles.infoText}>• Limited stock - first come, first served!</Text>
-            <Text style={styles.infoText}>• 🎰 Lottery tickets offer instant prizes!</Text>
-            <Text style={styles.infoText}>• Higher price = better odds & bigger prizes</Text>
-          </RNView>
-        </BorderedBox>
       </ScrollView>
+
+      {/* Coffee Popup Modal */}
+      {showCoffeePopup && (
+        <RNView style={styles.modalOverlay}>
+          <RNView style={styles.coffeePopup}>
+            <Text style={styles.coffeePopupTitle}>FREE COFFEE!</Text>
+            <Image source={moonpetalTeaImage} style={styles.coffeePopupImage} />
+            <Text style={styles.coffeePopupText}>
+              A complimentary cup of QuickStop coffee! ☕
+            </Text>
+            <Pressable 
+              style={styles.coffeePopupButton}
+              onPress={handleTakeCoffee}
+            >
+              <Text style={styles.coffeePopupButtonText}>Take Coffee</Text>
+            </Pressable>
+          </RNView>
+        </RNView>
+      )}
+
+      {/* Slushee Popup Modal */}
+      {showSlusheePopup && (
+        <RNView style={styles.modalOverlay}>
+          <RNView style={styles.slusheePopup}>
+            <Text style={styles.slusheePopupTitle}>MONTHLY SLUSHEE</Text>
+            <Image source={slusheeImage} style={styles.slusheePopupImage} />
+            <Text style={styles.slusheePopupText}>
+              Special monthly slushee available for 1 ticket! 🧊
+            </Text>
+            <RNView style={styles.slusheeButtonContainer}>
+              <Pressable 
+                style={styles.slusheePopupButton}
+                onPress={handlePurchaseSlushee}
+              >
+                <Text style={styles.slusheePopupButtonText}>1 Ticket</Text>
+              </Pressable>
+              <Pressable 
+                style={styles.slusheeNoThanksButton}
+                onPress={() => setShowSlusheePopup(false)}
+              >
+                <Text style={styles.slusheeNoThanksButtonText}>No Thanks</Text>
+              </Pressable>
+            </RNView>
+          </RNView>
+        </RNView>
+      )}
     </View>
   );
 }
@@ -454,8 +563,38 @@ const styles = StyleSheet.create({
   scrollContent: {
     alignItems: 'center',
     justifyContent: 'flex-start',
-    padding: 20,
-    paddingBottom: 100,
+    padding: 16,
+    paddingBottom: 80,
+  },
+  freeOptionsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 16,
+    marginBottom: 16,
+    width: '100%',
+    paddingHorizontal: 0,
+  },
+  freeOptionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.3)',
+    gap: 6,
+    width: '45%',
+    justifyContent: 'center',
+    minHeight: 50,
+    zIndex: 999,
+    elevation: 999,
+  },
+  freeOptionText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 8,
+    color: '#8b5cf6',
+    fontWeight: '500',
   },
   backButton: {
     position: 'absolute',
@@ -506,40 +645,41 @@ const styles = StyleSheet.create({
   },
   mainImage: {
     width: '100%',
-    height: 250,
+    height: 200,
     resizeMode: 'contain',
     borderRadius: 12,
-    marginTop: 60,
-    marginBottom: 0,
+    marginTop: 50,
+    marginBottom: 8,
   },
   npcContainer: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     justifyContent: 'center',
-    marginTop: 8,
-    marginBottom: 20,
-    paddingHorizontal: 20,
+    marginTop: 4,
+    marginBottom: 16,
+    paddingHorizontal: 0,
   },
   speechBubble: {
-    backgroundColor: 'rgba(14, 165, 233, 0.1)',
+    backgroundColor: 'rgba(20, 184, 166, 0.1)',
     padding: 12,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: 'rgba(14, 165, 233, 0.3)',
+    borderColor: 'rgba(20, 184, 166, 0.3)',
     maxWidth: 300,
     marginRight: 8,
   },
   characterName: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 10,
-    color: '#0ea5e9',
+    color: '#14b8a6',
     marginBottom: 4,
     textAlign: 'left',
+    fontWeight: 'bold',
   },
   speechText: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 10,
-    color: '#0f172a',
+    color: '#000000',
     textAlign: 'left',
   },
   martyImage: {
@@ -590,50 +730,59 @@ const styles = StyleSheet.create({
   chipsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-evenly',
-    padding: 4,
+    justifyContent: 'space-between',
+    padding: 8,
     alignItems: 'flex-start',
+    marginBottom: 0,
+    gap: 8,
   },
   chipsItem: {
-    width: '31%',
+    width: '30%',
     alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: 8,
-    padding: 2,
+    padding: 10,
     minHeight: 100,
+    backgroundColor: 'rgba(139, 92, 246, 0.05)',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.2)',
   },
   chipsImage: {
-    width: 30,
-    height: 30,
+    width: 32,
+    height: 32,
     marginBottom: 6,
+    resizeMode: 'contain',
   },
   chipsName: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 9,
+    fontSize: 8,
     fontWeight: 'bold',
     color: '#0f172a',
     textAlign: 'center',
-    marginBottom: 0,
-    height: 14,
+    marginBottom: 2,
+    height: 12,
     lineHeight: 10,
   },
   chipsPrice: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 8,
+    fontSize: 7,
     color: '#06b6d4',
     textAlign: 'center',
-    marginBottom: 0,
+    marginBottom: 2,
   },
   chipsStock: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 7,
+    fontSize: 6,
     color: '#64748b',
     textAlign: 'center',
-    marginBottom: 6,
+    marginBottom: 4,
   },
   chipsActions: {
     flexDirection: 'column',
     gap: 6,
     justifyContent: 'center',
+    marginTop: 4,
   },
   ticketPrice: {
     fontFamily: 'Silkscreen_400Regular',
@@ -751,7 +900,7 @@ const styles = StyleSheet.create({
   countdownText: {
     fontFamily: 'monospace',
     fontSize: 10,
-    color: '#64748b',
+    color: '#14b8a6',
     textAlign: 'center',
     marginTop: 4,
     letterSpacing: 0.5,
@@ -799,45 +948,50 @@ const styles = StyleSheet.create({
   lotteryGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-evenly',
+    justifyContent: 'space-between',
     padding: 8,
     alignItems: 'flex-start',
+    marginTop: -8,
+    marginBottom: 24,
+    gap: 8,
   },
   lotteryItem: {
-    width: '48%',
+    width: '30%',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 8,
     padding: 8,
     backgroundColor: 'rgba(139, 92, 246, 0.05)',
     borderRadius: 8,
     borderWidth: 1,
     borderColor: 'rgba(139, 92, 246, 0.2)',
-    minHeight: 160,
+    minHeight: 90,
   },
   lotteryImage: {
-    width: 32,
-    height: 32,
-    marginBottom: 6,
+    width: 28,
+    height: 28,
+    marginBottom: 4,
   },
   lotteryName: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 10,
+    fontSize: 8,
     fontWeight: 'bold',
     color: '#0f172a',
     textAlign: 'center',
     marginBottom: 2,
+    height: 12,
+    lineHeight: 10,
   },
   lotteryDescription: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 8,
+    fontSize: 6,
     color: '#64748b',
     textAlign: 'center',
-    marginBottom: 4,
+    marginBottom: 2,
     fontStyle: 'italic',
   },
   lotteryOdds: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 8,
+    fontSize: 6,
     color: '#f59e0b',
     textAlign: 'center',
     marginBottom: 2,
@@ -845,10 +999,10 @@ const styles = StyleSheet.create({
   },
   lotteryPrice: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 9,
+    fontSize: 7,
     color: '#06b6d4',
     textAlign: 'center',
-    marginBottom: 8,
+    marginBottom: 4,
     fontWeight: 'bold',
   },
   lotteryButton: {
@@ -866,8 +1020,9 @@ const styles = StyleSheet.create({
   },
   limitedTimeContainer: {
     position: 'relative',
-    marginVertical: 8,
-    marginHorizontal: 20,
+    marginTop: -8,
+    marginBottom: 16,
+    marginHorizontal: 0,
   },
   limitedTimeGlow: {
     position: 'absolute',
@@ -894,5 +1049,195 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 3,
     elevation: 2,
+  },
+  // Free Options List Styles
+  freeOptionsList: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    padding: 8,
+    alignItems: 'flex-start',
+    marginBottom: 8,
+    gap: 8,
+  },
+  freeOptionItem: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(139, 92, 246, 0.05)',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    marginBottom: 6,
+    borderWidth: 2,
+    borderColor: 'rgba(139, 92, 246, 0.3)',
+    borderRadius: 0,
+    width: 120,
+    minHeight: 50,
+    shadowColor: '#8b5cf6',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  freeOptionItemText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 12,
+    color: '#8b5cf6',
+    fontWeight: '500',
+    textAlign: 'center',
+  },
+  // Coffee Popup Modal Styles
+  modalOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1000,
+  },
+  coffeePopup: {
+    backgroundColor: '#ffffff',
+    padding: 28,
+    borderRadius: 16,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#8b5cf6',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 24,
+    elevation: 12,
+    width: 320,
+    marginTop: -100,
+  },
+  coffeePopupTitle: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 14,
+    color: '#1e293b',
+    marginBottom: 20,
+    textAlign: 'center',
+    fontWeight: '600',
+    letterSpacing: 0.5,
+  },
+  coffeePopupImage: {
+    width: 60,
+    height: 60,
+    marginBottom: 16,
+    resizeMode: 'contain',
+  },
+  coffeePopupText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 13,
+    color: '#64748b',
+    textAlign: 'center',
+    marginBottom: 24,
+    lineHeight: 18,
+    fontWeight: '400',
+  },
+  coffeePopupButton: {
+    backgroundColor: '#1e293b',
+    paddingVertical: 14,
+    paddingHorizontal: 32,
+    borderRadius: 8,
+    borderWidth: 0,
+    shadowColor: '#1e293b',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  coffeePopupButtonText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 12,
+    color: '#ffffff',
+    fontWeight: '600',
+    letterSpacing: 0.3,
+  },
+  // Slushee Popup Modal Styles
+  slusheePopup: {
+    backgroundColor: '#ffffff',
+    padding: 28,
+    borderRadius: 16,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#8b5cf6',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 24,
+    elevation: 12,
+    width: 320,
+    marginTop: -100,
+  },
+  slusheePopupTitle: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 14,
+    color: '#1e293b',
+    marginBottom: 20,
+    textAlign: 'center',
+    fontWeight: '600',
+    letterSpacing: 0.5,
+  },
+  slusheePopupImage: {
+    width: 60,
+    height: 60,
+    marginBottom: 16,
+    resizeMode: 'contain',
+  },
+  slusheePopupText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 13,
+    color: '#64748b',
+    textAlign: 'center',
+    marginBottom: 24,
+    lineHeight: 18,
+    fontWeight: '400',
+  },
+  slusheePopupButton: {
+    backgroundColor: '#8b5cf6',
+    paddingVertical: 14,
+    paddingHorizontal: 32,
+    borderRadius: 8,
+    borderWidth: 0,
+    shadowColor: '#8b5cf6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  slusheePopupButtonText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 12,
+    color: '#ffffff',
+    fontWeight: '600',
+    letterSpacing: 0.3,
+  },
+  slusheeButtonContainer: {
+    flexDirection: 'row',
+    gap: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  slusheeNoThanksButton: {
+    backgroundColor: '#f1f5f9',
+    paddingVertical: 14,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  slusheeNoThanksButtonText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 12,
+    color: '#64748b',
+    fontWeight: '600',
+    letterSpacing: 0.3,
   },
 });
