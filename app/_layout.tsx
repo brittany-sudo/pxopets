@@ -9,6 +9,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import { GameProvider } from '@/store/GameStore';
 import { SimpleGameProvider } from '@/store/SimpleGameStore';
+import { InventoryProvider } from '@/store/InventoryStore';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/components/useColorScheme';
@@ -61,7 +62,8 @@ function RootLayoutNav() {
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
         <GameProvider>
           <SimpleGameProvider>
-            <Stack>
+            <InventoryProvider>
+              <Stack>
               <Stack.Screen name="(tabs)" options={{ header: () => <AppHeader /> }} />
               <Stack.Screen name="adoption" options={{ headerShown: false }} />
               <Stack.Screen name="enchanted-island" options={{ headerShown: false }} />
@@ -78,7 +80,8 @@ function RootLayoutNav() {
               <Stack.Screen name="more" options={{ header: () => <AppHeader /> }} />
               <Stack.Screen name="quickstop" options={{ headerShown: false }} />
               <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-            </Stack>
+              </Stack>
+            </InventoryProvider>
           </SimpleGameProvider>
         </GameProvider>
       </ThemeProvider>

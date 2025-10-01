@@ -6,7 +6,7 @@ import { router, Link } from 'expo-router';
 
 // Import the banner image
 const staticTvImage = require('@/assets/images/static-tv.png');
-const pxoburbsSkylineImage = require('@/assets/images/pxoburbs-skyline.png');
+const pxoburbsSkylineImage = require('@/assets/images/thepxoburbs-main.png');
 const cosmicBurgerImage = require('@/assets/images/cosmicburger.png');
 const lilSodaImage = require('@/assets/images/lil-soda.png');
 const lilArcadeImage = require('@/assets/images/lil-arcade.png');
@@ -41,7 +41,7 @@ export default function PxoburbsScreen() {
     {
       id: 'mall-food-court',
       name: 'Pxoburbs Mall',
-      description: 'Shop and eat at the bustling food court.',
+      description: 'Multi-level shopping complex featuring diverse food court vendors, retail stores, and entertainment. Browse fashion, electronics, and specialty shops while enjoying meals from local and chain restaurants.',
       lightning: 25,
       difficulty: 'Medium',
       icon: 'shopping-bag'
@@ -49,7 +49,7 @@ export default function PxoburbsScreen() {
     {
       id: 'corner-store',
       name: 'Quickstop Corner Store',
-      description: 'Marty\'s corner store with snacks, lottery tickets, special imports, and free coffee!',
+      description: 'Marty\'s 24/7 convenience store offering snacks, lottery tickets, special imports, and complimentary coffee. Stock up on essentials, try limited-time items, and discover unique finds from across the galaxy.',
       lightning: 12,
       difficulty: 'Easy',
       icon: 'chips'
@@ -57,7 +57,7 @@ export default function PxoburbsScreen() {
     {
       id: 'roller-rink',
       name: 'Starlight Roller Rink',
-      description: 'Skate under the disco lights and neon stars.',
+      description: 'Retro roller skating rink with disco lights, neon decorations, and classic arcade games. Rent skates, enjoy themed music nights, and experience the golden age of roller disco under sparkling stars.',
       lightning: 20,
       difficulty: 'Easy',
       icon: 'roler'
@@ -65,7 +65,7 @@ export default function PxoburbsScreen() {
     {
       id: 'makeout-hill',
       name: 'Lovers Hill',
-      description: 'The legendary spot for romantic encounters.',
+      description: 'Romantic overlook with panoramic city views, perfect for couples and stargazing. Features cozy seating areas, string lights, and a peaceful atmosphere for intimate conversations and memorable moments.',
       lightning: 15,
       difficulty: 'Medium',
       icon: 'makeout-hill'
@@ -73,7 +73,7 @@ export default function PxoburbsScreen() {
     {
       id: 'midnight-rewind',
       name: 'Midnight Rewind',
-      description: 'Rent classic movies and rare video tapes.',
+      description: 'Classic video rental store specializing in rare films, cult classics, and vintage VHS tapes. Browse extensive collections of horror, sci-fi, and indie films with knowledgeable staff recommendations.',
       lightning: 10,
       difficulty: 'Easy',
       icon: 'lil-movie-reel.png'
@@ -81,7 +81,7 @@ export default function PxoburbsScreen() {
     {
       id: 'radio-station',
       name: 'PXO 101.8 FM',
-      description: 'Local radio station with community shows.',
+      description: 'Independent community radio station featuring local music, talk shows, and live broadcasts. Tune in for underground artists, community news, and interactive call-in programs with DJs and hosts.',
       lightning: 18,
       difficulty: 'Medium',
       icon: 'microphone'
@@ -89,7 +89,7 @@ export default function PxoburbsScreen() {
     {
       id: 'post-office',
       name: 'Pxoburbs Post Office',
-      description: 'Send mail and packages to friends.',
+      description: 'Full-service postal facility offering mail delivery, package shipping, and postal services. Send letters, ship packages worldwide, purchase stamps, and access PO boxes for secure mail storage.',
       lightning: 6,
       difficulty: 'Easy',
       icon: 'envelope'
@@ -97,7 +97,7 @@ export default function PxoburbsScreen() {
     {
       id: 'pet-supply',
       name: 'PXOPET SUPPLY CO.',
-      description: 'Everything your pets need for a happy life.',
+      description: 'Comprehensive pet store featuring food, toys, accessories, and health products for all types of pets. Expert staff provide grooming services, veterinary referrals, and personalized pet care advice.',
       lightning: 14,
       difficulty: 'Medium',
       icon: 'paw'
@@ -105,7 +105,7 @@ export default function PxoburbsScreen() {
     {
       id: 'community-pool',
       name: 'Pxoburbs Community Pool',
-      description: 'Swimming, diving, and poolside relaxation.',
+      description: 'Public swimming facility with Olympic-sized pool, diving boards, and recreational areas. Features swimming lessons, water aerobics classes, and family-friendly activities with lifeguard supervision.',
       lightning: 8,
       difficulty: 'Easy',
       icon: 'tree'
@@ -113,7 +113,7 @@ export default function PxoburbsScreen() {
     {
       id: 'frog-market-thrift',
       name: 'Frog Market Thrift',
-      description: 'Vintage finds and second-hand treasures.',
+      description: 'Eclectic thrift store featuring vintage clothing, retro furniture, and unique collectibles. Discover one-of-a-kind treasures, rare finds, and affordable second-hand items with rotating inventory.',
       lightning: 16,
       difficulty: 'Easy',
       image: 'lil-tag'
@@ -143,273 +143,56 @@ export default function PxoburbsScreen() {
           <Image source={pxoburbsSkylineImage} style={styles.bannerImage} />
         </RNView>
 
-        {/* Description */}
-        <Text style={styles.description}>
-          Welcome to The Pxoburbs! This bustling suburban district is where the action happens. 
-          From the neon-lit arcade to the local corner store, every block offers something exciting. 
-          Catch a movie at the cinema, grab snacks at the mall food court, or explore the arcade. 
-          It's the perfect place to hang out, explore, and make memories with friends!
-        </Text>
 
 
         {/* Activities Title */}
         <Text style={styles.activitiesTitle}>NEIGHBORHOOD ACTIVITIES</Text>
 
         {/* Activities List */}
-        {activities.map((activity) => (
-          <RNView key={activity.id} style={styles.activityItem}>
-            {activity.id === 'corner-store' ? (
-              <Link href="/quickstop" asChild>
-                <Pressable style={styles.activityPressable}>
-                  <RNView style={styles.activityHeader}>
-                    <RNView style={styles.activityInfo}>
-                      {activity.id === 'corner-store' ? (
-                        <Image source={cosmicBurgerImage} style={styles.activityImageIcon} />
-                      ) : (
-                        <FontAwesome name={activity.icon as any} size={32} color="#8b5cf6" style={styles.activityIcon} />
-                      )}
-                      <RNView style={styles.activityText}>
-                        <RNView style={styles.activityTitleRow}>
-                          <Text style={styles.activityName}>{activity.name}</Text>
-                        </RNView>
-                        <Text style={styles.activityDescription}>{activity.description}</Text>
-                      </RNView>
-                    </RNView>
-                  </RNView>
-                  <RNView style={styles.activityFooter}>
-                    <Pressable
-                      style={styles.favoriteButton}
-                      onPress={() => toggleFavorite(activity.id)}
-                    >
-                      <FontAwesome 
-                        name={favorites.has(activity.id) ? "star" : "star-o"} 
-                        size={16} 
-                        color={favorites.has(activity.id) ? "#94a3b8" : "#94a3b8"} 
-                      />
-                    </Pressable>
-                  </RNView>
-                </Pressable>
-              </Link>
-            ) : activity.id === 'frog-market-thrift' ? (
-              <Link href="/frog-market-thrift" asChild>
-                <Pressable style={styles.activityPressable}>
-                  <RNView style={styles.activityHeader}>
-                    <RNView style={styles.activityInfo}>
-                      <Image source={lilTagImage} style={styles.activityImageIcon} />
-                      <RNView style={styles.activityText}>
-                        <RNView style={styles.activityTitleRow}>
-                          <Text style={styles.activityName}>{activity.name}</Text>
-                        </RNView>
-                        <Text style={styles.activityDescription}>{activity.description}</Text>
-                      </RNView>
-                    </RNView>
-                  </RNView>
-                  <RNView style={styles.activityFooter}>
-                    <Pressable
-                      style={styles.favoriteButton}
-                      onPress={() => toggleFavorite(activity.id)}
-                    >
-                      <FontAwesome 
-                        name={favorites.has(activity.id) ? "star" : "star-o"} 
-                        size={16} 
-                        color={favorites.has(activity.id) ? "#94a3b8" : "#94a3b8"} 
-                      />
-                    </Pressable>
-                  </RNView>
-                </Pressable>
-              </Link>
-           ) : activity.id === 'roller-rink' ? (
-             <Link href="/(tabs)/starlight-roller-rink" asChild>
-               <Pressable style={styles.activityPressable}>
-                 <RNView style={styles.activityHeader}>
-                   <RNView style={styles.activityInfo}>
-                     {activity.id === 'roller-rink' ? (
-                       <Image source={rolerImage} style={styles.activityImageIcon} />
-                     ) : (
-                       <FontAwesome name={activity.icon as any} size={32} color="#8b5cf6" style={styles.activityIcon} />
-                     )}
-                     <RNView style={styles.activityText}>
-                       <RNView style={styles.activityTitleRow}>
-                         <Text style={styles.activityName}>{activity.name}</Text>
-                       </RNView>
-                       <Text style={styles.activityDescription}>{activity.description}</Text>
-                     </RNView>
-                   </RNView>
-                 </RNView>
-                 <RNView style={styles.activityFooter}>
-                   <Pressable
-                     style={styles.favoriteButton}
-                     onPress={() => toggleFavorite(activity.id)}
-                   >
-                     <FontAwesome
-                       name={favorites.has(activity.id) ? "star" : "star-o"}
-                       size={16}
-                       color={favorites.has(activity.id) ? "#8b5cf6" : "rgba(139, 92, 246, 0.3)"}
-                     />
-                   </Pressable>
-                 </RNView>
-               </Pressable>
-             </Link>
-           ) : activity.id === 'makeout-hill' ? (
-             <Link href="/(tabs)/makeout-hill" asChild>
-               <Pressable style={styles.activityPressable}>
-                 <RNView style={styles.activityHeader}>
-                   <RNView style={styles.activityInfo}>
-                     {activity.id === 'makeout-hill' ? (
-                       <Image source={makeoutHillImage} style={styles.activityImageIcon} />
-                     ) : (
-                       <FontAwesome name={activity.icon as any} size={32} color="#8b5cf6" style={styles.activityIcon} />
-                     )}
-                     <RNView style={styles.activityText}>
-                       <RNView style={styles.activityTitleRow}>
-                         <Text style={styles.activityName}>{activity.name}</Text>
-                       </RNView>
-                       <Text style={styles.activityDescription}>{activity.description}</Text>
-                     </RNView>
-                   </RNView>
-                 </RNView>
-                 <RNView style={styles.activityFooter}>
-                   <Pressable
-                     style={styles.favoriteButton}
-                     onPress={() => toggleFavorite(activity.id)}
-                   >
-                     <FontAwesome
-                       name={favorites.has(activity.id) ? "star" : "star-o"}
-                       size={16}
-                       color={favorites.has(activity.id) ? "#8b5cf6" : "rgba(139, 92, 246, 0.3)"}
-                     />
-                   </Pressable>
-                 </RNView>
-               </Pressable>
-             </Link>
-          ) : activity.id === 'radio-station' ? (
-            <Pressable 
-              style={styles.activityPressable}
-              onPress={() => router.navigate('/(tabs)/pxo-radio')}
-            >
-              <RNView style={styles.activityHeader}>
-                <RNView style={styles.activityInfo}>
-                  <Image source={lilRadioImage} style={styles.activityImageIcon} />
-                  <RNView style={styles.activityText}>
-                    <RNView style={styles.activityTitleRow}>
-                      <Text style={styles.activityName}>{activity.name}</Text>
-                    </RNView>
-                    <Text style={styles.activityDescription}>{activity.description}</Text>
-                  </RNView>
-                </RNView>
+        {activities.map((activity) => {
+          const getActivityIcon = () => {
+            const iconContent = (() => {
+              switch (activity.id) {
+                case 'corner-store':
+                  return <Image source={cosmicBurgerImage} style={styles.activityImageIcon} />;
+                case 'frog-market-thrift':
+                  return <Image source={lilTagImage} style={styles.activityImageIcon} />;
+                case 'roller-rink':
+                  return <Image source={rolerImage} style={styles.activityImageIcon} />;
+                case 'makeout-hill':
+                  return <Image source={makeoutHillImage} style={styles.activityImageIcon} />;
+                case 'radio-station':
+                  return <Image source={lilRadioImage} style={styles.activityImageIcon} />;
+                case 'midnight-rewind':
+                  return <Image source={lilMovieReelImage} style={styles.activityImageIcon} />;
+                case 'mall-food-court':
+                  return <Image source={lilMallImage} style={styles.activityImageIcon} />;
+                case 'post-office':
+                  return <Image source={lilMailImage} style={styles.activityImageIcon} />;
+                case 'pet-supply':
+                  return <Image source={lilPxosupplyImage} style={styles.activityImageIcon} />;
+                case 'community-pool':
+                  return <Image source={lilRubberduckImage} style={styles.activityImageIcon} />;
+                default:
+                  return <FontAwesome name={activity.icon as any} size={20} color="#8b5cf6" style={styles.activityIcon} />;
+              }
+            })();
+
+            return (
+              <RNView style={styles.activityIconContainer}>
+                {iconContent}
               </RNView>
-              <RNView style={styles.activityFooter}>
-                <Pressable
-                  style={styles.favoriteButton}
-                  onPress={() => toggleFavorite(activity.id)}
-                >
-                  <FontAwesome 
-                    name={favorites.has(activity.id) ? "star" : "star-o"} 
-                    size={16} 
-                    color={favorites.has(activity.id) ? "#8b5cf6" : "rgba(139, 92, 246, 0.3)"} 
-                  />
-                </Pressable>
-              </RNView>
-            </Pressable>
-          ) : activity.id === 'midnight-rewind' ? (
-            <Pressable 
-              style={styles.activityPressable}
-              onPress={() => router.navigate('/(tabs)/midnight-rewind')}
-            >
-               <RNView style={styles.activityHeader}>
-                 <RNView style={styles.activityInfo}>
-                   <Image source={lilMovieReelImage} style={styles.activityImageIcon} />
-                   <RNView style={styles.activityText}>
-                     <RNView style={styles.activityTitleRow}>
-                       <Text style={styles.activityName}>{activity.name}</Text>
-                     </RNView>
-                     <Text style={styles.activityDescription}>{activity.description}</Text>
-                   </RNView>
-                 </RNView>
-               </RNView>
-               <RNView style={styles.activityFooter}>
-                 <Pressable
-                   style={styles.favoriteButton}
-                   onPress={() => toggleFavorite(activity.id)}
-                 >
-                   <FontAwesome 
-                     name={favorites.has(activity.id) ? "star" : "star-o"} 
-                     size={16} 
-                     color={favorites.has(activity.id) ? "#8b5cf6" : "rgba(139, 92, 246, 0.3)"} 
-                   />
-                 </Pressable>
-               </RNView>
-            </Pressable>
-          ) : activity.id === 'mall-food-court' ? (
-            <Pressable 
-              style={styles.activityPressable}
-              onPress={() => router.navigate('/(tabs)/pxoburbs-mall')}
-            >
-              <RNView style={styles.activityHeader}>
-                <RNView style={styles.activityInfo}>
-                  <Image source={lilMallImage} style={styles.activityImageIcon} />
-                  <RNView style={styles.activityText}>
-                    <RNView style={styles.activityTitleRow}>
-                      <Text style={styles.activityName}>{activity.name}</Text>
-                    </RNView>
-                    <Text style={styles.activityDescription}>{activity.description}</Text>
-                  </RNView>
-                </RNView>
-              </RNView>
-              <RNView style={styles.activityFooter}>
-                <Pressable
-                  style={styles.favoriteButton}
-                  onPress={() => toggleFavorite(activity.id)}
-                >
-                  <FontAwesome 
-                    name={favorites.has(activity.id) ? "star" : "star-o"} 
-                    size={16} 
-                    color={favorites.has(activity.id) ? "#8b5cf6" : "rgba(139, 92, 246, 0.3)"} 
-                  />
-                </Pressable>
-              </RNView>
-            </Pressable>
-          ) : (
-            <Pressable 
-              style={styles.activityPressable}
-              onPress={() => {
-                if (activity.id === 'post-office') {
-                  router.navigate('/(tabs)/post-office');
-                } else if (activity.id === 'pet-supply') {
-                  router.navigate('/(tabs)/pxopet-supply');
-                } else if (activity.id === 'community-pool') {
-                  router.navigate('/(tabs)/community-pool');
-                }
-              }}
-            >
-              <>
+            );
+          };
+
+          const getActivityPressable = () => {
+            const content = (
+              <Pressable style={styles.activityPressable}>
                 <RNView style={styles.activityHeader}>
                   <RNView style={styles.activityInfo}>
-                {activity.id === 'corner-store' ? (
-                  <Image source={cosmicBurgerImage} style={styles.activityImageIcon} />
-                ) : activity.id === 'arcade' ? (
-                  <Image source={lilArcadeImage} style={styles.arcadeImageIcon} />
-                ) : activity.id === 'makeout-hill' ? (
-                  <Image source={makeoutHillImage} style={styles.activityImageIcon} />
-                ) : activity.id === 'roller-rink' ? (
-                  <Image source={rolerImage} style={styles.activityImageIcon} />
-                ) : activity.id === 'post-office' ? (
-                  <Image source={lilMailImage} style={styles.activityImageIcon} />
-                ) : activity.id === 'mall-food-court' ? (
-                  <Image source={lilMallImage} style={styles.activityImageIcon} />
-                ) : activity.id === 'pet-supply' ? (
-                  <Image source={lilPxosupplyImage} style={styles.activityImageIcon} />
-                ) : activity.id === 'community-pool' ? (
-                  <Image source={lilRubberduckImage} style={styles.activityImageIcon} />
-                ) : activity.id === 'frog-market-thrift' ? (
-                  <Image source={lilTagImage} style={styles.activityImageIcon} />
-                ) : (
-                  <FontAwesome name={activity.icon as any} size={32} color="#8b5cf6" style={styles.activityIcon} />
-                )}
+                    {getActivityIcon()}
                     <RNView style={styles.activityText}>
-                      <RNView style={styles.activityTitleRow}>
-                        <Text style={styles.activityName}>{activity.name}</Text>
-                      </RNView>
+                      <Text style={styles.activityName}>{activity.name}</Text>
                       <Text style={styles.activityDescription}>{activity.description}</Text>
                     </RNView>
                   </RNView>
@@ -421,16 +204,46 @@ export default function PxoburbsScreen() {
                   >
                     <FontAwesome 
                       name={favorites.has(activity.id) ? "star" : "star-o"} 
-                      size={16} 
+                      size={12} 
                       color={favorites.has(activity.id) ? "#8b5cf6" : "rgba(139, 92, 246, 0.3)"} 
                     />
                   </Pressable>
                 </RNView>
-              </>
-            </Pressable>
-            )}
-          </RNView>
-        ))}
+              </Pressable>
+            );
+
+            switch (activity.id) {
+              case 'corner-store':
+                return <Link href="/quickstop" asChild>{content}</Link>;
+              case 'frog-market-thrift':
+                return <Link href="/frog-market-thrift" asChild>{content}</Link>;
+              case 'roller-rink':
+                return <Link href="/(tabs)/starlight-roller-rink" asChild>{content}</Link>;
+              case 'makeout-hill':
+                return <Link href="/(tabs)/makeout-hill" asChild>{content}</Link>;
+              case 'radio-station':
+                return <Pressable onPress={() => router.navigate('/(tabs)/pxo-radio')}>{content}</Pressable>;
+              case 'midnight-rewind':
+                return <Pressable onPress={() => router.navigate('/(tabs)/midnight-rewind')}>{content}</Pressable>;
+              case 'mall-food-court':
+                return <Pressable onPress={() => router.navigate('/(tabs)/pxoburbs-mall')}>{content}</Pressable>;
+              case 'post-office':
+                return <Pressable onPress={() => router.navigate('/(tabs)/post-office')}>{content}</Pressable>;
+              case 'pet-supply':
+                return <Pressable onPress={() => router.navigate('/(tabs)/pxopet-supply')}>{content}</Pressable>;
+              case 'community-pool':
+                return <Pressable onPress={() => router.navigate('/(tabs)/community-pool')}>{content}</Pressable>;
+              default:
+                return content;
+            }
+          };
+
+          return (
+            <RNView key={activity.id} style={styles.activityItem}>
+              {getActivityPressable()}
+            </RNView>
+          );
+        })}
         </ScrollView>
 
       </View>
@@ -482,19 +295,20 @@ const styles = StyleSheet.create({
   },
   locationTitle: {
     fontFamily: 'PressStart2P_400Regular',
-    fontSize: 12,
+    fontSize: 10,
     color: '#0f172a',
     fontWeight: 'bold',
     letterSpacing: 1,
     textAlign: 'center',
+    textTransform: 'uppercase',
   },
   bannerContainer: {
     width: '100%',
-    height: 200,
+    height: 300,
     borderWidth: 2,
     borderColor: '#0ea5e9',
     borderRadius: 8,
-    marginTop: 0,
+    marginTop: -20,
     marginBottom: 20,
     alignItems: 'center',
     justifyContent: 'flex-end',
@@ -504,7 +318,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     resizeMode: 'cover',
-    marginTop: 20,
+    marginTop: 0,
   },
   description: {
     fontFamily: 'Silkscreen_400Regular',
@@ -518,7 +332,7 @@ const styles = StyleSheet.create({
   },
   activitiesTitle: {
     fontFamily: 'PressStart2P_400Regular',
-    fontSize: 16,
+    fontSize: 12,
     fontWeight: 'bold',
     color: '#0f172a',
     marginBottom: 20,
@@ -526,43 +340,64 @@ const styles = StyleSheet.create({
     textAlign: 'left',
     alignSelf: 'flex-start',
     width: '100%',
+    textTransform: 'uppercase',
   },
   activityItem: {
-    backgroundColor: 'rgba(14, 165, 233, 0.05)',
-    borderRadius: 8,
+    backgroundColor: 'rgba(139, 92, 246, 0.05)',
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: 'rgba(14, 165, 233, 0.2)',
-    padding: 16,
-    marginBottom: 16,
+    borderColor: 'rgba(139, 92, 246, 0.2)',
+    padding: 12,
+    marginBottom: 10,
     width: '100%',
-    minHeight: 100,
+    minHeight: 70,
     justifyContent: 'center',
+    shadowColor: '#8b5cf6',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   activityPressable: {
     width: '100%',
   },
   activityHeader: {
     flexDirection: 'row',
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    marginBottom: 12,
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 6,
   },
   activityInfo: {
     flexDirection: 'row',
     flex: 1,
     justifyContent: 'flex-start',
     alignItems: 'center',
+    gap: 0,
+    minHeight: 50,
+    marginRight: 40,
   },
   activityIcon: {
-    marginRight: 12,
+    width: 28,
+    height: 28,
     alignSelf: 'center',
+    textAlign: 'center',
+    lineHeight: 28,
   },
   activityImageIcon: {
-    width: 36,
-    height: 36,
-    marginRight: 12,
+    width: 42,
+    height: 42,
     alignSelf: 'center',
     imageRendering: 'pixelated' as any,
+    resizeMode: 'contain',
+  },
+  activityIconContainer: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
   },
   arcadeImageIcon: {
     width: 36,
@@ -574,34 +409,41 @@ const styles = StyleSheet.create({
   },
   activityText: {
     flex: 1,
-    marginLeft: 8,
     alignItems: 'flex-start',
+    justifyContent: 'center',
   },
   activityTitleRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-start',
-    marginBottom: 6,
+    marginBottom: 3,
   },
   activityName: {
-    fontFamily: 'Silkscreen_400Regular',
-    fontSize: 14,
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 10,
     fontWeight: 'bold',
     color: '#0f172a',
-    marginBottom: 4,
+    marginBottom: 3,
     textAlign: 'left',
+    lineHeight: 14,
+    textTransform: 'uppercase',
   },
   activityDescription: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 11,
-    color: '#0f172a',
-    lineHeight: 16,
-    textAlign: 'left',
+    fontSize: 9,
+    color: '#64748b',
+    lineHeight: 13,
+    textAlign: 'justify',
   },
   favoriteButton: {
     padding: 4,
+    borderRadius: 4,
+    backgroundColor: 'rgba(139, 92, 246, 0.05)',
   },
   activityFooter: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
     flexDirection: 'row',
     justifyContent: 'flex-end',
     alignItems: 'center',

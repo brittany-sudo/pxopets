@@ -48,9 +48,10 @@ export default function SimpleDeveloperPanel({ visible, onClose }: SimpleDevelop
   };
 
   const handleSetCustomCurrency = () => {
-    const tickets = parseInt(customTickets) || 0;
-    const stamina = parseInt(customStamina) || 0;
-    const coins = parseInt(customCoins) || 0;
+    // Only set values that have been entered (not empty strings)
+    const tickets = customTickets.trim() !== '' ? parseInt(customTickets) : state.tickets;
+    const stamina = customStamina.trim() !== '' ? parseInt(customStamina) : state.stamina;
+    const coins = customCoins.trim() !== '' ? parseInt(customCoins) : state.coins;
     
     setCurrency(tickets, stamina, coins);
     
@@ -58,6 +59,9 @@ export default function SimpleDeveloperPanel({ visible, onClose }: SimpleDevelop
     setCustomTickets('');
     setCustomStamina('');
     setCustomCoins('');
+    
+    // Close modal
+    onClose();
   };
 
   const handleResetGame = () => {
@@ -81,7 +85,7 @@ export default function SimpleDeveloperPanel({ visible, onClose }: SimpleDevelop
       <View style={styles.overlay}>
         <View style={styles.container}>
           <View style={styles.header}>
-            <Text style={styles.title}>🛠️ Dev Panel</Text>
+            <Text style={styles.title}>Dev Panel</Text>
             <Pressable onPress={onClose} style={styles.closeButton}>
               <FontAwesome name="times" size={24} color="#fff" />
             </Pressable>
@@ -90,7 +94,7 @@ export default function SimpleDeveloperPanel({ visible, onClose }: SimpleDevelop
           <View style={styles.content}>
             {/* Tickets Control */}
             <View style={styles.currencyControl}>
-              <Text style={styles.currencyLabel}>🎫 Tickets: {state.tickets}</Text>
+              <Text style={styles.currencyLabel}>Tickets: {state.tickets}</Text>
               <View style={styles.controlRow}>
                 <Pressable style={styles.arrowButton} onPress={() => handleAdjustTickets(-10)}>
                   <FontAwesome name="minus" size={16} color="#fff" />
@@ -110,7 +114,7 @@ export default function SimpleDeveloperPanel({ visible, onClose }: SimpleDevelop
 
             {/* Stamina Control */}
             <View style={styles.currencyControl}>
-              <Text style={styles.currencyLabel}>⚡ Stamina: {state.stamina}</Text>
+              <Text style={styles.currencyLabel}>Stamina: {state.stamina}</Text>
               <View style={styles.controlRow}>
                 <Pressable style={styles.arrowButton} onPress={() => handleAdjustStamina(-10)}>
                   <FontAwesome name="minus" size={16} color="#fff" />
@@ -130,7 +134,7 @@ export default function SimpleDeveloperPanel({ visible, onClose }: SimpleDevelop
 
             {/* Gems Control */}
             <View style={styles.currencyControl}>
-              <Text style={styles.currencyLabel}>💎 Gems: {state.coins}</Text>
+              <Text style={styles.currencyLabel}>Gems: {state.coins}</Text>
               <View style={styles.controlRow}>
                 <Pressable style={styles.arrowButton} onPress={() => handleAdjustGems(-10)}>
                   <FontAwesome name="minus" size={16} color="#fff" />

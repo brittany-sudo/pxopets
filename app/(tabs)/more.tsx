@@ -1,17 +1,38 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, ScrollView, View as RNView, Pressable } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import BorderedBox from '@/components/BorderedBox';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useColorSchemeContext } from '@/components/ColorSchemeContext';
+import { useInventory } from '@/store/InventoryStore';
+import DevModePanel from '@/components/DevModePanel';
 import BottomNavigation from '@/components/BottomNavigation';
 
 export default function MoreScreen() {
   const { colorScheme, toggleColorScheme, isDark } = useColorSchemeContext();
+  const { state: inventoryState, toggleDevMode } = useInventory();
+  const [showDevMode, setShowDevMode] = useState(false);
+  const [tapCount, setTapCount] = useState(0);
+
+  const handleTitlePress = () => {
+    const newTapCount = tapCount + 1;
+    setTapCount(newTapCount);
+    
+    if (newTapCount >= 5) {
+      toggleDevMode();
+      setTapCount(0);
+    }
+    
+    // Reset tap count after 3 seconds
+    setTimeout(() => setTapCount(0), 3000);
+  };
 
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
+        <Pressable onPress={handleTitlePress}>
+          <Text style={styles.hiddenTitle}>Settings</Text>
+        </Pressable>
         <BorderedBox>
           <RNView style={styles.menuItem}>
             <FontAwesome name="cog" size={20} color="#0ea5e9" />
@@ -43,6 +64,13 @@ export default function MoreScreen() {
             <Text style={styles.menuText}>Help & Support</Text>
           </RNView>
 
+          {inventoryState.devMode && (
+            <Pressable style={styles.menuItem} onPress={() => setShowDevMode(true)}>
+              <FontAwesome name="code" size={20} color="#8b5cf6" />
+              <Text style={[styles.menuText, styles.devModeText]}>Dev Mode - Add Items</Text>
+            </Pressable>
+          )}
+
           <RNView style={styles.menuItem}>
             <FontAwesome name="sign-out" size={20} color="#ef4444" />
             <Text style={[styles.menuText, styles.signOutText]}>Sign Out</Text>
@@ -50,6 +78,12 @@ export default function MoreScreen() {
         </BorderedBox>
       </ScrollView>
       <BottomNavigation />
+
+      {/* Dev Mode Panel */}
+      <DevModePanel 
+        visible={showDevMode} 
+        onClose={() => setShowDevMode(false)} 
+      />
     </View>
   );
 }
@@ -89,6 +123,18 @@ const styles = StyleSheet.create({
   },
   signOutText: {
     color: '#ef4444',
+  },
+  devModeText: {
+    color: '#8b5cf6',
+  },
+  hiddenTitle: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#0f172a',
+    marginBottom: 20,
+    textAlign: 'center',
+    opacity: 0,
   },
   toggleContainer: {
     marginLeft: 'auto',

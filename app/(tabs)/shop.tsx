@@ -5,8 +5,12 @@ import PixelButton from '@/components/PixelButton';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useGame } from '@/store/GameStore';
 
-// Import lunchbox image
-const lunchboxImage = require('@/assets/images/lunchbox-hill.png');
+// Import lunchbox images
+const gameLunchboxImage = require('@/assets/images/game-lunchbox.png');
+const cuteLunchboxImage = require('@/assets/images/cute-lunchbox.png');
+const whaleLunchboxImage = require('@/assets/images/whale-lunchbox.png');
+const rocketLunchboxImage = require('@/assets/images/rocket-lunchbox.png');
+const dragonLunchboxImage = require('@/assets/images/dragon-lunchbox.png');
 
 export default function ShopScreen() {
   const { state, addCoins, spendCoins, addTickets, spendTickets, addStamina, spendStamina, addFood } = useGame();
@@ -227,44 +231,59 @@ export default function ShopScreen() {
 
   const specialItems = [
     {
-      id: 'mystery_lunchbox',
-      name: 'MYSTERY LUNCHBOX',
-      price: 25,
+      id: 'game_lunchbox',
+      name: 'GAME LUNCHBOX',
+      price: 5,
       currency: 'tickets',
       icon: 'gift',
       color: '#8b5cf6',
-      description: 'Contains random food items',
+      description: 'Perfect for gaming snacks!',
       rarity: 'common',
+      image: 'game-lunchbox',
     },
     {
-      id: 'premium_lunchbox',
-      name: 'PREMIUM LUNCHBOX',
-      price: 50,
+      id: 'cute_lunchbox',
+      name: 'CUTE LUNCHBOX',
+      price: 5,
+      currency: 'tickets',
+      icon: 'gift',
+      color: '#ec4899',
+      description: 'Adorably cute lunch container',
+      rarity: 'common',
+      image: 'cute-lunchbox',
+    },
+    {
+      id: 'whale_lunchbox',
+      name: 'WHALE LUNCHBOX',
+      price: 5,
+      currency: 'tickets',
+      icon: 'gift',
+      color: '#06b6d4',
+      description: 'Whale-sized appetite container',
+      rarity: 'common',
+      image: 'whale-lunchbox',
+    },
+    {
+      id: 'rocket_lunchbox',
+      name: 'ROCKET LUNCHBOX',
+      price: 5,
       currency: 'tickets',
       icon: 'gift',
       color: '#f59e0b',
-      description: 'Contains rare food items',
-      rarity: 'rare',
+      description: 'Blast off with space food!',
+      rarity: 'common',
+      image: 'rocket-lunchbox',
     },
     {
-      id: 'golden_lunchbox',
-      name: 'GOLDEN LUNCHBOX',
-      price: 100,
+      id: 'dragon_lunchbox',
+      name: 'DRAGON LUNCHBOX',
+      price: 5,
       currency: 'tickets',
       icon: 'gift',
-      color: '#fbbf24',
-      description: 'Contains epic food items',
-      rarity: 'epic',
-    },
-    {
-      id: 'legendary_lunchbox',
-      name: 'LEGENDARY LUNCHBOX',
-      price: 200,
-      currency: 'tickets',
-      icon: 'gift',
-      color: '#dc2626',
-      description: 'Contains legendary food items',
-      rarity: 'legendary',
+      color: '#ef4444',
+      description: 'Fiery dragon-themed container',
+      rarity: 'common',
+      image: 'dragon-lunchbox',
     },
   ];
 
@@ -419,7 +438,17 @@ export default function ShopScreen() {
               <RNView style={styles.activityHeader}>
                 <RNView style={styles.activityIconContainer}>
                   {selectedCategory === 'special-items' ? (
-                    <Image source={lunchboxImage} style={styles.lunchboxIcon} />
+                    <Image 
+                      source={
+                        item.image === 'game-lunchbox' ? gameLunchboxImage :
+                        item.image === 'cute-lunchbox' ? cuteLunchboxImage :
+                        item.image === 'whale-lunchbox' ? whaleLunchboxImage :
+                        item.image === 'rocket-lunchbox' ? rocketLunchboxImage :
+                        item.image === 'dragon-lunchbox' ? dragonLunchboxImage :
+                        gameLunchboxImage
+                      } 
+                      style={styles.lunchboxIcon} 
+                    />
                   ) : (
                     <FontAwesome name={item.icon as any} size={16} color={item.color} />
                   )}

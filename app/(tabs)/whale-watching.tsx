@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, Pressable, ScrollView, StyleSheet, Image, Animated } from 'react-native';
 import { router } from 'expo-router';
 import { FontAwesome } from '@expo/vector-icons';
-import { View as RNView } from '@/components/Themed';
 
 type WeatherType = 'calm' | 'foggy' | 'stormy' | 'icy';
 type SightingType = 'junk' | 'normal' | 'golden' | 'white';
@@ -535,7 +534,7 @@ export default function WhaleWatchingScreen() {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: 'transparent' }]}>
+    <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Back Button - Fixed Position */}
         <Pressable 
@@ -547,9 +546,9 @@ export default function WhaleWatchingScreen() {
         </Pressable>
 
         {/* Header Row */}
-        <RNView style={styles.headerRow}>
+        <View style={styles.headerRow}>
           <Text style={styles.locationTitle}>HARBOR WATCH</Text>
-        </RNView>
+        </View>
 
         {/* Title Logo */}
         <Image 
@@ -559,27 +558,27 @@ export default function WhaleWatchingScreen() {
         />
 
         {/* Game Stats */}
-        <RNView style={styles.gameStats}>
-          <RNView style={styles.statItem}>
+        <View style={styles.gameStats}>
+          <View style={styles.statItem}>
             <Text style={styles.statLabel}>Outings Left</Text>
             <Text style={styles.statValue}>{outingsLeft}</Text>
-          </RNView>
-          <RNView style={styles.statItem}>
+          </View>
+          <View style={styles.statItem}>
             <Text style={styles.statLabel}>Tickets</Text>
-            <RNView style={styles.ticketValueContainer}>
+            <View style={styles.ticketValueContainer}>
               <Text style={styles.statValue}>3</Text>
               <FontAwesome name="ticket" size={12} color="#8b5cf6" />
-            </RNView>
-          </RNView>
-          <RNView style={styles.statItem}>
+            </View>
+          </View>
+          <View style={styles.statItem}>
             <Text style={styles.statLabel}>Weather</Text>
             <Text style={styles.statValue}>{WEATHER_EFFECTS[currentWeather].name}</Text>
-          </RNView>
-        </RNView>
+          </View>
+        </View>
 
 
         {/* Top Row - Button and Instructions */}
-        <RNView style={styles.topRow}>
+        <View style={styles.topRow}>
           {/* Scan the Horizon Button */}
           <Pressable
             style={[styles.watchButton, (outingsLeft <= 0 || gameActive) && styles.disabledButton]}
@@ -592,59 +591,59 @@ export default function WhaleWatchingScreen() {
           </Pressable>
           
           {/* Game Instructions */}
-          <RNView style={styles.instructionsContainer}>
+          <View style={styles.instructionsContainer}>
             <Text style={styles.instructionsText}>Pay 3 tickets for 3 outings - watch for sea creatures and treasures popping up from the waves!</Text>
-          </RNView>
-        </RNView>
+          </View>
+        </View>
 
         {/* Ocean View */}
-        <RNView style={styles.oceanView}>
+        <View style={styles.oceanView}>
           {/* Ocean Background - With tiled wave pattern */}
-          <RNView style={styles.oceanBackground}>
+          <View style={styles.oceanBackground}>
             {/* Tiled Background Pattern */}
-            <RNView style={styles.tiledBackground}>
+            <View style={styles.tiledBackground}>
               {generateTiledBackground()}
-            </RNView>
+            </View>
             {/* Scrolling Wave Row */}
-            <RNView style={styles.scrollingWaveContainer}>
+            <View style={styles.scrollingWaveContainer}>
               {generateScrollingWaves()}
-            </RNView>
+            </View>
             {/* Second Scrolling Wave Row */}
-            <RNView style={styles.scrollingWaveContainer2}>
+            <View style={styles.scrollingWaveContainer2}>
               {generateScrollingWaves()}
-            </RNView>
+            </View>
             {/* Third Scrolling Wave Row - Opposite Direction */}
-            <RNView style={styles.scrollingWaveContainer3}>
+            <View style={styles.scrollingWaveContainer3}>
               {generateScrollingWavesReverse()}
-            </RNView>
+            </View>
             {/* Fourth Scrolling Wave Row - Original Direction */}
-            <RNView style={styles.scrollingWaveContainer4}>
+            <View style={styles.scrollingWaveContainer4}>
               {generateScrollingWaves()}
-            </RNView>
+            </View>
             {/* Fifth Scrolling Wave Row - Opposite Direction */}
-            <RNView style={styles.scrollingWaveContainer5}>
+            <View style={styles.scrollingWaveContainer5}>
               {generateScrollingWavesReverse()}
-            </RNView>
+            </View>
             {/* Sixth Scrolling Wave Row - Original Direction */}
-            <RNView style={styles.scrollingWaveContainer6}>
+            <View style={styles.scrollingWaveContainer6}>
               {generateScrollingWaves()}
-            </RNView>
+            </View>
             {/* Seventh Scrolling Wave Row - Opposite Direction */}
-            <RNView style={styles.scrollingWaveContainer7}>
+            <View style={styles.scrollingWaveContainer7}>
               {generateScrollingWavesReverse()}
-            </RNView>
+            </View>
             {/* Eighth Scrolling Wave Row - Original Direction */}
-            <RNView style={styles.scrollingWaveContainer8}>
+            <View style={styles.scrollingWaveContainer8}>
               {generateScrollingWaves()}
-            </RNView>
+            </View>
             {/* Ninth Scrolling Wave Row - Opposite Direction */}
-            <RNView style={styles.scrollingWaveContainer9}>
+            <View style={styles.scrollingWaveContainer9}>
               {generateScrollingWavesReverse()}
-            </RNView>
+            </View>
             {/* Tenth Scrolling Wave Row - Original Direction */}
-            <RNView style={styles.scrollingWaveContainer10}>
+            <View style={styles.scrollingWaveContainer10}>
               {generateScrollingWaves()}
-            </RNView>
+            </View>
             
             {/* Whale Popups */}
             {/* Harbor Lighthouse */}
@@ -673,26 +672,26 @@ export default function WhaleWatchingScreen() {
                 />
               </Pressable>
             ))}
-          </RNView>
-        </RNView>
+          </View>
+        </View>
 
         {/* Captain's Log */}
-        <RNView style={styles.captainsLog}>
-          <RNView style={styles.logHeader}>
+        <View style={styles.captainsLog}>
+          <View style={styles.logHeader}>
             <Text style={styles.logTitle}>CAPTAIN'S LOG</Text>
-            <RNView style={styles.logHeaderRight}>
+            <View style={styles.logHeaderRight}>
               <Text style={styles.staminaText}>⚡ {stamina}/100</Text>
               <Image 
                 source={require('@/assets/images/captains-lighthouse.png')} 
                 style={styles.lighthouseImage}
                 resizeMode="contain"
               />
-            </RNView>
-          </RNView>
+            </View>
+          </View>
           {sightings.length > 0 ? (
             sightings.slice(-5).reverse().map((sighting) => (
-              <RNView key={sighting.id} style={styles.logEntry}>
-                <RNView style={styles.logDetails}>
+              <View key={sighting.id} style={styles.logEntry}>
+                <View style={styles.logDetails}>
                   <Text style={styles.logName}>
                     {sighting.type === 'pearl_deep' ? '🐚 Pearl of the Deep' :
                      sighting.type === 'mermaid_comb' ? '⚓ Mermaid\'s Comb' :
@@ -721,29 +720,29 @@ export default function WhaleWatchingScreen() {
                   <Text style={styles.logTime}>
                     {sighting.timestamp.toLocaleTimeString()} - {WEATHER_EFFECTS[sighting.weather].name}
                   </Text>
-                </RNView>
-                <RNView style={styles.logRewardContainer}>
+                </View>
+                <View style={styles.logRewardContainer}>
                   <FontAwesome name="bolt" size={12} color="#fbbf24" />
                   <Text style={styles.logReward}>+{sighting.reward}</Text>
-                </RNView>
-              </RNView>
+                </View>
+              </View>
             ))
           ) : (
             <Text style={styles.emptyLogText}>No sightings yet. Start sailing to spot some whales!</Text>
           )}
-        </RNView>
+        </View>
 
         {/* Result Display */}
         {showResult && currentSighting && (
-          <RNView style={styles.resultContainer}>
+          <View style={styles.resultContainer}>
             <Text style={styles.resultText}>
               You spotted a {WHALE_TYPES[currentSighting.type].name}!
             </Text>
-            <RNView style={styles.resultRewardContainer}>
+            <View style={styles.resultRewardContainer}>
               <FontAwesome name="bolt" size={16} color="#fbbf24" />
               <Text style={styles.resultReward}>+{WHALE_TYPES[currentSighting.type].reward}</Text>
-            </RNView>
-          </RNView>
+            </View>
+          </View>
         )}
       </ScrollView>
     </View>
@@ -781,8 +780,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     backgroundColor: 'rgba(14, 165, 233, 0.1)',
     borderRadius: 6,
-    borderWidth: 1,
-    borderColor: 'rgba(14, 165, 233, 0.3)',
+    borderWidth: 0,
   },
   locationTitle: {
     fontFamily: 'PressStart2P_400Regular',
@@ -839,8 +837,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   watchButton: {
-    borderWidth: 2,
-    borderColor: '#a78bfa', // Purple border
+    borderWidth: 0,
     backgroundColor: '#f9fafb', // Light purple background
     paddingHorizontal: 14,
     paddingVertical: 10,
@@ -884,8 +881,7 @@ const styles = StyleSheet.create({
     height: 200,
     backgroundColor: '#4f7c8a', // Between teal and blue - perfect ocean color
     borderRadius: 8,
-    borderWidth: 2,
-    borderColor: '#0284c7',
+    borderWidth: 0,
     position: 'relative',
     overflow: 'hidden',
   },
@@ -1026,8 +1022,7 @@ const styles = StyleSheet.create({
     width: '100%', // Fixed width instead of flex: 1
     backgroundColor: '#f7f3e9',
     borderRadius: 8,
-    borderWidth: 2,
-    borderColor: '#d4af37',
+    borderWidth: 0,
     padding: 12,
     shadowColor: '#000',
     shadowOffset: {
@@ -1122,8 +1117,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 16,
     marginTop: 20,
-    borderWidth: 2,
-    borderColor: '#a78bfa',
+    borderWidth: 0,
     alignItems: 'center',
   },
   resultText: {

@@ -244,7 +244,7 @@ export default function HomeScreen() {
 
         {/* Rare Finds - Large */}
         <RNView style={styles.featuredSection}>
-          <FontAwesome name="gem" size={32} color="#8b5cf6" style={styles.featuredIcon} />
+          <FontAwesome name="diamond" size={32} color="#8b5cf6" style={styles.featuredIcon} />
           <Text style={styles.featuredText}>Rare Finds: Golden Watering Can spotted in shop!</Text>
         </RNView>
 

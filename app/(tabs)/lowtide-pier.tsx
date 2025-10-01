@@ -8,8 +8,33 @@ export default function LowtidePierScreen() {
   const [showOceanView, setShowOceanView] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [popupMessage, setPopupMessage] = useState('');
+  const [showSeagulls, setShowSeagulls] = useState(false);
+  const [isFeeding, setIsFeeding] = useState(false);
   const waveAnimation = useRef(new Animated.Value(0)).current;
   const oceanOpacity = useRef(new Animated.Value(0)).current;
+  const seagullAnimation = useRef(new Animated.Value(0)).current;
+  const pierOverlayOpacity = useRef(new Animated.Value(1)).current;
+
+  const pierActivities = [
+    {
+      id: 'feed-seagulls',
+      name: 'Feed Seagulls',
+      description: 'Toss some breadcrumbs to the friendly seagulls that gather around the pier. Watch them swoop and dive for their treats.',
+      icon: 'cutlery'
+    },
+    {
+      id: 'check-tidepool',
+      name: 'Check Tidepool',
+      description: 'Explore the rocky tidepools that form during low tide. Discover tiny sea creatures and hidden treasures.',
+      icon: 'search'
+    },
+    {
+      id: 'message-bottle',
+      name: 'Message in a Bottle',
+      description: 'Write a message and send it out to sea in a glass bottle. Who knows where it might wash ashore.',
+      icon: 'envelope'
+    }
+  ];
 
   // Start ocean animation
   useEffect(() => {
@@ -44,6 +69,47 @@ export default function LowtidePierScreen() {
       };
     }
   }, [showOceanView]);
+
+  // Seagull animation
+  const animateSeagulls = () => {
+    setIsFeeding(true);
+    setShowSeagulls(true);
+    
+    // Fade out pier overlay
+    Animated.timing(pierOverlayOpacity, {
+      toValue: 0,
+      duration: 1000,
+      useNativeDriver: true,
+    }).start();
+
+    // Animate seagulls flying in
+    Animated.timing(seagullAnimation, {
+      toValue: 1,
+      duration: 1500,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  // Stop feeding function
+  const stopFeeding = () => {
+    setIsFeeding(false);
+    
+    // Fade out seagulls
+    Animated.timing(seagullAnimation, {
+      toValue: 0,
+      duration: 1000,
+      useNativeDriver: true,
+    }).start(() => {
+      setShowSeagulls(false);
+    });
+
+    // Fade in pier overlay
+    Animated.timing(pierOverlayOpacity, {
+      toValue: 1,
+      duration: 1000,
+      useNativeDriver: true,
+    }).start();
+  };
 
   const generateRandomEvent = () => {
     // Show ocean view immediately
@@ -84,25 +150,118 @@ export default function LowtidePierScreen() {
           <Text style={styles.locationTitle}>LOWTIDE PIER</Text>
         </RNView>
 
-        {/* Pier Image */}
-        <Image 
-          source={require('@/assets/images/lowtide-pier.png')} 
-          style={styles.pierImage}
-        />
+        {/* Pier Image with Overlay */}
+        <RNView style={styles.imageContainer}>
+          <Image 
+            source={require('@/assets/images/lowtide-pierbanner.png')} 
+            style={styles.pierImage}
+          />
+          <Animated.Image 
+            source={require('@/assets/images/lowtide-pier.png')} 
+            style={[
+              styles.pierOverlay,
+              {
+                opacity: pierOverlayOpacity,
+              },
+            ]}
+          />
+          {isFeeding && (
+            <Pressable 
+              style={styles.stopFeedingButton}
+              onPress={stopFeeding}
+            >
+              <FontAwesome name="times" size={10} color="#ffffff" />
+              <Text style={styles.stopFeedingText}>Stop Feeding</Text>
+            </Pressable>
+          )}
+          {showSeagulls && (
+            <RNView style={styles.seagullContainer}>
+              <Animated.Image 
+                source={require('@/assets/images/seagull-standing.png')} 
+                style={[
+                  styles.seagull,
+                  styles.seagull1,
+                  {
+                    opacity: seagullAnimation,
+                  },
+                ]}
+              />
+              <Animated.Image 
+                source={require('@/assets/images/seagull-standing2.png')} 
+                style={[
+                  styles.seagull,
+                  styles.seagull2,
+                  {
+                    opacity: seagullAnimation,
+                  },
+                ]}
+              />
+              <Animated.Image 
+                source={require('@/assets/images/seagull-standing3.png')} 
+                style={[
+                  styles.seagull,
+                  styles.seagull3,
+                  {
+                    opacity: seagullAnimation,
+                  },
+                ]}
+              />
+              <Animated.Image 
+                source={require('@/assets/images/seagull-standing4.png')} 
+                style={[
+                  styles.seagull,
+                  styles.seagull4,
+                  {
+                    opacity: seagullAnimation,
+                  },
+                ]}
+              />
+              <Animated.Image 
+                source={require('@/assets/images/seagullsitting.png')} 
+                style={[
+                  styles.seagull,
+                  styles.seagull5,
+                  {
+                    opacity: seagullAnimation,
+                  },
+                ]}
+              />
+            </RNView>
+          )}
+        </RNView>
 
-        {/* Description */}
-        <Text style={styles.description}>
-          A peaceful pier extending into the harbor. Take a moment to watch the ocean and discover what the tides bring.
-        </Text>
-
-        {/* Look Button */}
-        <Pressable 
-          style={styles.lookButton}
-          onPress={generateRandomEvent}
-        >
-          <FontAwesome name="eye" size={16} color="#ffffff" />
-          <Text style={styles.lookButtonText}>Look Out to Sea</Text>
-        </Pressable>
+        {/* Activities */}
+        <Text style={styles.activitiesTitle}>PIER ACTIVITIES</Text>
+        {pierActivities.map((activity) => (
+          <RNView key={activity.id} style={styles.activityItem}>
+            <Pressable 
+              style={styles.activityPressable}
+              onPress={() => {
+                if (activity.id === 'feed-seagulls') {
+                  animateSeagulls();
+                } else if (activity.id === 'check-tidepool') {
+                  // Handle check tidepool
+                  console.log('Check tidepool');
+                } else if (activity.id === 'message-bottle') {
+                  // Handle message in bottle
+                  console.log('Send message in bottle');
+                }
+              }}
+            >
+              <RNView style={styles.activityHeader}>
+                <RNView style={styles.activityInfo}>
+                  <FontAwesome name={activity.icon as any} size={20} color="#0ea5e9" style={styles.activityIcon} />
+                  <RNView style={styles.activityText}>
+                    <RNView style={styles.activityTitleRow}>
+                      <Text style={styles.activityName}>{activity.name}</Text>
+                    </RNView>
+                    <Text style={styles.activityDescription}>{activity.description}</Text>
+                  </RNView>
+                </RNView>
+              </RNView>
+            </Pressable>
+          </RNView>
+        ))}
 
         {/* Animated Ocean View */}
         {showOceanView && (
@@ -239,19 +398,140 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 20,
   },
+  imageContainer: {
+    position: 'relative',
+    marginTop: -20,
+    marginBottom: 20,
+    overflow: 'hidden',
+  },
   pierImage: {
     width: '100%',
-    height: 250,
-    marginBottom: 20,
+    height: 400,
     resizeMode: 'contain',
+  },
+  pierOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: '25%',
+    transform: [{ translateX: -50 }],
+    width: 320,
+    height: 240,
+    resizeMode: 'contain',
+  },
+  seagullContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 100, // Bottom quarter of 400px image
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'flex-end',
+  },
+  seagull: {
+    width: 40,
+    height: 40,
+    resizeMode: 'contain',
+  },
+  seagull1: {
+    // Right side - highest
+    marginBottom: 70,
+    marginLeft: 20,
+  },
+  seagull2: {
+    // Left center - higher
+    marginBottom: 60,
+  },
+  seagull3: {
+    // Center - top of bottom quarter
+    marginBottom: 100,
+  },
+  seagull4: {
+    // Right side - medium-high (was seagull5)
+    marginBottom: 55,
+  },
+  seagull5: {
+    // Right center - lower (was seagull4)
+    marginBottom: 35,
+    width: 46,
+    height: 46,
+  },
+  stopFeedingButton: {
+    position: 'absolute',
+    top: 50,
+    right: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
+  },
+  stopFeedingText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#ffffff',
+    marginLeft: 6,
   },
   description: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 14,
+    fontSize: 10,
     color: '#64748b',
     textAlign: 'center',
-    lineHeight: 20,
-    marginBottom: 30,
+    lineHeight: 16,
+    marginBottom: 20,
+  },
+  activitiesTitle: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 12,
+    color: '#0f172a',
+    textAlign: 'center',
+    marginBottom: 16,
+    marginTop: -20,
+  },
+  activityItem: {
+    marginBottom: 12,
+  },
+  activityPressable: {
+    backgroundColor: 'rgba(14, 165, 233, 0.05)',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(14, 165, 233, 0.2)',
+    padding: 12,
+  },
+  activityHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  activityInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  activityIcon: {
+    marginRight: 12,
+  },
+  activityText: {
+    flex: 1,
+  },
+  activityTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  activityName: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 12,
+    color: '#0f172a',
+    fontWeight: 'bold',
+  },
+  activityDescription: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 9,
+    color: '#64748b',
+    lineHeight: 14,
   },
   lookButton: {
     flexDirection: 'row',

@@ -412,7 +412,7 @@ export default function PetsScreen() {
                 <Text style={styles.trophyName}>Royal Pet</Text>
               </RNView>
               <RNView style={styles.trophyItem}>
-                <FontAwesome name="gem" size={20} color="#06b6d4" />
+                <FontAwesome name="diamond" size={20} color="#06b6d4" />
                 <Text style={styles.trophyName}>Treasure Hunter</Text>
               </RNView>
               <RNView style={styles.trophyItem}>

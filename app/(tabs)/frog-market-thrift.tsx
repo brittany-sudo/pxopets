@@ -20,6 +20,9 @@ const retroClockImage = require('@/assets/images/moonpetal-tea.png'); // Placeho
 const vintageHatImage = require('@/assets/images/milkshakes.png'); // Placeholder
 const thriftVaseImage = require('@/assets/images/glowcorn.png'); // Placeholder
 const vintageScarfImage = require('@/assets/images/moonpetal-tea.png'); // Placeholder
+const pufferjacketImage = require('@/assets/images/pufferjacket.png');
+const lavalampImage = require('@/assets/images/lavalamp.png');
+const vintagetvImage = require('@/assets/images/vintagetv.png');
 
 // Image mapping for items
 const itemImageMap: { [key: string]: any } = {
@@ -33,6 +36,9 @@ const itemImageMap: { [key: string]: any } = {
   'vintage-hat': vintageHatImage,
   'thrift-vase': thriftVaseImage,
   'vintage-scarf': vintageScarfImage,
+  'pufferjacket': pufferjacketImage,
+  'lavalamp': lavalampImage,
+  'vintagetv': vintagetvImage,
 };
 
 export default function FrogMarketThriftScreen() {
@@ -64,6 +70,30 @@ export default function FrogMarketThriftScreen() {
 
   // All possible thrift items
   const allThriftItems = [
+    {
+      id: 'pufferjacket',
+      name: 'Vintage Puffer Jacket',
+      description: 'Bright 90s puffer jacket in neon colors. Peak retro fashion.',
+      basePrice: 35,
+      rarity: 'uncommon',
+      image: 'pufferjacket'
+    },
+    {
+      id: 'lavalamp',
+      name: 'Retro Lava Lamp',
+      description: 'Classic lava lamp with mesmerizing wax blobs. Perfect mood lighting.',
+      basePrice: 28,
+      rarity: 'uncommon',
+      image: 'lavalamp'
+    },
+    {
+      id: 'vintagetv',
+      name: 'Vintage Wooden TV',
+      description: '1950s wooden console TV. No remote, no cable, all charm.',
+      basePrice: 55,
+      rarity: 'rare',
+      image: 'vintagetv'
+    },
     {
       id: 'vintage-sweater',
       name: 'Vintage Cable Knit Sweater',
@@ -188,8 +218,19 @@ export default function FrogMarketThriftScreen() {
 
   // Generate random stock
   const generateRandomStock = () => {
-    const shuffled = [...allThriftItems].sort(() => 0.5 - Math.random());
-    const selectedItems = shuffled.slice(0, 10);
+    // Always include the new featured items first
+    const featuredItems = allThriftItems.filter(item => 
+      ['pufferjacket', 'lavalamp', 'vintagetv'].includes(item.id)
+    );
+    
+    // Get remaining items and shuffle them
+    const remainingItems = allThriftItems.filter(item => 
+      !['pufferjacket', 'lavalamp', 'vintagetv'].includes(item.id)
+    );
+    const shuffled = [...remainingItems].sort(() => 0.5 - Math.random());
+    
+    // Combine featured items with 7 random others
+    const selectedItems = [...featuredItems, ...shuffled.slice(0, 7)];
     
     // Add random price variations and stock
     return selectedItems.map(item => ({
@@ -299,17 +340,6 @@ export default function FrogMarketThriftScreen() {
           </Pressable>
         </RNView>
 
-        {/* Player Stats */}
-        <RNView style={styles.statsContainer}>
-          <RNView style={styles.statItem}>
-            <FontAwesome name="diamond" size={16} color="#8b5cf6" />
-            <Text style={styles.statValue}>{state.coins.toLocaleString()}</Text>
-          </RNView>
-          <RNView style={styles.statItem}>
-            <FontAwesome name="ticket" size={16} color="#22c55e" />
-            <Text style={styles.statValue}>{state.tickets.toLocaleString()}</Text>
-          </RNView>
-        </RNView>
 
         {/* Shop Description */}
         <Text style={styles.description}>
@@ -342,7 +372,7 @@ export default function FrogMarketThriftScreen() {
               
               <RNView style={styles.itemFooter}>
                 <RNView style={styles.priceContainer}>
-                  <FontAwesome name="ticket" size={12} color="#22c55e" />
+                  <FontAwesome name="ticket" size={12} color="#0ea5e9" />
                   <Text style={styles.priceText}>{item.price}</Text>
                 </RNView>
                 <Text style={styles.stockText}>Stock: {item.stock}</Text>
@@ -464,7 +494,6 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: '#0f172a',
     textAlign: 'left',
-    fontStyle: 'italic',
   },
   jeremiahImage: {
     width: 60,
@@ -581,7 +610,7 @@ const styles = StyleSheet.create({
   priceContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(34, 197, 94, 0.1)',
+    backgroundColor: 'rgba(14, 165, 233, 0.1)',
     borderRadius: 6,
     paddingHorizontal: 6,
     paddingVertical: 2,
@@ -589,7 +618,7 @@ const styles = StyleSheet.create({
   priceText: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 10,
-    color: '#22c55e',
+    color: '#0ea5e9',
     fontWeight: 'bold',
     marginLeft: 4,
   },
@@ -599,7 +628,7 @@ const styles = StyleSheet.create({
     color: '#64748b',
   },
   buyButton: {
-    backgroundColor: '#22c55e',
+    backgroundColor: '#0ea5e9',
     borderRadius: 6,
     paddingHorizontal: 12,
     paddingVertical: 6,

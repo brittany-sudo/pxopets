@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, ScrollView, View as RNView, Image, Pressable, Alert, Animated } from 'react-native';
+import { StyleSheet, ScrollView, View as RNView, Image, Pressable, Alert, Animated, TouchableOpacity } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { router } from 'expo-router';
 import BorderedBox from '@/components/BorderedBox';
+import { useInventory } from '@/store/InventoryStore';
+import { useSimpleGame } from '@/store/SimpleGameStore';
 
 // Import the Marty image and main image
 const martyImage = require('@/assets/images/quickstop-marty.png');
@@ -30,26 +32,39 @@ const scratchoff2Image = require('@/assets/images/scratchoff2.png');
 const scratchoff3Image = require('@/assets/images/scratchoff3.png');
 const scratchoff4Image = require('@/assets/images/scratchoff4.png');
 const moonpetalTeaImage = require('@/assets/images/moonpetal-tea.png');
+const quickstopCoffeeImage = require('@/assets/images/quickstopcoffee.png');
+const slushee3Image = require('@/assets/images/slushee3.png');
+const gameLunchboxImage = require('@/assets/images/game-lunchbox.png');
+const cuteLunchboxImage = require('@/assets/images/cute-lunchbox.png');
+const whaleLunchboxImage = require('@/assets/images/whale-lunchbox.png');
+const rocketLunchboxImage = require('@/assets/images/rocket-lunchbox.png');
+const dragonLunchboxImage = require('@/assets/images/dragon-lunchbox.png');
+const pxogulpJugImage = require('@/assets/images/pxogulp-jug.png');
 
 export default function ShopScreen() {
   const [shopkeeperSaying, setShopkeeperSaying] = useState("Welcome to QuickStop! Best prices in Pxoburbs!");
   const [countdown, setCountdown] = useState(3600); // 1 hour in seconds
   const [showCoffeePopup, setShowCoffeePopup] = useState(false);
   const [showSlusheePopup, setShowSlusheePopup] = useState(false);
+  const [showPurchaseConfirm, setShowPurchaseConfirm] = useState(false);
+  const [showPurchaseSuccess, setShowPurchaseSuccess] = useState(false);
+  const [showNotEnoughTickets, setShowNotEnoughTickets] = useState(false);
+  const [showOutOfStock, setShowOutOfStock] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [coffeeClaimedToday, setCoffeeClaimedToday] = useState(false);
+  const [slusheeClaimedToday, setSlusheeClaimedToday] = useState(false);
+  const [showSlusheeConfirm, setShowSlusheeConfirm] = useState(false);
+  const [showSlusheeSuccess, setShowSlusheeSuccess] = useState(false);
   const glowAnimation = useRef(new Animated.Value(0.2)).current;
-  const [playerInventory, setPlayerInventory] = useState([
-    { id: '1', name: 'Golden Star', price: 15, image: 'cosmicburger' },
-    { id: '2', name: 'Magic Leaf', price: 8, image: 'cupnoddle' },
-    { id: '3', name: 'Blue Crystal', price: 25, image: 'chocolate' },
-    { id: '4', name: 'Love Token', price: 12, image: 'gumballs' },
-  ]);
+  const { addItem } = useInventory();
+  const { state: gameState, addCoins, addTickets, spendTickets, hydrated } = useSimpleGame();
 
   // Limited time items that can only be bought with tickets
   const [limitedItems, setLimitedItems] = useState([
-    { id: 'l1', name: 'Space Bubblegum', price: 50, image: 'gumballs', tickets: 3 },
-    { id: 'l2', name: 'Cosmic Burger', price: 75, image: 'cosmicburger', tickets: 5 },
-    { id: 'l3', name: 'Punch Pouch', price: 100, image: 'pouchdrink', tickets: 7 },
-    { id: 'l4', name: 'Choco-Donut', price: 125, image: 'chocodonut', tickets: 10 },
+    { id: 'l1', name: 'Space Bubblegum', price: 2, image: 'gumballs', tickets: 2 },
+    { id: 'l2', name: 'Cosmic Burger', price: 2, image: 'cosmicburger', tickets: 2 },
+    { id: 'l3', name: 'Punch Pouch', price: 2, image: 'pouchdrink', tickets: 2 },
+    { id: 'l4', name: 'Choco-Donut', price: 2, image: 'chocodonut', tickets: 2 },
   ]);
 
   // Scratch-off tickets with different variations
@@ -57,7 +72,7 @@ export default function ShopScreen() {
     { 
       id: 'lot1', 
       name: 'Cash Match', 
-      price: 5, 
+      price: 1, 
       description: 'Match 3 to win!',
       odds: '1 in 3',
       prizes: ['5 tickets', '10 tickets', '25 tickets', '50 tickets'],
@@ -66,7 +81,7 @@ export default function ShopScreen() {
     { 
       id: 'lot2', 
       name: 'Lucky 7s', 
-      price: 15, 
+      price: 1, 
       description: 'Find 3 lucky 7s!',
       odds: '1 in 5',
       prizes: ['25 tickets', '50 tickets', '100 tickets', 'Rare Item'],
@@ -75,7 +90,7 @@ export default function ShopScreen() {
     { 
       id: 'lot3', 
       name: 'Mega Money', 
-      price: 50, 
+      price: 1, 
       description: 'Scratch to reveal your prize!',
       odds: '1 in 20',
       prizes: ['100 tickets', '500 tickets', '1000 tickets', 'Legendary Pet'],
@@ -84,7 +99,7 @@ export default function ShopScreen() {
     { 
       id: 'lot4', 
       name: 'Win Big', 
-      price: 10, 
+      price: 1, 
       description: 'Instant winner guaranteed!',
       odds: '1 in 4',
       prizes: ['15 tickets', '30 tickets', '60 tickets', 'Special Item'],
@@ -94,15 +109,15 @@ export default function ShopScreen() {
 
   // Shop inventory that changes every few hours
   const [shopInventory, setShopInventory] = useState([
-    { id: 's1', name: 'Protein Bar', price: 8, stock: 3, image: 'chocolate' },
-    { id: 's2', name: 'Hot Chips', price: 18, stock: 1, image: 'hotchips' },
-    { id: 's3', name: 'Slushee', price: 12, stock: 5, image: 'slushee' },
-    { id: 's4', name: 'Lil Soda', price: 20, stock: 2, image: 'lil-soda' },
-    { id: 's5', name: "Cup O'Noodle", price: 15, stock: 4, image: 'cupnoodle' },
-    { id: 's6', name: 'Gas Station Dog', price: 25, stock: 2, image: 'regularhotdog' },
-    { id: 's7', name: 'Potato Chomps', price: 30, stock: 1, image: 'potatochomps' },
-    { id: 's8', name: 'Saturn Soda', price: 14, stock: 3, image: 'saturnsoda' },
-    { id: 's9', name: 'Nuggets', price: 16, stock: 4, image: 'nuggets' },
+    { id: 's1', name: 'Protein Bar', price: 1, stock: 3, image: 'chocolate' },
+    { id: 's2', name: 'Hot Chips', price: 1, stock: 1, image: 'hotchips' },
+    { id: 's3', name: 'Slushee', price: 1, stock: 5, image: 'slushee' },
+    { id: 's4', name: 'Lil Soda', price: 1, stock: 2, image: 'lil-soda' },
+    { id: 's5', name: "Cup O'Noodle", price: 1, stock: 4, image: 'cupnoodle' },
+    { id: 's6', name: 'Quickdog', price: 1, stock: 2, image: 'regularhotdog' },
+    { id: 's7', name: 'Quick Chips', price: 1, stock: 1, image: 'potatochomps' },
+    { id: 's8', name: 'Saturn Soda', price: 1, stock: 3, image: 'saturnsoda' },
+    { id: 's9', name: 'Nuggets', price: 1, stock: 4, image: 'nuggets' },
   ]);
 
   // Countdown timer effect
@@ -164,6 +179,22 @@ export default function ShopScreen() {
     return () => clearInterval(interval);
   }, []);
 
+  // Check and reset daily coffee and slushee claims
+  useEffect(() => {
+    const checkDailyClaims = () => {
+      const today = new Date().toDateString();
+      
+      // For now, let's just reset both to false to test
+      // In a real app, you'd use AsyncStorage or another persistent storage
+      setCoffeeClaimedToday(false);
+      setSlusheeClaimedToday(false);
+      
+      console.log('Daily claims reset for:', today);
+    };
+
+    checkDailyClaims();
+  }, []);
+
   const formatTime = (seconds: number) => {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
@@ -173,28 +204,65 @@ export default function ShopScreen() {
 
 
   const handleBuy = (item: any) => {
-    if (item.stock > 0) {
-      Alert.alert(
-        "Purchase Item",
-        `Buy ${item.name} for ${item.price} lightning?`,
-        [
-          { text: "Cancel", style: "cancel" },
-          { text: "Buy", onPress: () => {
-            // Update stock
-            setShopInventory(prev => 
-              prev.map(shopItem => 
-                shopItem.id === item.id 
-                  ? { ...shopItem, stock: shopItem.stock - 1 }
-                  : shopItem
-              )
-            );
-            Alert.alert("Success!", `You bought ${item.name}!`);
-          }}
-        ]
-      );
-    } else {
-      Alert.alert("Out of Stock", "This item is currently unavailable.");
+    if (!hydrated) {
+      alert('App not ready yet, please wait...');
+      return;
     }
+    
+    if (item.stock > 0) {
+      // Check if player has enough tickets
+      if (gameState.tickets >= item.price) {
+        setSelectedItem(item);
+        setShowPurchaseConfirm(true);
+      } else {
+        setShowNotEnoughTickets(true);
+      }
+    } else {
+      setShowOutOfStock(true);
+    }
+  };
+
+  const confirmPurchase = () => {
+    if (!selectedItem) return;
+    
+    // Deduct tickets
+    spendTickets(selectedItem.price);
+    
+    // Update stock
+    setShopInventory(prev => 
+      prev.map(shopItem => 
+        shopItem.id === selectedItem.id 
+          ? { ...shopItem, stock: shopItem.stock - 1 }
+          : shopItem
+      )
+    );
+    
+    // Add to inventory
+    const itemData = {
+      id: selectedItem.id,
+      name: selectedItem.name,
+      price: selectedItem.price,
+      image: selectedItem.image,
+      category: 'snack' as const,
+      description: `Purchased from QuickStop`
+    };
+    
+    addItem(itemData, 1);
+    
+    // Close confirmation modal and show success
+    setShowPurchaseConfirm(false);
+    setShowPurchaseSuccess(true);
+    
+    // Auto-close success modal after 2 seconds
+    setTimeout(() => {
+      setShowPurchaseSuccess(false);
+      setSelectedItem(null);
+    }, 2000);
+  };
+
+  const cancelPurchase = () => {
+    setShowPurchaseConfirm(false);
+    setSelectedItem(null);
   };
 
   const handleSell = (item: any) => {
@@ -204,104 +272,150 @@ export default function ShopScreen() {
       [
         { text: "Cancel", style: "cancel" },
         { text: "Sell", onPress: () => {
-          // Remove from player inventory
-          setPlayerInventory(prev => prev.filter(playerItem => playerItem.id !== item.id));
-          Alert.alert("Sold!", `You sold ${item.name} for ${Math.floor(item.price * 0.7)} tickets!`);
+          // TODO: Implement sell functionality
+          Alert.alert("Coming Soon", "Sell functionality will be implemented soon!");
         }}
       ]
     );
   };
 
-  const handleHaggle = (item: any) => {
-    const hagglePrice = Math.floor(item.price * 0.8);
-    Alert.alert(
-      "Haggle",
-      `Try to get ${item.name} for ${hagglePrice} tickets instead of ${item.price}?`,
-      [
-        { text: "Cancel", style: "cancel" },
-        { text: "Haggle", onPress: () => {
-          const success = Math.random() > 0.3; // 70% success rate
-          if (success) {
-            Alert.alert("Success!", `Shopkeeper accepted your offer! ${item.name} for ${hagglePrice} tickets!`);
-            setShopInventory(prev => 
-              prev.map(shopItem => 
-                shopItem.id === item.id 
-                  ? { ...shopItem, stock: shopItem.stock - 1 }
-                  : shopItem
-              )
-            );
-          } else {
-            Alert.alert("Failed", "Shopkeeper rejected your offer. Try again later!");
-          }
-        }}
-      ]
-    );
-  };
 
   const handleLotteryPurchase = (lottery: any) => {
-    Alert.alert(
-      "Buy Lottery Ticket",
-      `Buy a ${lottery.name} ticket for ${lottery.price} ⚡?\n\nOdds: ${lottery.odds}\nPrizes: ${lottery.prizes.join(', ')}`,
-      [
-        { text: "Cancel", style: "cancel" },
-        { text: "Buy Ticket", onPress: () => {
-          // Simulate lottery draw based on odds
-          let winChance = 0;
-          switch (lottery.odds) {
-            case '1 in 3': winChance = 1/3; break;
-            case '1 in 4': winChance = 1/4; break;
-            case '1 in 5': winChance = 1/5; break;
-            case '1 in 20': winChance = 1/20; break;
-            default: winChance = 0.1;
-          }
-          
-          const won = Math.random() < winChance;
-          
-          if (won) {
-            const randomPrize = lottery.prizes[Math.floor(Math.random() * lottery.prizes.length)];
-            Alert.alert(
-              "🎉 WINNER! 🎉", 
-              `Congratulations! You won: ${randomPrize}!\n\nYour ${lottery.name} ticket was a winner!`
-            );
-          } else {
-            Alert.alert(
-              "Better Luck Next Time", 
-              `Your ${lottery.name} ticket didn't win this time.\n\nTry again for another chance!`
-            );
-          }
-        }}
-      ]
-    );
+    // Check if player has enough tickets
+    if (gameState.tickets >= lottery.price) {
+      Alert.alert(
+        "Buy Lottery Ticket",
+        `Buy a ${lottery.name} ticket for ${lottery.price} ticket${lottery.price > 1 ? 's' : ''}?\n\nOdds: ${lottery.odds}\nPrizes: ${lottery.prizes.join(', ')}\n\nYou have ${gameState.tickets} tickets.`,
+        [
+          { text: "Cancel", style: "cancel" },
+          { text: "Buy Ticket", onPress: () => {
+            // Deduct tickets
+            spendTickets(lottery.price);
+            
+            // Simulate lottery draw based on odds
+            let winChance = 0;
+            switch (lottery.odds) {
+              case '1 in 3': winChance = 1/3; break;
+              case '1 in 4': winChance = 1/4; break;
+              case '1 in 5': winChance = 1/5; break;
+              case '1 in 20': winChance = 1/20; break;
+              default: winChance = 0.1;
+            }
+            
+            const won = Math.random() < winChance;
+            
+            if (won) {
+              const randomPrize = lottery.prizes[Math.floor(Math.random() * lottery.prizes.length)];
+              Alert.alert(
+                "🎉 WINNER! 🎉", 
+                `Congratulations! You won: ${randomPrize}!\n\nYour ${lottery.name} ticket was a winner!`
+              );
+            } else {
+              Alert.alert(
+                "Better Luck Next Time", 
+                `Your ${lottery.name} ticket didn't win this time.\n\nTry again for another chance!`
+              );
+            }
+          }}
+        ]
+      );
+    } else {
+      Alert.alert("Not Enough Tickets", `You need ${lottery.price} ticket${lottery.price > 1 ? 's' : ''} to buy a ${lottery.name} ticket.\n\nYou have ${gameState.tickets} tickets.`);
+    }
   };
 
   const handleFreeCoffee = () => {
+    if (coffeeClaimedToday) {
+      Alert.alert("Already Claimed", "You've already claimed your free coffee today! Come back tomorrow!");
+      return;
+    }
     setShowCoffeePopup(true);
   };
 
   const handleTakeCoffee = () => {
-    setPlayerInventory(prev => [...prev, { 
-      id: Date.now().toString(), 
-      name: 'Cup of Coffee', 
-      price: 0, 
-      image: 'moonpetal-tea' 
-    }]);
+    addItem({
+      id: 'quickstop-coffee',
+      name: 'QuickStop Coffee',
+      price: 0,
+      image: 'quickstopcoffee',
+      category: 'drink',
+      description: 'A complimentary cup of QuickStop coffee'
+    }, 1);
+    
+    // Mark coffee as claimed for today
+    setCoffeeClaimedToday(true);
+    
     setShowCoffeePopup(false);
   };
 
   const handleMonthlySlushee = () => {
+    if (slusheeClaimedToday) {
+      Alert.alert("Already Claimed", "You've already claimed your monthly slushee today! Come back tomorrow!");
+      return;
+    }
+    if (gameState.tickets < 3) {
+      Alert.alert("Not Enough Tickets", "You need 3 tickets to buy a monthly slushee!");
+      return;
+    }
     setShowSlusheePopup(true);
   };
 
-  const handlePurchaseSlushee = () => {
-    // Check if player has enough tickets (assuming they have tickets in inventory)
-    // For now, we'll just add the slushee and close the popup
-    setPlayerInventory(prev => [...prev, { 
-      id: Date.now().toString(), 
-      name: 'Monthly Slushee', 
-      price: 1, 
-      image: 'slushee' 
-    }]);
+  const handleSlusheeConfirm = () => {
     setShowSlusheePopup(false);
+    setShowSlusheeConfirm(true);
+  };
+
+  const handleSlusheePurchase = () => {
+    // Deduct 3 tickets
+    spendTickets(3);
+    
+    // Add slushee to inventory
+    addItem({
+      id: 'monthly-slushee',
+      name: 'Monthly Slushee',
+      price: 3,
+      image: 'slushee3',
+      category: 'drink',
+      description: 'A refreshing monthly slushee!'
+    }, 1);
+    
+    // Mark slushee as claimed for today
+    setSlusheeClaimedToday(true);
+    
+    setShowSlusheeConfirm(false);
+    setShowSlusheeSuccess(true);
+
+    setTimeout(() => {
+      setShowSlusheeSuccess(false);
+    }, 2000);
+  };
+
+
+  const handlePurchaseItem = (item: any) => {
+    // Check if player has enough tickets
+    if (gameState.tickets >= item.price) {
+      // Deduct tickets
+      spendTickets(item.price);
+      
+      const itemData = {
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        image: item.image,
+        category: 'snack' as const,
+        description: `Purchased from QuickStop`
+      };
+      
+      const success = addItem(itemData, 1);
+      
+      if (success) {
+        Alert.alert("Purchase Successful", `${item.name} added to inventory!`);
+      } else {
+        Alert.alert("Inventory Full", "Item moved to safety deposit box!");
+      }
+    } else {
+      Alert.alert("Not Enough Tickets", `You need ${item.price} ticket${item.price > 1 ? 's' : ''} to buy ${item.name}.\n\nYou have ${gameState.tickets} tickets.`);
+    }
   };
 
   return (
@@ -315,6 +429,7 @@ export default function ShopScreen() {
           <FontAwesome name="arrow-left" size={12} color="#8b5cf6" />
           <Text style={styles.backButtonText}>Back</Text>
         </Pressable>
+
 
         {/* Header Row */}
         <RNView style={styles.headerRow}>
@@ -359,6 +474,7 @@ export default function ShopScreen() {
           </Pressable>
         </RNView>
 
+
         {/* Shop Inventory */}
         <BorderedBox>
           <RNView style={styles.stockHeader}>
@@ -387,7 +503,10 @@ export default function ShopScreen() {
                   style={styles.chipsImage} 
                 />
                 <Text style={styles.chipsName}>{item.name}</Text>
-                <Text style={styles.chipsPrice}>{item.price} ⚡</Text>
+                <RNView style={styles.priceContainer}>
+                  <FontAwesome name="ticket" size={14} color="#8b5cf6" />
+                  <Text style={styles.ticketPrice}>{item.price}</Text>
+                </RNView>
                 <Text style={styles.chipsStock}>Stock: {item.stock}</Text>
                 <RNView style={styles.chipsActions}>
                   <Pressable 
@@ -396,13 +515,6 @@ export default function ShopScreen() {
                     disabled={item.stock === 0}
                   >
                     <Text style={styles.buyButtonText}>BUY</Text>
-                  </Pressable>
-                  <Pressable 
-                    style={[styles.actionButton, styles.haggleButton]}
-                    onPress={() => handleHaggle(item)}
-                    disabled={item.stock === 0}
-                  >
-                    <Text style={styles.haggleButtonText}>HAGGLE</Text>
                   </Pressable>
                 </RNView>
               </RNView>
@@ -442,7 +554,7 @@ export default function ShopScreen() {
           >
             <RNView style={styles.chipsGrid}>
               {limitedItems.map((item) => (
-                <RNView key={item.id} style={[styles.chipsItem, { width: '48%' }]}>
+                <RNView key={item.id} style={styles.martysItem}>
                   <Image 
                     source={
                       item.image === 'gumballs' ? gumballsImage :
@@ -452,9 +564,13 @@ export default function ShopScreen() {
                       item.image === 'pouchdrink' ? pouchdrinkImage :
                       pouchdrinkImage
                     } 
-                    style={styles.chipsImage} 
+                    style={styles.martysImage} 
                   />
-                  <Text style={styles.chipsName}>{item.name}</Text>
+                  <Text style={styles.martysName}>{item.name}</Text>
+                  <RNView style={styles.priceContainer}>
+                    <FontAwesome name="diamond" size={14} color="#4a90e2" />
+                    <Text style={styles.gemPrice}>{item.price}</Text>
+                  </RNView>
                   <RNView style={styles.chipsActions}>
                     <Pressable 
                       style={[styles.actionButton, styles.buyButton]}
@@ -493,7 +609,7 @@ export default function ShopScreen() {
                 <Text style={styles.lotteryName}>{lottery.name}</Text>
                 <Text style={styles.lotteryDescription}>{lottery.description}</Text>
                 <Text style={styles.lotteryOdds}>Odds: {lottery.odds}</Text>
-                <Text style={styles.lotteryPrice}>{lottery.price} ⚡</Text>
+                <Text style={styles.lotteryPrice}>{lottery.price} ticket{lottery.price > 1 ? 's' : ''}</Text>
                 <Pressable 
                   style={[styles.actionButton, styles.lotteryButton]}
                   onPress={() => handleLotteryPurchase(lottery)}
@@ -504,6 +620,35 @@ export default function ShopScreen() {
             ))}
         </RNView>
 
+        {/* Featured Item - Pxogulp Jug */}
+        <RNView style={styles.featuredContainer}>
+          <RNView style={styles.featuredBorder}>
+            <RNView style={styles.featuredHeader}>
+              <Text style={styles.featuredTitle}>✨ FEATURED ITEM ✨</Text>
+            </RNView>
+            <RNView style={styles.featuredContent}>
+              <RNView style={styles.featuredImageContainer}>
+                <Image source={pxogulpJugImage} style={styles.featuredImage} />
+                <RNView style={styles.featuredGlow} />
+              </RNView>
+              <RNView style={styles.featuredInfo}>
+                <Text style={styles.featuredItemName}>Pxogulp Refillable Jug</Text>
+                <Text style={styles.featuredDescription}>
+                  Fill with your choice of 6 sodas!{'\n'}
+                  3 refills per day • 20 stamina each
+                </Text>
+                <RNView style={styles.featuredPriceContainer}>
+                  <FontAwesome name="diamond" size={20} color="#00ffff" />
+                  <Text style={styles.featuredPrice}>50</Text>
+                </RNView>
+                <Pressable style={styles.featuredBuyButton}>
+                  <Text style={styles.featuredBuyText}>GET REFILLABLE JUG</Text>
+                </Pressable>
+              </RNView>
+            </RNView>
+          </RNView>
+        </RNView>
+
       </ScrollView>
 
       {/* Coffee Popup Modal */}
@@ -511,9 +656,9 @@ export default function ShopScreen() {
         <RNView style={styles.modalOverlay}>
           <RNView style={styles.coffeePopup}>
             <Text style={styles.coffeePopupTitle}>FREE COFFEE!</Text>
-            <Image source={moonpetalTeaImage} style={styles.coffeePopupImage} />
+            <Image source={quickstopCoffeeImage} style={styles.coffeePopupImage} />
             <Text style={styles.coffeePopupText}>
-              A complimentary cup of QuickStop coffee! ☕
+              A complimentary cup of QuickStop coffee!
             </Text>
             <Pressable 
               style={styles.coffeePopupButton}
@@ -528,29 +673,193 @@ export default function ShopScreen() {
       {/* Slushee Popup Modal */}
       {showSlusheePopup && (
         <RNView style={styles.modalOverlay}>
-          <RNView style={styles.slusheePopup}>
-            <Text style={styles.slusheePopupTitle}>MONTHLY SLUSHEE</Text>
-            <Image source={slusheeImage} style={styles.slusheePopupImage} />
-            <Text style={styles.slusheePopupText}>
-              Special monthly slushee available for 1 ticket! 🧊
+          <RNView style={styles.coffeePopup}>
+            <Text style={styles.coffeePopupTitle}>MONTHLY SLUSHEE!</Text>
+            <Image source={slushee3Image} style={styles.coffeePopupImage} />
+            <Text style={styles.coffeePopupText}>
+              A refreshing monthly slushee for 3 tickets!
             </Text>
-            <RNView style={styles.slusheeButtonContainer}>
+            <Pressable 
+              style={styles.coffeePopupButton}
+              onPress={handleSlusheeConfirm}
+            >
+              <Text style={styles.coffeePopupButtonText}>Buy for 3 Tickets</Text>
+            </Pressable>
+            <Pressable 
+              style={styles.coffeePopupCancelButton}
+              onPress={() => setShowSlusheePopup(false)}
+            >
+              <Text style={styles.coffeePopupCancelButtonText}>Cancel</Text>
+            </Pressable>
+          </RNView>
+        </RNView>
+      )}
+
+      {/* Slushee Confirmation Modal */}
+      {showSlusheeConfirm && (
+        <RNView style={styles.modalOverlay}>
+          <RNView style={styles.purchaseConfirmPopup}>
+            <Text style={styles.purchaseConfirmTitle}>CONFIRM PURCHASE</Text>
+            <Image source={slushee3Image} style={styles.coffeePopupImage} />
+            <Text style={styles.purchaseConfirmText}>
+              Buy Monthly Slushee for 3 tickets?
+            </Text>
+            <RNView style={styles.purchaseConfirmButtons}>
               <Pressable 
-                style={styles.slusheePopupButton}
-                onPress={handlePurchaseSlushee}
+                style={styles.purchaseConfirmButton}
+                onPress={handleSlusheePurchase}
               >
-                <Text style={styles.slusheePopupButtonText}>1 Ticket</Text>
+                <Text style={styles.purchaseConfirmButtonText}>Confirm</Text>
               </Pressable>
               <Pressable 
-                style={styles.slusheeNoThanksButton}
-                onPress={() => setShowSlusheePopup(false)}
+                style={styles.purchaseCancelButton}
+                onPress={() => setShowSlusheeConfirm(false)}
               >
-                <Text style={styles.slusheeNoThanksButtonText}>No Thanks</Text>
+                <Text style={styles.purchaseCancelButtonText}>Cancel</Text>
               </Pressable>
             </RNView>
           </RNView>
         </RNView>
       )}
+
+      {/* Slushee Success Modal */}
+      {showSlusheeSuccess && (
+        <RNView style={styles.modalOverlay}>
+          <RNView style={styles.purchaseSuccessPopup}>
+            <Text style={styles.purchaseSuccessTitle}>PURCHASE SUCCESSFUL! 🎉</Text>
+            <Image source={slushee3Image} style={styles.purchaseSuccessImage} />
+            <Text style={styles.purchaseSuccessText}>
+              Monthly Slushee was added to your inventory!
+            </Text>
+            <Text style={styles.purchaseSuccessSubtext}>
+              Check your inventory on the home page to see it.
+            </Text>
+          </RNView>
+        </RNView>
+      )}
+
+      {/* Purchase Confirmation Modal */}
+      {showPurchaseConfirm && selectedItem && (
+        <RNView style={styles.modalOverlay}>
+          <RNView style={styles.purchaseConfirmPopup}>
+            <Text style={styles.purchaseConfirmTitle}>PURCHASE CONFIRMATION</Text>
+            <RNView style={styles.purchaseConfirmItemContainer}>
+              <Image 
+                source={
+                  selectedItem.image === 'chocolate' ? chocolateImage :
+                  selectedItem.image === 'hotchips' ? hotchipsImage :
+                  selectedItem.image === 'slushee' ? slusheeImage :
+                  selectedItem.image === 'lil-soda' ? lilSodaImage :
+                  selectedItem.image === 'cupnoodle' ? cupnoodleImage :
+                  selectedItem.image === 'regularhotdog' ? regularHotdogImage :
+                  selectedItem.image === 'potatochomps' ? potatochompsImage :
+                  selectedItem.image === 'saturnsoda' ? saturnsodaImage :
+                  selectedItem.image === 'nuggets' ? nuggetsImage :
+                  selectedItem.image === 'milkshakes' ? milkshakesImage :
+                  selectedItem.image === 'glowcorn' ? glowcornImage :
+                  selectedItem.image === 'gumballs' ? gumballsImage :
+                  selectedItem.image === 'chocodonut' ? chocodonutImage :
+                  selectedItem.image === 'pouchdrink' ? pouchdrinkImage :
+                  selectedItem.image === 'cosmicburger' ? cosmicBurgerImage :
+                  chocolateImage
+                } 
+                style={styles.purchaseConfirmItemImage} 
+              />
+            </RNView>
+            <Text style={styles.purchaseConfirmText}>
+              Buy {selectedItem.name} for {selectedItem.price} ticket{selectedItem.price > 1 ? 's' : ''}?
+            </Text>
+            <Text style={styles.purchaseConfirmSubtext}>
+              You have {gameState.tickets} tickets.
+            </Text>
+            <RNView style={styles.purchaseConfirmButtonContainer}>
+              <Pressable 
+                style={styles.purchaseConfirmButton}
+                onPress={confirmPurchase}
+              >
+                <Text style={styles.purchaseConfirmButtonText}>CONFIRM</Text>
+              </Pressable>
+              <Pressable 
+                style={styles.purchaseCancelButton}
+                onPress={cancelPurchase}
+              >
+                <Text style={styles.purchaseCancelButtonText}>CANCEL</Text>
+              </Pressable>
+            </RNView>
+          </RNView>
+        </RNView>
+      )}
+
+      {/* Purchase Success Modal */}
+      {showPurchaseSuccess && selectedItem && (
+        <RNView style={styles.modalOverlay}>
+          <RNView style={styles.purchaseSuccessPopup}>
+            <Text style={styles.purchaseSuccessTitle}>PURCHASE SUCCESSFUL! 🎉</Text>
+            <Image 
+              source={
+                selectedItem.image === 'chocolate' ? chocolateImage :
+                selectedItem.image === 'cupnoodle' ? cupnoodleImage :
+                selectedItem.image === 'cupnoddle' ? cupnoddleImage :
+                selectedItem.image === 'hotchips' ? hotchipsImage :
+                selectedItem.image === 'lil-soda' ? lilSodaImage :
+                selectedItem.image === 'regularhotdog' ? regularHotdogImage :
+                selectedItem.image === 'potatochomps' ? potatochompsImage :
+                selectedItem.image === 'saturnsoda' ? saturnsodaImage :
+                selectedItem.image === 'slushee' ? slusheeImage :
+                selectedItem.image === 'nuggets' ? nuggetsImage :
+                selectedItem.image === 'milkshakes' ? milkshakesImage :
+                selectedItem.image === 'glowcorn' ? glowcornImage :
+                selectedItem.image === 'game-lunchbox' ? gameLunchboxImage :
+                selectedItem.image === 'cute-lunchbox' ? cuteLunchboxImage :
+                selectedItem.image === 'whale-lunchbox' ? whaleLunchboxImage :
+                selectedItem.image === 'rocket-lunchbox' ? rocketLunchboxImage :
+                selectedItem.image === 'dragon-lunchbox' ? dragonLunchboxImage :
+                chocolateImage
+              } 
+              style={styles.purchaseSuccessImage} 
+            />
+            <Text style={styles.purchaseSuccessText}>
+              {selectedItem.name} was added to your inventory!
+            </Text>
+            <Text style={styles.purchaseSuccessSubtext}>
+              Check your inventory on the home page to see it.
+            </Text>
+          </RNView>
+        </RNView>
+      )}
+
+      {/* Not Enough Tickets Modal */}
+      {showNotEnoughTickets && (
+        <RNView style={styles.modalOverlay}>
+          <RNView style={styles.errorModal}>
+            <Text style={styles.errorTitle}>Not Enough Tickets! 💸</Text>
+            <Text style={styles.errorText}>You need more tickets to buy this item.</Text>
+            <Pressable
+              style={styles.modalButton}
+              onPress={() => setShowNotEnoughTickets(false)}
+            >
+              <Text style={styles.modalButtonText}>OK</Text>
+            </Pressable>
+          </RNView>
+        </RNView>
+      )}
+
+      {/* Out of Stock Modal */}
+      {showOutOfStock && (
+        <RNView style={styles.modalOverlay}>
+          <RNView style={styles.errorModal}>
+            <Text style={styles.errorTitle}>Out of Stock! 📦</Text>
+            <Text style={styles.errorText}>This item is currently unavailable.</Text>
+            <Pressable
+              style={styles.modalButton}
+              onPress={() => setShowOutOfStock(false)}
+            >
+              <Text style={styles.modalButtonText}>OK</Text>
+            </Pressable>
+          </RNView>
+        </RNView>
+      )}
+
     </View>
   );
 }
@@ -731,7 +1040,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    padding: 8,
+    padding: 0,
     alignItems: 'flex-start',
     marginBottom: 0,
     gap: 8,
@@ -740,29 +1049,62 @@ const styles = StyleSheet.create({
     width: '30%',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 8,
-    padding: 10,
-    minHeight: 100,
+    marginBottom: 2,
+    padding: 4,
+    minHeight: 70,
     backgroundColor: 'rgba(139, 92, 246, 0.05)',
-    borderRadius: 8,
+    borderRadius: 6,
     borderWidth: 1,
     borderColor: 'rgba(139, 92, 246, 0.2)',
+  },
+  martysItem: {
+    width: '48%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 6,
+    padding: 8,
+    minHeight: 85,
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: '#4a90e2',
+    shadowColor: '#4a90e2',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  martysImage: {
+    width: 32,
+    height: 32,
+    marginBottom: 4,
+    resizeMode: 'contain',
+  },
+  martysName: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 8,
+    fontWeight: 'bold',
+    color: '#2c3e50',
+    textAlign: 'center',
+    marginBottom: 1,
+    height: 12,
+    lineHeight: 10,
   },
   chipsImage: {
     width: 32,
     height: 32,
-    marginBottom: 6,
+    marginBottom: 4,
     resizeMode: 'contain',
   },
   chipsName: {
-    fontFamily: 'Silkscreen_400Regular',
-    fontSize: 8,
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 7,
     fontWeight: 'bold',
     color: '#0f172a',
     textAlign: 'center',
-    marginBottom: 2,
-    height: 12,
-    lineHeight: 10,
+    marginBottom: -2,
+    height: 14,
+    lineHeight: 12,
   },
   chipsPrice: {
     fontFamily: 'Silkscreen_400Regular',
@@ -776,7 +1118,7 @@ const styles = StyleSheet.create({
     fontSize: 6,
     color: '#64748b',
     textAlign: 'center',
-    marginBottom: 4,
+    marginBottom: 6,
   },
   chipsActions: {
     flexDirection: 'column',
@@ -786,20 +1128,21 @@ const styles = StyleSheet.create({
   },
   ticketPrice: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 8,
-    color: '#f59e0b',
+    fontSize: 10,
+    color: '#8b5cf6',
     textAlign: 'center',
     marginBottom: 4,
     fontWeight: 'bold',
   },
   itemCard: {
-    width: '48%',
+    width: '22%',
     backgroundColor: 'rgba(14, 165, 233, 0.05)',
     borderRadius: 8,
     borderWidth: 1,
     borderColor: 'rgba(14, 165, 233, 0.2)',
-    padding: 12,
+    padding: 6,
     marginBottom: 12,
+    minHeight: 90,
   },
   itemHeader: {
     flexDirection: 'row',
@@ -807,12 +1150,13 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   itemName: {
-    fontFamily: 'Silkscreen_400Regular',
-    fontSize: 12,
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 9,
     fontWeight: 'bold',
     color: '#0f172a',
     marginLeft: 8,
     flex: 1,
+    lineHeight: 12,
   },
   itemPrice: {
     fontFamily: 'Silkscreen_400Regular',
@@ -839,21 +1183,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   buyButton: {
-    backgroundColor: '#8b5cf6',
+    backgroundColor: '#0ea5e9',
   },
   shopBuyButton: {
     backgroundColor: '#8b5cf6',
   },
   buyButtonText: {
-    fontFamily: 'Silkscreen_400Regular',
-    fontSize: 8,
-    color: '#ffffff',
-    fontWeight: 'bold',
-  },
-  haggleButton: {
-    backgroundColor: '#f59e0b',
-  },
-  haggleButtonText: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 8,
     color: '#ffffff',
@@ -898,7 +1233,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   countdownText: {
-    fontFamily: 'monospace',
+    fontFamily: 'Silkscreen_400Regular',
     fontSize: 10,
     color: '#14b8a6',
     textAlign: 'center',
@@ -972,14 +1307,14 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   lotteryName: {
-    fontFamily: 'Silkscreen_400Regular',
-    fontSize: 8,
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 7,
     fontWeight: 'bold',
     color: '#0f172a',
     textAlign: 'center',
-    marginBottom: 2,
-    height: 12,
-    lineHeight: 10,
+    marginBottom: 4,
+    height: 14,
+    lineHeight: 12,
   },
   lotteryDescription: {
     fontFamily: 'Silkscreen_400Regular',
@@ -1021,7 +1356,7 @@ const styles = StyleSheet.create({
   limitedTimeContainer: {
     position: 'relative',
     marginTop: -8,
-    marginBottom: 16,
+    marginBottom: 8,
     marginHorizontal: 0,
   },
   limitedTimeGlow: {
@@ -1039,16 +1374,16 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   limitedTimeBorder: {
-    backgroundColor: '#fff0f5',
+    backgroundColor: '#e8f4fd',
     borderRadius: 8,
     borderWidth: 2,
-    borderColor: '#ff69b4',
-    padding: 8,
-    shadowColor: '#ff69b4',
+    borderColor: '#4a90e2',
+    padding: 12,
+    shadowColor: '#4a90e2',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
-    shadowRadius: 3,
-    elevation: 2,
+    shadowRadius: 4,
+    elevation: 3,
   },
   // Free Options List Styles
   freeOptionsList: {
@@ -1085,6 +1420,37 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     textAlign: 'center',
   },
+  monthlySlusheeItem: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#8b5cf6',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    marginBottom: 6,
+    borderWidth: 2,
+    borderColor: '#7c3aed',
+    borderRadius: 0,
+    width: 120,
+    minHeight: 50,
+    shadowColor: '#8b5cf6',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  monthlySlusheeContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 4,
+  },
+  monthlySlusheeText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 12,
+    color: '#ffffff',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
   // Coffee Popup Modal Styles
   modalOverlay: {
     position: 'absolute',
@@ -1099,27 +1465,26 @@ const styles = StyleSheet.create({
   },
   coffeePopup: {
     backgroundColor: '#ffffff',
-    padding: 28,
-    borderRadius: 16,
+    padding: 24,
+    borderRadius: 12,
     alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#8b5cf6',
+    borderWidth: 1,
+    borderColor: '#e5e5e5',
     shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.15,
-    shadowRadius: 24,
-    elevation: 12,
-    width: 320,
-    marginTop: -100,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 8,
+    width: 300,
+    marginTop: -80,
   },
   coffeePopupTitle: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 14,
-    color: '#1e293b',
-    marginBottom: 20,
+    fontSize: 16,
+    color: '#000000',
+    marginBottom: 16,
     textAlign: 'center',
     fontWeight: '600',
-    letterSpacing: 0.5,
   },
   coffeePopupImage: {
     width: 60,
@@ -1130,30 +1495,51 @@ const styles = StyleSheet.create({
   coffeePopupText: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 13,
-    color: '#64748b',
+    color: '#666666',
     textAlign: 'center',
-    marginBottom: 24,
+    marginBottom: 20,
     lineHeight: 18,
     fontWeight: '400',
   },
   coffeePopupButton: {
-    backgroundColor: '#1e293b',
-    paddingVertical: 14,
-    paddingHorizontal: 32,
+    backgroundColor: '#8b5cf6',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
     borderRadius: 8,
-    borderWidth: 0,
-    shadowColor: '#1e293b',
-    shadowOffset: { width: 0, height: 4 },
+    borderWidth: 1,
+    borderColor: '#7c3aed',
+    marginBottom: 8,
+    shadowColor: '#8b5cf6',
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 4,
+    shadowRadius: 4,
+    elevation: 2,
   },
   coffeePopupButtonText: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 12,
     color: '#ffffff',
-    fontWeight: '600',
-    letterSpacing: 0.3,
+    fontWeight: '500',
+  },
+  coffeePopupCancelButton: {
+    backgroundColor: '#ffffff',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#e5e5e5',
+    marginBottom: 8,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  coffeePopupCancelButtonText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 12,
+    color: '#8b5cf6',
+    fontWeight: '500',
   },
   // Slushee Popup Modal Styles
   slusheePopup: {
@@ -1239,5 +1625,322 @@ const styles = StyleSheet.create({
     color: '#64748b',
     fontWeight: '600',
     letterSpacing: 0.3,
+  },
+  // Purchase Confirmation Modal Styles
+  purchaseConfirmPopup: {
+    backgroundColor: '#ffffff',
+    padding: 28,
+    borderRadius: 16,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#8b5cf6',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 24,
+    elevation: 12,
+    width: 320,
+    marginTop: -100,
+  },
+  purchaseConfirmTitle: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 14,
+    color: '#1e293b',
+    marginBottom: 16,
+    textAlign: 'center',
+    fontWeight: '600',
+    letterSpacing: 0.5,
+  },
+  purchaseConfirmItemContainer: {
+    width: 48,
+    height: 48,
+    backgroundColor: 'rgba(139, 92, 246, 0.05)',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+  },
+  purchaseConfirmItemImage: {
+    width: 32,
+    height: 32,
+    resizeMode: 'contain',
+  },
+  purchaseConfirmText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 13,
+    color: '#1e293b',
+    textAlign: 'center',
+    marginBottom: 8,
+    lineHeight: 18,
+    fontWeight: '500',
+  },
+  purchaseConfirmSubtext: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 11,
+    color: '#64748b',
+    textAlign: 'center',
+    marginBottom: 24,
+    lineHeight: 16,
+  },
+  purchaseConfirmButtonContainer: {
+    flexDirection: 'row',
+    gap: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  purchaseConfirmButton: {
+    backgroundColor: '#8b5cf6',
+    paddingVertical: 14,
+    paddingHorizontal: 32,
+    borderRadius: 8,
+    borderWidth: 0,
+    shadowColor: '#8b5cf6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  purchaseConfirmButtonText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 12,
+    color: '#ffffff',
+    fontWeight: '600',
+    letterSpacing: 0.3,
+  },
+  purchaseCancelButton: {
+    backgroundColor: '#f1f5f9',
+    paddingVertical: 14,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  purchaseCancelButtonText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 12,
+    color: '#64748b',
+    fontWeight: '600',
+    letterSpacing: 0.3,
+  },
+  // Purchase Success Modal Styles
+  purchaseSuccessPopup: {
+    backgroundColor: '#ffffff',
+    padding: 28,
+    borderRadius: 16,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#10b981',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 24,
+    elevation: 12,
+    width: 320,
+    marginTop: -100,
+  },
+  purchaseSuccessTitle: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 14,
+    color: '#10b981',
+    marginBottom: 20,
+    textAlign: 'center',
+    fontWeight: '600',
+    letterSpacing: 0.5,
+  },
+  purchaseSuccessImage: {
+    width: 80,
+    height: 80,
+    marginBottom: 16,
+    resizeMode: 'contain',
+  },
+  purchaseSuccessText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 13,
+    color: '#1e293b',
+    textAlign: 'center',
+    marginBottom: 8,
+    lineHeight: 18,
+    fontWeight: '500',
+  },
+  purchaseSuccessSubtext: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 11,
+    color: '#64748b',
+    textAlign: 'center',
+    lineHeight: 16,
+  },
+  // Error Modal Styles
+  errorModal: {
+    backgroundColor: '#ffffff',
+    padding: 28,
+    borderRadius: 16,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#ef4444',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 24,
+    elevation: 12,
+    width: 320,
+    marginTop: -100,
+  },
+  errorTitle: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 16,
+    color: '#ef4444',
+    textAlign: 'center',
+    marginBottom: 12,
+  },
+  errorText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 12,
+    color: '#64748b',
+    textAlign: 'center',
+    lineHeight: 18,
+    marginBottom: 20,
+  },
+  modalButton: {
+    backgroundColor: '#ef4444',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: '#dc2626',
+  },
+  modalButtonText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 12,
+    color: '#ffffff',
+    textAlign: 'center',
+  },
+  priceContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 4,
+    gap: 3,
+  },
+  ticketPriceLarge: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 14,
+    color: '#4a90e2',
+    marginLeft: 4,
+    fontWeight: '600',
+  },
+  gemPrice: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 14,
+    color: '#4a90e2',
+    marginLeft: 4,
+    fontWeight: '600',
+  },
+  // Featured Item Styles
+  featuredContainer: {
+    marginTop: 16,
+    marginHorizontal: 16,
+    marginBottom: 16,
+  },
+  featuredBorder: {
+    backgroundColor: 'rgba(139, 92, 246, 0.08)',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.3)',
+    padding: 12,
+    shadowColor: '#8b5cf6',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  featuredHeader: {
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  featuredTitle: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 8,
+    color: '#8b5cf6',
+    textAlign: 'center',
+    letterSpacing: 0.5,
+  },
+  featuredContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  featuredImageContainer: {
+    position: 'relative',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  featuredImage: {
+    width: 60,
+    height: 60,
+    resizeMode: 'contain',
+  },
+  featuredGlow: {
+    position: 'absolute',
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+    shadowColor: '#8b5cf6',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  featuredInfo: {
+    flex: 1,
+    alignItems: 'flex-start',
+  },
+  featuredItemName: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 10,
+    color: '#8b5cf6',
+    marginBottom: 6,
+    textAlign: 'left',
+  },
+  featuredDescription: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 8,
+    color: '#64748b',
+    marginBottom: 8,
+    lineHeight: 12,
+    textAlign: 'left',
+  },
+  featuredPriceContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+    gap: 4,
+  },
+  featuredPrice: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 12,
+    color: '#8b5cf6',
+    fontWeight: 'bold',
+  },
+  featuredBuyButton: {
+    backgroundColor: '#8b5cf6',
+    borderRadius: 6,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  featuredBuyText: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 7,
+    color: '#ffffff',
+    fontWeight: 'bold',
   },
 });
