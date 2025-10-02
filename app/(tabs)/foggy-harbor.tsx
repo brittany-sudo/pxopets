@@ -30,7 +30,7 @@ export default function FoggyHarborScreen() {
     {
       id: 'old-net-pub',
       name: 'The Old Net Pub',
-      description: 'A cozy harbor pub where weathered sailors gather to share stories and drinks. Features traditional Maine fare, local brews, and the best fish chowder in town. Perfect for warming up after a day at sea.',
+      description: 'Cozy harbor pub where sailors gather for stories, drinks, and the best fish chowder.',
       lightning: 25,
       difficulty: 'Easy',
       icon: 'lil-oldnet'
@@ -38,7 +38,7 @@ export default function FoggyHarborScreen() {
     {
       id: 'whale-watching',
       name: 'Harbor Watch',
-      description: 'Venture out to sea three times daily to spot magnificent whales and log your sightings. Experienced captains guide you through prime whale territory where humpbacks, fin whales, and even the rare right whale can be spotted.',
+      description: 'Daily whale watching tours with experienced captains in prime whale territory.',
       lightning: 35,
       difficulty: 'Easy',
       icon: 'lil-whale'
@@ -46,7 +46,7 @@ export default function FoggyHarborScreen() {
     {
       id: 'trappers-shack',
       name: 'Trapper\'s Shack',
-      description: 'Step into the rustic Trapper\'s Shack where seasoned fishermen share their secrets. Learn traditional trapping techniques, study seasonal patterns, and discover the ancient art of successful fishing in these historic waters.',
+      description: 'Rustic shack where seasoned fishermen share traditional trapping techniques.',
       lightning: 50,
       difficulty: 'Medium',
       icon: 'trappericon'
@@ -54,7 +54,7 @@ export default function FoggyHarborScreen() {
     {
       id: 'lowtide-pier',
       name: 'Lowtide Pier',
-      description: 'A scenic pier where you can watch the ocean and discover rare events during low tide. Explore tide pools, find hidden treasures, and witness the harbor\'s transformation as the water recedes.',
+      description: 'Scenic pier for watching the ocean and discovering treasures during low tide.',
       lightning: 0,
       difficulty: 'Easy',
       icon: 'anchor'
@@ -62,7 +62,7 @@ export default function FoggyHarborScreen() {
     {
       id: 'lighthouse-keeper',
       name: 'Lighthouse Keeper',
-      description: 'Tend to the ancient lighthouse that guides ships through treacherous waters. Learn the history of maritime navigation, maintain the beacon, and keep watch for vessels in distress during stormy nights.',
+      description: 'Tend the ancient lighthouse that guides ships through treacherous waters.',
       lightning: 60,
       difficulty: 'Medium',
       icon: 'lightbulb-o'
@@ -70,7 +70,7 @@ export default function FoggyHarborScreen() {
     {
       id: 'storm-watching',
       name: 'Storm Watching',
-      description: 'Experience the raw power of Atlantic storms from the harbor breakwater. Witness massive waves, feel the salt spray, and observe nature\'s fury from the safety of the protected viewing areas.',
+      description: 'Experience Atlantic storms from the harbor breakwater viewing areas.',
       lightning: 30,
       difficulty: 'Easy',
       icon: 'cloud'
@@ -78,7 +78,7 @@ export default function FoggyHarborScreen() {
     {
       id: 'net-mending',
       name: 'Net Mending',
-      description: 'Learn the traditional craft of mending fishing nets from master craftspeople. Master various knot techniques, understand net patterns, and keep the fishing community\'s tools in perfect working order.',
+      description: 'Learn traditional net mending craft from master craftspeople.',
       lightning: 20,
       difficulty: 'Easy',
       icon: 'th'
@@ -86,7 +86,7 @@ export default function FoggyHarborScreen() {
     {
       id: 'harbor-mystery',
       name: 'Harbor Mystery',
-      description: 'Investigate the mysterious disappearances that have plagued the harbor for generations. Uncover clues, interview witnesses, and solve the dark secrets that lurk beneath the fog-shrouded waters.',
+      description: 'Investigate mysterious disappearances and solve dark harbor secrets.',
       lightning: 100,
       difficulty: 'Hard',
       icon: 'search'
@@ -94,7 +94,7 @@ export default function FoggyHarborScreen() {
     {
       id: 'fog-horn',
       name: 'Fog Horn Keeper',
-      description: 'Operate the town\'s iconic fog horn that echoes across the harbor. Learn the signals, maintain the equipment, and ensure ships can navigate safely through the thick coastal fog that blankets the area.',
+      description: 'Operate the iconic fog horn to guide ships through thick coastal fog.',
       lightning: 45,
       difficulty: 'Medium',
       icon: 'volume-up'
@@ -189,6 +189,8 @@ export default function FoggyHarborScreen() {
                 return <Pressable style={styles.activityPressable} onPress={() => router.navigate('/(tabs)/lowtide-pier')}>{content}{footer}</Pressable>;
               case 'trappers-shack':
                 return <Pressable style={styles.activityPressable} onPress={() => router.navigate('/(tabs)/trappers-shack')}>{content}{footer}</Pressable>;
+              case 'lighthouse-keeper':
+                return <Pressable style={styles.activityPressable} onPress={() => router.navigate('/(tabs)/lighthouse-keeper')}>{content}{footer}</Pressable>;
               default:
                 return <Pressable style={styles.activityPressable} onPress={() => {}}>{content}{footer}</Pressable>;
             }
@@ -209,7 +211,7 @@ export default function FoggyHarborScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'transparent',
+    backgroundColor: '#e0f2fe', // Light blue maritime background
   },
   scrollContent: {
     alignItems: 'center',
@@ -234,7 +236,7 @@ const styles = StyleSheet.create({
   },
   backButtonText: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 12,
+    fontSize: 14, // Larger (was 12)
     color: '#0ea5e9',
     marginLeft: 6,
   },
@@ -251,7 +253,7 @@ const styles = StyleSheet.create({
   },
   locationTitle: {
     fontFamily: 'PressStart2P_400Regular',
-    fontSize: 10,
+    fontSize: 12, // Larger (was 10)
     color: '#0f172a',
     fontWeight: 'bold',
     letterSpacing: 1,
@@ -261,14 +263,14 @@ const styles = StyleSheet.create({
   bannerContainer: {
     width: '100%',
     height: 300,
-    borderWidth: 3,
+    borderWidth: 2,
     borderColor: '#0ea5e9',
-    borderRadius: 4,
+    borderRadius: 8,
     marginTop: -20,
     marginBottom: 20,
     alignItems: 'center',
     justifyContent: 'flex-end',
-    backgroundColor: 'transparent',
+    backgroundColor: 'rgba(14, 165, 233, 0.05)',
   },
   bannerImage: {
     width: '100%',
@@ -278,11 +280,11 @@ const styles = StyleSheet.create({
   },
   activitiesTitle: {
     fontFamily: 'PressStart2P_400Regular',
-    fontSize: 12,
+    fontSize: 14, // Larger (was 12)
     fontWeight: 'bold',
     color: '#0f172a',
-    marginBottom: 4,
-    marginTop: 0,
+    marginBottom: 12, // Closer to activity cards (was 20)
+    marginTop: 16, // More space from banner (was 8)
     textAlign: 'left',
     alignSelf: 'flex-start',
     width: '100%',
@@ -291,7 +293,8 @@ const styles = StyleSheet.create({
   activityItem: {
     backgroundColor: 'rgba(14, 165, 233, 0.05)',
     borderRadius: 12,
-    borderWidth: 0,
+    borderWidth: 1,
+    borderColor: 'rgba(14, 165, 233, 0.2)',
     padding: 12,
     marginBottom: 10,
     width: '100%',
@@ -357,19 +360,19 @@ const styles = StyleSheet.create({
   },
   activityName: {
     fontFamily: 'PressStart2P_400Regular',
-    fontSize: 10,
+    fontSize: 12, // Larger (was 10)
     fontWeight: 'bold',
     color: '#0f172a',
     marginBottom: 3,
     textAlign: 'left',
-    lineHeight: 14,
+    lineHeight: 16, // Adjusted for larger font
     textTransform: 'uppercase',
   },
   activityDescription: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 9,
+    fontSize: 11, // Larger (was 9)
     color: '#64748b',
-    lineHeight: 13,
+    lineHeight: 15, // Adjusted for larger font
     textAlign: 'justify',
   },
   favoriteButton: {
@@ -379,10 +382,10 @@ const styles = StyleSheet.create({
   },
   activityFooter: {
     position: 'absolute',
-    top: 10,
-    right: 10,
+    top: 12, // More centered vertically
+    right: 12, // More centered from right edge
     flexDirection: 'row',
-    justifyContent: 'flex-end',
+    justifyContent: 'center', // Center the star within its container
     alignItems: 'center',
   },
 });

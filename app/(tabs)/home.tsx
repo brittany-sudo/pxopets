@@ -4,6 +4,7 @@ import { Text, View } from '@/components/Themed';
 import { useSimpleGame } from '@/store/SimpleGameStore';
 import { useInventory } from '@/store/InventoryStore';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { router } from 'expo-router';
 
 export default function PlayerHomeScreen() {
   const { state, hydrated } = useSimpleGame();
@@ -60,9 +61,12 @@ export default function PlayerHomeScreen() {
           {/* Co-star Style Action Buttons */}
           <RNView style={styles.profileStats}>
             <RNView style={styles.actionButtonsRow}>
-              <Pressable style={[styles.actionButton, styles.primaryButton]}>
-                <FontAwesome name="home" size={14} color="#8b5cf6" />
-                <Text style={styles.primaryButtonText}>Rooms</Text>
+              <Pressable 
+                style={[styles.actionButton, styles.primaryButton]}
+                onPress={() => router.push('/(tabs)/pets')}
+              >
+                <FontAwesome name="heart" size={14} color="#8b5cf6" />
+                <Text style={styles.primaryButtonText}>Pets</Text>
               </Pressable>
               <Pressable style={[styles.actionButton, styles.secondaryButton]}>
                 <FontAwesome name="shopping-bag" size={14} color="#8b5cf6" />
@@ -90,69 +94,6 @@ export default function PlayerHomeScreen() {
           </RNView>
         </RNView>
 
-        {/* Active Pet Section */}
-        <RNView style={styles.petSection}>
-          <Text style={styles.sectionTitle}>ACTIVE PET</Text>
-          <RNView style={styles.petCard}>
-            <RNView style={styles.petHeader}>
-              <Image
-                source={require('@/assets/images/tigerguy.png')}
-                style={styles.petImage}
-                resizeMode="contain"
-              />
-              <RNView style={styles.petInfo}>
-                <Text style={styles.petName}>TigerGuy</Text>
-                <Text style={styles.petLevel}>Level 12</Text>
-              </RNView>
-            </RNView>
-            
-            <RNView style={styles.hpBarContainer}>
-              <Text style={styles.hpLabel}>HP</Text>
-              <RNView style={styles.hpBarBackground}>
-                <RNView style={[styles.hpBarFill, { width: '85%' }]} />
-              </RNView>
-              <Text style={styles.hpText}>85/100</Text>
-            </RNView>
-            
-            <RNView style={styles.expBarContainer}>
-              <Text style={styles.expLabel}>EXP</Text>
-              <RNView style={styles.expBarBackground}>
-                <RNView style={[styles.expBarFill, { width: '60%' }]} />
-              </RNView>
-              <Text style={styles.expText}>1200/2000</Text>
-            </RNView>
-            
-            <RNView style={styles.statsGrid}>
-              <RNView style={styles.statItem}>
-                <Text style={styles.statLabel}>ATK</Text>
-                <Text style={styles.statValue}>120</Text>
-              </RNView>
-              <RNView style={styles.statItem}>
-                <Text style={styles.statLabel}>DEF</Text>
-                <Text style={styles.statValue}>96</Text>
-              </RNView>
-              <RNView style={styles.statItem}>
-                <Text style={styles.statLabel}>SPD</Text>
-                <Text style={styles.statValue}>144</Text>
-              </RNView>
-            </RNView>
-            
-            <RNView style={styles.statsGrid}>
-              <RNView style={styles.statItem}>
-                <Text style={styles.statLabel}>HP</Text>
-                <Text style={styles.statValue}>100</Text>
-              </RNView>
-              <RNView style={styles.statItem}>
-                <Text style={styles.statLabel}>SPC</Text>
-                <Text style={styles.statValue}>88</Text>
-              </RNView>
-              <RNView style={styles.statItem}>
-                <Text style={styles.statLabel}>LUK</Text>
-                <Text style={styles.statValue}>72</Text>
-              </RNView>
-            </RNView>
-          </RNView>
-        </RNView>
 
         {/* Visual Inventory */}
         <RNView style={styles.inventorySection}>
@@ -253,6 +194,68 @@ export default function PlayerHomeScreen() {
             <FontAwesome name="trash" size={14} color="#ffffff" />
             <Text style={styles.clearInventoryButtonText}>Clear Inventory</Text>
           </Pressable>
+        </RNView>
+
+        {/* Active Pet Section - Moved below inventory */}
+        <RNView style={styles.petSection}>
+          <Text style={styles.sectionTitle}>ACTIVE PET</Text>
+          <RNView style={styles.petCard}>
+            <RNView style={styles.petHeader}>
+              <Image
+                source={require('@/assets/images/tigerguy.png')}
+                style={styles.petImage}
+                resizeMode="contain"
+              />
+              <RNView style={styles.petInfo}>
+                <Text style={styles.petName}>TigerGuy</Text>
+                <Text style={styles.petLevel}>Level 12</Text>
+              </RNView>
+            </RNView>
+            
+            <RNView style={styles.hpBarContainer}>
+              <Text style={styles.hpLabel}>HP</Text>
+              <RNView style={styles.hpBarBackground}>
+                <RNView style={[styles.hpBarFill, { width: '85%' }]} />
+              </RNView>
+              <Text style={styles.hpText}>85/100</Text>
+            </RNView>
+            
+            <RNView style={styles.expBarContainer}>
+              <Text style={styles.expLabel}>EXP</Text>
+              <RNView style={styles.expBarBackground}>
+                <RNView style={[styles.expBarFill, { width: '60%' }]} />
+              </RNView>
+              <Text style={styles.expText}>1200/2000</Text>
+            </RNView>
+            
+            {/* Condensed Stats - Single row with transparent cyan border */}
+            <RNView style={styles.condensedStatsContainer}>
+              <RNView style={styles.statItem}>
+                <Text style={styles.statLabel}>ATK</Text>
+                <Text style={styles.statValue}>120</Text>
+              </RNView>
+              <RNView style={styles.statItem}>
+                <Text style={styles.statLabel}>DEF</Text>
+                <Text style={styles.statValue}>96</Text>
+              </RNView>
+              <RNView style={styles.statItem}>
+                <Text style={styles.statLabel}>SPD</Text>
+                <Text style={styles.statValue}>144</Text>
+              </RNView>
+              <RNView style={styles.statItem}>
+                <Text style={styles.statLabel}>HP</Text>
+                <Text style={styles.statValue}>100</Text>
+              </RNView>
+              <RNView style={styles.statItem}>
+                <Text style={styles.statLabel}>SPC</Text>
+                <Text style={styles.statValue}>88</Text>
+              </RNView>
+              <RNView style={styles.statItem}>
+                <Text style={styles.statLabel}>LUK</Text>
+                <Text style={styles.statValue}>72</Text>
+              </RNView>
+            </RNView>
+          </RNView>
         </RNView>
       </ScrollView>
     </View>
@@ -618,6 +621,16 @@ const styles = StyleSheet.create({
     padding: 12,
     borderWidth: 1,
     borderColor: '#e5e5e5',
+    marginBottom: 8,
+  },
+  condensedStatsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderRadius: 8,
+    padding: 8, // More compact padding
+    borderWidth: 1,
+    borderColor: 'rgba(20, 184, 166, 0.4)', // Transparent cyan border
     marginBottom: 8,
   },
   statItem: {

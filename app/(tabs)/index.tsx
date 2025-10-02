@@ -27,7 +27,8 @@ export default function HomeScreen() {
   const celebrationOpacity = useRef(new Animated.Value(0)).current;
   const celebrationTranslateY = useRef(new Animated.Value(0)).current;
   const buttonScale = useRef(new Animated.Value(1)).current;
-  const tickerTranslateX = useRef(new Animated.Value(0)).current;
+  const ticker1TranslateX = useRef(new Animated.Value(0)).current;
+  const ticker2TranslateX = useRef(new Animated.Value(0)).current;
 
   // Flash animation for the gem icon
   useEffect(() => {
@@ -45,21 +46,36 @@ export default function HomeScreen() {
     return () => clearInterval(interval);
   }, []);
 
-  // Stock ticker animation
+  // Stock ticker animations - seamless continuous tickers
   useEffect(() => {
-    const runTicker = () => {
-      tickerTranslateX.setValue(0);
-      Animated.timing(tickerTranslateX, {
-        toValue: -1000, // Adjust based on content width
-        duration: 25000, // 25 seconds for full scroll (slower)
-        useNativeDriver: true,
-      }).start(() => {
-        // Restart immediately when animation completes
-        runTicker();
-      });
+    // Ticker 1 - moves left to right (slower) - seamless loop
+    const runTicker1 = () => {
+      ticker1TranslateX.setValue(0); // Start at normal position
+      Animated.loop(
+        Animated.timing(ticker1TranslateX, {
+          toValue: -800, // Move exactly one full content width
+          duration: 40000, // 40 seconds for full scroll (very slow)
+          useNativeDriver: true,
+        }),
+        { iterations: -1 } // Infinite loop
+      ).start();
     };
     
-    runTicker();
+    // Ticker 2 - moves right to left (faster) - seamless loop
+    const runTicker2 = () => {
+      ticker2TranslateX.setValue(0); // Start at normal position
+      Animated.loop(
+        Animated.timing(ticker2TranslateX, {
+          toValue: -800, // Move in same direction as ticker 1 for now to test
+          duration: 25000, // Slightly different speed for variety
+          useNativeDriver: true,
+        }),
+        { iterations: -1 } // Infinite loop
+      ).start();
+    };
+    
+    runTicker1();
+    runTicker2();
   }, []);
 
   const handleDailyReward = () => {
@@ -150,12 +166,13 @@ export default function HomeScreen() {
         <Text style={styles.developerButtonText}>🛠️ Dev Panel</Text>
       </Pressable>
 
-      {/* Stock Ticker */}
+      {/* Stock Tickers - Two continuous tickers moving in opposite directions */}
       <View style={styles.tickerContainer}>
+        {/* Ticker 1 - Moving left to right (slower) - Seamless */}
         <Animated.View 
           style={[
             styles.tickerContent,
-            { transform: [{ translateX: tickerTranslateX }] }
+            { transform: [{ translateX: ticker1TranslateX }] }
           ]}
         >
           <Text style={styles.tickerText}>
@@ -175,6 +192,34 @@ export default function HomeScreen() {
             <Text style={styles.tickerSeparator}> • </Text>
             <Text style={styles.tickerDown}>BEAN ▼2%</Text>
             <Text style={styles.tickerSeparator}> • </Text>
+            {/* Duplicate for seamless loop */}
+            <Text style={styles.tickerUp}>CARROT ▲15%</Text>
+            <Text style={styles.tickerSeparator}> • </Text>
+            <Text style={styles.tickerDown}>WHEAT ▼8%</Text>
+            <Text style={styles.tickerSeparator}> • </Text>
+            <Text style={styles.tickerUp}>CORN ▲3%</Text>
+            <Text style={styles.tickerSeparator}> • </Text>
+            <Text style={styles.tickerUp}>TOMATO ▲22%</Text>
+            <Text style={styles.tickerSeparator}> • </Text>
+            <Text style={styles.tickerDown}>LETTUCE ▼5%</Text>
+            <Text style={styles.tickerSeparator}> • </Text>
+            <Text style={styles.tickerUp}>POTATO ▲12%</Text>
+            <Text style={styles.tickerSeparator}> • </Text>
+            <Text style={styles.tickerUp}>ONION ▲7%</Text>
+            <Text style={styles.tickerSeparator}> • </Text>
+            <Text style={styles.tickerDown}>BEAN ▼2%</Text>
+          </Text>
+        </Animated.View>
+        
+        {/* Ticker 2 - Moving right to left (faster) - Seamless */}
+        <Animated.View 
+          style={[
+            styles.tickerContent,
+            styles.ticker2Content,
+            { transform: [{ translateX: ticker2TranslateX }] }
+          ]}
+        >
+          <Text style={styles.tickerText}>
             <Text style={styles.tickerUp}>APPLE ▲18%</Text>
             <Text style={styles.tickerSeparator}> • </Text>
             <Text style={styles.tickerUp}>BERRY ▲25%</Text>
@@ -191,23 +236,32 @@ export default function HomeScreen() {
             <Text style={styles.tickerSeparator}> • </Text>
             <Text style={styles.tickerUp}>SUN ▲19%</Text>
             <Text style={styles.tickerSeparator}> • </Text>
-            <Text style={styles.tickerDown}>RAIN ▼3%</Text>
+            {/* Duplicate for seamless loop */}
+            <Text style={styles.tickerUp}>APPLE ▲18%</Text>
             <Text style={styles.tickerSeparator}> • </Text>
-            <Text style={styles.tickerUp}>WIND ▲8%</Text>
+            <Text style={styles.tickerUp}>BERRY ▲25%</Text>
             <Text style={styles.tickerSeparator}> • </Text>
-            <Text style={styles.tickerUp}>SOIL ▲13%</Text>
+            <Text style={styles.tickerUp}>MUSHROOM ▲9%</Text>
             <Text style={styles.tickerSeparator}> • </Text>
-            <Text style={styles.tickerUp}>COMPOST ▲16%</Text>
+            <Text style={styles.tickerUp}>HERB ▲14%</Text>
+            <Text style={styles.tickerSeparator}> • </Text>
+            <Text style={styles.tickerUp}>SEED ▲6%</Text>
+            <Text style={styles.tickerSeparator}> • </Text>
+            <Text style={styles.tickerUp}>FERTILIZER ▲11%</Text>
+            <Text style={styles.tickerSeparator}> • </Text>
+            <Text style={styles.tickerUp}>WATER ▲4%</Text>
+            <Text style={styles.tickerSeparator}> • </Text>
+            <Text style={styles.tickerUp}>SUN ▲19%</Text>
           </Text>
         </Animated.View>
       </View>
               
       <ScrollView contentContainerStyle={styles.scrollContent}>
 
-        {/* Daily Gazette Image */}
+        {/* Daily News Image */}
         <RNView style={styles.dailyGazzContainer}>
           <Image
-            source={require('@/assets/images/daily-gazz.png')}
+            source={require('@/assets/images/daily-news.png')}
             style={styles.dailyGazzImage}
             resizeMode="contain"
           />
@@ -425,21 +479,25 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    height: 30,
+    height: 42, // Even taller for bigger text (was 32)
     backgroundColor: '#1a0033',
-    borderBottomWidth: 2,
-    borderBottomColor: '#0ea5e9',
     overflow: 'hidden',
     zIndex: 1000,
   },
   tickerContent: {
+    position: 'absolute',
     flexDirection: 'row',
     alignItems: 'center',
-    height: '100%',
+    height: 20, // Taller for bigger text (was 15)
+    top: 0, // First ticker at top
+    width: 1600, // Much wider for seamless looping
+  },
+  ticker2Content: {
+    top: 21, // Adjusted for bigger ticker height (20 + 1 = 21)
   },
   tickerText: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 10,
+    fontSize: 14, // Much bigger (was 10)
     fontWeight: 'bold',
     whiteSpace: 'nowrap',
   },
@@ -456,7 +514,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'flex-start',
     padding: 20,
-    paddingTop: 35,
+    paddingTop: 5, // Much smaller top padding to bring content closer
     flexGrow: 1,
     overflow: 'visible',
   },
@@ -516,7 +574,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   bannerSubtitle: {
-    fontFamily: 'monospace',
+    fontFamily: 'Silkscreen_400Regular',
     fontSize: 13, // Reduced from 14
     color: '#ffffff',
     fontWeight: '500',
@@ -529,7 +587,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   bannerRewardText: {
-    fontFamily: 'monospace',
+    fontFamily: 'Silkscreen_400Regular',
     fontSize: 11, // Reduced from 12
     color: '#f59e0b',
     fontWeight: '500',
@@ -561,14 +619,14 @@ const styles = StyleSheet.create({
     marginRight: 4,
   },
   bannerOriginalPrice: {
-    fontFamily: 'monospace',
+    fontFamily: 'Silkscreen_400Regular',
     fontSize: 12,
     color: '#94a3b8',
     textDecorationLine: 'line-through',
     marginRight: 4,
   },
   bannerTimer: {
-    fontFamily: 'monospace',
+    fontFamily: 'Silkscreen_400Regular',
     fontSize: 9,
     color: '#ffffff',
     fontWeight: '500',
@@ -593,7 +651,7 @@ const styles = StyleSheet.create({
     height: 200,
   },
   dateText: {
-    fontSize: 12,
+    fontSize: 14, // Bigger (was 12)
     fontFamily: 'monospace',
     color: '#0f172a',
     textAlign: 'center',
@@ -611,35 +669,36 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   whatsNewTitle: {
-    fontFamily: 'Silkscreen_400Regular',
-    fontSize: 14,
+    fontFamily: 'monospace',
+    fontSize: 16, // Bigger (was 14)
     fontWeight: 'bold',
     color: '#0f172a',
-    marginBottom: 4,
+    marginBottom: 6, // More space below (was 4)
+    marginTop: 2, // Added top margin for spacing
   },
   whatsNewSubtitle: {
     fontFamily: 'monospace',
-    fontSize: 10, // Reduced from 11
+    fontSize: 12, // Bigger (was 10)
     color: '#0f172a',
     marginBottom: 12,
     fontWeight: '400',
     letterSpacing: 0.3, // Added letter spacing
   },
   whatsNewFeature: {
-    fontFamily: 'Silkscreen_400Regular',
-    fontSize: 12,
+    fontFamily: 'monospace',
+    fontSize: 14, // Bigger (was 12)
     fontWeight: 'bold',
     color: '#0f172a',
-    marginTop: 8,
-    marginBottom: 4,
+    marginTop: 10, // More space above (was 8)
+    marginBottom: 6, // More space below (was 4)
   },
   whatsNewItem: {
     fontFamily: 'monospace',
-    fontSize: 9, // Reduced from 10
+    fontSize: 11, // Bigger (was 9)
     color: '#0f172a',
     marginLeft: 8,
     marginBottom: 2,
-    lineHeight: 13, // Reduced from 14
+    lineHeight: 15, // Adjusted for bigger text (was 13)
     fontWeight: '400',
     letterSpacing: 0.3, // Added letter spacing
   },

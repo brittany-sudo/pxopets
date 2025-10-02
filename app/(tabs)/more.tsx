@@ -6,7 +6,6 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useColorSchemeContext } from '@/components/ColorSchemeContext';
 import { useInventory } from '@/store/InventoryStore';
 import DevModePanel from '@/components/DevModePanel';
-import BottomNavigation from '@/components/BottomNavigation';
 
 export default function MoreScreen() {
   const { colorScheme, toggleColorScheme, isDark } = useColorSchemeContext();
@@ -35,12 +34,12 @@ export default function MoreScreen() {
         </Pressable>
         <BorderedBox>
           <RNView style={styles.menuItem}>
-            <FontAwesome name="cog" size={20} color="#0ea5e9" />
+            <FontAwesome name="cog" size={20} color="#0f172a" />
             <Text style={styles.menuText}>Settings</Text>
           </RNView>
 
           <Pressable style={styles.menuItem} onPress={toggleColorScheme}>
-            <FontAwesome name={isDark ? "sun-o" : "moon-o"} size={20} color="#0ea5e9" />
+            <FontAwesome name={isDark ? "sun-o" : "moon-o"} size={20} color="#0f172a" />
             <Text style={styles.menuText}>Dark Mode</Text>
             <RNView style={styles.toggleContainer}>
               <RNView style={[styles.toggle, isDark && styles.toggleActive]}>
@@ -50,17 +49,17 @@ export default function MoreScreen() {
           </Pressable>
 
           <RNView style={styles.menuItem}>
-            <FontAwesome name="user" size={20} color="#0ea5e9" />
+            <FontAwesome name="user" size={20} color="#0f172a" />
             <Text style={styles.menuText}>Profile</Text>
           </RNView>
 
           <RNView style={styles.menuItem}>
-            <FontAwesome name="info-circle" size={20} color="#0ea5e9" />
+            <FontAwesome name="info-circle" size={20} color="#0f172a" />
             <Text style={styles.menuText}>About</Text>
           </RNView>
 
           <RNView style={styles.menuItem}>
-            <FontAwesome name="question-circle" size={20} color="#0ea5e9" />
+            <FontAwesome name="question-circle" size={20} color="#0f172a" />
             <Text style={styles.menuText}>Help & Support</Text>
           </RNView>
 
@@ -72,12 +71,11 @@ export default function MoreScreen() {
           )}
 
           <RNView style={styles.menuItem}>
-            <FontAwesome name="sign-out" size={20} color="#ef4444" />
+            <FontAwesome name="sign-out" size={20} color="#8b5cf6" />
             <Text style={[styles.menuText, styles.signOutText]}>Sign Out</Text>
           </RNView>
         </BorderedBox>
       </ScrollView>
-      <BottomNavigation />
 
       {/* Dev Mode Panel */}
       <DevModePanel 
@@ -112,7 +110,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 12,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(14, 165, 233, 0.1)',
+    borderBottomColor: 'rgba(15, 23, 42, 0.1)', // Black borders (was blue)
   },
   menuText: {
     fontFamily: 'Silkscreen_400Regular',
@@ -122,7 +120,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   signOutText: {
-    color: '#ef4444',
+    color: '#8b5cf6', // Purple (was red)
   },
   devModeText: {
     color: '#8b5cf6',
@@ -150,8 +148,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 2,
   },
   toggleActive: {
-    backgroundColor: '#0ea5e9',
-    borderColor: '#0ea5e9',
+    backgroundColor: '#0f172a', // Black toggle (was blue)
+    borderColor: '#0f172a',
   },
   toggleThumb: {
     width: 22,

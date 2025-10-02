@@ -3,7 +3,6 @@ import { StyleSheet, ScrollView, View as RNView, Image, Pressable } from 'react-
 import { Text, View } from '@/components/Themed';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { router } from 'expo-router';
-import BorderedBox from '@/components/BorderedBox';
 
 /*
  * NPC SYSTEM DOCUMENTATION:
@@ -141,26 +140,14 @@ export default function PxoburbsMallScreen() {
         </RNView>
 
         {/* Description */}
-        <Text style={styles.description}>
-          Step into the bustling heart of Pxoburbs! The mall is a vibrant shopping destination 
-          featuring the latest fashion, cutting-edge electronics, and a diverse food court. 
-          Whether you're looking for trendy clothes, the newest gadgets, or a delicious meal, 
-          the Pxoburbs Mall has everything you need for the perfect shopping experience.
-        </Text>
+        <RNView style={styles.descriptionContainer}>
+          <Text style={styles.description}>
+            The bustling heart of Pxoburbs featuring fashion, electronics, and dining.
+          </Text>
+        </RNView>
 
         {/* Mall Directory */}
         <RNView style={styles.directoryContainer}>
-          <BorderedBox style={styles.thickBorderBox}>
-            {/* Mall Fountain */}
-            <RNView style={styles.fountainContainer}>
-              <Image source={pxoburbsMallFountainImage} style={styles.fountainImage} />
-            </RNView>
-
-            <RNView style={styles.directoryHeader}>
-              <Text style={styles.directoryTitle}>MALL DIRECTORY</Text>
-              <Text style={styles.directorySubtitle}>Find your favorite stores and eateries!</Text>
-            </RNView>
-
             {/* Mall Attendant */}
             <RNView style={styles.attendantContainer}>
               <Pressable onPress={handleJerryInteraction}>
@@ -177,7 +164,7 @@ export default function PxoburbsMallScreen() {
             </RNView>
 
             {/* Stores Section */}
-            <Text style={styles.sectionTitle}>STORES & SHOPS</Text>
+            <Text style={styles.smallDirectoryTitle}>MALL DIRECTORY</Text>
             <RNView style={styles.storesList}>
               {mallStores.map((store) => (
                 <Pressable
@@ -202,14 +189,8 @@ export default function PxoburbsMallScreen() {
               ))}
             </RNView>
 
-          </BorderedBox>
         </RNView>
 
-        {/* Mall Bottom Images */}
-        <RNView style={styles.mallBottomContainer}>
-          <Image source={pxoburbsMallBottomImage} style={styles.mallBottomImage} />
-          <Image source={pxoburbsMallBottom2Image} style={styles.mallBottomImage} />
-        </RNView>
 
         {/* Selected Store Display */}
         {selectedStore && (
@@ -283,6 +264,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     overflow: 'hidden',
     marginBottom: 20,
+    marginTop: -25, // Move header image up but not as much (was -40)
   },
   mallImage: {
     width: '100%',
@@ -302,26 +284,33 @@ const styles = StyleSheet.create({
     height: '100%',
     resizeMode: 'contain',
   },
+  descriptionContainer: {
+    width: '95%',
+    alignSelf: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.98)', // Clean white background like co-star
+    borderRadius: 12, // Rounded corners like co-star
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.3)', // Transparent purple border like co-star
+    padding: 16,
+    marginTop: -20, // Much closer to header image (was -8)
+    marginBottom: 16, // Less space below
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+  },
   description: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 10,
-    color: '#64748b',
+    fontSize: 12, // Slightly larger for readability
+    color: '#0f172a',
     lineHeight: 16,
-    marginBottom: 16,
-    padding: 12,
-    borderWidth: 1,
-    borderColor: '#8b5cf6',
-    borderRadius: 8,
-    backgroundColor: 'rgba(139, 92, 246, 0.05)',
-    marginHorizontal: 40,
+    textAlign: 'center',
   },
   directoryContainer: {
-    alignItems: 'center',
+    width: '100%',
+    paddingHorizontal: 16,
     marginBottom: 24,
-  },
-  thickBorderBox: {
-    width: '95%',
-    alignItems: 'stretch',
   },
   directoryHeader: {
     marginBottom: 16,
@@ -347,12 +336,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   speechBubble: {
-    backgroundColor: 'rgba(139, 92, 246, 0.1)',
-    padding: 12,
+    backgroundColor: 'rgba(139, 92, 246, 0.05)', // Match store cards exactly
+    padding: 16, // Match store card padding
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: 'rgba(139, 92, 246, 0.3)',
+    borderColor: '#8b5cf6', // Match store card border color exactly
     maxWidth: 250,
+    shadowColor: '#000', // Add shadow to match store cards
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   characterName: {
     fontFamily: 'PressStart2P_400Regular',
@@ -363,56 +357,73 @@ const styles = StyleSheet.create({
   },
   speechText: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 10,
+    fontSize: 12, // Bigger (was 10)
     color: '#0f172a',
     textAlign: 'center',
+    lineHeight: 16, // Added line height for better readability
   },
   sectionTitle: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 12,
-    color: '#0f172a',
-    marginBottom: 12,
+    fontSize: 16, // Larger (was 12)
+    color: '#8b5cf6', // Purple to match theme
+    marginBottom: 16,
+    marginTop: 8,
     textAlign: 'center',
+    fontWeight: 'bold',
+  },
+  smallDirectoryTitle: {
+    fontFamily: 'PressStart2P_400Regular', // Changed to pixel font
+    fontSize: 16, // Much bigger (was 12)
+    color: '#8b5cf6', // Purple to match theme
+    marginBottom: 16,
+    marginTop: 8,
+    textAlign: 'center',
+    fontWeight: 'bold',
   },
   storesList: {
     marginBottom: 20,
   },
   storeCard: {
-    borderRadius: 4,
-    padding: 10,
-    marginBottom: 4,
-    marginHorizontal: 2,
+    backgroundColor: 'rgba(255, 255, 255, 0.98)', // Clean white background like co-star
+    borderRadius: 12, // More rounded like co-star
     borderWidth: 1,
-    borderColor: '#cbd5e1',
-    backgroundColor: '#f8fafc',
+    borderColor: 'rgba(139, 92, 246, 0.3)', // Transparent purple border like co-star
+    padding: 16,
+    marginBottom: 12, // More space between items like co-star
+    marginHorizontal: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8, // Larger shadow radius like co-star
+    elevation: 3, // Higher elevation like co-star
   },
   storeContent: {
     flex: 1,
   },
   storeName: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 11,
+    fontSize: 14, // Much larger (was 11)
     fontWeight: 'bold',
-    marginBottom: 2,
+    marginBottom: 4,
     textAlign: 'left',
     color: '#1e293b',
     letterSpacing: 0.5,
   },
   storeType: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 7,
+    fontSize: 10, // Much larger (was 7)
     color: '#64748b',
-    marginBottom: 3,
+    marginBottom: 4,
     textAlign: 'left',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
   storeDescription: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 7,
+    fontSize: 10, // Much larger (was 7)
     color: '#64748b',
-    marginBottom: 6,
-    lineHeight: 9,
+    marginBottom: 8,
+    lineHeight: 14, // Adjusted for larger font
     textAlign: 'left',
   },
   storeFooter: {

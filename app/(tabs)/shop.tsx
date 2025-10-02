@@ -353,43 +353,6 @@ export default function ShopScreen() {
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Premium Shop Banner */}
-        <RNView style={styles.premiumBanner}>
-          <RNView style={styles.bannerGradient}>
-            <RNView style={styles.bannerContent}>
-              <RNView style={styles.bannerLeft}>
-                <RNView style={styles.bannerIconContainer}>
-                  <Image 
-                    source={require('@/assets/images/milkshakes.png')} 
-                    style={styles.bannerImage}
-                    resizeMode="contain"
-                  />
-                </RNView>
-                <RNView style={styles.bannerText}>
-                  <Text style={styles.bannerTitle}>PREMIUM OFFER</Text>
-                  <Text style={styles.bannerSubtitle}>Cosmic Milkshakes</Text>
-                  <RNView style={styles.bannerReward}>
-                    <Text style={styles.bannerRewardText}>200</Text>
-                    <FontAwesome name="bolt" size={12} color="#f59e0b" />
-                  </RNView>
-                </RNView>
-              </RNView>
-              <RNView style={styles.bannerRight}>
-                <RNView style={styles.priceContainer}>
-                  <RNView style={styles.currentPriceRow}>
-                    <Text style={styles.bannerPrice}>50</Text>
-                    <FontAwesome name="ticket" size={12} color="#8b5cf6" />
-                  </RNView>
-                  <RNView style={styles.originalPriceRow}>
-                    <Text style={styles.bannerOriginalPrice}>75</Text>
-                    <FontAwesome name="ticket" size={10} color="#8b5cf6" />
-                  </RNView>
-                </RNView>
-                <Text style={styles.bannerTimer}>2h 15m left</Text>
-              </RNView>
-            </RNView>
-          </RNView>
-        </RNView>
 
         {/* Category Tabs */}
         <RNView style={styles.categoryTabs}>
@@ -493,124 +456,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f0f9ff',
   },
-  premiumBanner: {
-    width: '80%',
-    alignSelf: 'center',
-    marginBottom: 20,
-    borderRadius: 12,
-    overflow: 'visible',
-    borderWidth: 2,
-    borderColor: '#8b5cf6',
-    position: 'relative',
-    marginTop: 8,
-    zIndex: 5,
-  },
-  bannerGradient: {
-    backgroundColor: '#ffffff',
-    padding: 2,
-    position: 'relative',
-    zIndex: 10,
-    borderRadius: 10,
-  },
-  bannerContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 16,
-    paddingHorizontal: 20,
-    backgroundColor: '#1e1b4b',
-    borderRadius: 10,
-  },
-  bannerLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  bannerIconContainer: {
-    width: 60,
-    height: 60,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 16,
-  },
-  bannerImage: {
-    width: 50,
-    height: 50,
-  },
-  bannerText: {
-    flex: 1,
-  },
-  bannerTitle: {
-    fontFamily: 'PressStart2P_400Regular',
-    fontSize: 8,
-    fontWeight: 'bold',
-    color: '#8b5cf6',
-    marginBottom: 4,
-    letterSpacing: 1,
-  },
-  bannerSubtitle: {
-    fontFamily: 'monospace',
-    fontSize: 14,
-    color: '#ffffff',
-    fontWeight: '500',
-    marginBottom: 2,
-  },
-  bannerReward: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 2,
-  },
-  bannerRewardText: {
-    fontFamily: 'monospace',
-    fontSize: 12,
-    color: '#f59e0b',
-    fontWeight: '500',
-    marginRight: 4,
-  },
-  bannerRight: {
-    alignItems: 'flex-end',
-  },
-  priceContainer: {
-    flexDirection: 'column',
-    alignItems: 'flex-end',
-    marginBottom: 4,
-  },
-  currentPriceRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  originalPriceRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  bannerPrice: {
-    fontFamily: 'PressStart2P_400Regular',
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: '#10b981',
-    marginRight: 4,
-  },
-  bannerOriginalPrice: {
-    fontFamily: 'monospace',
-    fontSize: 12,
-    color: '#94a3b8',
-    textDecorationLine: 'line-through',
-  },
-  bannerTimer: {
-    fontFamily: 'monospace',
-    fontSize: 9,
-    color: '#ffffff',
-    fontWeight: '500',
-    backgroundColor: 'rgba(139, 92, 246, 0.3)',
-    shadowColor: '#8b5cf6',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.8,
-    shadowRadius: 4,
-    elevation: 4,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
-  },
   scrollContent: {
     alignItems: 'center',
     justifyContent: 'flex-start',
@@ -624,6 +469,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
     marginBottom: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.98)', // Clean white background
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.3)', // Purple border
+    borderRadius: 12, // Rounded like games page
+    padding: 16, // More padding
+    width: '95%',
+    alignSelf: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3, // Android shadow
   },
   categoryTab: {
     flexDirection: 'row',
@@ -631,22 +488,23 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingHorizontal: 12,
     paddingVertical: 8,
-    backgroundColor: 'rgba(139, 92, 246, 0.1)',
-    borderRadius: 6,
+    backgroundColor: 'rgba(139, 92, 246, 0.05)', // Subtle background
+    borderRadius: 8, // More rounded
     borderWidth: 1,
     borderColor: 'rgba(139, 92, 246, 0.3)',
   },
   categoryTabActive: {
-    backgroundColor: 'rgba(139, 92, 246, 0.2)',
+    backgroundColor: '#8b5cf6', // Solid purple background
     borderColor: '#8b5cf6',
   },
   categoryText: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 10,
+    fontSize: 12, // Larger text like games page
     color: '#8b5cf6',
+    fontWeight: '500',
   },
   categoryTextActive: {
-    color: '#0f172a',
+    color: '#ffffff', // White text on purple background
     fontWeight: 'bold',
   },
   shopTitle: {
@@ -666,14 +524,19 @@ const styles = StyleSheet.create({
   },
   itemCard: {
     width: '45%',
-    backgroundColor: 'rgba(14, 165, 233, 0.05)',
-    borderRadius: 4,
-    borderWidth: 2,
-    borderColor: '#1e3a8a',
+    backgroundColor: 'rgba(255, 255, 255, 0.98)', // Clean white background
+    borderRadius: 12, // More rounded like games page
+    borderWidth: 1, // Thinner border
+    borderColor: 'rgba(139, 92, 246, 0.3)', // Purple border
     padding: 16,
     marginBottom: 16,
     alignItems: 'center',
     position: 'relative',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3, // Android shadow
   },
   popularCard: {
     borderColor: '#f59e0b',
@@ -742,17 +605,17 @@ const styles = StyleSheet.create({
   },
   itemName: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 12,
-    color: '#0f172a',
+    fontSize: 14, // Larger like games page
+    color: '#1f2937', // Darker, more premium color
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 4,
   },
   itemDescription: {
     fontFamily: 'monospace',
-    fontSize: 9,
-    color: '#64748b',
-    lineHeight: 12,
+    fontSize: 11, // Larger text
+    color: '#6b7280', // Softer gray like games page
+    lineHeight: 14,
     textAlign: 'center',
     marginBottom: 8,
     fontWeight: '400',
@@ -770,7 +633,7 @@ const styles = StyleSheet.create({
   },
   activityPrice: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 10,
+    fontSize: 12, // Larger price text
     color: '#8b5cf6',
     fontWeight: 'bold',
   },

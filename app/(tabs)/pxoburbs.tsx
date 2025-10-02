@@ -41,7 +41,7 @@ export default function PxoburbsScreen() {
     {
       id: 'mall-food-court',
       name: 'Pxoburbs Mall',
-      description: 'Multi-level shopping complex featuring diverse food court vendors, retail stores, and entertainment. Browse fashion, electronics, and specialty shops while enjoying meals from local and chain restaurants.',
+      description: 'Multi-level shopping complex with food court, retail stores, and entertainment.',
       lightning: 25,
       difficulty: 'Medium',
       icon: 'shopping-bag'
@@ -49,7 +49,7 @@ export default function PxoburbsScreen() {
     {
       id: 'corner-store',
       name: 'Quickstop Corner Store',
-      description: 'Marty\'s 24/7 convenience store offering snacks, lottery tickets, special imports, and complimentary coffee. Stock up on essentials, try limited-time items, and discover unique finds from across the galaxy.',
+      description: 'Marty\'s 24/7 convenience store with snacks, lottery tickets, and special imports.',
       lightning: 12,
       difficulty: 'Easy',
       icon: 'chips'
@@ -57,7 +57,7 @@ export default function PxoburbsScreen() {
     {
       id: 'roller-rink',
       name: 'Starlight Roller Rink',
-      description: 'Retro roller skating rink with disco lights, neon decorations, and classic arcade games. Rent skates, enjoy themed music nights, and experience the golden age of roller disco under sparkling stars.',
+      description: 'Retro roller skating rink with disco lights and classic arcade games.',
       lightning: 20,
       difficulty: 'Easy',
       icon: 'roler'
@@ -65,7 +65,7 @@ export default function PxoburbsScreen() {
     {
       id: 'makeout-hill',
       name: 'Lovers Hill',
-      description: 'Romantic overlook with panoramic city views, perfect for couples and stargazing. Features cozy seating areas, string lights, and a peaceful atmosphere for intimate conversations and memorable moments.',
+      description: 'Romantic overlook with panoramic city views, perfect for couples and stargazing.',
       lightning: 15,
       difficulty: 'Medium',
       icon: 'makeout-hill'
@@ -73,7 +73,7 @@ export default function PxoburbsScreen() {
     {
       id: 'midnight-rewind',
       name: 'Midnight Rewind',
-      description: 'Classic video rental store specializing in rare films, cult classics, and vintage VHS tapes. Browse extensive collections of horror, sci-fi, and indie films with knowledgeable staff recommendations.',
+      description: 'Classic video rental store with rare films, cult classics, and vintage VHS tapes.',
       lightning: 10,
       difficulty: 'Easy',
       icon: 'lil-movie-reel.png'
@@ -81,7 +81,7 @@ export default function PxoburbsScreen() {
     {
       id: 'radio-station',
       name: 'PXO 101.8 FM',
-      description: 'Independent community radio station featuring local music, talk shows, and live broadcasts. Tune in for underground artists, community news, and interactive call-in programs with DJs and hosts.',
+      description: 'Independent community radio station with local music and live broadcasts.',
       lightning: 18,
       difficulty: 'Medium',
       icon: 'microphone'
@@ -89,7 +89,7 @@ export default function PxoburbsScreen() {
     {
       id: 'post-office',
       name: 'Pxoburbs Post Office',
-      description: 'Full-service postal facility offering mail delivery, package shipping, and postal services. Send letters, ship packages worldwide, purchase stamps, and access PO boxes for secure mail storage.',
+      description: 'Full-service postal facility for mail delivery and package shipping.',
       lightning: 6,
       difficulty: 'Easy',
       icon: 'envelope'
@@ -97,7 +97,7 @@ export default function PxoburbsScreen() {
     {
       id: 'pet-supply',
       name: 'PXOPET SUPPLY CO.',
-      description: 'Comprehensive pet store featuring food, toys, accessories, and health products for all types of pets. Expert staff provide grooming services, veterinary referrals, and personalized pet care advice.',
+      description: 'Comprehensive pet store with food, toys, accessories, and grooming services.',
       lightning: 14,
       difficulty: 'Medium',
       icon: 'paw'
@@ -105,7 +105,7 @@ export default function PxoburbsScreen() {
     {
       id: 'community-pool',
       name: 'Pxoburbs Community Pool',
-      description: 'Public swimming facility with Olympic-sized pool, diving boards, and recreational areas. Features swimming lessons, water aerobics classes, and family-friendly activities with lifeguard supervision.',
+      description: 'Public swimming facility with Olympic-sized pool and recreational areas.',
       lightning: 8,
       difficulty: 'Easy',
       icon: 'tree'
@@ -113,7 +113,7 @@ export default function PxoburbsScreen() {
     {
       id: 'frog-market-thrift',
       name: 'Frog Market Thrift',
-      description: 'Eclectic thrift store featuring vintage clothing, retro furniture, and unique collectibles. Discover one-of-a-kind treasures, rare finds, and affordable second-hand items with rotating inventory.',
+      description: 'Eclectic thrift store with vintage clothing, retro furniture, and unique collectibles.',
       lightning: 16,
       difficulty: 'Easy',
       image: 'lil-tag'
@@ -187,7 +187,7 @@ export default function PxoburbsScreen() {
 
           const getActivityPressable = () => {
             const content = (
-              <Pressable style={styles.activityPressable}>
+              <RNView style={styles.activityPressable}>
                 <RNView style={styles.activityHeader}>
                   <RNView style={styles.activityInfo}>
                     {getActivityIcon()}
@@ -200,7 +200,10 @@ export default function PxoburbsScreen() {
                 <RNView style={styles.activityFooter}>
                   <Pressable
                     style={styles.favoriteButton}
-                    onPress={() => toggleFavorite(activity.id)}
+                    onPress={(e) => {
+                      e.stopPropagation();
+                      toggleFavorite(activity.id);
+                    }}
                   >
                     <FontAwesome 
                       name={favorites.has(activity.id) ? "star" : "star-o"} 
@@ -209,18 +212,18 @@ export default function PxoburbsScreen() {
                     />
                   </Pressable>
                 </RNView>
-              </Pressable>
+              </RNView>
             );
 
             switch (activity.id) {
               case 'corner-store':
-                return <Link href="/quickstop" asChild>{content}</Link>;
+                return <Link href="/quickstop" asChild><Pressable>{content}</Pressable></Link>;
               case 'frog-market-thrift':
-                return <Link href="/frog-market-thrift" asChild>{content}</Link>;
+                return <Link href="/frog-market-thrift" asChild><Pressable>{content}</Pressable></Link>;
               case 'roller-rink':
-                return <Link href="/(tabs)/starlight-roller-rink" asChild>{content}</Link>;
+                return <Link href="/(tabs)/starlight-roller-rink" asChild><Pressable>{content}</Pressable></Link>;
               case 'makeout-hill':
-                return <Link href="/(tabs)/makeout-hill" asChild>{content}</Link>;
+                return <Link href="/(tabs)/makeout-hill" asChild><Pressable>{content}</Pressable></Link>;
               case 'radio-station':
                 return <Pressable onPress={() => router.navigate('/(tabs)/pxo-radio')}>{content}</Pressable>;
               case 'midnight-rewind':
@@ -234,7 +237,7 @@ export default function PxoburbsScreen() {
               case 'community-pool':
                 return <Pressable onPress={() => router.navigate('/(tabs)/community-pool')}>{content}</Pressable>;
               default:
-                return content;
+                return <Pressable>{content}</Pressable>;
             }
           };
 
@@ -278,7 +281,7 @@ const styles = StyleSheet.create({
   },
   backButtonText: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 12,
+    fontSize: 14, // Larger (was 12)
     color: '#8b5cf6',
     marginLeft: 6,
   },
@@ -295,7 +298,7 @@ const styles = StyleSheet.create({
   },
   locationTitle: {
     fontFamily: 'PressStart2P_400Regular',
-    fontSize: 10,
+    fontSize: 12, // Larger (was 10)
     color: '#0f172a',
     fontWeight: 'bold',
     letterSpacing: 1,
@@ -322,9 +325,9 @@ const styles = StyleSheet.create({
   },
   description: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 12,
+    fontSize: 14, // Larger (was 12)
     color: '#0f172a',
-    lineHeight: 18,
+    lineHeight: 20, // Adjusted for larger font
     marginTop: -10,
     marginBottom: 24,
     textAlign: 'left',
@@ -332,11 +335,11 @@ const styles = StyleSheet.create({
   },
   activitiesTitle: {
     fontFamily: 'PressStart2P_400Regular',
-    fontSize: 12,
+    fontSize: 14, // Larger (was 12)
     fontWeight: 'bold',
     color: '#0f172a',
-    marginBottom: 20,
-    marginTop: 8,
+    marginBottom: 12, // Closer to activity cards (was 20)
+    marginTop: 16, // More space from banner (was 8)
     textAlign: 'left',
     alignSelf: 'flex-start',
     width: '100%',
@@ -420,19 +423,19 @@ const styles = StyleSheet.create({
   },
   activityName: {
     fontFamily: 'PressStart2P_400Regular',
-    fontSize: 10,
+    fontSize: 12, // Larger (was 10)
     fontWeight: 'bold',
     color: '#0f172a',
     marginBottom: 3,
     textAlign: 'left',
-    lineHeight: 14,
+    lineHeight: 16, // Adjusted for larger font
     textTransform: 'uppercase',
   },
   activityDescription: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 9,
+    fontSize: 11, // Larger (was 9)
     color: '#64748b',
-    lineHeight: 13,
+    lineHeight: 15, // Adjusted for larger font
     textAlign: 'justify',
   },
   favoriteButton: {
@@ -442,10 +445,10 @@ const styles = StyleSheet.create({
   },
   activityFooter: {
     position: 'absolute',
-    top: 10,
-    right: 10,
+    top: 16, // Same height as the title text
+    right: 8,
     flexDirection: 'row',
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
     alignItems: 'center',
   },
   rewardContainer: {

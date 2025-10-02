@@ -23,7 +23,7 @@ const lilPotImage = require('@/assets/images/lil-pot.png');
 const lilTrailerImage = require('@/assets/images/lil-trailer.png');
 const lilBayouImage = require('@/assets/images/lil-bayou.png');
 const loomersTinyImage = require('@/assets/images/loomers-tiny.png');
-const mapOfPxopiaImage = require('@/assets/images/mapofpxopia.png');
+const mapOfPxopiaImage = require('@/assets/images/map-of-pxopia.png');
 
 export default function ExploreScreen() {
   const { hydrated } = useGame();
@@ -53,6 +53,14 @@ export default function ExploreScreen() {
       color: "#f59e0b",
       description: "A desert mirage where atomic age meets cosmic wonder.",
       image: lilTrailerImage
+    },
+    {
+      id: "vintage-hollow",
+      name: "Barrelhaven",
+      icon: "glass",
+      color: "#8b5cf6",
+      description: "A medieval vineyard where wine flows as freely as the rolling hills.",
+      image: lilWineCasketImage
     },
     {
       id: "artisan",
@@ -117,14 +125,6 @@ export default function ExploreScreen() {
       color: "#f97316",
       description: "A tropical paradise where ancient tiki spirits dance with volcanic fire.",
       image: volcanoImage
-    },
-    {
-      id: "vintage-hollow",
-      name: "Barrelhaven",
-      icon: "glass",
-      color: "#8b5cf6",
-      description: "A medieval vineyard where wine flows as freely as the rolling hills.",
-      image: lilWineCasketImage
     },
     {
       id: "midwinter-crossing",
@@ -218,7 +218,7 @@ export default function ExploreScreen() {
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Worlds List */}
-        <BorderedBox>
+        <RNView style={styles.worldsContainer}>
           <Image 
             source={mapOfPxopiaImage} 
             style={styles.mapOfPxopiaImage}
@@ -241,7 +241,7 @@ export default function ExploreScreen() {
               </RNView>
             </Pressable>
           ))}
-        </BorderedBox>
+        </RNView>
       </ScrollView>
     </View>
   );
@@ -284,7 +284,8 @@ const styles = StyleSheet.create({
   scrollContent: {
     alignItems: 'center',
     justifyContent: 'flex-start',
-    padding: 20,
+    padding: 16, // More reasonable padding
+    paddingHorizontal: 12, // Better horizontal padding
     flexGrow: 1,
   },
   title: {
@@ -305,10 +306,11 @@ const styles = StyleSheet.create({
   },
   mapOfPxopiaImage: {
     width: '100%',
-    height: 134, // 40% bigger than 96px (96 * 1.4 = 134.4, rounded to 134)
-    marginTop: -24, // Increased negative margin to remove more top padding
-    marginBottom: -16, // Increased negative margin to remove more space below
+    height: 140, // Slightly taller for better presence
+    marginTop: 20, // More space above the map (was -20)
+    marginBottom: 20, // More space below the map (was 8)
     alignSelf: 'center',
+    borderRadius: 12, // Rounded corners to match design
   },
   pxopiaBlurb: {
     fontFamily: 'Silkscreen_400Regular',
@@ -327,16 +329,29 @@ const styles = StyleSheet.create({
     borderRadius: 6, // Reduced from 8
     letterSpacing: 0.4, // Reduced from 0.5
   },
+  worldsContainer: {
+    width: '95%', // Slightly less wide (was 100%)
+    backgroundColor: 'rgba(255, 255, 255, 0.98)', // Clean white background
+    borderRadius: 12, // More subtle rounding (was 20)
+    padding: 16, // Internal padding
+    borderWidth: 1, // Simple 1px border
+    borderColor: 'rgba(139, 92, 246, 0.3)', // Transparent purple border
+    // Removed all shadow properties for clean border look
+  },
   worldItem: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
-    backgroundColor: 'rgba(14, 165, 233, 0.05)',
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: 'rgba(14, 165, 233, 0.2)',
-    padding: 12,
-    marginBottom: 8,
+    alignItems: 'center', // Better alignment
+    backgroundColor: 'rgba(255, 255, 255, 0.95)', // Clean white background
+    borderRadius: 16, // Much more rounded, co-star style
+    borderWidth: 0, // Remove border for cleaner look
+    padding: 16, // More padding for premium feel
+    marginBottom: 12, // More space between items
     width: '100%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3, // Android shadow
   },
   worldIcon: {
     marginRight: 12,
@@ -345,30 +360,30 @@ const styles = StyleSheet.create({
     fontSize: 32,
   },
   worldImage: {
-    width: 48,
-    height: 48,
-    marginRight: 12,
-    marginTop: 2,
+    width: 56, // Bigger images
+    height: 56,
+    marginRight: 16, // More space from text
     flexShrink: 0,
     resizeMode: 'contain',
+    borderRadius: 12, // Rounded image corners
   },
   worldContent: {
     flex: 1,
   },
   worldName: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 14,
+    fontSize: 16, // Bigger title
     fontWeight: 'bold',
-    color: '#0f172a',
-    marginBottom: 4,
+    color: '#1f2937', // Darker, more premium color
+    marginBottom: 6, // More space below title
   },
   worldDescription: {
     fontFamily: 'monospace',
-    fontSize: 11, // Reduced from 12
-    color: '#0f172a',
-    lineHeight: 16, // Reduced from 18
+    fontSize: 13, // Bigger description text
+    color: '#6b7280', // Softer gray color
+    lineHeight: 18, // Better line height for readability
     fontWeight: '400',
-    letterSpacing: 0.3, // Added letter spacing
+    letterSpacing: 0.2, // Subtle letter spacing
   },
 });
 

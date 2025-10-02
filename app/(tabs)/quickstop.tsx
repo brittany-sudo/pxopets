@@ -3,7 +3,6 @@ import { StyleSheet, ScrollView, View as RNView, Image, Pressable, Alert, Animat
 import { Text, View } from '@/components/Themed';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { router } from 'expo-router';
-import BorderedBox from '@/components/BorderedBox';
 import { useInventory } from '@/store/InventoryStore';
 import { useSimpleGame } from '@/store/SimpleGameStore';
 
@@ -56,6 +55,7 @@ export default function ShopScreen() {
   const [showSlusheeConfirm, setShowSlusheeConfirm] = useState(false);
   const [showSlusheeSuccess, setShowSlusheeSuccess] = useState(false);
   const glowAnimation = useRef(new Animated.Value(0.2)).current;
+  const neonGlow = useRef(new Animated.Value(0)).current;
   const { addItem } = useInventory();
   const { state: gameState, addCoins, addTickets, spendTickets, hydrated } = useSimpleGame();
 
@@ -72,7 +72,7 @@ export default function ShopScreen() {
     { 
       id: 'lot1', 
       name: 'Cash Match', 
-      price: 1, 
+      price: 2, 
       description: 'Match 3 to win!',
       odds: '1 in 3',
       prizes: ['5 tickets', '10 tickets', '25 tickets', '50 tickets'],
@@ -81,7 +81,7 @@ export default function ShopScreen() {
     { 
       id: 'lot2', 
       name: 'Lucky 7s', 
-      price: 1, 
+      price: 2, 
       description: 'Find 3 lucky 7s!',
       odds: '1 in 5',
       prizes: ['25 tickets', '50 tickets', '100 tickets', 'Rare Item'],
@@ -90,7 +90,7 @@ export default function ShopScreen() {
     { 
       id: 'lot3', 
       name: 'Mega Money', 
-      price: 1, 
+      price: 2, 
       description: 'Scratch to reveal your prize!',
       odds: '1 in 20',
       prizes: ['100 tickets', '500 tickets', '1000 tickets', 'Legendary Pet'],
@@ -99,7 +99,7 @@ export default function ShopScreen() {
     { 
       id: 'lot4', 
       name: 'Win Big', 
-      price: 1, 
+      price: 2, 
       description: 'Instant winner guaranteed!',
       odds: '1 in 4',
       prizes: ['15 tickets', '30 tickets', '60 tickets', 'Special Item'],
@@ -154,6 +154,27 @@ export default function ShopScreen() {
 
     return () => pulseAnimation.stop();
   }, [glowAnimation]);
+
+  // Neon glow animation for Marty's imports
+  useEffect(() => {
+    const neonAnimation = Animated.loop(
+      Animated.sequence([
+        Animated.timing(neonGlow, {
+          toValue: 1,
+          duration: 2000,
+          useNativeDriver: false, // Need to animate shadowOpacity
+        }),
+        Animated.timing(neonGlow, {
+          toValue: 0.3,
+          duration: 2000,
+          useNativeDriver: false,
+        }),
+      ])
+    );
+    neonAnimation.start();
+
+    return () => neonAnimation.stop();
+  }, [neonGlow]);
 
   // Time-based shopkeeper sayings
   const getTimeBasedSaying = () => {
@@ -463,20 +484,19 @@ export default function ShopScreen() {
             style={styles.freeOptionItem}
             onPress={() => Alert.alert("Coming Soon", "Pxogulp Refill feature coming soon!")}
           >
-            <Text style={styles.freeOptionItemText}>Pxogulp Refill</Text>
+            <Text style={styles.freeOptionItemText}>Pxogulp{'\n'}Refill</Text>
           </Pressable>
           
           <Pressable 
             style={styles.freeOptionItem}
             onPress={handleMonthlySlushee}
           >
-            <Text style={styles.freeOptionItemText}>Monthly Slushee</Text>
+            <Text style={styles.freeOptionItemText}>Monthly{'\n'}Slushee</Text>
           </Pressable>
         </RNView>
 
-
         {/* Shop Inventory */}
-        <BorderedBox>
+        <RNView style={styles.shopInventoryContainer}>
           <RNView style={styles.stockHeader}>
             <Text style={styles.stockTitle}>CURRENT STOCK</Text>
             <Text style={styles.countdownText}>REFRESHES IN {formatTime(countdown)}</Text>
@@ -520,11 +540,22 @@ export default function ShopScreen() {
               </RNView>
             ))}
           </RNView>
-        </BorderedBox>
+        </RNView>
 
         {/* Special Imports */}
         <RNView style={styles.stockHeader}>
-          <Text style={styles.stockTitle}>MARTY'S IMPORTS</Text>
+          <Animated.Text style={[
+            styles.stockTitle,
+            styles.neonTitle,
+            {
+              shadowOpacity: neonGlow.interpolate({
+                inputRange: [0.3, 1],
+                outputRange: [0.3, 0.8],
+              }),
+            }
+          ]}>
+            MARTY'S IMPORTS
+          </Animated.Text>
         </RNView>
         <RNView style={styles.limitedTimeContainer}>
           <Animated.View 
@@ -545,10 +576,14 @@ export default function ShopScreen() {
             style={[
               styles.limitedTimeBorder,
               {
-                borderColor: glowAnimation.interpolate({
-                  inputRange: [0.2, 1],
-                  outputRange: ['#ff69b4', '#ffb6c1'],
-                })
+                borderColor: neonGlow.interpolate({
+                  inputRange: [0.3, 1],
+                  outputRange: ['#ff69b4', '#ff1493'],
+                }),
+                shadowOpacity: neonGlow.interpolate({
+                  inputRange: [0.3, 1],
+                  outputRange: [0.3, 0.8],
+                }),
               }
             ]}
           >
@@ -609,12 +644,15 @@ export default function ShopScreen() {
                 <Text style={styles.lotteryName}>{lottery.name}</Text>
                 <Text style={styles.lotteryDescription}>{lottery.description}</Text>
                 <Text style={styles.lotteryOdds}>Odds: {lottery.odds}</Text>
-                <Text style={styles.lotteryPrice}>{lottery.price} ticket{lottery.price > 1 ? 's' : ''}</Text>
+                <RNView style={styles.lotteryPriceContainer}>
+                  <FontAwesome name="ticket" size={12} color="#8b5cf6" />
+                  <Text style={styles.lotteryTicketPrice}>2</Text>
+                </RNView>
                 <Pressable 
                   style={[styles.actionButton, styles.lotteryButton]}
                   onPress={() => handleLotteryPurchase(lottery)}
                 >
-                  <Text style={styles.lotteryButtonText}>BUY TICKET</Text>
+                  <Text style={styles.lotteryButtonText}>BUY</Text>
                 </Pressable>
               </RNView>
             ))}
@@ -624,7 +662,7 @@ export default function ShopScreen() {
         <RNView style={styles.featuredContainer}>
           <RNView style={styles.featuredBorder}>
             <RNView style={styles.featuredHeader}>
-              <Text style={styles.featuredTitle}>✨ FEATURED ITEM ✨</Text>
+              <Text style={styles.featuredTitle}>FEATURED ITEM</Text>
             </RNView>
             <RNView style={styles.featuredContent}>
               <RNView style={styles.featuredImageContainer}>
@@ -638,7 +676,7 @@ export default function ShopScreen() {
                   3 refills per day • 20 stamina each
                 </Text>
                 <RNView style={styles.featuredPriceContainer}>
-                  <FontAwesome name="diamond" size={20} color="#00ffff" />
+                  <FontAwesome name="diamond" size={20} color="#06b6d4" />
                   <Text style={styles.featuredPrice}>50</Text>
                 </RNView>
                 <Pressable style={styles.featuredBuyButton}>
@@ -875,35 +913,48 @@ const styles = StyleSheet.create({
     padding: 16,
     paddingBottom: 80,
   },
-  freeOptionsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 16,
-    marginBottom: 16,
-    width: '100%',
-    paddingHorizontal: 0,
-  },
-  freeOptionButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(139, 92, 246, 0.1)',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 8,
+  shopInventoryContainer: {
+    width: '95%',
+    padding: 16,
+    backgroundColor: 'rgba(255, 255, 255, 0.98)',
+    borderRadius: 12,
     borderWidth: 1,
     borderColor: 'rgba(139, 92, 246, 0.3)',
-    gap: 6,
-    width: '45%',
-    justifyContent: 'center',
-    minHeight: 50,
-    zIndex: 999,
-    elevation: 999,
+    marginVertical: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
   },
-  freeOptionText: {
+  freeOptionsList: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+    paddingHorizontal: 8,
+    gap: 8,
+  },
+  freeOptionItem: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(139, 92, 246, 0.05)',
+    paddingVertical: 12,
+    paddingHorizontal: 8, // Back to original padding
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.3)',
+    borderRadius: 8,
+    width: 110, // Back to original width
+    height: 50, // Fixed height for consistency
+  },
+  freeOptionItemText: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 8,
+    fontSize: 10, // Smaller to ensure text fits (was 12)
     color: '#8b5cf6',
     fontWeight: '500',
+    textAlign: 'center',
+    lineHeight: 12,
+    numberOfLines: 2, // Allow text to wrap to 2 lines
   },
   backButton: {
     position: 'absolute',
@@ -921,7 +972,7 @@ const styles = StyleSheet.create({
   },
   backButtonText: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 12,
+    fontSize: 14, // Larger (was 12)
     color: '#8b5cf6',
     marginLeft: 6,
   },
@@ -945,8 +996,8 @@ const styles = StyleSheet.create({
     height: 40,
   },
   locationTitle: {
-    fontFamily: 'Silkscreen_400Regular',
-    fontSize: 16,
+    fontFamily: 'PressStart2P_400Regular', // Match Pxoburbs Mall font
+    fontSize: 16, // Adjusted for PressStart2P (was 20)
     fontWeight: 'bold',
     color: '#0f172a',
     letterSpacing: 1,
@@ -958,15 +1009,17 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
     borderRadius: 12,
     marginTop: 50,
-    marginBottom: 8,
+    marginBottom: 4, // Closer to Marty (was 8)
   },
   npcContainer: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     justifyContent: 'center',
     marginTop: 4,
-    marginBottom: 16,
+    marginBottom: 20, // More space before free options (was 8)
     paddingHorizontal: 0,
+    width: '95%', // Match current stock border width
+    alignSelf: 'center',
   },
   speechBubble: {
     backgroundColor: 'rgba(20, 184, 166, 0.1)',
@@ -974,12 +1027,13 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 1,
     borderColor: 'rgba(20, 184, 166, 0.3)',
-    maxWidth: 300,
+    flex: 1, // Take up remaining space in container
+    maxWidth: 250, // Narrower max width (was 300)
     marginRight: 8,
   },
   characterName: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 10,
+    fontSize: 12, // Larger (was 10)
     color: '#14b8a6',
     marginBottom: 4,
     textAlign: 'left',
@@ -987,7 +1041,7 @@ const styles = StyleSheet.create({
   },
   speechText: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 10,
+    fontSize: 12, // Larger (was 10)
     color: '#000000',
     textAlign: 'left',
   },
@@ -1082,13 +1136,13 @@ const styles = StyleSheet.create({
   },
   martysName: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 8,
+    fontSize: 10, // Larger (was 8)
     fontWeight: 'bold',
     color: '#2c3e50',
     textAlign: 'center',
     marginBottom: 1,
-    height: 12,
-    lineHeight: 10,
+    height: 14, // Adjusted for larger text
+    lineHeight: 12, // Adjusted for larger text
   },
   chipsImage: {
     width: 32,
@@ -1098,13 +1152,13 @@ const styles = StyleSheet.create({
   },
   chipsName: {
     fontFamily: 'PressStart2P_400Regular',
-    fontSize: 7,
+    fontSize: 9, // Larger (was 7)
     fontWeight: 'bold',
     color: '#0f172a',
     textAlign: 'center',
     marginBottom: -2,
-    height: 14,
-    lineHeight: 12,
+    height: 16, // Adjusted for larger text
+    lineHeight: 14, // Adjusted for larger text
   },
   chipsPrice: {
     fontFamily: 'Silkscreen_400Regular',
@@ -1115,7 +1169,7 @@ const styles = StyleSheet.create({
   },
   chipsStock: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 6,
+    fontSize: 8, // Larger (was 6)
     color: '#64748b',
     textAlign: 'center',
     marginBottom: 6,
@@ -1128,7 +1182,7 @@ const styles = StyleSheet.create({
   },
   ticketPrice: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 10,
+    fontSize: 12, // Larger (was 10)
     color: '#8b5cf6',
     textAlign: 'center',
     marginBottom: 4,
@@ -1175,12 +1229,13 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   actionButton: {
-    flex: 1,
-    minWidth: 60,
     paddingVertical: 6,
-    paddingHorizontal: 8,
-    borderRadius: 4,
+    paddingHorizontal: 12,
+    borderRadius: 6,
     alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 50,
+    maxWidth: 60,
   },
   buyButton: {
     backgroundColor: '#0ea5e9',
@@ -1190,7 +1245,7 @@ const styles = StyleSheet.create({
   },
   buyButtonText: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 8,
+    fontSize: 10, // Larger (was 8)
     color: '#ffffff',
     fontWeight: 'bold',
   },
@@ -1227,14 +1282,21 @@ const styles = StyleSheet.create({
   },
   stockTitle: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 16,
+    fontSize: 20, // Larger (was 16)
     fontWeight: 'bold',
     color: '#0f172a',
     marginBottom: 4,
   },
+  neonTitle: {
+    color: '#ff1493', // Hot pink for neon effect
+    shadowColor: '#ff69b4',
+    shadowOffset: { width: 0, height: 0 },
+    shadowRadius: 10,
+    elevation: 5,
+  },
   countdownText: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 10,
+    fontSize: 12, // Larger (was 10)
     color: '#14b8a6',
     textAlign: 'center',
     marginTop: 4,
@@ -1308,17 +1370,17 @@ const styles = StyleSheet.create({
   },
   lotteryName: {
     fontFamily: 'PressStart2P_400Regular',
-    fontSize: 7,
+    fontSize: 9, // Larger (was 7)
     fontWeight: 'bold',
     color: '#0f172a',
     textAlign: 'center',
     marginBottom: 4,
-    height: 14,
-    lineHeight: 12,
+    height: 16, // Adjusted for larger text
+    lineHeight: 14, // Adjusted for larger text
   },
   lotteryDescription: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 6,
+    fontSize: 8, // Larger (was 6)
     color: '#64748b',
     textAlign: 'center',
     marginBottom: 2,
@@ -1326,32 +1388,40 @@ const styles = StyleSheet.create({
   },
   lotteryOdds: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 6,
+    fontSize: 8, // Larger (was 6)
     color: '#f59e0b',
     textAlign: 'center',
     marginBottom: 2,
     fontWeight: 'bold',
   },
-  lotteryPrice: {
+  lotteryPriceContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 6,
+    gap: 4,
+  },
+  lotteryTicketPrice: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 7,
-    color: '#06b6d4',
-    textAlign: 'center',
-    marginBottom: 4,
+    fontSize: 10,
+    color: '#8b5cf6',
     fontWeight: 'bold',
   },
   lotteryButton: {
     backgroundColor: '#8b5cf6',
     width: '100%',
-    paddingVertical: 6,
+    paddingVertical: 8,
     paddingHorizontal: 8,
-    borderRadius: 4,
+    borderRadius: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   lotteryButtonText: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 8,
+    fontSize: 10, // Slightly smaller for "BUY" (was 11)
     color: '#ffffff',
     fontWeight: 'bold',
+    textAlign: 'center',
   },
   limitedTimeContainer: {
     position: 'relative',
@@ -1377,48 +1447,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#e8f4fd',
     borderRadius: 8,
     borderWidth: 2,
-    borderColor: '#4a90e2',
+    borderColor: '#ff69b4', // Pink border
     padding: 12,
-    shadowColor: '#4a90e2',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  // Free Options List Styles
-  freeOptionsList: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    padding: 8,
-    alignItems: 'flex-start',
-    marginBottom: 8,
-    gap: 8,
-  },
-  freeOptionItem: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(139, 92, 246, 0.05)',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    marginBottom: 6,
-    borderWidth: 2,
-    borderColor: 'rgba(139, 92, 246, 0.3)',
-    borderRadius: 0,
-    width: 120,
-    minHeight: 50,
-    shadowColor: '#8b5cf6',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  freeOptionItemText: {
-    fontFamily: 'Silkscreen_400Regular',
-    fontSize: 12,
-    color: '#8b5cf6',
-    fontWeight: '500',
-    textAlign: 'center',
+    shadowColor: '#ff1493', // Hot pink shadow
+    shadowOffset: { width: 0, height: 0 },
+    shadowRadius: 15, // Larger glow radius
+    elevation: 8, // Higher elevation for better glow
   },
   monthlySlusheeItem: {
     alignItems: 'center',
@@ -1844,102 +1878,98 @@ const styles = StyleSheet.create({
   },
   // Featured Item Styles
   featuredContainer: {
-    marginTop: 16,
-    marginHorizontal: 16,
+    marginTop: 8, // Much closer to lottery (was 16)
     marginBottom: 16,
+    width: '95%',
+    alignSelf: 'center',
   },
   featuredBorder: {
-    backgroundColor: 'rgba(139, 92, 246, 0.08)',
+    backgroundColor: 'rgba(255, 255, 255, 0.98)',
     borderRadius: 12,
     borderWidth: 1,
     borderColor: 'rgba(139, 92, 246, 0.3)',
-    padding: 12,
-    shadowColor: '#8b5cf6',
+    padding: 16, // More compact (was 20)
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowRadius: 8,
     elevation: 3,
+    width: '100%',
   },
   featuredHeader: {
-    alignItems: 'center',
-    marginBottom: 12,
+    alignItems: 'flex-start', // Left align (was center)
+    marginBottom: 12, // More compact (was 16)
   },
   featuredTitle: {
-    fontFamily: 'PressStart2P_400Regular',
-    fontSize: 8,
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 16, // Larger (was 12)
     color: '#8b5cf6',
-    textAlign: 'center',
+    textAlign: 'left', // Left align (was center)
     letterSpacing: 0.5,
+    fontWeight: 'bold',
   },
   featuredContent: {
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
+    alignItems: 'flex-start',
+    width: '100%',
   },
   featuredImageContainer: {
-    position: 'relative',
     alignItems: 'center',
     justifyContent: 'center',
+    width: 70, // More compact (was 90)
+    height: 70, // More compact (was 90)
+    marginRight: 12, // More compact (was 16)
+    flexShrink: 0,
   },
   featuredImage: {
-    width: 60,
-    height: 60,
+    width: 60, // More compact (was 80)
+    height: 60, // More compact (was 80)
     resizeMode: 'contain',
-  },
-  featuredGlow: {
-    position: 'absolute',
-    width: 70,
-    height: 70,
-    borderRadius: 35,
-    backgroundColor: 'rgba(139, 92, 246, 0.1)',
-    shadowColor: '#8b5cf6',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.2,
-    shadowRadius: 6,
-    elevation: 2,
   },
   featuredInfo: {
     flex: 1,
     alignItems: 'flex-start',
+    minWidth: 0,
   },
   featuredItemName: {
-    fontFamily: 'PressStart2P_400Regular',
-    fontSize: 10,
-    color: '#8b5cf6',
-    marginBottom: 6,
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 16, // Larger (was 14)
+    color: '#1f2937',
+    marginBottom: 6, // More compact (was 8)
     textAlign: 'left',
+    fontWeight: 'bold',
   },
   featuredDescription: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 8,
-    color: '#64748b',
-    marginBottom: 8,
-    lineHeight: 12,
+    fontSize: 12, // Larger (was 10)
+    color: '#6b7280',
+    marginBottom: 8, // More compact (was 12)
+    lineHeight: 16, // Adjusted for larger text
     textAlign: 'left',
   },
   featuredPriceContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
-    gap: 4,
+    marginBottom: 8, // More compact (was 12)
+    gap: 6,
   },
   featuredPrice: {
-    fontFamily: 'PressStart2P_400Regular',
-    fontSize: 12,
-    color: '#8b5cf6',
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 18, // Larger (was 16)
+    color: '#06b6d4', // Changed to nav gem blue (was #8b5cf6)
     fontWeight: 'bold',
   },
   featuredBuyButton: {
     backgroundColor: '#8b5cf6',
-    borderRadius: 6,
-    paddingVertical: 6,
-    paddingHorizontal: 10,
+    borderRadius: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
     alignItems: 'center',
     justifyContent: 'center',
   },
   featuredBuyText: {
-    fontFamily: 'PressStart2P_400Regular',
-    fontSize: 7,
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 12, // Larger (was 10)
     color: '#ffffff',
     fontWeight: 'bold',
   },

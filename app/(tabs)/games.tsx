@@ -18,6 +18,8 @@ const keycardHuntImage = require('@/assets/images/keycard-hunt.png');
 const perfumersLabImage = require('@/assets/images/perfumers-lab.png');
 const driveInImage = require('@/assets/images/drive-in.png');
 const grapeStompImage = require('@/assets/images/grape-stomp.png');
+const starlightGlideImage = require('@/assets/images/starlightglide.png');
+const lavaJugTossImage = require('@/assets/images/lavajugtoss.png');
 
 export default function GamesScreen() {
   const { addCoins, hydrated } = useGame();
@@ -103,12 +105,13 @@ export default function GamesScreen() {
       category: 'Puzzle'
     },
     {
-      id: 'treasure-hunt',
-      name: 'Treasure Hunt',
-      icon: 'map',
+      id: 'starlight-glide',
+      name: 'Starlight Glide',
+      icon: 'star',
       color: '#dc2626',
-      world: 'Pirate\'s Port',
-      description: 'Find buried treasure on the high seas!',
+      world: 'Starlight Roller Rink',
+      description: 'Glide through the stars in this magical skating adventure!',
+      image: starlightGlideImage,
       category: 'Adventure'
     },
     {
@@ -121,13 +124,14 @@ export default function GamesScreen() {
       category: 'Simulation'
     },
     {
-      id: 'spell-casting',
-      name: 'Magic Spells',
-      icon: 'magic',
+      id: 'lava-jug-toss',
+      name: 'Lava Jug Toss',
+      icon: 'fire',
       color: '#7c3aed',
-      world: 'Scholar\'s Library',
-      description: 'Cast spells by drawing runes!',
-      category: 'Puzzle'
+      world: 'Volcanic Peaks',
+      description: 'Toss lava jugs with precision and skill!',
+      image: lavaJugTossImage,
+      category: 'Action'
     },
     {
       id: 'hula-dancing',
@@ -233,56 +237,55 @@ export default function GamesScreen() {
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Arcade Header with Welcome Box */}
-        <RNView style={styles.arcadeHeader}>
-          {/* Welcome Box with High Scores */}
-          <RNView style={styles.welcomeBox}>
-            <Text style={styles.welcomeTitle}>WELCOME TO THE GAME ROOM</Text>
-            <RNView>
-              <RNView style={styles.highScoreItem}>
-                <Text style={styles.highScoreText}>1. ATOMIC SURF</Text>
-                <Text style={styles.highScoreValue}>12,450</Text>
-              </RNView>
-              <Text style={styles.playerName}>- NEO_PLAYER</Text>
-              
-              <RNView style={styles.highScoreItem}>
-                <Text style={styles.highScoreText}>2. LOST 'N FOUND</Text>
-                <Text style={styles.highScoreValue}>9,870</Text>
-              </RNView>
-              <Text style={styles.playerName}>- TREASURE_HUNTER</Text>
-              
-              <RNView style={styles.highScoreItem}>
-                <Text style={styles.highScoreText}>3. LUCKY GUESS</Text>
-                <Text style={styles.highScoreValue}>8,230</Text>
-              </RNView>
-              <Text style={styles.playerName}>- LUCKY_STAR</Text>
-              
-              <RNView style={styles.highScoreItem}>
-                <Text style={styles.highScoreText}>4. STAMP SAFARI</Text>
-                <Text style={styles.highScoreValue}>7,650</Text>
-              </RNView>
-              <Text style={styles.playerName}>- SAFARI_MASTER</Text>
-              
-              <RNView style={styles.highScoreItem}>
-                <Text style={styles.highScoreText}>5. TIKI GAME</Text>
-                <Text style={styles.highScoreValue}>6,420</Text>
-              </RNView>
-              <Text style={styles.playerName}>- TIKI_WARRIOR</Text>
-            </RNView>
-          </RNView>
-          
-          {/* Arcade Image */}
+        {/* Arcade Header Image - Above welcome text */}
+        <RNView style={styles.arcadeImageContainer}>
           <Image 
             source={arcadeImage} 
-            style={styles.arcadeImage}
+            style={styles.arcadeHeaderImage}
             resizeMode="contain"
           />
+        </RNView>
+
+        {/* Full Width Welcome Box with High Scores */}
+        <RNView style={styles.welcomeBox}>
+          <Text style={styles.welcomeTitle}>WELCOME TO THE GAME ROOM</Text>
+          <RNView>
+            <RNView style={styles.highScoreItem}>
+              <Text style={styles.highScoreText}>1. ATOMIC SURF</Text>
+              <Text style={styles.highScoreValue}>12,450</Text>
+            </RNView>
+            <Text style={styles.playerName}>- NEO_PLAYER</Text>
+            
+            <RNView style={styles.highScoreItem}>
+              <Text style={styles.highScoreText}>2. LOST 'N FOUND</Text>
+              <Text style={styles.highScoreValue}>9,870</Text>
+            </RNView>
+            <Text style={styles.playerName}>- TREASURE_HUNTER</Text>
+            
+            <RNView style={styles.highScoreItem}>
+              <Text style={styles.highScoreText}>3. LUCKY GUESS</Text>
+              <Text style={styles.highScoreValue}>8,230</Text>
+            </RNView>
+            <Text style={styles.playerName}>- LUCKY_STAR</Text>
+            
+            <RNView style={styles.highScoreItem}>
+              <Text style={styles.highScoreText}>4. STAMP SAFARI</Text>
+              <Text style={styles.highScoreValue}>7,650</Text>
+            </RNView>
+            <Text style={styles.playerName}>- SAFARI_MASTER</Text>
+            
+            <RNView style={styles.highScoreItem}>
+              <Text style={styles.highScoreText}>5. TIKI GAME</Text>
+              <Text style={styles.highScoreValue}>6,420</Text>
+            </RNView>
+            <Text style={styles.playerName}>- TIKI_WARRIOR</Text>
+          </RNView>
         </RNView>
 
 
         {/* Search Bar */}
         <RNView style={styles.searchContainer}>
-          <FontAwesome name="search" size={16} color="#0ea5e9" />
+          <FontAwesome name="search" size={16} color="#8b5cf6" />
           <TextInput
             style={styles.searchInput}
             placeholder="Search games..."
@@ -381,92 +384,109 @@ const styles = StyleSheet.create({
     padding: 20,
     flexGrow: 1,
   },
-  arcadeHeader: {
+  arcadeImageContainer: {
     width: '95%',
-    flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
-    gap: 15,
+    marginBottom: 16,
     alignSelf: 'center',
   },
-  arcadeImage: {
-    width: '55%', // Slightly smaller width to balance better
-    height: 211, // 10% bigger than 192 (192 * 1.1 = 211.2, rounded to 211)
+  arcadeHeaderImage: {
+    width: 200, // Fixed width for header
+    height: 120, // Smaller height since it's now a header
   },
   welcomeBox: {
-    width: '40%', // Made bigger
-    backgroundColor: 'rgba(14, 165, 233, 0.1)',
+    width: '95%', // Full width like categories
+    backgroundColor: 'rgba(255, 255, 255, 0.98)', // Clean white background
     borderWidth: 1,
-    borderColor: '#0ea5e9',
-    borderRadius: 8,
-    padding: 15, // Increased padding
-    minHeight: 200, // Added minimum height
+    borderColor: 'rgba(139, 92, 246, 0.3)', // Purple border like explore page
+    borderRadius: 12, // More rounded for sleek look
+    padding: 20, // More padding for premium feel
+    marginBottom: 16, // Space before search
+    alignSelf: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3, // Android shadow
   },
   welcomeTitle: {
-    fontFamily: 'PressStart2P_400Regular',
-    fontSize: 10,
-    color: '#0f172a',
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 16, // Larger title (was 12)
+    color: '#1f2937', // Darker, more premium color
     textAlign: 'center',
-    marginBottom: 10,
+    marginBottom: 16, // More space below
+    fontWeight: 'bold',
+    letterSpacing: 0.5,
   },
   highScoreItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 2,
+    paddingVertical: 6, // More padding for better spacing
+    paddingHorizontal: 4,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(14, 165, 233, 0.2)',
+    borderBottomColor: 'rgba(139, 92, 246, 0.15)', // Purple divider
+    backgroundColor: 'rgba(139, 92, 246, 0.05)', // Subtle background
+    borderRadius: 4, // Rounded score items
+    marginBottom: 2, // Space between items
   },
   highScoreText: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 8,
-    color: '#0f172a',
+    fontSize: 12, // Larger (was 9)
+    color: '#374151', // Softer dark color
+    fontWeight: '500',
   },
   highScoreValue: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 8,
-    color: '#0ea5e9',
+    fontSize: 12, // Larger (was 9)
+    color: '#8b5cf6', // Purple to match theme
     fontWeight: 'bold',
   },
   playerName: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 7,
-    color: '#64748b',
+    fontSize: 10, // Larger (was 8)
+    color: '#6b7280', // Softer gray
     fontStyle: 'italic',
     marginLeft: 8,
-    marginBottom: 4,
+    marginBottom: 6, // More space
+    opacity: 0.8,
   },
   gameCardHeader: {
     position: 'absolute',
-    top: 8,
-    right: 8,
+    top: 12, // More centered vertically
+    right: 12, // More centered from right edge
     zIndex: 1,
   },
   favoriteButton: {
     padding: 8,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.98)', // Cleaner white like other elements
+    borderRadius: 12, // More rounded like other co-star elements
     borderWidth: 1,
-    borderColor: 'rgba(139, 92, 246, 0.3)',
+    borderColor: 'rgba(139, 92, 246, 0.3)', // Purple border
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
+    shadowOffset: { width: 0, height: 2 }, // Better shadow like other elements
     shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+    shadowRadius: 8, // Larger shadow radius
+    elevation: 3, // Higher elevation
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
+    paddingVertical: 10, // Slightly more padding
+    paddingHorizontal: 16, // More horizontal padding
     borderWidth: 1,
-    borderColor: '#0ea5e9',
-    borderRadius: 4,
-    backgroundColor: 'rgba(14, 165, 233, 0.05)',
-    width: '95%',
+    borderColor: 'rgba(139, 92, 246, 0.3)', // Purple border like scoreboard
+    borderRadius: 12, // More rounded like scoreboard
+    backgroundColor: 'rgba(255, 255, 255, 0.98)', // Clean white background
+    width: '90%', // Smaller width
     marginBottom: 16,
     alignSelf: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3, // Android shadow
   },
   categoriesSection: {
     width: '95%',
@@ -481,29 +501,35 @@ const styles = StyleSheet.create({
     textAlign: 'left',
   },
   categoriesBox: {
-    backgroundColor: 'rgba(14, 165, 233, 0.05)',
+    backgroundColor: 'rgba(255, 255, 255, 0.98)', // Clean white background
     borderWidth: 1,
-    borderColor: '#0ea5e9',
-    borderRadius: 6,
-    padding: 12,
+    borderColor: 'rgba(139, 92, 246, 0.3)', // Purple border like scoreboard
+    borderRadius: 12, // More rounded like scoreboard
+    padding: 16, // More padding for premium feel
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3, // Android shadow
   },
   searchInput: {
     flex: 1,
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 12,
-    color: '#0f172a',
+    fontSize: 14, // Larger (was 12)
+    color: '#374151', // Softer dark color like scoreboard
     paddingVertical: 4,
     paddingHorizontal: 8,
     borderWidth: 0,
     backgroundColor: 'transparent',
   },
   categoriesTitle: {
-    fontFamily: 'PressStart2P_400Regular',
-    fontSize: 10,
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 16, // Larger (was 12)
     fontWeight: 'bold',
-    color: '#0f172a',
-    marginBottom: 12,
+    color: '#1f2937', // Darker, more premium color like scoreboard
+    marginBottom: 8, // Closer to categories (was 16)
     textAlign: 'left',
+    letterSpacing: 0.5,
   },
   categoriesContainer: {
     flexDirection: 'row',
@@ -512,20 +538,21 @@ const styles = StyleSheet.create({
   },
   categoryButton: {
     paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingVertical: 8, // More padding
     borderWidth: 1,
-    borderColor: '#0ea5e9',
-    borderRadius: 4,
-    backgroundColor: 'transparent',
+    borderColor: 'rgba(139, 92, 246, 0.3)', // Purple border
+    borderRadius: 8, // More rounded
+    backgroundColor: 'rgba(139, 92, 246, 0.05)', // Subtle purple background
   },
   selectedCategory: {
-    backgroundColor: '#0ea5e9',
+    backgroundColor: '#8b5cf6', // Purple selected state
+    borderColor: '#8b5cf6',
   },
   categoryText: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 10,
-    color: '#0ea5e9',
-    fontWeight: 'bold',
+    fontSize: 12, // Larger (was 10)
+    color: '#8b5cf6', // Purple text
+    fontWeight: '500',
   },
   selectedCategoryText: {
     color: '#ffffff',
@@ -548,11 +575,11 @@ const styles = StyleSheet.create({
   imageContainer: {
     width: '100%',
     height: '80%',
-    borderRadius: 8,
+    borderRadius: 6, // Less rounded (was 8)
     borderWidth: 2,
     borderColor: '#0ea5e9',
     overflow: 'hidden',
-    marginBottom: 8,
+    marginBottom: 4, // Closer to text (was 8)
   },
   gameIcon: {
     width: 50,
@@ -560,7 +587,7 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 8,
+    marginBottom: 4, // Closer to text (was 8)
   },
   gameImage: {
     width: '100%',
@@ -568,7 +595,7 @@ const styles = StyleSheet.create({
   },
   gameName: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 12,
+    fontSize: 14, // Larger (was 12)
     fontWeight: 'bold',
     color: '#0f172a',
     textAlign: 'center',

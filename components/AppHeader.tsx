@@ -1,5 +1,5 @@
-import React from 'react';
-import { StyleSheet, View, Pressable, Image } from 'react-native';
+import React, { useRef, useEffect, useState } from 'react';
+import { StyleSheet, View, Pressable, Image, Animated } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Link, usePathname, router } from 'expo-router';
 import { Text } from '@/components/Themed';
@@ -11,6 +11,8 @@ import { useSimpleGame } from '@/store/SimpleGameStore';
 export default function AppHeader() {
   const colorScheme = useColorScheme() ?? 'light';
   const { state } = useSimpleGame();
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const refreshRotation = useRef(new Animated.Value(0)).current;
   
   // Weather that changes 2-3 times per day based on time periods
   const getCurrentWeather = () => {
@@ -76,7 +78,27 @@ export default function AppHeader() {
   const isHome = pathname === '/(tabs)/home' || pathname === '/home';
 
   const handleRefresh = () => {
-    router.replace(router.pathname);
+    // Start rotation animation
+    setIsRefreshing(true);
+    refreshRotation.setValue(0);
+    
+    Animated.timing(refreshRotation, {
+      toValue: 1,
+      duration: 900, // Slower rotation (was 600ms)
+      useNativeDriver: true,
+    }).start(() => {
+      setIsRefreshing(false);
+    });
+
+    // Simple refresh by navigating to the current path
+    try {
+      const currentPath = pathname || '/(tabs)/index';
+      router.replace(currentPath);
+    } catch (error) {
+      console.log('Refresh error:', error);
+      // Fallback to home if there's an issue
+      router.replace('/(tabs)/index');
+    }
   };
 
   return (
@@ -84,10 +106,13 @@ export default function AppHeader() {
       {/* Top Navigation Bar */}
       <View style={styles.topBar}>
         <Pressable 
-          style={styles.iconButton}
+          style={({ pressed }) => [
+            styles.iconButton,
+            pressed && styles.iconButtonPressed
+          ]}
           onPress={() => router.push('/more')}
         >
-          <FontAwesome name="bars" size={20} color={colorScheme === 'dark' ? '#ffffff' : '#000000'} />
+          <FontAwesome name="bars" size={20} color={colorScheme === 'dark' ? '#ffffff' : '#6b46c1'} />
         </Pressable>
         
         <View style={styles.logoContainer}>
@@ -99,10 +124,22 @@ export default function AppHeader() {
         </View>
         
         <Pressable 
-          style={styles.iconButton}
+          style={({ pressed }) => [
+            styles.iconButton,
+            pressed && styles.iconButtonPressed
+          ]}
           onPress={handleRefresh}
         >
-          <FontAwesome name="refresh" size={20} color={colorScheme === 'dark' ? '#ffffff' : '#000000'} />
+          <Animated.View style={{
+            transform: [{
+              rotate: refreshRotation.interpolate({
+                inputRange: [0, 1],
+                outputRange: ['0deg', '360deg'],
+              })
+            }]
+          }}>
+            <FontAwesome name="refresh" size={20} color={colorScheme === 'dark' ? '#ffffff' : '#6b46c1'} />
+          </Animated.View>
         </Pressable>
       </View>
       
@@ -113,14 +150,8 @@ export default function AppHeader() {
       <View style={styles.userBar}>
         <View style={styles.leftSection}>
           <Text style={[styles.greeting, { color: colorScheme === 'dark' ? '#ffffff' : '#000000' }]}>
-            Hello, PxopetMaster
+            Hello, Pxopete
           </Text>
-          <View style={styles.weatherContainer}>
-            <FontAwesome name={weatherIcon as any} size={14} color={weatherColor} />
-            <Text style={[styles.temperatureText, { color: colorScheme === 'dark' ? '#ffffff' : '#000000' }]}>
-              {temperature}°
-            </Text>
-          </View>
         </View>
         
         <View style={styles.currencyContainer}>
@@ -137,7 +168,7 @@ export default function AppHeader() {
             </Text>
           </View>
           <View style={styles.currencyItem}>
-            <FontAwesome name="diamond" size={16} color="#0ea5e9" />
+            <FontAwesome name="diamond" size={16} color="#06b6d4" />
             <Text style={[styles.currencyText, { color: colorScheme === 'dark' ? '#ffffff' : '#000000' }]}>
               {state.coins}
             </Text>
@@ -159,37 +190,50 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 0, // No vertical padding
-    paddingTop: 0, // No top padding
-    marginTop: -10, // Reduced negative margin
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    paddingTop: 16, // iOS safe area padding
+    paddingBottom: 8,
+    minHeight: 70, // Consistent height
   },
   iconButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 44, // Smaller buttons (was 60)
+    height: 44, // Smaller buttons (was 60)
+    borderRadius: 22, // Adjusted for smaller size (was 30)
     backgroundColor: 'transparent',
-    borderWidth: 1,
+    borderWidth: 1.5, // Slightly thinner border (was 2)
     borderColor: '#e5e5e5',
     alignItems: 'center',
     justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  iconButtonPressed: {
+    backgroundColor: 'rgba(107, 70, 193, 0.15)', // Transparent purple background
+    borderColor: '#6b46c1', // Purple border when pressed
+    transform: [{ scale: 0.95 }], // Slight scale down effect
   },
   logoContainer: {
     flex: 1,
     alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 8,
   },
   logo: {
     width: 280,
     height: 100,
+    marginTop: 16, // Better alignment with buttons
   },
   userBar: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
-    paddingVertical: 8, // Increased for more breathing room
-    paddingTop: 12, // Extra top padding
-    paddingBottom: 12, // Extra bottom padding
+    paddingTop: 32, // Push it down closer to bottom
+    paddingBottom: 16, // Less bottom padding
   },
   leftSection: {
     flexDirection: 'row',
@@ -199,7 +243,7 @@ const styles = StyleSheet.create({
   },
   greeting: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 14,
+    fontSize: 16, // Increased for better visibility
     fontWeight: '500',
   },
   weatherContainer: {
@@ -219,12 +263,13 @@ const styles = StyleSheet.create({
   currencyContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 20, // Increased from 16 for more spacing
+    gap: 8, // Reduced spacing between currency items
+    marginLeft: 'auto', // Push to the right
   },
   currencyItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 4, // Reduced from 6 for tighter spacing
   },
   currencyText: {
     fontFamily: 'Silkscreen_400Regular',
@@ -234,7 +279,8 @@ const styles = StyleSheet.create({
   divider: {
     height: 1,
     marginHorizontal: 0,
-    marginVertical: 4, // Reduced from 8
+    marginVertical: -12, // Better spacing from logo
+    marginTop: -16, // Closer to logo but not too tight
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
