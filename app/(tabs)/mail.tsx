@@ -1,8 +1,6 @@
 import React from 'react';
 import { StyleSheet, ScrollView, View as RNView, Pressable } from 'react-native';
 import { Text, View } from '@/components/Themed';
-import BorderedBox from '@/components/BorderedBox';
-import JazzyTitle from '@/components/JazzyTitle';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 export default function MailScreen() {
@@ -94,8 +92,8 @@ export default function MailScreen() {
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Inbox Section */}
-        <BorderedBox>
-          <JazzyTitle style={styles.sectionTitle}>INBOX</JazzyTitle>
+        <RNView style={styles.inboxContainer}>
+          <Text style={styles.sectionTitle}>Inbox</Text>
           <RNView style={styles.inboxList}>
             {inboxLetters.map((letter) => (
               <Pressable key={letter.id} style={styles.letterItem}>
@@ -103,7 +101,7 @@ export default function MailScreen() {
                   <FontAwesome 
                     name={letter.icon as any} 
                     size={16} 
-                    color={letter.unread ? '#0ea5e9' : '#64748b'} 
+                    color={letter.unread ? '#8b5cf6' : '#64748b'} 
                   />
                   <RNView style={styles.letterInfo}>
                     <Text style={[
@@ -130,11 +128,11 @@ export default function MailScreen() {
               </Pressable>
             ))}
           </RNView>
-        </BorderedBox>
+        </RNView>
 
         {/* Active Trades Section */}
-        <BorderedBox>
-          <JazzyTitle style={styles.sectionTitle}>ACTIVE TRADES</JazzyTitle>
+        <RNView style={styles.tradesContainer}>
+          <Text style={styles.sectionTitle}>Active Trades</Text>
           <RNView style={styles.tradesList}>
             {activeTrades.map((trade) => (
               <Pressable key={trade.id} style={styles.tradeItem}>
@@ -153,7 +151,7 @@ export default function MailScreen() {
               </Pressable>
             ))}
           </RNView>
-        </BorderedBox>
+        </RNView>
       </ScrollView>
     </View>
   );
@@ -169,23 +167,56 @@ const styles = StyleSheet.create({
     padding: 20,
     flexGrow: 1,
   },
+  inboxContainer: {
+    width: '95%',
+    alignSelf: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.98)',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.3)',
+    shadowColor: '#8b5cf6',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  tradesContainer: {
+    width: '95%',
+    alignSelf: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.98)',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.3)',
+    shadowColor: '#8b5cf6',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+  },
   sectionTitle: {
     fontFamily: 'PressStart2P_400Regular',
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#0f172a',
+    color: '#8b5cf6',
     marginBottom: 16,
-    textAlign: 'left',
+    textAlign: 'center',
   },
   inboxList: {
     width: '100%',
     gap: 8,
   },
   letterItem: {
-    paddingVertical: 8,
-    paddingHorizontal: 4,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(14, 165, 233, 0.2)',
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+    marginBottom: 8,
+    borderRadius: 8,
+    backgroundColor: 'rgba(139, 92, 246, 0.05)',
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.2)',
   },
   letterHeader: {
     flexDirection: 'row',
@@ -233,7 +264,7 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#0ea5e9',
+    backgroundColor: '#8b5cf6',
   },
   tradesList: {
     width: '100%',
@@ -242,9 +273,10 @@ const styles = StyleSheet.create({
   tradeItem: {
     padding: 12,
     borderWidth: 1,
-    borderColor: '#0ea5e9',
-    borderRadius: 6,
-    backgroundColor: 'rgba(14, 165, 233, 0.05)',
+    borderColor: 'rgba(139, 92, 246, 0.3)',
+    borderRadius: 8,
+    backgroundColor: 'rgba(139, 92, 246, 0.05)',
+    marginBottom: 8,
   },
   tradeHeader: {
     flexDirection: 'row',

@@ -15,6 +15,7 @@ export default function SimpleDeveloperPanel({ visible, onClose }: SimpleDevelop
     addTickets, 
     addStamina, 
     addCoins, 
+    addGems,
     setCurrency, 
     resetGame 
   } = useSimpleGame();
@@ -22,6 +23,7 @@ export default function SimpleDeveloperPanel({ visible, onClose }: SimpleDevelop
   const [customTickets, setCustomTickets] = useState('');
   const [customStamina, setCustomStamina] = useState('');
   const [customCoins, setCustomCoins] = useState('');
+  const [customGems, setCustomGems] = useState('');
 
   const handleAdjustTickets = (amount: number) => {
     if (amount < 0 && state.tickets + amount < 0) {
@@ -40,11 +42,12 @@ export default function SimpleDeveloperPanel({ visible, onClose }: SimpleDevelop
   };
 
   const handleAdjustGems = (amount: number) => {
-    if (amount < 0 && state.coins + amount < 0) {
+    const currentGems = state.gems || 0; // Fallback to 0 if undefined
+    if (amount < 0 && currentGems + amount < 0) {
       // Don't allow going below 0
       return;
     }
-    addCoins(amount);
+    addGems(amount);
   };
 
   const handleSetCustomCurrency = () => {
@@ -52,13 +55,15 @@ export default function SimpleDeveloperPanel({ visible, onClose }: SimpleDevelop
     const tickets = customTickets.trim() !== '' ? parseInt(customTickets) : state.tickets;
     const stamina = customStamina.trim() !== '' ? parseInt(customStamina) : state.stamina;
     const coins = customCoins.trim() !== '' ? parseInt(customCoins) : state.coins;
+    const gems = customGems.trim() !== '' ? parseInt(customGems) : (state.gems || 0);
     
-    setCurrency(tickets, stamina, coins);
+    setCurrency(tickets, stamina, coins, gems);
     
     // Clear inputs
     setCustomTickets('');
     setCustomStamina('');
     setCustomCoins('');
+    setCustomGems('');
     
     // Close modal
     onClose();
@@ -134,15 +139,15 @@ export default function SimpleDeveloperPanel({ visible, onClose }: SimpleDevelop
 
             {/* Gems Control */}
             <View style={styles.currencyControl}>
-              <Text style={styles.currencyLabel}>Gems: {state.coins}</Text>
+              <Text style={styles.currencyLabel}>Gems: {state.gems || 0}</Text>
               <View style={styles.controlRow}>
                 <Pressable style={styles.arrowButton} onPress={() => handleAdjustGems(-10)}>
                   <FontAwesome name="minus" size={16} color="#fff" />
                 </Pressable>
                 <TextInput
                   style={styles.valueInput}
-                  value={customCoins}
-                  onChangeText={setCustomCoins}
+                  value={customGems}
+                  onChangeText={setCustomGems}
                   placeholder="Set amount"
                   keyboardType="numeric"
                 />

@@ -170,7 +170,7 @@ export default function AppHeader() {
           <View style={styles.currencyItem}>
             <FontAwesome name="diamond" size={16} color="#06b6d4" />
             <Text style={[styles.currencyText, { color: colorScheme === 'dark' ? '#ffffff' : '#000000' }]}>
-              {state.coins}
+              {state.gems || 0}
             </Text>
           </View>
         </View>

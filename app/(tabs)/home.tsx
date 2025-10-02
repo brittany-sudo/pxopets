@@ -1,5 +1,5 @@
-import React from 'react';
-import { StyleSheet, View as RNView, ScrollView, Image, Pressable, TextInput } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { StyleSheet, View as RNView, ScrollView, Image, Pressable, TextInput, Animated } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { useSimpleGame } from '@/store/SimpleGameStore';
 import { useInventory } from '@/store/InventoryStore';
@@ -7,8 +7,96 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { router } from 'expo-router';
 
 export default function PlayerHomeScreen() {
-  const { state, hydrated } = useSimpleGame();
+  const { state, hydrated, addStamina } = useSimpleGame();
   const { state: inventoryState, addItem, clearAllItems } = useInventory();
+  
+  // Daily rewards state
+  const [isFlashing, setIsFlashing] = useState(true);
+  const [rewardClaimed, setRewardClaimed] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
+  
+  // Animation values
+  const celebrationScale = useRef(new Animated.Value(0)).current;
+  const celebrationOpacity = useRef(new Animated.Value(0)).current;
+  const celebrationTranslateY = useRef(new Animated.Value(0)).current;
+  const buttonScale = useRef(new Animated.Value(1)).current;
+
+  // Flash animation for the gem icon
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIsFlashing(prev => !prev);
+    }, 800);
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleDailyReward = () => {
+    if (!rewardClaimed) {
+      // Button press feedback
+      Animated.sequence([
+        Animated.timing(buttonScale, {
+          toValue: 0.95,
+          duration: 100,
+          useNativeDriver: true,
+        }),
+        Animated.timing(buttonScale, {
+          toValue: 1,
+          duration: 100,
+          useNativeDriver: true,
+        }),
+      ]).start();
+
+      addStamina(5); // Give 5 stamina
+      setRewardClaimed(true);
+      setIsFlashing(false);
+      setShowCelebration(true);
+      
+      // Spring celebration animation
+      Animated.parallel([
+        Animated.spring(celebrationScale, {
+          toValue: 1.2,
+          tension: 150,
+          friction: 6,
+          useNativeDriver: true,
+        }),
+        Animated.timing(celebrationOpacity, {
+          toValue: 1,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+        Animated.timing(celebrationTranslateY, {
+          toValue: -50,
+          duration: 800,
+          useNativeDriver: true,
+        }),
+      ]).start();
+
+      // Fade out and reset after 1.2 seconds
+      setTimeout(() => {
+        Animated.parallel([
+          Animated.timing(celebrationOpacity, {
+            toValue: 0,
+            duration: 400,
+            useNativeDriver: true,
+          }),
+          Animated.timing(celebrationTranslateY, {
+            toValue: -80,
+            duration: 400,
+            useNativeDriver: true,
+          }),
+          Animated.timing(celebrationScale, {
+            toValue: 0.8,
+            duration: 400,
+            useNativeDriver: true,
+          }),
+        ]).start(() => {
+          setShowCelebration(false);
+          celebrationScale.setValue(0);
+          celebrationOpacity.setValue(0);
+          celebrationTranslateY.setValue(0);
+        });
+      }, 1200);
+    }
+  };
   
   if (!hydrated) return <View style={styles.container}><Text>Loading...</Text></View>;
 
@@ -69,8 +157,8 @@ export default function PlayerHomeScreen() {
                 <Text style={styles.primaryButtonText}>Pets</Text>
               </Pressable>
               <Pressable style={[styles.actionButton, styles.secondaryButton]}>
-                <FontAwesome name="shopping-bag" size={14} color="#8b5cf6" />
-                <Text style={styles.secondaryButtonText}>Shop</Text>
+                <FontAwesome name="exchange" size={14} color="#8b5cf6" />
+                <Text style={styles.secondaryButtonText}>Trade</Text>
               </Pressable>
               <Pressable style={[styles.actionButton, styles.accentButton]}>
                 <FontAwesome name="calendar" size={14} color="#8b5cf6" />
@@ -165,6 +253,14 @@ export default function PlayerHomeScreen() {
                         item.image === 'dragon-lunchbox' ? require('@/assets/images/dragon-lunchbox.png') :
                         item.image === 'quickstopcoffee' ? require('@/assets/images/quickstopcoffee.png') :
                         item.image === 'slushee3' ? require('@/assets/images/slushee3.png') :
+                        item.image === 'moonbeandreamcatcher.png' ? require('@/assets/images/moonbeandreamcatcher.png') :
+                        item.image === 'keycard.png' ? require('@/assets/images/keycard.png') :
+                        item.image === 'mirage-martini.png' ? require('@/assets/images/mirage-martini.png') :
+                        item.image === 'solar-flare-sling.png' ? require('@/assets/images/solar-flare-sling.png') :
+                        item.image === 'aurora-highball.png' ? require('@/assets/images/aurora-highball.png') :
+                        item.image === 'pink-sand-shaker.png' ? require('@/assets/images/pink-sand-shaker.png') :
+                        item.image === 'starlight-sour.png' ? require('@/assets/images/starlight-sour.png') :
+                        item.image === 'lunar-lagoon.png' ? require('@/assets/images/lunar-lagoon.png') :
                         // Default fallback - show chocolate for unknown items
                         require('@/assets/images/chocolate.png') // default fallback
                       } 
@@ -198,65 +294,159 @@ export default function PlayerHomeScreen() {
 
         {/* Active Pet Section - Moved below inventory */}
         <RNView style={styles.petSection}>
-          <Text style={styles.sectionTitle}>ACTIVE PET</Text>
-          <RNView style={styles.petCard}>
-            <RNView style={styles.petHeader}>
-              <Image
-                source={require('@/assets/images/tigerguy.png')}
-                style={styles.petImage}
-                resizeMode="contain"
-              />
-              <RNView style={styles.petInfo}>
-                <Text style={styles.petName}>TigerGuy</Text>
-                <Text style={styles.petLevel}>Level 12</Text>
-              </RNView>
+          <Text style={styles.sectionTitle}>Active Pet</Text>
+          <RNView style={styles.petHeader}>
+            <Image
+              source={require('@/assets/images/tigerguy.png')}
+              style={styles.petImage}
+              resizeMode="contain"
+            />
+            <RNView style={styles.petInfo}>
+              <Text style={styles.petName}>TigerGuy</Text>
+              <Text style={styles.petLevel}>Level 12</Text>
             </RNView>
-            
-            <RNView style={styles.hpBarContainer}>
-              <Text style={styles.hpLabel}>HP</Text>
-              <RNView style={styles.hpBarBackground}>
-                <RNView style={[styles.hpBarFill, { width: '85%' }]} />
-              </RNView>
-              <Text style={styles.hpText}>85/100</Text>
+          </RNView>
+          
+          <RNView style={styles.hpBarContainer}>
+            <Text style={styles.hpLabel}>HP</Text>
+            <RNView style={styles.hpBarBackground}>
+              <RNView style={[styles.hpBarFill, { width: '85%' }]} />
             </RNView>
-            
-            <RNView style={styles.expBarContainer}>
-              <Text style={styles.expLabel}>EXP</Text>
-              <RNView style={styles.expBarBackground}>
-                <RNView style={[styles.expBarFill, { width: '60%' }]} />
-              </RNView>
-              <Text style={styles.expText}>1200/2000</Text>
+            <Text style={styles.hpText}>85/100</Text>
+          </RNView>
+          
+          <RNView style={styles.expBarContainer}>
+            <Text style={styles.expLabel}>EXP</Text>
+            <RNView style={styles.expBarBackground}>
+              <RNView style={[styles.expBarFill, { width: '60%' }]} />
             </RNView>
-            
-            {/* Condensed Stats - Single row with transparent cyan border */}
-            <RNView style={styles.condensedStatsContainer}>
-              <RNView style={styles.statItem}>
-                <Text style={styles.statLabel}>ATK</Text>
-                <Text style={styles.statValue}>120</Text>
-              </RNView>
-              <RNView style={styles.statItem}>
-                <Text style={styles.statLabel}>DEF</Text>
-                <Text style={styles.statValue}>96</Text>
-              </RNView>
-              <RNView style={styles.statItem}>
-                <Text style={styles.statLabel}>SPD</Text>
-                <Text style={styles.statValue}>144</Text>
-              </RNView>
-              <RNView style={styles.statItem}>
-                <Text style={styles.statLabel}>HP</Text>
-                <Text style={styles.statValue}>100</Text>
-              </RNView>
-              <RNView style={styles.statItem}>
-                <Text style={styles.statLabel}>SPC</Text>
-                <Text style={styles.statValue}>88</Text>
-              </RNView>
-              <RNView style={styles.statItem}>
-                <Text style={styles.statLabel}>LUK</Text>
-                <Text style={styles.statValue}>72</Text>
-              </RNView>
+            <Text style={styles.expText}>1200/2000</Text>
+          </RNView>
+          
+          {/* Condensed Stats - Single row with transparent cyan border */}
+          <RNView style={styles.condensedStatsContainer}>
+            <RNView style={styles.statItem}>
+              <Text style={styles.statLabel}>ATK</Text>
+              <Text style={styles.statValue}>120</Text>
+            </RNView>
+            <RNView style={styles.statItem}>
+              <Text style={styles.statLabel}>DEF</Text>
+              <Text style={styles.statValue}>96</Text>
+            </RNView>
+            <RNView style={styles.statItem}>
+              <Text style={styles.statLabel}>SPD</Text>
+              <Text style={styles.statValue}>144</Text>
+            </RNView>
+            <RNView style={styles.statItem}>
+              <Text style={styles.statLabel}>HP</Text>
+              <Text style={styles.statValue}>100</Text>
+            </RNView>
+            <RNView style={styles.statItem}>
+              <Text style={styles.statLabel}>SPC</Text>
+              <Text style={styles.statValue}>88</Text>
+            </RNView>
+            <RNView style={styles.statItem}>
+              <Text style={styles.statLabel}>LUK</Text>
+              <Text style={styles.statValue}>72</Text>
             </RNView>
           </RNView>
         </RNView>
+
+        {/* Daily Quests Section - Moved from News */}
+        <RNView style={styles.dailyQuestsContainer}>
+          <Text style={styles.sectionTitle}>Daily Quests</Text>
+          
+          {/* Quest 1 - Daily Login */}
+          <RNView style={styles.questItem}>
+            <FontAwesome name="calendar" size={16} color="#8b5cf6" style={styles.questIcon} />
+            <RNView style={styles.questContent}>
+              <Text style={styles.questName}>Daily Login Streak</Text>
+              <Text style={styles.questDescription}>Log in for 3 consecutive days</Text>
+              <RNView style={styles.questProgress}>
+                <Text style={styles.questProgressText}>Progress: 2/3 days</Text>
+                <RNView style={styles.progressBar}>
+                  <RNView style={[styles.progressFill, { width: '67%' }]} />
+                </RNView>
+              </RNView>
+            </RNView>
+            <Text style={styles.questReward}>+10 ⚡</Text>
+          </RNView>
+
+          {/* Quest 2 - Pet Care */}
+          <RNView style={styles.questItem}>
+            <FontAwesome name="heart" size={16} color="#ef4444" style={styles.questIcon} />
+            <RNView style={styles.questContent}>
+              <Text style={styles.questName}>Pet Care Master</Text>
+              <Text style={styles.questDescription}>Give your pet 5 treats today</Text>
+              <RNView style={styles.questProgress}>
+                <Text style={styles.questProgressText}>Progress: 3/5 treats</Text>
+                <RNView style={styles.progressBar}>
+                  <RNView style={[styles.progressFill, { width: '60%' }]} />
+                </RNView>
+              </RNView>
+            </RNView>
+            <Text style={styles.questReward}>+15 ⚡</Text>
+          </RNView>
+
+          {/* Quest 3 - Weekly Challenge */}
+          <RNView style={styles.questItem}>
+            <FontAwesome name="trophy" size={16} color="#f59e0b" style={styles.questIcon} />
+            <RNView style={styles.questContent}>
+              <Text style={styles.questName}>Weekly Explorer</Text>
+              <Text style={styles.questDescription}>Visit 5 different areas this week</Text>
+              <RNView style={styles.questProgress}>
+                <Text style={styles.questProgressText}>Progress: 2/5 areas</Text>
+                <RNView style={styles.progressBar}>
+                  <RNView style={[styles.progressFill, { width: '40%' }]} />
+                </RNView>
+              </RNView>
+            </RNView>
+            <Text style={styles.questReward}>+25 ⚡</Text>
+          </RNView>
+
+          {/* Daily Reward Section - At Bottom of Quests */}
+          <RNView style={styles.dailyRewardContainer}>
+            <Animated.View style={{ transform: [{ scale: buttonScale }] }}>
+              <Pressable onPress={handleDailyReward} disabled={rewardClaimed}>
+                <RNView style={[styles.dailyRewardSection, rewardClaimed && styles.claimedSection]}>
+                  <FontAwesome 
+                    name="bolt" 
+                    size={32} 
+                    color={rewardClaimed ? "#64748b" : (isFlashing ? "#8b5cf6" : "#f59e0b")} 
+                    style={styles.flashingGem}
+                  />
+                  <Text style={[styles.dailyRewardText, rewardClaimed && styles.claimedText]}>
+                    {rewardClaimed ? "Daily Reward: Claimed!" : "Daily Reward: Tap to claim!"}
+                  </Text>
+                </RNView>
+              </Pressable>
+            </Animated.View>
+            
+            {/* Celebration Effect */}
+            {showCelebration && (
+              <Animated.View 
+                style={[
+                  styles.celebrationContainer,
+                  {
+                    transform: [
+                      { scale: celebrationScale },
+                      { translateY: celebrationTranslateY }
+                    ],
+                    opacity: celebrationOpacity,
+                  }
+                ]}
+              >
+                <Animated.View style={[styles.gradientBackground, { transform: [{ scale: celebrationScale }] }]}>
+                  <RNView style={styles.celebrationContent}>
+                    <Text style={styles.celebrationText}>5</Text>
+                    <FontAwesome name="bolt" size={16} color="#f59e0b" />
+                  </RNView>
+                </Animated.View>
+              </Animated.View>
+            )}
+          </RNView>
+        </RNView>
+
       </ScrollView>
     </View>
   );
@@ -290,17 +480,19 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   playerProfileCard: {
-    backgroundColor: '#ffffff',
-    borderRadius: 16,
+    width: '95%',
+    alignSelf: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.98)',
+    borderRadius: 12,
     padding: 20,
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: '#e5e7eb',
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
+    borderColor: 'rgba(139, 92, 246, 0.3)',
+    shadowColor: '#8b5cf6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
     shadowRadius: 8,
-    elevation: 2,
+    elevation: 5,
   },
   profileHeader: {
     flexDirection: 'row',
@@ -432,11 +624,16 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     padding: 12,
-    borderRadius: 8,
+    borderRadius: 12,
     marginHorizontal: 3,
     borderWidth: 1,
-    borderColor: '#8b5cf6',
-    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+    borderColor: 'rgba(139, 92, 246, 0.3)',
+    backgroundColor: 'rgba(139, 92, 246, 0.05)',
+    shadowColor: '#8b5cf6',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   primaryButton: {
     backgroundColor: 'rgba(139, 92, 246, 0.1)',
@@ -499,26 +696,27 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   sectionTitle: {
-    fontFamily: 'Silkscreen_400Regular',
-    fontSize: 14,
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 12,
     fontWeight: 'bold',
-    color: '#000000',
+    color: '#8b5cf6',
     marginBottom: 16,
+    textAlign: 'center',
   },
   petSection: {
-    marginBottom: 24,
-  },
-  petCard: {
-    backgroundColor: '#ffffff',
+    width: '95%',
+    alignSelf: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.98)',
     borderRadius: 12,
     padding: 16,
+    marginBottom: 24,
     borderWidth: 1,
-    borderColor: '#e5e5e5',
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
+    borderColor: 'rgba(139, 92, 246, 0.3)',
+    shadowColor: '#8b5cf6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
   },
   petHeader: {
     flexDirection: 'row',
@@ -733,7 +931,19 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   inventorySection: {
+    width: '95%',
+    alignSelf: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.98)',
+    borderRadius: 12,
+    padding: 16,
     marginBottom: 24,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.3)',
+    shadowColor: '#8b5cf6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
   },
   inventoryText: {
     fontFamily: 'Silkscreen_400Regular',
@@ -860,21 +1070,26 @@ const styles = StyleSheet.create({
     lineHeight: 10,
   },
   clearInventoryButton: {
-    backgroundColor: '#ffffff',
+    backgroundColor: 'rgba(239, 68, 68, 0.05)',
     padding: 12,
-    borderRadius: 8,
+    borderRadius: 12,
     marginTop: 12,
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'center',
     gap: 8,
     borderWidth: 1,
-    borderColor: '#e5e5e5',
+    borderColor: 'rgba(239, 68, 68, 0.3)',
+    shadowColor: '#ef4444',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   clearInventoryButtonText: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 12,
-    color: '#999999',
+    fontSize: 10,
+    color: '#ef4444',
     fontWeight: '600',
   },
   inventoryGrid: {
@@ -901,6 +1116,164 @@ const styles = StyleSheet.create({
     fontFamily: 'monospace',
     fontSize: 20,
     color: '#cccccc',
+  },
+  // Daily Reward Styles
+  dailyRewardContainer: {
+    marginTop: 16,
+    padding: 12,
+    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: 'rgba(139, 92, 246, 0.3)',
+    borderStyle: 'dashed',
+  },
+  dailyRewardSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+    paddingVertical: 12,
+    backgroundColor: 'rgba(139, 92, 246, 0.15)',
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.4)',
+    justifyContent: 'center',
+  },
+  claimedSection: {
+    backgroundColor: 'rgba(100, 116, 139, 0.1)',
+    borderColor: 'rgba(100, 116, 139, 0.3)',
+  },
+  flashingGem: {
+    marginRight: 8,
+  },
+  dailyRewardText: {
+    fontSize: 14,
+    fontFamily: 'Silkscreen_400Regular',
+    color: '#0f172a',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  claimedText: {
+    color: '#64748b',
+  },
+  celebrationContainer: {
+    position: 'absolute',
+    top: -10,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 10,
+    pointerEvents: 'none',
+  },
+  gradientBackground: {
+    backgroundColor: '#8b5cf6',
+    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    shadowColor: '#8b5cf6',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.8,
+    shadowRadius: 10,
+    elevation: 10,
+  },
+  celebrationContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  celebrationText: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 6,
+    color: '#ffffff',
+    textAlign: 'center',
+    fontWeight: 'bold',
+  },
+  // Quest Styles
+  questTitle: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#0f172a',
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  questItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(14, 165, 233, 0.05)',
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: 'rgba(14, 165, 233, 0.2)',
+    padding: 12,
+    marginBottom: 8,
+  },
+  questIcon: {
+    marginRight: 12,
+    flexShrink: 0,
+  },
+  questContent: {
+    flex: 1,
+    marginRight: 8,
+  },
+  questName: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#0f172a',
+    marginBottom: 2,
+  },
+  questDescription: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#0f172a',
+    marginBottom: 6,
+  },
+  questProgress: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  questProgressText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 9,
+    color: '#0f172a',
+    flexShrink: 0,
+  },
+  progressBar: {
+    flex: 1,
+    height: 6,
+    backgroundColor: 'rgba(14, 165, 233, 0.2)',
+    borderRadius: 3,
+    overflow: 'hidden',
+  },
+  progressFill: {
+    height: '100%',
+    backgroundColor: '#0ea5e9',
+    borderRadius: 3,
+  },
+  questReward: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    fontWeight: 'bold',
+    color: '#8b5cf6',
+    textAlign: 'right',
+    flexShrink: 0,
+  },
+  dailyQuestsContainer: {
+    width: '95%',
+    alignSelf: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.98)',
+    borderRadius: 12,
+    padding: 16,
+    marginTop: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.3)',
+    shadowColor: '#8b5cf6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
   },
 });
 

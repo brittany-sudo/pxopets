@@ -9,6 +9,7 @@ import { router } from 'expo-router';
 // Import images
 const volcanoImage = require('@/assets/images/tiny-volcano.png');
 const staticTvImage = require('@/assets/images/static-tv.png');
+const pxoburbsIconImage = require('@/assets/images/pxoburbs-icon.png');
 const lilPaletteImage = require('@/assets/images/lil-palette.png');
 const cosmicBurgerImage = require('@/assets/images/cosmicburger.png');
 const lilAnchorImage = require('@/assets/images/lil-anchor.png');
@@ -36,7 +37,7 @@ export default function ExploreScreen() {
       icon: "home",
       color: "#64748b",
       description: "A nostalgic suburban enclave where neon-lit arcades meet corner stores.",
-      image: staticTvImage
+      image: pxoburbsIconImage
     },
     {
       id: "crystal-cove",
@@ -206,13 +207,13 @@ export default function ExploreScreen() {
           <FontAwesome name="shopping-cart" size={20} color="#8b5cf6" />
           <Text style={styles.navButtonText}>SHOP</Text>
         </Pressable>
-        <Pressable style={styles.navButton} onPress={() => Alert.alert('Contest', 'Contests coming soon!')}>
-          <FontAwesome name="trophy" size={20} color="#8b5cf6" />
-          <Text style={styles.navButtonText}>CONTEST</Text>
+        <Pressable style={styles.navButton} onPress={() => Alert.alert('Inventory', 'Inventory coming soon!')}>
+          <FontAwesome name="archive" size={20} color="#8b5cf6" />
+          <Text style={styles.navButtonText}>INVENTORY</Text>
         </Pressable>
-        <Pressable style={styles.navButton} onPress={() => Alert.alert('Dailies', 'Daily quests coming soon!')}>
-          <FontAwesome name="calendar" size={20} color="#8b5cf6" />
-          <Text style={styles.navButtonText}>DAILIES</Text>
+        <Pressable style={styles.navButton} onPress={() => Alert.alert('Bank', 'Bank coming soon!')}>
+          <FontAwesome name="bank" size={20} color="#8b5cf6" />
+          <Text style={styles.navButtonText}>BANK</Text>
         </Pressable>
       </RNView>
 
@@ -230,11 +231,13 @@ export default function ExploreScreen() {
               style={styles.worldItem}
               onPress={() => handleWorldPress(world)}
             >
-              {world.image ? (
-                <Image source={world.image} style={styles.worldImage} />
-              ) : (
-                <FontAwesome name={world.icon as any} size={32} color={world.color} style={styles.worldIcon} />
-              )}
+              <RNView style={styles.worldIconContainer}>
+                {world.image ? (
+                  <Image source={world.image} style={styles.worldImage} />
+                ) : (
+                  <FontAwesome name={world.icon as any} size={32} color={world.color} style={styles.worldIcon} />
+                )}
+              </RNView>
               <RNView style={styles.worldContent}>
                 <Text style={styles.worldName}>{world.name}</Text>
                 <Text style={styles.worldDescription}>{world.description}</Text>
@@ -253,11 +256,11 @@ const styles = StyleSheet.create({
   },
   secondNavContainer: {
     flexDirection: 'row',
-    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+    backgroundColor: 'rgba(139, 92, 246, 0.05)',
     borderTopWidth: 1,
-    borderTopColor: 'rgba(139, 92, 246, 0.3)',
+    borderTopColor: 'rgba(139, 92, 246, 0.2)',
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(139, 92, 246, 0.3)',
+    borderBottomColor: 'rgba(139, 92, 246, 0.2)',
     paddingVertical: 8,
     paddingHorizontal: 4,
     justifyContent: 'space-around',
@@ -353,19 +356,32 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 3, // Android shadow
   },
-  worldIcon: {
-    marginRight: 12,
-    marginTop: 2,
+  worldIconContainer: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 16,
     flexShrink: 0,
+    shadowColor: '#8b5cf6',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  worldIcon: {
     fontSize: 32,
+    color: '#8b5cf6',
   },
   worldImage: {
-    width: 56, // Bigger images
-    height: 56,
-    marginRight: 16, // More space from text
-    flexShrink: 0,
+    width: 48,
+    height: 48,
     resizeMode: 'contain',
-    borderRadius: 12, // Rounded image corners
+    borderRadius: 8,
   },
   worldContent: {
     flex: 1,

@@ -8,12 +8,16 @@ import { router } from 'expo-router';
 const cosmicBurgerImage = require('@/assets/images/cosmicburger.png');
 const lilAtomicDinerImage = require('@/assets/images/lil-atomic-diner.png');
 const lilChipImage = require('@/assets/images/lil-chip.png');
+const lilDieImage = require('@/assets/images/lil-die.png');
+const motelKeysImage = require('@/assets/images/motelkeys.png');
 
 // Image mapping for activities
 const activityImageMap: { [key: string]: any } = {
   'cosmicburger.png': cosmicBurgerImage,
   'lil-atomic-diner.png': lilAtomicDinerImage,
   'lil-chip.png': lilChipImage,
+  'lil-die.png': lilDieImage,
+  'motelkeys.png': motelKeysImage,
 };
 
 // Import the banner image
@@ -38,65 +42,49 @@ export default function CrescentOasisScreen() {
     {
       id: 'atomic-diner',
       name: 'Atomic Diner',
-      description: 'Dine at the retro 50s diner with alien waitstaff.',
-      lightning: 15,
-      difficulty: 'Easy',
+      description: 'Retro 50s diner with alien waitstaff.',
       icon: 'lil-atomic-diner.png'
+    },
+    {
+      id: 'moonbeam-motel',
+      name: 'Moonbeam Motel',
+      description: 'Sketchy motel with flickering neon signs.',
+      icon: 'motelkeys.png'
     },
     {
       id: 'neon-casino',
       name: 'Neon Casino',
-      description: 'Try your luck at the glowing slot machines and cosmic card tables.',
-      lightning: 25,
-      difficulty: 'Medium',
-      icon: 'lil-chip.png'
+      description: 'Glowing slot machines and cosmic card tables.',
+      icon: 'lil-die.png'
     },
     {
       id: 'hovercar-speedway',
       name: 'Lucky Strike Speedway',
-      description: 'Race hover cars across the pink sand dunes at breakneck speeds.',
-      lightning: 30,
-      difficulty: 'Hard',
+      description: 'Race hovercars across pink sand dunes.',
       icon: 'cosmicburger.png'
     },
     {
       id: 'hippie-alien-radio',
       name: 'Visit Zephyr',
-      description: 'Hang out with Zephyr, the groovy alien DJ who broadcasts cosmic tunes from his airstream.',
-      lightning: 20,
-      difficulty: 'Easy',
+      description: 'Groovy alien DJ broadcasting cosmic tunes.',
       icon: 'cosmicburger.png'
     },
     {
       id: 'cosmic-gas-station',
       name: 'Cosmic Gas Station',
-      description: 'Fuel up your hovercar with stardust and grab space snacks.',
-      lightning: 18,
-      difficulty: 'Easy',
-      icon: 'cosmicburger.png'
-    },
-    {
-      id: 'moonbeam-motel',
-      name: 'Moonbeam Motel',
-      description: 'Stay at the sketchy motel where neon signs flicker all night.',
-      lightning: 22,
-      difficulty: 'Medium',
+      description: 'Fuel hovercars with stardust and space snacks.',
       icon: 'cosmicburger.png'
     },
     {
       id: 'cosmic-drive-in',
       name: 'Cosmic Drive-In',
-      description: 'Watch alien movies under the stars from your hovercar.',
-      lightning: 28,
-      difficulty: 'Medium',
+      description: 'Watch alien movies under the stars.',
       icon: 'cosmicburger.png'
     },
     {
       id: 'sunset-rest-stop',
       name: 'Sunset Rest Stop',
-      description: 'Meditate as the pink sun sets over the dunes at this peaceful oasis.',
-      lightning: 12,
-      difficulty: 'Easy',
+      description: 'Meditate as the pink sun sets over dunes.',
       icon: 'cosmicburger.png'
     }
   ];
@@ -110,7 +98,7 @@ export default function CrescentOasisScreen() {
           style={styles.backButton}
           onPress={() => router.navigate('/(tabs)/explore')}
         >
-          <FontAwesome name="arrow-left" size={12} color="#8b5cf6" />
+          <FontAwesome name="arrow-left" size={12} color="#ec4899" />
           <Text style={styles.backButtonText}>Back</Text>
         </Pressable>
 
@@ -124,13 +112,6 @@ export default function CrescentOasisScreen() {
           <Image source={crescentBackgroundImage} style={styles.bannerImage} />
         </RNView>
 
-        {/* Description */}
-        <Text style={styles.description}>
-          A pink desert mirage where hippie aliens and atomic 50s diners coexist in perfect harmony. 
-          Neon lights pulse against the endless dunes while hover cars zip between crystal formations. 
-          Here, the future meets the past in a kaleidoscope of color and sound.
-        </Text>
-
         {/* Activities Title */}
         <Text style={styles.activitiesTitle}>OASIS ACTIVITIES</Text>
 
@@ -142,6 +123,8 @@ export default function CrescentOasisScreen() {
             onPress={() => {
               if (activity.id === 'atomic-diner') {
                 router.navigate('/(tabs)/atomic-diner');
+              } else if (activity.id === 'moonbeam-motel') {
+                router.navigate('/(tabs)/moonbeam-motel');
               } else if (activity.id === 'neon-casino') {
                 router.navigate('/(tabs)/neon-casino');
               } else if (activity.id === 'hovercar-speedway') {
@@ -151,14 +134,12 @@ export default function CrescentOasisScreen() {
           >
             <RNView style={styles.activityHeader}>
               <RNView style={styles.activityInfo}>
-                <Image source={activityImageMap[activity.icon]} style={styles.activityIcon} />
+                <RNView style={styles.activityIconContainer}>
+                  <Image source={activityImageMap[activity.icon]} style={styles.activityIcon} />
+                </RNView>
                     <RNView style={styles.activityText}>
                       <RNView style={styles.activityTitleRow}>
                         <Text style={styles.activityName}>{activity.name}</Text>
-                        <RNView style={styles.ticketDisplay}>
-                          <FontAwesome name="bolt" size={15} color="#06b6d4" />
-                          <Text style={styles.ticketCountText}>{activity.lightning}</Text>
-                        </RNView>
                       </RNView>
                       <Text style={styles.activityDescription}>{activity.description}</Text>
                     </RNView>
@@ -172,7 +153,7 @@ export default function CrescentOasisScreen() {
                 <FontAwesome 
                   name={favorites.has(activity.id) ? "star" : "star-o"} 
                   size={16} 
-                  color={favorites.has(activity.id) ? "#94a3b8" : "#94a3b8"} 
+                  color={favorites.has(activity.id) ? "#ec4899" : "rgba(236, 72, 153, 0.3)"} 
                 />
               </Pressable>
             </RNView>
@@ -186,7 +167,7 @@ export default function CrescentOasisScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f0f9ff',
+    backgroundColor: '#fce7f3', // Light pink desert background
   },
   scrollContent: {
     alignItems: 'center',
@@ -211,10 +192,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 12,
     paddingVertical: 8,
-    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+    backgroundColor: 'rgba(236, 72, 153, 0.1)',
     borderRadius: 6,
     borderWidth: 1,
-    borderColor: 'rgba(139, 92, 246, 0.3)',
+    borderColor: 'rgba(236, 72, 153, 0.3)',
   },
   locationTitle: {
     fontFamily: 'PressStart2P_400Regular',
@@ -226,8 +207,8 @@ const styles = StyleSheet.create({
   },
   backButtonText: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 12,
-    color: '#8b5cf6',
+    fontSize: 14,
+    color: '#ec4899',
     marginLeft: 6,
   },
   headerRow: {
@@ -251,46 +232,44 @@ const styles = StyleSheet.create({
   },
   bannerContainer: {
     width: '100%',
-    height: 200,
+    height: 300,
     borderWidth: 2,
-    borderColor: '#0ea5e9',
+    borderColor: '#ec4899',
     borderRadius: 8,
+    marginTop: -20,
     marginBottom: 20,
-    overflow: 'hidden',
-    backgroundColor: 'rgba(14, 165, 233, 0.05)',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(236, 72, 153, 0.05)',
   },
   bannerImage: {
     width: '100%',
     height: '100%',
     resizeMode: 'cover',
   },
-  description: {
-    fontFamily: 'Silkscreen_400Regular',
-    fontSize: 12,
-    color: '#0f172a',
-    lineHeight: 18,
-    marginTop: -10,
-    marginBottom: 24,
-    textAlign: 'left',
-    alignSelf: 'flex-start',
-  },
   activitiesTitle: {
     fontFamily: 'PressStart2P_400Regular',
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 'bold',
     color: '#0f172a',
-    marginBottom: 16,
+    marginTop: 16,
+    marginBottom: 12,
     textAlign: 'left',
     alignSelf: 'flex-start',
   },
   activityItem: {
-    backgroundColor: 'rgba(14, 165, 233, 0.05)',
-    borderRadius: 8,
+    backgroundColor: 'rgba(236, 72, 153, 0.05)',
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: 'rgba(14, 165, 233, 0.2)',
-    padding: 16,
-    marginBottom: 12,
+    borderColor: 'rgba(236, 72, 153, 0.2)',
+    padding: 12,
+    marginBottom: 10,
     width: '100%',
+    shadowColor: '#ec4899',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   activityHeader: {
     flexDirection: 'row',
@@ -302,11 +281,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flex: 1,
   },
+  activityIconContainer: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: 'rgba(236, 72, 153, 0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
   activityIcon: {
     width: 40,
     height: 40,
-    marginRight: 12,
     alignSelf: 'center',
+    resizeMode: 'contain',
   },
   activityText: {
     flex: 1,
@@ -318,37 +306,32 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 4,
   },
-  ticketDisplay: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 2,
-  },
-  ticketCountText: {
-    fontFamily: 'Silkscreen_400Regular',
-    fontSize: 10,
-    color: '#06b6d4',
-    fontWeight: 'bold',
-  },
   activityName: {
-    fontFamily: 'Silkscreen_400Regular',
-    fontSize: 14,
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 12,
     fontWeight: 'bold',
     color: '#0f172a',
-    marginBottom: 4,
+    marginBottom: 3,
+    textAlign: 'left',
+    lineHeight: 16,
+    textTransform: 'uppercase',
   },
   activityDescription: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 11,
-    color: '#0f172a',
-    lineHeight: 16,
+    color: '#64748b',
+    lineHeight: 15,
+    textAlign: 'justify',
   },
   favoriteButton: {
     padding: 4,
+    backgroundColor: 'rgba(236, 72, 153, 0.05)',
   },
   activityFooter: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    justifyContent: 'center',
   },
   rewardText: {
     fontFamily: 'Silkscreen_400Regular',

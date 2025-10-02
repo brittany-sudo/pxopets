@@ -26,8 +26,8 @@ export default function TabLayout() {
     <Tabs
       initialRouteName="index"
       screenOptions={{
-        tabBarActiveTintColor: colorScheme === 'dark' ? '#ffffff' : '#6b46c1',
-        tabBarInactiveTintColor: colorScheme === 'dark' ? '#666666' : '#999999',
+        tabBarActiveTintColor: colorScheme === 'dark' ? '#8b5cf6' : '#8b5cf6',
+        tabBarInactiveTintColor: colorScheme === 'dark' ? 'rgba(139, 92, 246, 0.3)' : 'rgba(139, 92, 246, 0.3)',
                 tabBarLabelStyle: { 
                   fontFamily: 'Silkscreen_400Regular', 
                   fontSize: 9, 
@@ -133,6 +133,36 @@ export default function TabLayout() {
       />
       <Tabs.Screen
         name="crescent-oasis"
+        options={{
+          href: null, // Hide from tab bar
+        }}
+      />
+      <Tabs.Screen
+        name="moonbeam-motel"
+        options={{
+          href: null, // Hide from tab bar
+        }}
+      />
+      <Tabs.Screen
+        name="moonbeam-motel-room"
+        options={{
+          href: null, // Hide from tab bar
+        }}
+      />
+      <Tabs.Screen
+        name="moonbeam-motel-room-interior"
+        options={{
+          href: null, // Hide from tab bar
+        }}
+      />
+      <Tabs.Screen
+        name="broken-vending-machine"
+        options={{
+          href: null, // Hide from tab bar
+        }}
+      />
+      <Tabs.Screen
+        name="neon-rooftop-lounge"
         options={{
           href: null, // Hide from tab bar
         }}

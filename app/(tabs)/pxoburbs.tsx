@@ -256,7 +256,7 @@ export default function PxoburbsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f0f9ff',
+    backgroundColor: '#f3f0ff', // Light purple suburban background
   },
   scrollContent: {
     alignItems: 'center',
@@ -309,13 +309,13 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 300,
     borderWidth: 2,
-    borderColor: '#0ea5e9',
+    borderColor: '#8b5cf6',
     borderRadius: 8,
     marginTop: -20,
     marginBottom: 20,
     alignItems: 'center',
     justifyContent: 'flex-end',
-    backgroundColor: 'rgba(14, 165, 233, 0.05)',
+    backgroundColor: 'rgba(139, 92, 246, 0.05)',
   },
   bannerImage: {
     width: '100%',

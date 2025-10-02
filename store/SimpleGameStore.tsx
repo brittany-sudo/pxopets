@@ -13,6 +13,7 @@ type SimpleGameState = {
   tickets: number;
   stamina: number;
   coins: number;
+  gems: number;
   foodInventory: { [key: string]: FoodItem };
   devMode: boolean;
   lastStaminaUpdate: number;
@@ -23,13 +24,15 @@ type SimpleGameContextType = {
   addTickets: (amount: number) => void;
   addStamina: (amount: number) => void;
   addCoins: (amount: number) => void;
+  addGems: (amount: number) => void;
   spendTickets: (amount: number) => boolean;
   spendStamina: (amount: number) => boolean;
   spendCoins: (amount: number) => boolean;
+  spendGems: (amount: number) => boolean;
   addFood: (foodId: string, quantity: number) => void;
   consumeFood: (foodId: string, quantity: number) => boolean;
   toggleDevMode: () => void;
-  setCurrency: (tickets: number, stamina: number, coins: number) => void;
+  setCurrency: (tickets: number, stamina: number, coins: number, gems: number) => void;
   resetGame: () => void;
   hydrated: boolean;
 };
@@ -71,12 +74,13 @@ const DEFAULT_STATE: SimpleGameState = {
   tickets: 0,
   stamina: 100,
   coins: 50,
+  gems: 25,
   foodInventory: DEFAULT_FOODS,
   devMode: false,
   lastStaminaUpdate: Date.now(),
 };
 
-const STORAGE_KEY = 'simple-game-state-v1';
+const STORAGE_KEY = 'simple-game-state-v2';
 
 export function SimpleGameProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<SimpleGameState>(DEFAULT_STATE);
@@ -89,7 +93,13 @@ export function SimpleGameProvider({ children }: { children: React.ReactNode }) 
         const stored = await AsyncStorage.getItem(STORAGE_KEY);
         if (stored) {
           const parsedState = JSON.parse(stored);
-          setState(parsedState);
+          // Handle migration from old save format that might not have gems
+          const migratedState = {
+            ...DEFAULT_STATE,
+            ...parsedState,
+            gems: parsedState.gems ?? DEFAULT_STATE.gems, // Ensure gems exists
+          };
+          setState(migratedState);
         }
       } catch (error) {
         console.error('Failed to load game state:', error);
@@ -124,6 +134,16 @@ export function SimpleGameProvider({ children }: { children: React.ReactNode }) 
     setState(prev => ({ ...prev, coins: prev.coins + amount }));
   };
 
+  const addGems = (amount: number) => {
+    console.log('Adding gems:', amount, 'Current gems:', state.gems);
+    setState(prev => {
+      const currentGems = prev.gems || 0; // Fallback to 0 if undefined
+      const newGems = currentGems + amount;
+      console.log('New gems:', newGems);
+      return { ...prev, gems: newGems };
+    });
+  };
+
   const spendTickets = (amount: number): boolean => {
     if (state.tickets >= amount) {
       setState(prev => ({ ...prev, tickets: prev.tickets - amount }));
@@ -143,6 +163,18 @@ export function SimpleGameProvider({ children }: { children: React.ReactNode }) 
   const spendCoins = (amount: number): boolean => {
     if (state.coins >= amount) {
       setState(prev => ({ ...prev, coins: prev.coins - amount }));
+      return true;
+    }
+    return false;
+  };
+
+  const spendGems = (amount: number): boolean => {
+    const currentGems = state.gems || 0; // Fallback to 0 if undefined
+    if (currentGems >= amount) {
+      setState(prev => {
+        const prevGems = prev.gems || 0;
+        return { ...prev, gems: prevGems - amount };
+      });
       return true;
     }
     return false;
@@ -183,12 +215,13 @@ export function SimpleGameProvider({ children }: { children: React.ReactNode }) 
     setState(prev => ({ ...prev, devMode: !prev.devMode }));
   };
 
-  const setCurrency = (tickets: number, stamina: number, coins: number) => {
+  const setCurrency = (tickets: number, stamina: number, coins: number, gems: number) => {
     setState(prev => ({
       ...prev,
       tickets: Math.max(0, tickets),
       stamina: Math.max(0, stamina),
-      coins: Math.max(0, coins)
+      coins: Math.max(0, coins),
+      gems: Math.max(0, gems)
     }));
   };
 
@@ -201,9 +234,11 @@ export function SimpleGameProvider({ children }: { children: React.ReactNode }) 
     addTickets,
     addStamina,
     addCoins,
+    addGems,
     spendTickets,
     spendStamina,
     spendCoins,
+    spendGems,
     addFood,
     consumeFood,
     toggleDevMode,

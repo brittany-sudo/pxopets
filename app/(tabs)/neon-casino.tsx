@@ -6,6 +6,7 @@ import { router } from 'expo-router';
 
 // Import the casino image
 const neonCasinoImage = require('@/assets/images/neon-casino.png');
+const lilChipImage = require('@/assets/images/lil-chip.png');
 
 // Import game images
 const cosmicBurgerImage = require('@/assets/images/cosmicburger.png');
@@ -16,7 +17,6 @@ const rinkPizzaImage = require('@/assets/images/rinkpizza.png');
 const glowCornImage = require('@/assets/images/glowcorn.png');
 const galaxySundaeImage = require('@/assets/images/galaxysundae.png');
 const blueTboneImage = require('@/assets/images/blue-tbone.png');
-const lilChipImage = require('@/assets/images/lil-chip.png');
 
 // Image mapping
 const imageMap: { [key: string]: any } = {
@@ -256,6 +256,15 @@ export default function NeonCasinoScreen() {
 
   const casinoActivities = [
     {
+      id: 'rooftop-pool',
+      name: 'Neon Rooftop Pool & Lounge',
+      description: 'Exclusive VIP area with cosmic cocktails and stellar views',
+      stamina: 0,
+      price: 100,
+      icon: 'star',
+      isHighlighted: true
+    },
+    {
       id: 'slot-machines',
       name: 'Neon Slot Machines',
       description: 'Try your luck at the glowing cosmic slot machines',
@@ -270,6 +279,14 @@ export default function NeonCasinoScreen() {
       stamina: 15,
       price: 50,
       icon: 'diamond'
+    },
+    {
+      id: 'luxe-shop',
+      name: 'Luxe Casino Shop',
+      description: 'Browse exclusive high-end casino merchandise and collectibles',
+      stamina: 0,
+      price: 0,
+      icon: 'shopping-bag'
     },
     {
       id: 'chat-dealer',
@@ -319,17 +336,15 @@ export default function NeonCasinoScreen() {
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Back Button - Fixed Position */}
-        <Pressable 
-          style={styles.backButton}
-          onPress={() => router.navigate('/(tabs)/crescent-oasis')}
-        >
-          <FontAwesome name="arrow-left" size={12} color="#8b5cf6" />
-          <Text style={styles.backButtonText}>Back</Text>
-        </Pressable>
-
         {/* Header Row */}
         <RNView style={styles.headerRow}>
+          <Pressable 
+            style={styles.backButton}
+            onPress={() => router.navigate('/(tabs)/crescent-oasis')}
+          >
+            <FontAwesome name="arrow-left" size={12} color="#ec4899" />
+            <Text style={styles.backButtonText}>Back</Text>
+          </Pressable>
           <Text style={styles.locationTitle}>NEON CASINO</Text>
         </RNView>
 
@@ -347,28 +362,65 @@ export default function NeonCasinoScreen() {
           <Image source={require('@/assets/images/dex-guy.png')} style={styles.dexImage} />
         </RNView>
 
-        {/* Player Stats */}
-        <RNView style={styles.statsContainer}>
-          <RNView style={styles.statItem}>
-            <FontAwesome name="diamond" size={16} color="#8b5cf6" />
-            <Text style={styles.statText}>{playerCoins} Gems</Text>
-          </RNView>
-          <RNView style={styles.statItem}>
-            <FontAwesome name="bolt" size={16} color="#f59e0b" />
-            <Text style={styles.statText}>{playerStamina} Energy</Text>
+        {/* Chip Purchase Options */}
+        <RNView style={styles.chipPurchaseContainer}>
+          <Text style={styles.chipPurchaseTitle}>BUY CASINO CHIPS</Text>
+          <RNView style={styles.chipOptionsContainer}>
+            <Pressable 
+              style={styles.chipOption}
+              onPress={() => Alert.alert("Chip Purchase", "You bought 50 chips for 5 tickets!")}
+            >
+              <Image source={lilChipImage} style={styles.chipIcon} />
+              <Text style={styles.chipAmount}>50 CHIPS</Text>
+              <RNView style={styles.chipPrice}>
+                <FontAwesome name="ticket" size={12} color="#8b5cf6" />
+                <Text style={styles.chipPriceText}>5</Text>
+              </RNView>
+            </Pressable>
+            
+            <Pressable 
+              style={styles.chipOption}
+              onPress={() => Alert.alert("Chip Purchase", "You bought 150 chips for 12 tickets!")}
+            >
+              <Image source={lilChipImage} style={styles.chipIcon} />
+              <Text style={styles.chipAmount}>150 CHIPS</Text>
+              <RNView style={styles.chipPrice}>
+                <FontAwesome name="ticket" size={12} color="#8b5cf6" />
+                <Text style={styles.chipPriceText}>12</Text>
+              </RNView>
+            </Pressable>
+            
+            <Pressable 
+              style={styles.chipOption}
+              onPress={() => Alert.alert("Chip Purchase", "You bought 300 chips for 20 tickets!")}
+            >
+              <Image source={lilChipImage} style={styles.chipIcon} />
+              <Text style={styles.chipAmount}>300 CHIPS</Text>
+              <RNView style={styles.chipPrice}>
+                <FontAwesome name="ticket" size={12} color="#8b5cf6" />
+                <Text style={styles.chipPriceText}>20</Text>
+              </RNView>
+            </Pressable>
           </RNView>
         </RNView>
 
+        {/* Activities Title */}
+        <Text style={styles.activitiesTitle}>CASINO ACTIVITIES</Text>
+        
         {/* Activities */}
         {casinoActivities.map((activity) => (
-          <RNView key={activity.id} style={styles.pubActivityItem}>
+          <RNView key={activity.id} style={activity.isHighlighted ? styles.highlightedActivityItem : styles.pubActivityItem}>
             <Pressable 
               style={styles.pubActivityPressable}
               onPress={() => {
-                if (activity.id === 'slot-machines') {
+                if (activity.id === 'rooftop-pool') {
+                  router.navigate('/(tabs)/neon-rooftop-lounge');
+                } else if (activity.id === 'slot-machines') {
                   setShowSlotModal(true);
                 } else if (activity.id === 'blackjack') {
                   setShowBlackjackModal(true);
+                } else if (activity.id === 'luxe-shop') {
+                  Alert.alert("Luxe Casino Shop", "Welcome to our exclusive boutique! Browse premium casino merchandise, limited edition collectibles, and luxury accessories.");
                 } else if (activity.id === 'chat-dealer') {
                   handleDexInteraction();
                 }
@@ -380,10 +432,6 @@ export default function NeonCasinoScreen() {
                   <RNView style={styles.pubActivityText}>
                     <RNView style={styles.pubActivityTitleRow}>
                       <Text style={styles.pubActivityName}>{activity.name}</Text>
-                      <RNView style={styles.activityCost}>
-                        <Text style={styles.costText}>⚡ {activity.stamina}</Text>
-                        {activity.price > 0 && <Text style={styles.costText}>💎 {activity.price}</Text>}
-                      </RNView>
                     </RNView>
                     <Text style={styles.pubActivityDescription}>{activity.description}</Text>
                   </RNView>
@@ -392,6 +440,19 @@ export default function NeonCasinoScreen() {
             </Pressable>
           </RNView>
         ))}
+
+        {/* Slotbot777 Character */}
+        <RNView style={styles.slotbotContainer}>
+          <RNView style={styles.slotbotSpeechBubble}>
+            <Text style={styles.slotbotCharacterName}>SLOTBOT777:</Text>
+            <Text style={styles.slotbotSpeechText}>
+              {slotbotSaying}
+            </Text>
+          </RNView>
+          <Pressable onPress={handleSlotbotInteraction}>
+            <Image source={require('@/assets/images/slotbot777.png')} style={styles.slotbotImage} />
+          </Pressable>
+        </RNView>
 
         {/* Casino Rewards */}
         <Text style={styles.rewardsTitle}>CASINO REWARDS</Text>
@@ -409,24 +470,11 @@ export default function NeonCasinoScreen() {
               <RNView style={styles.rewardItemFooter}>
                 <RNView style={styles.ticketPriceContainer}>
                   <Text style={styles.rewardItemPrice}>{item.price}</Text>
-                  <FontAwesome name="diamond" size={10} color="#8b5cf6" />
+                  <FontAwesome name="diamond" size={10} color="#ec4899" />
                 </RNView>
               </RNView>
             </RNView>
           ))}
-        </RNView>
-
-        {/* Slotbot777 Character */}
-        <RNView style={styles.slotbotContainer}>
-          <RNView style={styles.slotbotSpeechBubble}>
-            <Text style={styles.slotbotCharacterName}>SLOTBOT777:</Text>
-            <Text style={styles.slotbotSpeechText}>
-              {slotbotSaying}
-            </Text>
-          </RNView>
-          <Pressable onPress={handleSlotbotInteraction}>
-            <Image source={require('@/assets/images/slotbot777.png')} style={styles.slotbotImage} />
-          </Pressable>
         </RNView>
 
         {/* Slot Machine Modal */}
@@ -444,7 +492,7 @@ export default function NeonCasinoScreen() {
                   style={styles.closeButton}
                   onPress={() => setShowSlotModal(false)}
                 >
-                  <FontAwesome name="times" size={20} color="#8b5cf6" />
+                  <FontAwesome name="times" size={20} color="#ec4899" />
                 </Pressable>
               </View>
               
@@ -489,7 +537,7 @@ export default function NeonCasinoScreen() {
                     resetBlackjack();
                   }}
                 >
-                  <FontAwesome name="times" size={20} color="#8b5cf6" />
+                  <FontAwesome name="times" size={20} color="#ec4899" />
                 </Pressable>
               </View>
               
@@ -587,35 +635,40 @@ export default function NeonCasinoScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f0f9ff',
+    backgroundColor: '#fce7f3', // Light pink desert background
   },
   scrollContent: {
     alignItems: 'center',
     justifyContent: 'flex-start',
-    paddingHorizontal: 10,
-    paddingTop: 5,
+    padding: 20,
+    paddingTop: 20,
     paddingBottom: 100,
   },
   headerRow: {
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 5,
-    paddingHorizontal: 4,
-    height: 40,
+    width: '100%',
+    marginBottom: 20,
+    paddingHorizontal: 16,
+    position: 'relative',
   },
   backButton: {
-    position: 'absolute',
-    top: 20,
-    left: 20,
-    zIndex: 1000,
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 12,
     paddingVertical: 8,
-    backgroundColor: 'rgba(139, 92, 246, 0.1)',
-    borderRadius: 6,
+    backgroundColor: 'rgba(236, 72, 153, 0.1)',
+    borderRadius: 8,
     borderWidth: 1,
-    borderColor: 'rgba(139, 92, 246, 0.3)',
+    borderColor: 'rgba(236, 72, 153, 0.3)',
+    shadowColor: '#ec4899',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+    position: 'absolute',
+    left: 0,
   },
   locationTitle: {
     fontFamily: 'PressStart2P_400Regular',
@@ -624,27 +677,31 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     letterSpacing: 1,
     textAlign: 'center',
+    flex: 1,
+    marginLeft: 16,
   },
   backButtonText: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 12,
-    color: '#8b5cf6',
+    fontSize: 14,
+    color: '#ec4899',
     marginLeft: 6,
+    fontWeight: 'bold',
   },
   casinoImage: {
     width: '100%',
-    height: 400,
+    height: 250,
     resizeMode: 'contain',
-    marginTop: -5,
-    marginBottom: -5,
+    marginBottom: 20,
   },
   attendantContainer: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     justifyContent: 'center',
     marginTop: -10,
     marginBottom: 20,
-    paddingHorizontal: 20,
+    paddingHorizontal: 10,
+    width: '95%',
+    alignSelf: 'center',
   },
   dexImage: {
     width: 60,
@@ -653,59 +710,139 @@ const styles = StyleSheet.create({
     marginLeft: 2,
   },
   speechBubble: {
-    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+    backgroundColor: 'rgba(236, 72, 153, 0.05)',
     padding: 12,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: 'rgba(139, 92, 246, 0.3)',
-    maxWidth: 300,
+    borderColor: '#ec4899',
+    maxWidth: 250,
+    flex: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   characterName: {
     fontFamily: 'PressStart2P_400Regular',
     fontSize: 8,
-    color: '#8b5cf6',
+    color: '#ec4899',
     marginBottom: 4,
-    textAlign: 'left',
+    textAlign: 'center',
   },
   speechText: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 10,
-    color: '#0f172a',
-    textAlign: 'left',
-  },
-  statsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 20,
-    marginBottom: 20,
-    paddingHorizontal: 20,
-  },
-  statItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    backgroundColor: 'rgba(139, 92, 246, 0.1)',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: 'rgba(139, 92, 246, 0.3)',
-  },
-  statText: {
-    fontFamily: 'Silkscreen_400Regular',
     fontSize: 12,
     color: '#0f172a',
+    textAlign: 'center',
+    lineHeight: 16,
+  },
+  chipPurchaseContainer: {
+    width: '95%',
+    alignSelf: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.98)',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(236, 72, 153, 0.3)',
+    padding: 16,
+    marginBottom: 20,
+    shadowColor: '#ec4899',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  chipPurchaseTitle: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 12,
+    color: '#ec4899',
+    textAlign: 'center',
+    marginBottom: 12,
     fontWeight: 'bold',
   },
-  pubActivityItem: {
-    backgroundColor: 'rgba(139, 92, 246, 0.05)',
-    borderRadius: 6,
+  chipOptionsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 8,
+  },
+  chipOption: {
+    flex: 1,
+    backgroundColor: 'rgba(236, 72, 153, 0.05)',
+    borderRadius: 8,
     borderWidth: 1,
-    borderColor: 'rgba(139, 92, 246, 0.2)',
+    borderColor: 'rgba(236, 72, 153, 0.2)',
     padding: 12,
-    marginBottom: 8,
-    width: '80%',
+    alignItems: 'center',
+    shadowColor: '#ec4899',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  chipIcon: {
+    width: 32,
+    height: 32,
+    resizeMode: 'contain',
+    marginBottom: 6,
+  },
+  chipAmount: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 8,
+    color: '#0f172a',
+    textAlign: 'center',
+    marginBottom: 6,
+    fontWeight: 'bold',
+  },
+  chipPrice: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  chipPriceText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#8b5cf6',
+    fontWeight: 'bold',
+  },
+  activitiesTitle: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#0f172a',
+    marginTop: 16,
+    marginBottom: 12,
+    textAlign: 'center',
     alignSelf: 'center',
+  },
+  highlightedActivityItem: {
+    backgroundColor: 'rgba(255, 215, 0, 0.1)',
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#ffd700',
+    padding: 16,
+    marginBottom: 12,
+    width: '95%',
+    alignSelf: 'center',
+    shadowColor: '#ffd700',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  pubActivityItem: {
+    backgroundColor: 'rgba(236, 72, 153, 0.05)',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(236, 72, 153, 0.2)',
+    padding: 16,
+    marginBottom: 12,
+    width: '95%',
+    alignSelf: 'center',
+    shadowColor: '#ec4899',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
   },
   pubActivityPressable: {
     width: '100%',
@@ -721,10 +858,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   pubActivityImageIcon: {
-    width: 20,
-    height: 20,
-    marginRight: 8,
+    width: 24,
+    height: 24,
+    marginRight: 12,
     alignSelf: 'center',
+    color: '#ec4899',
   },
   pubActivityText: {
     flex: 1,
@@ -736,54 +874,58 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   pubActivityName: {
-    fontFamily: 'Silkscreen_400Regular',
+    fontFamily: 'PressStart2P_400Regular',
     fontSize: 12,
     color: '#0f172a',
     fontWeight: 'bold',
-  },
-  activityCost: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  costText: {
-    fontFamily: 'Silkscreen_400Regular',
-    fontSize: 9,
-    color: '#8b5cf6',
-    fontWeight: 'bold',
+    textTransform: 'uppercase',
+    lineHeight: 16,
+    marginBottom: 3,
   },
   pubActivityDescription: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 9,
+    fontSize: 11,
     color: '#64748b',
-    lineHeight: 12,
+    lineHeight: 15,
+    textAlign: 'justify',
   },
   rewardsTitle: {
     fontFamily: 'PressStart2P_400Regular',
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#8b5cf6',
-    marginTop: 20,
-    marginBottom: 8,
-    textAlign: 'center',
-    alignSelf: 'center',
+    color: '#0f172a',
+    marginTop: 16,
+    marginBottom: 12,
+    textAlign: 'left',
+    alignSelf: 'flex-start',
   },
   rewardsContainer: {
-    width: '85%',
+    width: '95%',
     alignSelf: 'center',
-    backgroundColor: '#f8f9fa',
+    backgroundColor: 'rgba(255, 255, 255, 0.98)',
     borderRadius: 12,
-    borderWidth: 2,
-    borderColor: '#8b5cf6',
+    borderWidth: 1,
+    borderColor: 'rgba(236, 72, 153, 0.3)',
     padding: 16,
+    shadowColor: '#ec4899',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
   },
   rewardItem: {
-    backgroundColor: '#ffffff',
-    borderRadius: 8,
+    backgroundColor: 'rgba(236, 72, 153, 0.05)',
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#8b5cf6',
-    padding: 12,
-    marginBottom: 10,
+    borderColor: 'rgba(236, 72, 153, 0.2)',
+    padding: 16,
+    marginBottom: 12,
     width: '100%',
+    shadowColor: '#ec4899',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   rewardItemHeader: {
     flexDirection: 'row',
@@ -791,25 +933,29 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   rewardItemIcon: {
-    width: 22,
-    height: 22,
+    width: 40,
+    height: 40,
     marginRight: 12,
+    resizeMode: 'contain',
   },
   rewardItemInfo: {
     flex: 1,
   },
   rewardItemName: {
     fontFamily: 'PressStart2P_400Regular',
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: 'bold',
-    color: '#8b5cf6',
-    marginBottom: 4,
+    color: '#0f172a',
+    marginBottom: 3,
+    textTransform: 'uppercase',
+    lineHeight: 16,
   },
   rewardItemDescription: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 9,
-    color: '#374151',
-    lineHeight: 14,
+    fontSize: 11,
+    color: '#64748b',
+    lineHeight: 15,
+    textAlign: 'justify',
   },
   rewardItemFooter: {
     flexDirection: 'row',
@@ -823,8 +969,8 @@ const styles = StyleSheet.create({
   },
   rewardItemPrice: {
     fontFamily: 'PressStart2P_400Regular',
-    fontSize: 9,
-    color: '#8b5cf6',
+    fontSize: 10,
+    color: '#ec4899',
     fontWeight: 'bold',
   },
   // Modal Styles
@@ -836,13 +982,18 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   slotModal: {
-    backgroundColor: '#f0f9ff',
+    backgroundColor: 'rgba(255, 255, 255, 0.98)',
     borderRadius: 12,
     padding: 20,
     width: '100%',
     maxWidth: 400,
-    borderWidth: 3,
-    borderColor: '#8b5cf6',
+    borderWidth: 1,
+    borderColor: 'rgba(236, 72, 153, 0.3)',
+    shadowColor: '#ec4899',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 12,
+    elevation: 8,
   },
   slotHeader: {
     flexDirection: 'row',
@@ -853,7 +1004,7 @@ const styles = StyleSheet.create({
   slotTitle: {
     fontFamily: 'PressStart2P_400Regular',
     fontSize: 14,
-    color: '#8b5cf6',
+    color: '#ec4899',
     textAlign: 'center',
     flex: 1,
   },
@@ -874,7 +1025,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     borderRadius: 8,
     borderWidth: 2,
-    borderColor: '#8b5cf6',
+    borderColor: '#ec4899',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -882,12 +1033,12 @@ const styles = StyleSheet.create({
     fontSize: 24,
   },
   spinButton: {
-    backgroundColor: '#8b5cf6',
+    backgroundColor: '#ec4899',
     paddingHorizontal: 30,
     paddingVertical: 12,
     borderRadius: 8,
     borderWidth: 2,
-    borderColor: '#7c3aed',
+    borderColor: '#db2777',
   },
   spinningButton: {
     backgroundColor: '#64748b',
@@ -899,13 +1050,18 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   blackjackModal: {
-    backgroundColor: '#f0f9ff',
+    backgroundColor: 'rgba(255, 255, 255, 0.98)',
     borderRadius: 12,
     padding: 20,
     width: '100%',
     maxWidth: 400,
-    borderWidth: 3,
-    borderColor: '#8b5cf6',
+    borderWidth: 1,
+    borderColor: 'rgba(236, 72, 153, 0.3)',
+    shadowColor: '#ec4899',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 12,
+    elevation: 8,
   },
   blackjackHeader: {
     flexDirection: 'row',
@@ -916,7 +1072,7 @@ const styles = StyleSheet.create({
   blackjackTitle: {
     fontFamily: 'PressStart2P_400Regular',
     fontSize: 14,
-    color: '#8b5cf6',
+    color: '#ec4899',
     textAlign: 'center',
     flex: 1,
   },
@@ -938,7 +1094,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   betButton: {
-    backgroundColor: '#8b5cf6',
+    backgroundColor: '#ec4899',
     paddingHorizontal: 15,
     paddingVertical: 8,
     borderRadius: 6,
@@ -983,7 +1139,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     borderRadius: 6,
     borderWidth: 2,
-    borderColor: '#8b5cf6',
+    borderColor: '#ec4899',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -999,7 +1155,7 @@ const styles = StyleSheet.create({
     gap: 15,
   },
   actionButton: {
-    backgroundColor: '#8b5cf6',
+    backgroundColor: '#ec4899',
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 6,
@@ -1010,19 +1166,24 @@ const styles = StyleSheet.create({
     color: '#ffffff',
   },
   winModal: {
-    backgroundColor: '#f0f9ff',
+    backgroundColor: 'rgba(255, 255, 255, 0.98)',
     borderRadius: 12,
     padding: 24,
     width: '90%',
     maxWidth: 400,
-    borderWidth: 3,
-    borderColor: '#8b5cf6',
+    borderWidth: 1,
+    borderColor: 'rgba(236, 72, 153, 0.3)',
     alignItems: 'center',
+    shadowColor: '#ec4899',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 12,
+    elevation: 8,
   },
   winTitle: {
     fontFamily: 'PressStart2P_400Regular',
     fontSize: 14,
-    color: '#8b5cf6',
+    color: '#ec4899',
     textAlign: 'center',
     marginBottom: 16,
   },
@@ -1035,7 +1196,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   winButton: {
-    backgroundColor: '#8b5cf6',
+    backgroundColor: '#ec4899',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,
@@ -1055,26 +1216,32 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   slotbotSpeechBubble: {
-    backgroundColor: 'rgba(16, 185, 129, 0.1)',
-    padding: 12,
+    backgroundColor: 'rgba(236, 72, 153, 0.05)',
+    padding: 16,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: 'rgba(16, 185, 129, 0.3)',
-    maxWidth: 300,
+    borderColor: '#ec4899',
+    maxWidth: 280,
     marginRight: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   slotbotCharacterName: {
     fontFamily: 'PressStart2P_400Regular',
     fontSize: 8,
-    color: '#10b981',
+    color: '#ec4899',
     marginBottom: 4,
-    textAlign: 'left',
+    textAlign: 'center',
   },
   slotbotSpeechText: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 10,
+    fontSize: 12,
     color: '#0f172a',
-    textAlign: 'left',
+    textAlign: 'center',
+    lineHeight: 16,
   },
   slotbotImage: {
     width: 80,
