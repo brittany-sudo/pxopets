@@ -12,33 +12,6 @@ const bayouMainImage = require('@/assets/images/bayou-nocture.png');
 export default function BayouNocturneScreen() {
   const { hydrated } = useGame();
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
-  const [lanternGuySaying, setLanternGuySaying] = useState<string>('');
-
-  // Lantern Guy's Quiet, Mysterious Personality
-  const getLanternGuyGreeting = () => {
-    const greetings = [
-      "The bayou watches...",
-      "Fireflies carry secrets...",
-      "Not all who wander are lost...",
-      "The lanterns remember...",
-      "Listen to the water...",
-      "The spirits are restless tonight...",
-      "Beware the mist...",
-      "Ancient magic flows here...",
-      "The cypress trees whisper...",
-      "Some secrets are better left buried..."
-    ];
-    return greetings[Math.floor(Math.random() * greetings.length)];
-  };
-
-  const handleLanternGuyInteraction = () => {
-    setLanternGuySaying(getLanternGuyGreeting());
-  };
-
-  // Initialize Lantern Guy's greeting on component mount
-  React.useEffect(() => {
-    setLanternGuySaying(getLanternGuyGreeting());
-  }, []);
 
   const toggleFavorite = (activityId: string) => {
     setFavorites(prev => {
@@ -56,44 +29,38 @@ export default function BayouNocturneScreen() {
     {
       id: 'firefly-glade',
       name: 'Firefly Glade',
-      description: 'Wander through a mystical clearing where thousands of fireflies create dancing patterns of light.',
-      icon: 'star',
-      difficulty: 'Easy'
+      description: 'Mystical clearing where thousands of fireflies create dancing patterns of light.',
+      icon: 'star'
     },
     {
       id: 'spirit-dock-boat',
       name: 'Spirit Dock Boat Ride',
-      description: 'Take a pirogue through the misty waters where spirits of the bayou guide your journey.',
-      icon: 'ship',
-      difficulty: 'Medium'
+      description: 'Pirogue through misty waters where bayou spirits guide your journey.',
+      icon: 'ship'
     },
     {
       id: 'voodoo-shack',
       name: 'Voodoo Shack',
-      description: 'Visit the mysterious swamp shack where ancient rituals and magical potions await.',
-      icon: 'home',
-      difficulty: 'Hard'
+      description: 'Mysterious swamp shack where ancient rituals and magical potions await.',
+      icon: 'home'
     },
     {
       id: 'skeleton-tavern',
       name: 'Skeleton Tavern',
-      description: 'Enter the haunted tavern where skeletal patrons share ghostly tales over spectral drinks.',
-      icon: 'glass',
-      difficulty: 'Medium'
+      description: 'Haunted tavern where skeletal patrons share ghostly tales over spectral drinks.',
+      icon: 'glass'
     },
     {
       id: 'cypress-cathedral',
       name: 'Cypress Cathedral',
-      description: 'Explore the towering cypress grove where ancient trees form a natural cathedral.',
-      icon: 'tree',
-      difficulty: 'Easy'
+      description: 'Towering cypress grove where ancient trees form a natural cathedral.',
+      icon: 'tree'
     },
     {
       id: 'gator-graveyard',
       name: 'Gator Graveyard',
-      description: 'Navigate the eerie graveyard where alligator spirits guard the resting place of the bayou.',
-      icon: 'bug',
-      difficulty: 'Hard'
+      description: 'Eerie graveyard where alligator spirits guard the resting place of the bayou.',
+      icon: 'bug'
     }
   ];
 
@@ -107,7 +74,7 @@ export default function BayouNocturneScreen() {
           style={styles.backButton}
           onPress={() => router.navigate('/(tabs)/explore')}
         >
-          <FontAwesome name="arrow-left" size={12} color="#8b5cf6" />
+          <FontAwesome name="arrow-left" size={12} color="#1f2937" />
           <Text style={styles.backButtonText}>Back</Text>
         </Pressable>
 
@@ -118,67 +85,49 @@ export default function BayouNocturneScreen() {
 
         {/* Banner Image */}
         <RNView style={styles.bannerContainer}>
-          <Image 
-            source={bayouMainImage} 
-            style={styles.bannerImage}
-          />
-        </RNView>
-
-        {/* Description */}
-        <Text style={styles.description}>
-          A mysterious swamp where fireflies dance with ancient spirits under moonlit cypress trees. 
-          The bayou whispers secrets to those brave enough to listen, while glowing orbs guide lost souls 
-          through the misty waters.
-        </Text>
-
-        {/* Lantern Guy NPC */}
-        <RNView style={styles.npcContainer}>
-          <RNView style={styles.npcSpeechBubble}>
-            <Text style={styles.npcCharacterName}>KEEPER OF LANTERNS:</Text>
-            <Text style={styles.npcSpeechText}>
-              {lanternGuySaying}
-            </Text>
-          </RNView>
-          <Pressable onPress={handleLanternGuyInteraction}>
-            <Image source={require('@/assets/images/lantern-guy.png')} style={styles.npcImage} />
-          </Pressable>
+          <Image source={bayouMainImage} style={styles.bannerImage} />
         </RNView>
 
         {/* Activities Title */}
         <Text style={styles.activitiesTitle}>BAYOU ADVENTURES</Text>
 
         {/* Activities List */}
-        {activities.map((activity) => (
-          <RNView key={activity.id} style={styles.activityItem}>
-            <RNView style={styles.activityHeader}>
-              <RNView style={styles.activityInfo}>
-                <FontAwesome name={activity.icon as any} size={22} color="#1f2937" style={styles.activityIcon} />
-                <RNView style={styles.activityText}>
-                  <RNView style={styles.activityTitleRow}>
-                    <Text style={styles.activityName}>{activity.name}</Text>
-                  </RNView>
-                  <Text style={styles.activityDescription}>{activity.description}</Text>
-                </RNView>
+        {activities.map((activity) => {
+          const handleActivityPress = () => {
+            // Add navigation for other locations here in the future
+          };
+
+          const content = (
+            <RNView style={styles.activityContent}>
+              <RNView style={styles.activityIconContainer}>
+                <FontAwesome name={activity.icon as any} size={20} color="#1f2937" />
+              </RNView>
+              <RNView style={styles.activityText}>
+                <Text style={styles.activityName}>{activity.name}</Text>
+                <Text style={styles.activityDescription}>{activity.description}</Text>
               </RNView>
             </RNView>
-            <RNView style={styles.activityFooter}>
-              <RNView style={styles.difficultyContainer}>
-                <Text style={styles.difficultyLabel}>Difficulty:</Text>
-                <Text style={styles.difficultyValue}>{activity.difficulty}</Text>
-              </RNView>
+          );
+
+          return (
+            <Pressable key={activity.id} style={styles.activityItem} onPress={handleActivityPress}>
+              {content}
               <Pressable
                 style={styles.favoriteButton}
-                onPress={() => toggleFavorite(activity.id)}
+                onPress={(e) => {
+                  e.stopPropagation();
+                  toggleFavorite(activity.id);
+                }}
               >
                 <FontAwesome 
                   name={favorites.has(activity.id) ? "star" : "star-o"} 
                   size={16} 
-                  color={favorites.has(activity.id) ? "#fbbf24" : "rgba(31, 41, 55, 0.3)"} 
+                  color={favorites.has(activity.id) ? "#1f2937" : "rgba(31, 41, 55, 0.3)"} 
                 />
               </Pressable>
-            </RNView>
-          </RNView>
-        ))}
+            </Pressable>
+          );
+        })}
 
       </ScrollView>
     </View>
@@ -188,6 +137,7 @@ export default function BayouNocturneScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#f9fafb', // Light gray background
   },
   scrollContent: {
     alignItems: 'center',
@@ -205,28 +155,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 12,
     paddingVertical: 8,
-    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+    backgroundColor: 'rgba(31, 41, 55, 0.1)',
     borderRadius: 6,
     borderWidth: 1,
-    borderColor: 'rgba(139, 92, 246, 0.3)',
+    borderColor: 'rgba(31, 41, 55, 0.3)',
   },
   backButtonText: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 12,
-    color: '#8b5cf6',
+    fontSize: 14,
+    color: '#1f2937',
     marginLeft: 6,
   },
   headerRow: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 20,
-    marginBottom: 20,
+    marginTop: 15,
+    marginBottom: 10,
     paddingHorizontal: 4,
     height: 40,
   },
   locationTitle: {
     fontFamily: 'PressStart2P_400Regular',
-    fontSize: 12,
+    fontSize: 10,
     color: '#0f172a',
     fontWeight: 'bold',
     letterSpacing: 1,
@@ -234,7 +184,7 @@ const styles = StyleSheet.create({
   },
   bannerContainer: {
     width: '100%',
-    height: 200,
+    height: 280,
     borderWidth: 2,
     borderColor: '#1f2937',
     borderRadius: 8,
@@ -246,132 +196,78 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     resizeMode: 'cover',
-    borderRadius: 6,
-  },
-  description: {
-    fontFamily: 'Silkscreen_400Regular',
-    fontSize: 12,
-    color: '#0f172a',
-    textAlign: 'center',
-    lineHeight: 18,
-    marginBottom: 20,
-    marginHorizontal: 20,
   },
   activitiesTitle: {
     fontFamily: 'PressStart2P_400Regular',
-    fontSize: 12,
-    color: '#1f2937',
-    textAlign: 'center',
-    marginBottom: 16,
-    letterSpacing: 1,
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#0f172a',
+    marginBottom: 12,
+    marginTop: 16,
+    textAlign: 'left',
+    alignSelf: 'flex-start',
+    width: '100%',
+    textTransform: 'uppercase',
   },
   activityItem: {
     backgroundColor: 'rgba(31, 41, 55, 0.05)',
-    borderRadius: 8,
+    borderRadius: 12,
     borderWidth: 1,
     borderColor: 'rgba(31, 41, 55, 0.2)',
-    padding: 16,
-    marginBottom: 12,
+    padding: 12,
+    marginBottom: 10,
     width: '100%',
+    minHeight: 65,
     shadowColor: '#1f2937',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 3,
+    elevation: 2,
+    position: 'relative',
   },
-  activityHeader: {
+  activityContent: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 8,
+    alignItems: 'center',
+    paddingRight: 35, // Space for favorite button
   },
-  activityInfo: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    flex: 1,
-  },
-  activityIcon: {
+  activityIconContainer: {
+    width: 45,
+    height: 45,
+    borderRadius: 22.5,
+    backgroundColor: 'rgba(31, 41, 55, 0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginRight: 12,
-    marginTop: 2,
+    flexShrink: 0,
   },
   activityText: {
     flex: 1,
-  },
-  activityTitleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 4,
+    minWidth: 0,
+    justifyContent: 'center',
   },
   activityName: {
-    fontFamily: 'Silkscreen_400Regular',
-    fontSize: 12,
-    color: '#1f2937',
-    fontWeight: 'bold',
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 11,
+    color: '#0f172a',
+    marginBottom: 2,
+    lineHeight: 14,
+    textTransform: 'uppercase',
+    textAlign: 'left',
   },
   activityDescription: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 10,
-    color: '#4b5563',
-    lineHeight: 16,
-  },
-  activityFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  difficultyContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  difficultyLabel: {
-    fontFamily: 'Silkscreen_400Regular',
-    fontSize: 9,
-    color: '#6b7280',
-    marginRight: 4,
-  },
-  difficultyValue: {
-    fontFamily: 'Silkscreen_400Regular',
-    fontSize: 9,
-    color: '#1f2937',
-    fontWeight: 'bold',
+    color: '#64748b',
+    lineHeight: 13,
+    textAlign: 'left',
   },
   favoriteButton: {
-    padding: 4,
-  },
-  // Lantern Guy NPC Styles
-  npcContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    padding: 8,
+    backgroundColor: 'rgba(31, 41, 55, 0.05)',
+    borderRadius: 20,
     justifyContent: 'center',
-    marginBottom: 20,
-    paddingHorizontal: 20,
-  },
-  npcSpeechBubble: {
-    backgroundColor: 'rgba(31, 41, 55, 0.1)',
-    padding: 12,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: 'rgba(31, 41, 55, 0.3)',
-    maxWidth: 300,
-    marginRight: -10,
-  },
-  npcCharacterName: {
-    fontFamily: 'PressStart2P_400Regular',
-    fontSize: 8,
-    color: '#1f2937',
-    marginBottom: 4,
-    textAlign: 'left',
-  },
-  npcSpeechText: {
-    fontFamily: 'Silkscreen_400Regular',
-    fontSize: 10,
-    color: '#0f172a',
-    textAlign: 'left',
-    fontStyle: 'italic',
-  },
-  npcImage: {
-    width: 72,
-    height: 72,
-    resizeMode: 'contain',
   },
 });

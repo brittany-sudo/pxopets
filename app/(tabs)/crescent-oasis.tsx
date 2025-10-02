@@ -132,31 +132,28 @@ export default function CrescentOasisScreen() {
               }
             }}
           >
-            <RNView style={styles.activityHeader}>
-              <RNView style={styles.activityInfo}>
-                <RNView style={styles.activityIconContainer}>
-                  <Image source={activityImageMap[activity.icon]} style={styles.activityIcon} />
-                </RNView>
-                    <RNView style={styles.activityText}>
-                      <RNView style={styles.activityTitleRow}>
-                        <Text style={styles.activityName}>{activity.name}</Text>
-                      </RNView>
-                      <Text style={styles.activityDescription}>{activity.description}</Text>
-                    </RNView>
+            <RNView style={styles.activityContent}>
+              <RNView style={styles.activityIconContainer}>
+                <Image source={activityImageMap[activity.icon]} style={styles.activityIcon} />
+              </RNView>
+              <RNView style={styles.activityText}>
+                <Text style={styles.activityName}>{activity.name}</Text>
+                <Text style={styles.activityDescription}>{activity.description}</Text>
               </RNView>
             </RNView>
-            <RNView style={styles.activityFooter}>
-              <Pressable
-                style={styles.favoriteButton}
-                onPress={() => toggleFavorite(activity.id)}
-              >
-                <FontAwesome 
-                  name={favorites.has(activity.id) ? "star" : "star-o"} 
-                  size={16} 
-                  color={favorites.has(activity.id) ? "#ec4899" : "rgba(236, 72, 153, 0.3)"} 
-                />
-              </Pressable>
-            </RNView>
+            <Pressable
+              style={styles.favoriteButton}
+              onPress={(e) => {
+                e.stopPropagation();
+                toggleFavorite(activity.id);
+              }}
+            >
+              <FontAwesome 
+                name={favorites.has(activity.id) ? "star" : "star-o"} 
+                size={16} 
+                color={favorites.has(activity.id) ? "#ec4899" : "rgba(236, 72, 153, 0.3)"} 
+              />
+            </Pressable>
           </Pressable>
         ))}
       </ScrollView>
@@ -172,14 +169,15 @@ const styles = StyleSheet.create({
   scrollContent: {
     alignItems: 'center',
     justifyContent: 'flex-start',
-    padding: 20,
-    paddingTop: 80,
+    paddingTop: 0,
+    paddingHorizontal: 20,
     paddingBottom: 100,
   },
   headerRow: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 20,
+    marginTop: 15,
+    marginBottom: 10,
     paddingHorizontal: 4,
     height: 40,
   },
@@ -212,13 +210,10 @@ const styles = StyleSheet.create({
     marginLeft: 6,
   },
   headerRow: {
-    position: 'absolute',
-    top: 20,
-    left: 0,
-    right: 0,
-    zIndex: 999,
     alignItems: 'center',
     justifyContent: 'center',
+    marginTop: 15,
+    marginBottom: 10,
     paddingHorizontal: 4,
     height: 40,
   },
@@ -236,10 +231,8 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#ec4899',
     borderRadius: 8,
-    marginTop: -20,
     marginBottom: 20,
-    alignItems: 'center',
-    justifyContent: 'flex-end',
+    overflow: 'hidden',
     backgroundColor: 'rgba(236, 72, 153, 0.05)',
   },
   bannerImage: {
@@ -252,10 +245,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: 'bold',
     color: '#0f172a',
-    marginTop: 16,
     marginBottom: 12,
+    marginTop: 16,
     textAlign: 'left',
     alignSelf: 'flex-start',
+    width: '100%',
+    textTransform: 'uppercase',
   },
   activityItem: {
     backgroundColor: 'rgba(236, 72, 153, 0.05)',
@@ -265,30 +260,28 @@ const styles = StyleSheet.create({
     padding: 12,
     marginBottom: 10,
     width: '100%',
+    minHeight: 65,
     shadowColor: '#ec4899',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
+    position: 'relative',
   },
-  activityHeader: {
+  activityContent: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 8,
-  },
-  activityInfo: {
-    flexDirection: 'row',
-    flex: 1,
+    alignItems: 'center',
+    paddingRight: 35, // Space for favorite button
   },
   activityIconContainer: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 45,
+    height: 45,
+    borderRadius: 22.5,
     backgroundColor: 'rgba(236, 72, 153, 0.1)',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
+    flexShrink: 0,
   },
   activityIcon: {
     width: 40,
@@ -298,39 +291,31 @@ const styles = StyleSheet.create({
   },
   activityText: {
     flex: 1,
-    marginLeft: 8,
-  },
-  activityTitleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 4,
+    minWidth: 0,
+    justifyContent: 'center',
   },
   activityName: {
     fontFamily: 'PressStart2P_400Regular',
-    fontSize: 12,
-    fontWeight: 'bold',
+    fontSize: 11,
     color: '#0f172a',
-    marginBottom: 3,
-    textAlign: 'left',
-    lineHeight: 16,
+    marginBottom: 2,
+    lineHeight: 14,
     textTransform: 'uppercase',
   },
   activityDescription: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 11,
+    fontSize: 10,
     color: '#64748b',
-    lineHeight: 15,
-    textAlign: 'justify',
+    lineHeight: 13,
+    textAlign: 'left',
   },
   favoriteButton: {
-    padding: 4,
-    backgroundColor: 'rgba(236, 72, 153, 0.05)',
-  },
-  activityFooter: {
     position: 'absolute',
-    top: 12,
-    right: 12,
+    top: 8,
+    right: 8,
+    padding: 8,
+    backgroundColor: 'rgba(236, 72, 153, 0.05)',
+    borderRadius: 20,
     justifyContent: 'center',
   },
   rewardText: {

@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { StyleSheet, ScrollView, View as RNView, Image, Pressable } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { router, Link } from 'expo-router';
+import { router } from 'expo-router';
 
 // Import the banner image
-const shakespeareQuartImage = require('@/assets/images/shakespeare-quart.png');
+const shakespeareQuarterMainImage = require('@/assets/images/shakespeares-quarter-main.png');
 
 export default function ArtisanQuarterScreen() {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
@@ -26,173 +26,124 @@ export default function ArtisanQuarterScreen() {
     {
       id: 'masquerade-hall',
       name: 'Masquerade Hall',
-      description: 'Weekly balls with elegant dancing.',
-      lightning: 3,
-      difficulty: 'Medium',
+      description: 'Candlelit ballroom where masks reveal hidden souls.',
       icon: 'theater-masks'
     },
     {
-      id: 'pottery-workshop',
-      name: 'Pottery Workshop',
-      description: 'Shape clay into beautiful vessels on ancient wheels.',
-      lightning: 12,
-      difficulty: 'Medium',
+      id: 'pottery-forge',
+      name: 'The Pottery Forge',
+      description: 'Glowing kiln built into ancient titan ruins.',
       icon: 'circle'
     },
     {
-      id: 'weaving-circle',
-      name: 'Weaving Circle',
-      description: 'Learn traditional textile arts from master weavers.',
-      lightning: 10,
-      difficulty: 'Medium',
+      id: 'loomhouse',
+      name: 'The Loomhouse',
+      description: 'Circular hall strung with glowing constellation threads.',
       icon: 'th'
     },
     {
-      id: 'jewelry-making',
-      name: 'Jewelry Making',
-      description: 'Craft intricate pieces from precious metals and gems.',
-      lightning: 15,
-      difficulty: 'Hard',
+      id: 'jewelers-hollow',
+      name: 'The Jeweler\'s Hollow',
+      description: 'Glittering cavern where gems hum with soft music.',
       icon: 'diamond'
     },
     {
-      id: 'painting-studio',
-      name: 'Painting Studio',
-      description: 'Express your creativity on canvas with master artists.',
-      lightning: 8,
-      difficulty: 'Easy',
+      id: 'painters-atrium',
+      name: 'The Painter\'s Atrium',
+      description: 'Skylit halls where canvases shift when you look away.',
       icon: 'paint-brush'
     },
     {
       id: 'sculpture-garden',
-      name: 'Sculpture Garden',
-      description: 'Carve stone and wood into magnificent sculptures.',
-      lightning: 18,
-      difficulty: 'Hard',
+      name: 'The Sculpture Garden',
+      description: 'Courtyard where statues strain against stone, half-awake.',
       icon: 'cube'
     },
     {
-      id: 'textile-dyeing',
-      name: 'Textile Dyeing',
-      description: 'Create vibrant colors using natural plant dyes.',
-      lightning: 9,
-      difficulty: 'Easy',
+      id: 'dyeing-pools',
+      name: 'The Dyeing Pools',
+      description: 'Bubbling cauldrons of impossible, shimmering hues.',
       icon: 'tint'
     },
     {
-      id: 'art-gallery',
-      name: 'Art Gallery',
-      description: 'Display your creations in the community gallery.',
-      lightning: 25,
-      difficulty: 'Medium',
+      id: 'everchanging-gallery',
+      name: 'Everchanging Gallery',
+      description: 'Living gallery whose halls rearrange overnight.',
       icon: 'picture-o'
+    },
+    {
+      id: 'lantern-market',
+      name: 'The Lantern Market',
+      description: 'Bustling plaza glowing with floating lanterns and spirits.',
+      icon: 'lightbulb-o'
     }
   ];
 
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-
         {/* Back Button - Fixed Position */}
         <Pressable 
           style={styles.backButton}
           onPress={() => router.navigate('/(tabs)/explore')}
         >
-          <FontAwesome name="arrow-left" size={12} color="#8b5cf6" />
+          <FontAwesome name="arrow-left" size={12} color="#d97706" />
           <Text style={styles.backButtonText}>Back</Text>
         </Pressable>
 
         {/* Header Row */}
         <RNView style={styles.headerRow}>
-          <Text style={styles.locationTitle}>SHAKESPEARE'S QUARTER</Text>
+          <Text style={styles.locationTitle}>SHAKESPEARE'S{'\n'}QUARTER</Text>
         </RNView>
 
         {/* Banner Image */}
         <RNView style={styles.bannerContainer}>
-          <Image source={shakespeareQuartImage} style={styles.bannerImage} />
+          <Image source={shakespeareQuarterMainImage} style={styles.bannerImage} />
         </RNView>
 
-        {/* Description */}
-        <Text style={styles.description}>
-          A bohemian arts district where creativity flows like wine. Master craftspeople 
-          work in open studios, sharing techniques passed down through generations. 
-          Here, every street corner bursts with color, texture, and artistic expression.
-        </Text>
-
         {/* Activities Title */}
-        <Text style={styles.activitiesTitle}>ARTISTIC ACTIVITIES</Text>
+        <Text style={styles.activitiesTitle}>TOWN LOCATIONS</Text>
 
         {/* Activities List */}
-        {activities.map((activity) => (
-          <RNView key={activity.id} style={styles.activityItem}>
-            {activity.id === 'masquerade-hall' ? (
-              <Link href="/masquerade-hall" asChild>
-                <Pressable style={styles.activityPressable}>
-                  <RNView style={styles.activityHeader}>
-                    <RNView style={styles.activityInfo}>
-                      <Image 
-                        source={require('@/assets/images/masquerade-hall-icon.png')} 
-                        style={styles.activityImageIcon} 
-                      />
-                      <RNView style={styles.activityText}>
-                        <RNView style={styles.activityTitleRow}>
-                          <Text style={styles.activityName}>{activity.name}</Text>
-                          <RNView style={styles.ticketDisplay}>
-                            <FontAwesome name="bolt" size={14} color="#06b6d4" />
-                            <Text style={styles.ticketCountText}>{activity.lightning}</Text>
-                          </RNView>
-                        </RNView>
-                        <Text style={styles.activityDescription}>{activity.description}</Text>
-                      </RNView>
-                    </RNView>
-                  </RNView>
-                  <RNView style={styles.activityFooter}>
-                    <Pressable
-                      style={styles.favoriteButton}
-                      onPress={() => toggleFavorite(activity.id)}
-                    >
-                      <FontAwesome 
-                        name={favorites.has(activity.id) ? "star" : "star-o"} 
-                        size={16} 
-                        color={favorites.has(activity.id) ? "#94a3b8" : "#94a3b8"} 
-                      />
-                    </Pressable>
-                  </RNView>
-                </Pressable>
-              </Link>
-            ) : (
-              <>
-                <RNView style={styles.activityHeader}>
-                  <RNView style={styles.activityInfo}>
-                    <FontAwesome name={activity.icon as any} size={32} color="#8b5cf6" style={styles.activityIcon} />
-                    <RNView style={styles.activityText}>
-                      <RNView style={styles.activityTitleRow}>
-                        <Text style={styles.activityName}>{activity.name}</Text>
-                        <RNView style={styles.ticketDisplay}>
-                          <FontAwesome name="bolt" size={14} color="#06b6d4" />
-                          <Text style={styles.ticketCountText}>{activity.lightning}</Text>
-                        </RNView>
-                      </RNView>
-                      <Text style={styles.activityDescription}>{activity.description}</Text>
-                    </RNView>
-                  </RNView>
-                </RNView>
-                <RNView style={styles.activityFooter}>
-                  <Pressable
-                    style={styles.favoriteButton}
-                    onPress={() => toggleFavorite(activity.id)}
-                  >
-                    <FontAwesome 
-                      name={favorites.has(activity.id) ? "star" : "star-o"} 
-                      size={16} 
-                      color={favorites.has(activity.id) ? "#94a3b8" : "#94a3b8"} 
-                    />
-                  </Pressable>
-                </RNView>
-              </>
-            )}
-          </RNView>
-        ))}
+        {activities.map((activity) => {
+          const handleActivityPress = () => {
+            if (activity.id === 'masquerade-hall') {
+              router.navigate('/(tabs)/masquerade-hall');
+            }
+            // Add navigation for other activities here in the future
+          };
+
+          const content = (
+            <RNView style={styles.activityContent}>
+              <RNView style={styles.activityIconContainer}>
+                <FontAwesome name={activity.icon as any} size={20} color="#d97706" />
+              </RNView>
+              <RNView style={styles.activityText}>
+                <Text style={styles.activityName}>{activity.name}</Text>
+                <Text style={styles.activityDescription}>{activity.description}</Text>
+              </RNView>
+            </RNView>
+          );
+
+          return (
+            <Pressable key={activity.id} style={styles.activityItem} onPress={handleActivityPress}>
+              {content}
+              <Pressable
+                style={styles.favoriteButton}
+                onPress={(e) => {
+                  e.stopPropagation();
+                  toggleFavorite(activity.id);
+                }}
+              >
+                <FontAwesome 
+                  name={favorites.has(activity.id) ? "star" : "star-o"} 
+                  size={16} 
+                  color={favorites.has(activity.id) ? "#d97706" : "rgba(217, 119, 6, 0.3)"} 
+                />
+              </Pressable>
+            </Pressable>
+          );
+        })}
       </ScrollView>
     </View>
   );
@@ -201,13 +152,13 @@ export default function ArtisanQuarterScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f0f9ff',
+    backgroundColor: '#fffbeb', // Light amber artistic background
   },
   scrollContent: {
     alignItems: 'center',
     justifyContent: 'flex-start',
-    padding: 20,
-    paddingTop: 80,
+    paddingTop: 0,
+    paddingHorizontal: 20,
     paddingBottom: 100,
   },
   backButton: {
@@ -219,157 +170,123 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 12,
     paddingVertical: 8,
-    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+    backgroundColor: 'rgba(217, 119, 6, 0.1)',
     borderRadius: 6,
     borderWidth: 1,
-    borderColor: 'rgba(139, 92, 246, 0.3)',
+    borderColor: 'rgba(217, 119, 6, 0.3)',
   },
   backButtonText: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 12,
-    color: '#8b5cf6',
+    fontSize: 14,
+    color: '#d97706',
     marginLeft: 6,
   },
   headerRow: {
-    position: 'absolute',
-    top: 20,
-    left: 0,
-    right: 0,
-    zIndex: 999,
     alignItems: 'center',
     justifyContent: 'center',
+    marginTop: 15,
+    marginBottom: 10,
     paddingHorizontal: 4,
     height: 40,
   },
   locationTitle: {
     fontFamily: 'PressStart2P_400Regular',
-    fontSize: 12,
+    fontSize: 10,
     color: '#0f172a',
     fontWeight: 'bold',
     letterSpacing: 1,
     textAlign: 'center',
+    lineHeight: 16,
   },
   bannerContainer: {
     width: '100%',
-    height: 200,
+    height: 280,
     borderWidth: 2,
-    borderColor: '#0ea5e9',
+    borderColor: '#d97706',
     borderRadius: 8,
-    marginTop: 0,
     marginBottom: 20,
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    backgroundColor: 'rgba(14, 165, 233, 0.05)',
+    overflow: 'hidden',
+    backgroundColor: 'rgba(217, 119, 6, 0.05)',
   },
   bannerImage: {
     width: '100%',
-    height: '100%',
+    height: '120%',
     resizeMode: 'cover',
-    marginTop: 20,
-  },
-  description: {
-    fontFamily: 'Silkscreen_400Regular',
-    fontSize: 12,
-    color: '#0f172a',
-    lineHeight: 18,
-    marginTop: -10,
-    marginBottom: 24,
-    textAlign: 'left',
-    alignSelf: 'flex-start',
+    position: 'absolute',
+    top: 0,
+    left: 0,
   },
   activitiesTitle: {
     fontFamily: 'PressStart2P_400Regular',
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#0f172a',
-    marginBottom: 16,
-    textAlign: 'left',
-    alignSelf: 'flex-start',
-  },
-  activityItem: {
-    backgroundColor: 'rgba(14, 165, 233, 0.05)',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: 'rgba(14, 165, 233, 0.2)',
-    padding: 16,
-    marginBottom: 12,
-    width: '100%',
-  },
-  activityPressable: {
-    width: '100%',
-  },
-  activityHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 8,
-  },
-  activityInfo: {
-    flexDirection: 'row',
-    flex: 1,
-  },
-  activityIcon: {
-    marginRight: 12,
-    alignSelf: 'center',
-  },
-  activityImageIcon: {
-    width: 36,
-    height: 36,
-    marginRight: 12,
-    alignSelf: 'center',
-    imageRendering: 'pixelated' as any,
-  },
-  activityText: {
-    flex: 1,
-    marginLeft: 8,
-  },
-  activityTitleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 4,
-  },
-  activityName: {
-    fontFamily: 'Silkscreen_400Regular',
     fontSize: 14,
     fontWeight: 'bold',
     color: '#0f172a',
-    marginBottom: 4,
+    marginBottom: 12,
+    marginTop: 16,
+    textAlign: 'left',
+    alignSelf: 'flex-start',
+    width: '100%',
+    textTransform: 'uppercase',
   },
-  ticketDisplay: {
+  activityItem: {
+    backgroundColor: 'rgba(217, 119, 6, 0.05)',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(217, 119, 6, 0.2)',
+    padding: 12,
+    marginBottom: 10,
+    width: '100%',
+    minHeight: 65,
+    shadowColor: '#d97706',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+    position: 'relative',
+  },
+  activityContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 2,
+    paddingRight: 35, // Space for favorite button
+  },
+  activityIconContainer: {
+    width: 45,
+    height: 45,
+    borderRadius: 22.5,
+    backgroundColor: 'rgba(217, 119, 6, 0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+    flexShrink: 0,
+  },
+  activityText: {
+    flex: 1,
+    minWidth: 0,
+    justifyContent: 'center',
+  },
+  activityName: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 11,
+    color: '#0f172a',
+    marginBottom: 2,
+    lineHeight: 14,
+    textTransform: 'uppercase',
+    textAlign: 'left',
   },
   activityDescription: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 11,
-    color: '#0f172a',
-    lineHeight: 16,
+    fontSize: 10,
+    color: '#64748b',
+    lineHeight: 13,
+    textAlign: 'left',
   },
   favoriteButton: {
-    padding: 4,
-  },
-  activityFooter: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-  },
-  rewardContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  rewardText: {
-    fontFamily: 'Silkscreen_400Regular',
-    fontSize: 12,
-    color: '#8b5cf6',
-    fontWeight: 'bold',
-  },
-  ticketCountText: {
-    fontFamily: 'Silkscreen_400Regular',
-    fontSize: 10,
-    color: '#06b6d4',
-    fontWeight: 'bold',
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    padding: 8,
+    backgroundColor: 'rgba(217, 119, 6, 0.05)',
+    borderRadius: 20,
+    justifyContent: 'center',
   },
 });

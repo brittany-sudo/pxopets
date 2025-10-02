@@ -154,53 +154,48 @@ export default function FoggyHarborScreen() {
 
           const getActivityPressable = () => {
             const content = (
-              <RNView style={styles.activityHeader}>
-                <RNView style={styles.activityInfo}>
-                  {getActivityIcon()}
-                  <RNView style={styles.activityText}>
-                    <Text style={styles.activityName}>{activity.name}</Text>
-                    <Text style={styles.activityDescription}>{activity.description}</Text>
-                  </RNView>
+              <RNView style={styles.activityContent}>
+                {getActivityIcon()}
+                <RNView style={styles.activityText}>
+                  <Text style={styles.activityName}>{activity.name}</Text>
+                  <Text style={styles.activityDescription}>{activity.description}</Text>
                 </RNView>
               </RNView>
             );
 
-            const footer = (
-              <RNView style={styles.activityFooter}>
-                <Pressable
-                  style={styles.favoriteButton}
-                  onPress={() => toggleFavorite(activity.id)}
-                >
-                  <FontAwesome 
-                    name={favorites.has(activity.id) ? "star" : "star-o"} 
-                    size={12} 
-                    color={favorites.has(activity.id) ? "#0ea5e9" : "rgba(14, 165, 233, 0.3)"} 
-                  />
-                </Pressable>
-              </RNView>
+            const star = (
+              <Pressable
+                style={styles.favoriteButton}
+                onPress={(e) => {
+                  e.stopPropagation();
+                  toggleFavorite(activity.id);
+                }}
+              >
+                <FontAwesome 
+                  name={favorites.has(activity.id) ? "star" : "star-o"} 
+                  size={16} 
+                  color={favorites.has(activity.id) ? "#0ea5e9" : "rgba(14, 165, 233, 0.3)"} 
+                />
+              </Pressable>
             );
 
             switch (activity.id) {
               case 'whale-watching':
-                return <Pressable style={styles.activityPressable} onPress={() => router.navigate('/(tabs)/whale-watching')}>{content}{footer}</Pressable>;
+                return <Pressable key={activity.id} style={styles.activityItem} onPress={() => router.navigate('/(tabs)/whale-watching')}>{content}{star}</Pressable>;
               case 'old-net-pub':
-                return <Pressable style={styles.activityPressable} onPress={() => router.navigate('/(tabs)/old-net-pub')}>{content}{footer}</Pressable>;
+                return <Pressable key={activity.id} style={styles.activityItem} onPress={() => router.navigate('/(tabs)/old-net-pub')}>{content}{star}</Pressable>;
               case 'lowtide-pier':
-                return <Pressable style={styles.activityPressable} onPress={() => router.navigate('/(tabs)/lowtide-pier')}>{content}{footer}</Pressable>;
+                return <Pressable key={activity.id} style={styles.activityItem} onPress={() => router.navigate('/(tabs)/lowtide-pier')}>{content}{star}</Pressable>;
               case 'trappers-shack':
-                return <Pressable style={styles.activityPressable} onPress={() => router.navigate('/(tabs)/trappers-shack')}>{content}{footer}</Pressable>;
+                return <Pressable key={activity.id} style={styles.activityItem} onPress={() => router.navigate('/(tabs)/trappers-shack')}>{content}{star}</Pressable>;
               case 'lighthouse-keeper':
-                return <Pressable style={styles.activityPressable} onPress={() => router.navigate('/(tabs)/lighthouse-keeper')}>{content}{footer}</Pressable>;
+                return <Pressable key={activity.id} style={styles.activityItem} onPress={() => router.navigate('/(tabs)/lighthouse-keeper')}>{content}{star}</Pressable>;
               default:
-                return <Pressable style={styles.activityPressable} onPress={() => {}}>{content}{footer}</Pressable>;
+                return <Pressable key={activity.id} style={styles.activityItem} onPress={() => {}}>{content}{star}</Pressable>;
             }
           };
 
-          return (
-            <RNView key={activity.id} style={styles.activityItem}>
-              {getActivityPressable()}
-            </RNView>
-          );
+          return getActivityPressable();
         })}
         </ScrollView>
 
@@ -216,8 +211,8 @@ const styles = StyleSheet.create({
   scrollContent: {
     alignItems: 'center',
     justifyContent: 'flex-start',
-    padding: 20,
-    paddingTop: 80,
+    paddingTop: 0,
+    paddingHorizontal: 20,
     paddingBottom: 100,
   },
   backButton: {
@@ -241,13 +236,10 @@ const styles = StyleSheet.create({
     marginLeft: 6,
   },
   headerRow: {
-    position: 'absolute',
-    top: 20,
-    left: 0,
-    right: 0,
-    zIndex: 999,
     alignItems: 'center',
     justifyContent: 'center',
+    marginTop: 15,
+    marginBottom: 10,
     paddingHorizontal: 4,
     height: 40,
   },
@@ -266,10 +258,8 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#0ea5e9',
     borderRadius: 8,
-    marginTop: -20,
     marginBottom: 20,
-    alignItems: 'center',
-    justifyContent: 'flex-end',
+    overflow: 'hidden',
     backgroundColor: 'rgba(14, 165, 233, 0.05)',
   },
   bannerImage: {
@@ -298,40 +288,28 @@ const styles = StyleSheet.create({
     padding: 12,
     marginBottom: 10,
     width: '100%',
-    minHeight: 70,
-    justifyContent: 'center',
+    minHeight: 65,
     shadowColor: '#0ea5e9',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
+    position: 'relative',
   },
-  activityPressable: {
-    width: '100%',
-  },
-  activityHeader: {
+  activityContent: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 6,
-  },
-  activityInfo: {
-    flexDirection: 'row',
-    flex: 1,
-    justifyContent: 'flex-start',
     alignItems: 'center',
-    gap: 0,
-    minHeight: 50,
-    marginRight: 40,
+    paddingRight: 35, // Space for favorite button
   },
   activityIconContainer: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 45,
+    height: 45,
+    borderRadius: 22.5,
     backgroundColor: 'rgba(14, 165, 233, 0.1)',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
+    flexShrink: 0,
   },
   activityImageIcon: {
     width: 42,
@@ -349,43 +327,32 @@ const styles = StyleSheet.create({
   },
   activityText: {
     flex: 1,
-    alignItems: 'flex-start',
+    minWidth: 0,
     justifyContent: 'center',
-  },
-  activityTitleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    marginBottom: 3,
   },
   activityName: {
     fontFamily: 'PressStart2P_400Regular',
-    fontSize: 12, // Larger (was 10)
-    fontWeight: 'bold',
+    fontSize: 11,
     color: '#0f172a',
-    marginBottom: 3,
-    textAlign: 'left',
-    lineHeight: 16, // Adjusted for larger font
+    marginBottom: 2,
+    lineHeight: 14,
     textTransform: 'uppercase',
+    textAlign: 'left',
   },
   activityDescription: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 11, // Larger (was 9)
+    fontSize: 10,
     color: '#64748b',
-    lineHeight: 15, // Adjusted for larger font
-    textAlign: 'justify',
+    lineHeight: 13,
+    textAlign: 'left',
   },
   favoriteButton: {
-    padding: 4,
-    borderRadius: 4,
-    backgroundColor: 'rgba(14, 165, 233, 0.05)',
-  },
-  activityFooter: {
     position: 'absolute',
-    top: 12, // More centered vertically
-    right: 12, // More centered from right edge
-    flexDirection: 'row',
-    justifyContent: 'center', // Center the star within its container
-    alignItems: 'center',
+    top: 8,
+    right: 8,
+    padding: 8,
+    backgroundColor: 'rgba(14, 165, 233, 0.05)',
+    borderRadius: 20,
+    justifyContent: 'center',
   },
 });

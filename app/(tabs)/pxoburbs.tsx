@@ -187,65 +187,58 @@ export default function PxoburbsScreen() {
 
           const getActivityPressable = () => {
             const content = (
-              <RNView style={styles.activityPressable}>
-                <RNView style={styles.activityHeader}>
-                  <RNView style={styles.activityInfo}>
-                    {getActivityIcon()}
-                    <RNView style={styles.activityText}>
-                      <Text style={styles.activityName}>{activity.name}</Text>
-                      <Text style={styles.activityDescription}>{activity.description}</Text>
-                    </RNView>
-                  </RNView>
-                </RNView>
-                <RNView style={styles.activityFooter}>
-                  <Pressable
-                    style={styles.favoriteButton}
-                    onPress={(e) => {
-                      e.stopPropagation();
-                      toggleFavorite(activity.id);
-                    }}
-                  >
-                    <FontAwesome 
-                      name={favorites.has(activity.id) ? "star" : "star-o"} 
-                      size={12} 
-                      color={favorites.has(activity.id) ? "#8b5cf6" : "rgba(139, 92, 246, 0.3)"} 
-                    />
-                  </Pressable>
+              <RNView style={styles.activityContent}>
+                {getActivityIcon()}
+                <RNView style={styles.activityText}>
+                  <Text style={styles.activityName}>{activity.name}</Text>
+                  <Text style={styles.activityDescription}>{activity.description}</Text>
                 </RNView>
               </RNView>
             );
 
+            const star = (
+              <Pressable
+                style={styles.favoriteButton}
+                onPress={(e) => {
+                  e.stopPropagation();
+                  toggleFavorite(activity.id);
+                }}
+              >
+                <FontAwesome 
+                  name={favorites.has(activity.id) ? "star" : "star-o"} 
+                  size={16} 
+                  color={favorites.has(activity.id) ? "#8b5cf6" : "rgba(139, 92, 246, 0.3)"} 
+                />
+              </Pressable>
+            );
+
             switch (activity.id) {
               case 'corner-store':
-                return <Link href="/quickstop" asChild><Pressable>{content}</Pressable></Link>;
+                return <Link href="/quickstop" asChild><Pressable key={activity.id} style={styles.activityItem}>{content}{star}</Pressable></Link>;
               case 'frog-market-thrift':
-                return <Link href="/frog-market-thrift" asChild><Pressable>{content}</Pressable></Link>;
+                return <Link href="/frog-market-thrift" asChild><Pressable key={activity.id} style={styles.activityItem}>{content}{star}</Pressable></Link>;
               case 'roller-rink':
-                return <Link href="/(tabs)/starlight-roller-rink" asChild><Pressable>{content}</Pressable></Link>;
+                return <Link href="/(tabs)/starlight-roller-rink" asChild><Pressable key={activity.id} style={styles.activityItem}>{content}{star}</Pressable></Link>;
               case 'makeout-hill':
-                return <Link href="/(tabs)/makeout-hill" asChild><Pressable>{content}</Pressable></Link>;
+                return <Link href="/(tabs)/makeout-hill" asChild><Pressable key={activity.id} style={styles.activityItem}>{content}{star}</Pressable></Link>;
               case 'radio-station':
-                return <Pressable onPress={() => router.navigate('/(tabs)/pxo-radio')}>{content}</Pressable>;
+                return <Pressable key={activity.id} style={styles.activityItem} onPress={() => router.navigate('/(tabs)/pxo-radio')}>{content}{star}</Pressable>;
               case 'midnight-rewind':
-                return <Pressable onPress={() => router.navigate('/(tabs)/midnight-rewind')}>{content}</Pressable>;
+                return <Pressable key={activity.id} style={styles.activityItem} onPress={() => router.navigate('/(tabs)/midnight-rewind')}>{content}{star}</Pressable>;
               case 'mall-food-court':
-                return <Pressable onPress={() => router.navigate('/(tabs)/pxoburbs-mall')}>{content}</Pressable>;
+                return <Pressable key={activity.id} style={styles.activityItem} onPress={() => router.navigate('/(tabs)/pxoburbs-mall')}>{content}{star}</Pressable>;
               case 'post-office':
-                return <Pressable onPress={() => router.navigate('/(tabs)/post-office')}>{content}</Pressable>;
+                return <Pressable key={activity.id} style={styles.activityItem} onPress={() => router.navigate('/(tabs)/post-office')}>{content}{star}</Pressable>;
               case 'pet-supply':
-                return <Pressable onPress={() => router.navigate('/(tabs)/pxopet-supply')}>{content}</Pressable>;
+                return <Pressable key={activity.id} style={styles.activityItem} onPress={() => router.navigate('/(tabs)/pxopet-supply')}>{content}{star}</Pressable>;
               case 'community-pool':
-                return <Pressable onPress={() => router.navigate('/(tabs)/community-pool')}>{content}</Pressable>;
+                return <Pressable key={activity.id} style={styles.activityItem} onPress={() => router.navigate('/(tabs)/community-pool')}>{content}{star}</Pressable>;
               default:
-                return <Pressable>{content}</Pressable>;
+                return <Pressable key={activity.id} style={styles.activityItem}>{content}{star}</Pressable>;
             }
           };
 
-          return (
-            <RNView key={activity.id} style={styles.activityItem}>
-              {getActivityPressable()}
-            </RNView>
-          );
+          return getActivityPressable();
         })}
         </ScrollView>
 
@@ -261,8 +254,8 @@ const styles = StyleSheet.create({
   scrollContent: {
     alignItems: 'center',
     justifyContent: 'flex-start',
-    padding: 20,
-    paddingTop: 80,
+    paddingTop: 0,
+    paddingHorizontal: 20,
     paddingBottom: 100,
   },
   backButton: {
@@ -286,13 +279,10 @@ const styles = StyleSheet.create({
     marginLeft: 6,
   },
   headerRow: {
-    position: 'absolute',
-    top: 20,
-    left: 0,
-    right: 0,
-    zIndex: 999,
     alignItems: 'center',
     justifyContent: 'center',
+    marginTop: 15,
+    marginBottom: 10,
     paddingHorizontal: 4,
     height: 40,
   },
@@ -311,10 +301,8 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#8b5cf6',
     borderRadius: 8,
-    marginTop: -20,
     marginBottom: 20,
-    alignItems: 'center',
-    justifyContent: 'flex-end',
+    overflow: 'hidden',
     backgroundColor: 'rgba(139, 92, 246, 0.05)',
   },
   bannerImage: {
@@ -353,31 +341,18 @@ const styles = StyleSheet.create({
     padding: 12,
     marginBottom: 10,
     width: '100%',
-    minHeight: 70,
-    justifyContent: 'center',
+    minHeight: 65,
     shadowColor: '#8b5cf6',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
+    position: 'relative',
   },
-  activityPressable: {
-    width: '100%',
-  },
-  activityHeader: {
+  activityContent: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 6,
-  },
-  activityInfo: {
-    flexDirection: 'row',
-    flex: 1,
-    justifyContent: 'flex-start',
     alignItems: 'center',
-    gap: 0,
-    minHeight: 50,
-    marginRight: 40,
+    paddingRight: 35, // Space for favorite button
   },
   activityIcon: {
     width: 28,
@@ -394,13 +369,14 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
   activityIconContainer: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 45,
+    height: 45,
+    borderRadius: 22.5,
     backgroundColor: 'rgba(139, 92, 246, 0.1)',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
+    flexShrink: 0,
   },
   arcadeImageIcon: {
     width: 36,
@@ -412,44 +388,33 @@ const styles = StyleSheet.create({
   },
   activityText: {
     flex: 1,
-    alignItems: 'flex-start',
+    minWidth: 0,
     justifyContent: 'center',
-  },
-  activityTitleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    marginBottom: 3,
   },
   activityName: {
     fontFamily: 'PressStart2P_400Regular',
-    fontSize: 12, // Larger (was 10)
-    fontWeight: 'bold',
+    fontSize: 11,
     color: '#0f172a',
-    marginBottom: 3,
-    textAlign: 'left',
-    lineHeight: 16, // Adjusted for larger font
+    marginBottom: 2,
+    lineHeight: 14,
     textTransform: 'uppercase',
+    textAlign: 'left',
   },
   activityDescription: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 11, // Larger (was 9)
+    fontSize: 10,
     color: '#64748b',
-    lineHeight: 15, // Adjusted for larger font
-    textAlign: 'justify',
+    lineHeight: 13,
+    textAlign: 'left',
   },
   favoriteButton: {
-    padding: 4,
-    borderRadius: 4,
-    backgroundColor: 'rgba(139, 92, 246, 0.05)',
-  },
-  activityFooter: {
     position: 'absolute',
-    top: 16, // Same height as the title text
+    top: 8,
     right: 8,
-    flexDirection: 'row',
+    padding: 8,
+    backgroundColor: 'rgba(139, 92, 246, 0.05)',
+    borderRadius: 20,
     justifyContent: 'center',
-    alignItems: 'center',
   },
   rewardContainer: {
     flexDirection: 'row',

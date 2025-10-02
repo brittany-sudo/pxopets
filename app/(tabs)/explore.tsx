@@ -73,7 +73,7 @@ export default function ExploreScreen() {
     },
     {
       id: "bag-of-stars-forest",
-      name: "Bag of Stars Forest",
+      name: "Stardiver Forest",
       icon: "leaf",
       color: "#10b981",
       description: "An enchanted woodland where celestial bodies bloom as foliage.",
@@ -86,22 +86,6 @@ export default function ExploreScreen() {
       color: "#6b7280",
       description: "A dreamy valley where sleepy melodies drift through moonlit meadows.",
       image: lilGnomehatImage
-    },
-    {
-      id: "gossamer-midway",
-      name: "Gossamer Midway",
-      icon: "star",
-      color: "#dc2626",
-      description: "A surreal traveling carnival that only appears under certain moons.",
-      image: lilTentGossImage
-    },
-    {
-      id: "library",
-      name: "Thistledown",
-      icon: "book",
-      color: "#7c3aed",
-      description: "A pastoral landscape where silent sentinels guard golden fields.",
-      image: lilScarecrowImage
     },
     {
       id: "bayou-nocturne",
@@ -128,12 +112,28 @@ export default function ExploreScreen() {
       image: volcanoImage
     },
     {
+      id: "library",
+      name: "Thistledown",
+      icon: "book",
+      color: "#7c3aed",
+      description: "A pastoral landscape where silent sentinels guard golden fields.",
+      image: lilScarecrowImage
+    },
+    {
       id: "midwinter-crossing",
       name: "Midwinter Crossing",
       icon: "snowflake-o",
       color: "#e5e7eb",
       description: "A frozen crossroads where winter's breath creates crystalline bridges between worlds.",
       image: lilGnomeImage
+    },
+    {
+      id: "gossamer-midway",
+      name: "Gossamer Midway",
+      icon: "star",
+      color: "#dc2626",
+      description: "A surreal traveling carnival that only appears under certain moons.",
+      image: lilTentGossImage
     }
   ];
 
@@ -156,7 +156,7 @@ export default function ExploreScreen() {
       console.log('Navigating to Barrelhaven from list...');
       router.navigate('/(tabs)/barrelhaven');
     } else if (world.id === 'bag-of-stars-forest') {
-      console.log('Navigating to Bag of Stars Forest from list...');
+      console.log('Navigating to Stardiver Forest from list...');
       router.navigate('/(tabs)/bag-of-stars-forest');
     } else if (world.id === 'pxoburbs') {
       console.log('Navigating to The Pxoburbs from list...');
@@ -310,7 +310,7 @@ const styles = StyleSheet.create({
   mapOfPxopiaImage: {
     width: '100%',
     height: 140, // Slightly taller for better presence
-    marginTop: 20, // More space above the map (was -20)
+    marginTop: 8, // Reduced from 20 for tighter spacing
     marginBottom: 20, // More space below the map (was 8)
     alignSelf: 'center',
     borderRadius: 12, // Rounded corners to match design
@@ -333,73 +333,75 @@ const styles = StyleSheet.create({
     letterSpacing: 0.4, // Reduced from 0.5
   },
   worldsContainer: {
-    width: '95%', // Slightly less wide (was 100%)
-    backgroundColor: 'rgba(255, 255, 255, 0.98)', // Clean white background
-    borderRadius: 12, // More subtle rounding (was 20)
-    padding: 16, // Internal padding
-    borderWidth: 1, // Simple 1px border
-    borderColor: 'rgba(139, 92, 246, 0.3)', // Transparent purple border
-    // Removed all shadow properties for clean border look
+    width: '100%',
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderRadius: 16,
+    padding: 18,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.2)',
+    shadowColor: '#8b5cf6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 4,
   },
   worldItem: {
     flexDirection: 'row',
-    alignItems: 'center', // Better alignment
-    backgroundColor: 'rgba(255, 255, 255, 0.95)', // Clean white background
-    borderRadius: 16, // Much more rounded, co-star style
-    borderWidth: 0, // Remove border for cleaner look
-    padding: 16, // More padding for premium feel
-    marginBottom: 12, // More space between items
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.98)',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.15)',
+    padding: 14,
+    marginBottom: 10,
     width: '100%',
-    shadowColor: '#000',
+    shadowColor: '#8b5cf6',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3, // Android shadow
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    elevation: 2,
   },
   worldIconContainer: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: 'rgba(139, 92, 246, 0.1)',
     borderWidth: 1,
     borderColor: 'rgba(139, 92, 246, 0.2)',
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 16,
+    marginRight: 14,
     flexShrink: 0,
-    shadowColor: '#8b5cf6',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
   },
   worldIcon: {
-    fontSize: 32,
+    fontSize: 24,
     color: '#8b5cf6',
   },
   worldImage: {
-    width: 48,
-    height: 48,
+    width: 36,
+    height: 36,
     resizeMode: 'contain',
-    borderRadius: 8,
+    borderRadius: 6,
   },
   worldContent: {
     flex: 1,
   },
   worldName: {
-    fontFamily: 'Silkscreen_400Regular',
-    fontSize: 16, // Bigger title
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 12,
     fontWeight: 'bold',
-    color: '#1f2937', // Darker, more premium color
-    marginBottom: 6, // More space below title
+    color: '#0f172a',
+    marginBottom: 4,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   worldDescription: {
-    fontFamily: 'monospace',
-    fontSize: 13, // Bigger description text
-    color: '#6b7280', // Softer gray color
-    lineHeight: 18, // Better line height for readability
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 11,
+    color: '#64748b',
+    lineHeight: 16,
     fontWeight: '400',
-    letterSpacing: 0.2, // Subtle letter spacing
+    letterSpacing: 0.1,
   },
 });
 

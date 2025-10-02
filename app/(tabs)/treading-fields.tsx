@@ -4,11 +4,10 @@ import { Text, View } from '@/components/Themed';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { router } from 'expo-router';
 
-// Import the banner image
-const lilWineCasketImage = require('@/assets/images/lil-wine-casket.png');
-const vineyardBgImage = require('@/assets/images/vineyard-bg.png');
+// Import images
+const treadingFieldsImage = require('@/assets/images/treading-fields.png');
 
-export default function BarrelhavenScreen() {
+export default function TreadingFieldsScreen() {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
 
   const toggleFavorite = (activityId: string) => {
@@ -25,40 +24,22 @@ export default function BarrelhavenScreen() {
 
   const activities = [
     {
-      id: 'barrelhaven-pizza',
-      name: 'Barrelhaven Pizza',
-      description: 'Central piazza with cobblestone and vine-wrapped fountain.',
-      icon: 'home'
-    },
-    {
-      id: 'ivy-post',
-      name: 'The Ivy Post',
-      description: 'Cozy tavern with thick beams and outdoor grape arbors.',
-      icon: 'glass'
-    },
-    {
-      id: 'treading-fields',
-      name: 'Treading Fields',
-      description: 'Terraced vineyards with olive groves and stone farmhouses.',
+      id: 'harvest-patches',
+      name: 'The Harvest Patches',
+      description: 'Choose from Suncrest, Shadegrove, Brookside, or Forgotten patches for daily grape harvest mini-games.',
       icon: 'leaf'
     },
     {
-      id: 'craftsmens-row',
-      name: 'Craftsmen\'s Row',
-      description: 'Narrow street of workshops with hammer clinks and beeswax.',
-      icon: 'wrench'
+      id: 'ruined-villa',
+      name: 'Ruined Villa',
+      description: 'Explore ancient ruins, leave offerings, and solve weekly relic puzzles with amphora shards.',
+      icon: 'university'
     },
     {
-      id: 'cellar-row',
-      name: 'Cellar Row',
-      description: 'Cool underground passages carved into the hillside.',
-      icon: 'arrow-down'
-    },
-    {
-      id: 'winery-chapel',
-      name: 'Winery Chapel & Grove',
-      description: 'Sunlit chapel with painted frescoes and cypress trees.',
-      icon: 'heart'
+      id: 'farmstead',
+      name: 'The Farmstead',
+      description: 'Trade grapes with animal villagers for rustic goods like bread, oil, and cheese.',
+      icon: 'home'
     }
   ];
 
@@ -68,38 +49,32 @@ export default function BarrelhavenScreen() {
         {/* Back Button - Fixed Position */}
         <Pressable 
           style={styles.backButton}
-          onPress={() => router.navigate('/(tabs)/explore')}
+          onPress={() => router.navigate('/(tabs)/barrelhaven')}
         >
-          <FontAwesome name="arrow-left" size={12} color="#92400e" />
+          <FontAwesome name="arrow-left" size={12} color="#8b5a2b" />
           <Text style={styles.backButtonText}>Back</Text>
         </Pressable>
 
         {/* Header Row */}
         <RNView style={styles.headerRow}>
-          <Text style={styles.locationTitle}>BARRELHAVEN</Text>
+          <Text style={styles.locationTitle}>TREADING FIELDS</Text>
         </RNView>
 
         {/* Banner Image */}
         <RNView style={styles.bannerContainer}>
-          <Image source={vineyardBgImage} style={styles.bannerImage} />
+          <Image source={treadingFieldsImage} style={styles.bannerImage} />
         </RNView>
 
+
         {/* Activities Title */}
-        <Text style={styles.activitiesTitle}>VILLAGE LOCATIONS</Text>
+        <Text style={styles.activitiesTitle}>FIELD ACTIVITIES</Text>
 
         {/* Activities List */}
         {activities.map((activity) => {
-          const handleActivityPress = () => {
-            if (activity.id === 'treading-fields') {
-              router.navigate('/(tabs)/treading-fields');
-            }
-            // Add navigation for other locations here in the future
-          };
-
           const content = (
             <RNView style={styles.activityContent}>
               <RNView style={styles.activityIconContainer}>
-                <FontAwesome name={activity.icon as any} size={20} color="#92400e" />
+                <FontAwesome name={activity.icon as any} size={24} color="#8b5a2b" />
               </RNView>
               <RNView style={styles.activityText}>
                 <Text style={styles.activityName}>{activity.name}</Text>
@@ -109,7 +84,7 @@ export default function BarrelhavenScreen() {
           );
 
           return (
-            <Pressable key={activity.id} style={styles.activityItem} onPress={handleActivityPress}>
+            <Pressable key={activity.id} style={styles.activityItem}>
               {content}
               <Pressable
                 style={styles.favoriteButton}
@@ -121,7 +96,7 @@ export default function BarrelhavenScreen() {
                 <FontAwesome 
                   name={favorites.has(activity.id) ? "star" : "star-o"} 
                   size={16} 
-                  color={favorites.has(activity.id) ? "#92400e" : "rgba(146, 64, 14, 0.3)"} 
+                  color={favorites.has(activity.id) ? "#8b5a2b" : "rgba(139, 90, 43, 0.3)"} 
                 />
               </Pressable>
             </Pressable>
@@ -135,7 +110,7 @@ export default function BarrelhavenScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fef7f0', // Light wine/burgundy background
+    backgroundColor: '#fefbf7', // Warm cream background
   },
   scrollContent: {
     alignItems: 'center',
@@ -153,15 +128,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 12,
     paddingVertical: 8,
-    backgroundColor: 'rgba(146, 64, 14, 0.1)',
+    backgroundColor: 'rgba(139, 90, 43, 0.1)',
     borderRadius: 6,
     borderWidth: 1,
-    borderColor: 'rgba(146, 64, 14, 0.3)',
+    borderColor: 'rgba(139, 90, 43, 0.3)',
   },
   backButtonText: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 14,
-    color: '#92400e',
+    color: '#8b5a2b',
     marginLeft: 6,
   },
   headerRow: {
@@ -182,13 +157,13 @@ const styles = StyleSheet.create({
   },
   bannerContainer: {
     width: '100%',
-    height: 280,
+    height: 320,
     borderWidth: 2,
-    borderColor: '#92400e',
+    borderColor: '#8b5a2b',
     borderRadius: 8,
     marginBottom: 20,
     overflow: 'hidden',
-    backgroundColor: 'rgba(146, 64, 14, 0.05)',
+    backgroundColor: 'rgba(139, 90, 43, 0.05)',
   },
   bannerImage: {
     width: '100%',
@@ -208,37 +183,20 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   activityItem: {
-    backgroundColor: 'rgba(146, 64, 14, 0.05)',
+    backgroundColor: 'rgba(139, 90, 43, 0.05)',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: 'rgba(146, 64, 14, 0.2)',
+    borderColor: 'rgba(139, 90, 43, 0.2)',
     padding: 12,
     marginBottom: 10,
     width: '100%',
     minHeight: 65,
-    shadowColor: '#92400e',
+    shadowColor: '#8b5a2b',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
     position: 'relative',
-  },
-  activityPressable: {
-    width: '100%',
-  },
-  activityHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 6,
-  },
-  activityInfo: {
-    flexDirection: 'row',
-    flex: 1,
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    gap: 0,
-    minHeight: 50,
   },
   activityContent: {
     flexDirection: 'row',
@@ -249,7 +207,7 @@ const styles = StyleSheet.create({
     width: 45,
     height: 45,
     borderRadius: 22.5,
-    backgroundColor: 'rgba(146, 64, 14, 0.1)',
+    backgroundColor: 'rgba(139, 90, 43, 0.1)',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
@@ -280,7 +238,7 @@ const styles = StyleSheet.create({
     top: 8,
     right: 8,
     padding: 8,
-    backgroundColor: 'rgba(146, 64, 14, 0.05)',
+    backgroundColor: 'rgba(139, 90, 43, 0.05)',
     borderRadius: 20,
     justifyContent: 'center',
   },

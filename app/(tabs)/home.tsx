@@ -160,7 +160,10 @@ export default function PlayerHomeScreen() {
                 <FontAwesome name="exchange" size={14} color="#8b5cf6" />
                 <Text style={styles.secondaryButtonText}>Trade</Text>
               </Pressable>
-              <Pressable style={[styles.actionButton, styles.accentButton]}>
+              <Pressable 
+                style={[styles.actionButton, styles.accentButton]}
+                onPress={() => router.push('/(tabs)/dailies')}
+              >
                 <FontAwesome name="calendar" size={14} color="#8b5cf6" />
                 <Text style={styles.accentButtonText}>Dailies</Text>
               </Pressable>
