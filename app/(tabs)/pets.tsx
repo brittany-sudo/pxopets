@@ -175,62 +175,58 @@ export default function PetsScreen() {
 
   return (
     <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <BorderedBox>
-        {/* Active Pet Title positioned above image */}
-        <Text style={styles.activePetTitleAbove}>ACTIVE PET</Text>
-        {/* Pet with full-width border */}
-        <RNView style={styles.petImageContainer}>
-          <Image
-            source={getBackgroundImage(selectedBackground)}
-            style={styles.petBackgroundImage}
-            resizeMode="cover"
-          />
-          <Image
-            source={pets[activePet].image}
-            style={styles.petImage}
-          />
-          
-          {/* Pet info on left side of image */}
-          <RNView style={styles.petInfoOverlay}>
-            <Text style={styles.petName}>{pets[activePet].name}</Text>
-            <Text style={styles.petLevel}>Level {pets[activePet].level}</Text>
-          </RNView>
-          
-          {/* Stamina on right side of image */}
-          <RNView style={styles.staminaOverlay}>
-            <Text style={styles.staminaLabel}>STAMINA</Text>
-            <RNView style={styles.staminaContainer}>
-              <FontAwesome name="bolt" size={12} color="#f59e0b" />
-              <Text style={styles.staminaText}>{state.coins}</Text>
-            </RNView>
-          </RNView>
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        {/* Header Row */}
+        <RNView style={styles.headerRow}>
+          <Text style={styles.locationTitle}>MY PETS</Text>
         </RNView>
 
-        {/* Action boxes underneath */}
-        <RNView style={styles.actionBoxes}>
-          <Pressable 
-            style={styles.actionBox}
-            onPress={() => {
-              setCurrentPage(0);
-              setShowFeedModal(true);
-            }}
-          >
-            <FontAwesome name="cutlery" size={20} color="#14b8a6" />
-            <Text style={styles.actionLabel}>FEED</Text>
-          </Pressable>
-          <Pressable style={styles.actionBox}>
-            <FontAwesome name="futbol-o" size={20} color="#14b8a6" />
-            <Text style={styles.actionLabel}>PLAY</Text>
-          </Pressable>
-          <Pressable style={styles.actionBox}>
-            <FontAwesome name="map" size={20} color="#14b8a6" />
-            <Text style={styles.actionLabel}>EXPLORE</Text>
-          </Pressable>
+        {/* Active Pet Card */}
+        <RNView style={styles.activePetCard}>
+          <RNView style={styles.petImageContainer}>
+            <Image
+              source={getBackgroundImage(selectedBackground)}
+              style={styles.petBackgroundImage}
+              resizeMode="cover"
+            />
+            <Image
+              source={pets[activePet].image}
+              style={styles.petImage}
+            />
+            
+            {/* Pet info on left side of image */}
+            <RNView style={styles.petInfoOverlay}>
+              <Text style={styles.petName}>{pets[activePet].name}</Text>
+              <Text style={styles.petLevel}>Level {pets[activePet].level}</Text>
+            </RNView>
+            
+          </RNView>
+
+          {/* Action boxes underneath */}
+          <RNView style={styles.actionBoxes}>
+            <Pressable 
+              style={styles.actionBox}
+              onPress={() => {
+                setCurrentPage(0);
+                setShowFeedModal(true);
+              }}
+            >
+              <FontAwesome name="cutlery" size={18} color="#8b5cf6" />
+              <Text style={styles.actionLabel}>FEED</Text>
+            </Pressable>
+            <Pressable style={styles.actionBox}>
+              <FontAwesome name="futbol-o" size={18} color="#8b5cf6" />
+              <Text style={styles.actionLabel}>PLAY</Text>
+            </Pressable>
+            <Pressable style={styles.actionBox}>
+              <FontAwesome name="map" size={18} color="#8b5cf6" />
+              <Text style={styles.actionLabel}>EXPLORE</Text>
+            </Pressable>
+          </RNView>
         </RNView>
 
         {/* Stats Section */}
-        <BorderedBox style={styles.sectionBox}>
+        <RNView style={styles.statsCard}>
           <Text style={styles.sectionTitle}>STATS</Text>
           <RNView style={styles.barStatsContainer}>
             <RNView style={styles.barStatRow}>
@@ -290,10 +286,10 @@ export default function PetsScreen() {
               <Text style={styles.barStatValue}>{Math.min(100, (state.pet.level * 11) % 100)}</Text>
             </RNView>
           </RNView>
-        </BorderedBox>
+        </RNView>
 
         {/* Closet Section */}
-        <BorderedBox style={styles.sectionBox}>
+        <RNView style={styles.closetCard}>
           <Text style={styles.sectionTitle}>CLOSET</Text>
           <RNView style={styles.closetContainer}>
             {/* Row 1 */}
@@ -386,10 +382,10 @@ export default function PetsScreen() {
               </Pressable>
             </RNView>
           </RNView>
-        </BorderedBox>
+        </RNView>
 
         {/* Trophies Section */}
-        <BorderedBox style={styles.sectionBox}>
+        <RNView style={styles.trophiesCard}>
           <Text style={styles.sectionTitle}>TROPHIES</Text>
           <RNView style={styles.trophiesContainer}>
             <RNView style={styles.trophyRow}>
@@ -421,78 +417,124 @@ export default function PetsScreen() {
               </RNView>
             </RNView>
           </RNView>
-        </BorderedBox>
-      </BorderedBox>
-
-      <Text style={[styles.collectionTitle, { marginTop: 16 }]}>ALL PETS</Text>
-      <BorderedBox>
-        <RNView style={styles.petCollection}>
-          {/* Pet 1 - FREKKI */}
-          <Pressable 
-            style={[styles.petSlot, activePet === 'frekki' && styles.activePetSlot]}
-            onPress={() => setActivePet('frekki')}
-          >
-            <RNView style={styles.petSlotHeader}>
-              <Image source={require('@/assets/images/coco-guy.png')} style={styles.petSlotImage} />
-              <Text style={styles.petSlotName}>FREKKI</Text>
-            </RNView>
-            <RNView style={styles.petSlotStats}>
-              <Text style={styles.petSlotStat}>Lvl 3</Text>
-              <Text style={styles.petSlotStat}>HP: 85</Text>
-              <Text style={styles.petSlotStat}>ATK: 42</Text>
-            </RNView>
-          </Pressable>
-          
-          {/* Pet 2 - NOXIA */}
-          <Pressable 
-            style={[styles.petSlot, activePet === 'noxia' && styles.activePetSlot]}
-            onPress={() => setActivePet('noxia')}
-          >
-            <RNView style={styles.petSlotHeader}>
-              <Image source={require('@/assets/images/purple-guy.png')} style={styles.petSlotImage} />
-              <Text style={styles.petSlotName}>NOXIA</Text>
-            </RNView>
-            <RNView style={styles.petSlotStats}>
-              <Text style={styles.petSlotStat}>Lvl 5</Text>
-              <Text style={styles.petSlotStat}>HP: 92</Text>
-              <Text style={styles.petSlotStat}>ATK: 38</Text>
-            </RNView>
-          </Pressable>
-          
-          {/* Pet 3 - TECHNOR */}
-          <Pressable 
-            style={[styles.petSlot, activePet === 'technor' && styles.activePetSlot]}
-            onPress={() => setActivePet('technor')}
-          >
-            <RNView style={styles.petSlotHeader}>
-              <Image source={require('@/assets/images/robot-guy.png')} style={styles.petSlotImage} />
-              <Text style={styles.petSlotName}>TECHNOR</Text>
-            </RNView>
-            <RNView style={styles.petSlotStats}>
-              <Text style={styles.petSlotStat}>Lvl 2</Text>
-              <Text style={styles.petSlotStat}>HP: 78</Text>
-              <Text style={styles.petSlotStat}>ATK: 45</Text>
-            </RNView>
-          </Pressable>
         </RNView>
-      </BorderedBox>
 
-      <RNView style={styles.adoptButtons}>
-        <Link href="/(tabs)/adoption/pound" asChild>
-          <RNView style={styles.adoptButton}>
-            <FontAwesome name="heart" size={24} color="#8b5cf6" />
-            <Text style={styles.adoptButtonText}>ADOPT</Text>
-            <Text style={styles.adoptButtonSubtext}>From The Pound</Text>
+        <Text style={styles.collectionTitle}>ALL PETS</Text>
+        <RNView style={styles.petsCollectionCard}>
+          <RNView style={styles.petsList}>
+            {/* Pet 1 - JUNO */}
+            <Pressable 
+              style={[styles.petListItem, activePet === 'juno' && styles.activePetListItem]}
+              onPress={() => setActivePet('juno')}
+            >
+              <RNView style={styles.petListImageContainer}>
+                <Image source={require('@/assets/images/tigerguy.png')} style={styles.petListImage} />
+              </RNView>
+              <RNView style={styles.petListInfo}>
+                <Text style={styles.petListName}>JUNO</Text>
+                <Text style={styles.petListLevel}>Level {pets.juno.level}</Text>
+                <RNView style={styles.petListStats}>
+                  <Text style={styles.petListStat}>HP: {pets.juno.hp}</Text>
+                  <Text style={styles.petListStat}>ATK: {pets.juno.atk}</Text>
+                </RNView>
+              </RNView>
+              <RNView style={styles.petListActions}>
+                {activePet === 'juno' ? (
+                  <Text style={styles.activeText}>ACTIVE</Text>
+                ) : (
+                  <Pressable style={styles.swapButton}>
+                    <FontAwesome name="exchange" size={14} color="#8b5cf6" />
+                    <Text style={styles.swapButtonText}>SWAP</Text>
+                  </Pressable>
+                )}
+              </RNView>
+            </Pressable>
+
+            {/* Pet 2 - FREKKI */}
+            <Pressable 
+              style={[styles.petListItem, activePet === 'frekki' && styles.activePetListItem]}
+              onPress={() => setActivePet('frekki')}
+            >
+              <RNView style={styles.petListImageContainer}>
+                <Image source={require('@/assets/images/coco-guy.png')} style={styles.petListImage} />
+              </RNView>
+              <RNView style={styles.petListInfo}>
+                <Text style={styles.petListName}>FREKKI</Text>
+                <Text style={styles.petListLevel}>Level {pets.frekki.level}</Text>
+                <RNView style={styles.petListStats}>
+                  <Text style={styles.petListStat}>HP: {pets.frekki.hp}</Text>
+                  <Text style={styles.petListStat}>ATK: {pets.frekki.atk}</Text>
+                </RNView>
+              </RNView>
+              <RNView style={styles.petListActions}>
+                {activePet === 'frekki' ? (
+                  <Text style={styles.activeText}>ACTIVE</Text>
+                ) : (
+                  <Pressable style={styles.swapButton}>
+                    <FontAwesome name="exchange" size={14} color="#8b5cf6" />
+                    <Text style={styles.swapButtonText}>SWAP</Text>
+                  </Pressable>
+                )}
+              </RNView>
+            </Pressable>
+
+            {/* Pet 3 - NOXIA */}
+            <Pressable 
+              style={[styles.petListItem, activePet === 'noxia' && styles.activePetListItem]}
+              onPress={() => setActivePet('noxia')}
+            >
+              <RNView style={styles.petListImageContainer}>
+                <Image source={require('@/assets/images/purple-guy.png')} style={styles.petListImage} />
+              </RNView>
+              <RNView style={styles.petListInfo}>
+                <Text style={styles.petListName}>NOXIA</Text>
+                <Text style={styles.petListLevel}>Level {pets.noxia.level}</Text>
+                <RNView style={styles.petListStats}>
+                  <Text style={styles.petListStat}>HP: {pets.noxia.hp}</Text>
+                  <Text style={styles.petListStat}>ATK: {pets.noxia.atk}</Text>
+                </RNView>
+              </RNView>
+              <RNView style={styles.petListActions}>
+                {activePet === 'noxia' ? (
+                  <Text style={styles.activeText}>ACTIVE</Text>
+                ) : (
+                  <Pressable style={styles.swapButton}>
+                    <FontAwesome name="exchange" size={14} color="#8b5cf6" />
+                    <Text style={styles.swapButtonText}>SWAP</Text>
+                  </Pressable>
+                )}
+              </RNView>
+            </Pressable>
+
+            {/* Pet 4 - TECHNOR */}
+            <Pressable 
+              style={[styles.petListItem, activePet === 'technor' && styles.activePetListItem]}
+              onPress={() => setActivePet('technor')}
+            >
+              <RNView style={styles.petListImageContainer}>
+                <Image source={require('@/assets/images/robot-guy.png')} style={styles.petListImage} />
+              </RNView>
+              <RNView style={styles.petListInfo}>
+                <Text style={styles.petListName}>TECHNOR</Text>
+                <Text style={styles.petListLevel}>Level {pets.technor.level}</Text>
+                <RNView style={styles.petListStats}>
+                  <Text style={styles.petListStat}>HP: {pets.technor.hp}</Text>
+                  <Text style={styles.petListStat}>ATK: {pets.technor.atk}</Text>
+                </RNView>
+              </RNView>
+              <RNView style={styles.petListActions}>
+                {activePet === 'technor' ? (
+                  <Text style={styles.activeText}>ACTIVE</Text>
+                ) : (
+                  <Pressable style={styles.swapButton}>
+                    <FontAwesome name="exchange" size={14} color="#8b5cf6" />
+                    <Text style={styles.swapButtonText}>SWAP</Text>
+                  </Pressable>
+                )}
+              </RNView>
+            </Pressable>
           </RNView>
-        </Link>
-        <Link href="/(tabs)/adoption/create" asChild>
-          <RNView style={styles.adoptButton}>
-            <FontAwesome name="plus-circle" size={24} color="#8b5cf6" />
-            <Text style={styles.adoptButtonText}>CREATE</Text>
-            <Text style={styles.adoptButtonSubtext}>New Pet</Text>
-          </RNView>
-        </Link>
-      </RNView>
+        </RNView>
       </ScrollView>
 
       {/* Background Selection Modal */}
@@ -650,12 +692,28 @@ export default function PetsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#ffffff',
   },
   scrollContent: {
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    paddingTop: 20,
+    padding: 20,
     paddingBottom: 100,
+  },
+  headerRow: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 10,
+    marginBottom: 8,
+    paddingHorizontal: 40,
+    height: 40,
+  },
+  locationTitle: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 14,
+    color: '#0f172a',
+    fontWeight: 'bold',
+    letterSpacing: 1,
+    textAlign: 'center',
+    lineHeight: 20,
   },
   title: {
     fontFamily: 'PressStart2P_400Regular',
@@ -666,20 +724,35 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     textAlign: 'left',
   },
-    petImageContainer: {
-      width: '100%',
-      height: 240,
-      borderRadius: 0,
-      borderWidth: 2,
-      borderColor: '#0ea5e9',
-      backgroundColor: 'rgba(14, 165, 233, 0.05)',
-      alignItems: 'center',
-      justifyContent: 'center',
-      marginBottom: 8,
-      padding: 20,
-      position: 'relative',
-      overflow: 'hidden',
-    },
+  activePetCard: {
+    width: '95%',
+    alignSelf: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.98)',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.3)',
+    shadowColor: '#8b5cf6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  petImageContainer: {
+    width: '100%',
+    height: 200,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.2)',
+    backgroundColor: 'rgba(139, 92, 246, 0.05)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+    padding: 0,
+    position: 'relative',
+    overflow: 'hidden',
+  },
     petBackgroundImage: {
       position: 'absolute',
       top: 0,
@@ -688,6 +761,7 @@ const styles = StyleSheet.create({
       bottom: 0,
       width: '100%',
       height: '100%',
+      resizeMode: 'cover',
     },
     petInfoOverlay: {
       position: 'absolute',
@@ -697,16 +771,6 @@ const styles = StyleSheet.create({
       paddingHorizontal: 8,
       paddingVertical: 4,
       borderRadius: 4,
-    },
-    staminaOverlay: {
-      position: 'absolute',
-      top: 10,
-      right: 10,
-      backgroundColor: 'rgba(0, 0, 0, 0.7)',
-      paddingHorizontal: 8,
-      paddingVertical: 4,
-      borderRadius: 4,
-      alignItems: 'center',
     },
     actionBoxes: {
       flexDirection: 'row',
@@ -823,37 +887,43 @@ const styles = StyleSheet.create({
       minWidth: '30%',
       minHeight: 40,
     },
-    actionBox: {
-      borderWidth: 2,
-      borderColor: '#14b8a6',
-      backgroundColor: '#ffffff',
-      paddingHorizontal: 24,
-      paddingVertical: 20,
-      borderRadius: 12,
-      alignItems: 'center',
-      justifyContent: 'center',
-      flexDirection: 'column',
-      gap: 8,
-      flex: 1,
-      height: 80,
-      shadowColor: '#14b8a6',
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.4,
-      shadowRadius: 6,
-      elevation: 6,
-    },
-    actionLabel: {
-      fontFamily: 'monospace',
-      fontSize: 12,
-      color: '#14b8a6',
-      textAlign: 'center',
-      fontWeight: '500',
-    },
+  actionBoxes: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 12,
+    marginTop: 8,
+  },
+  actionBox: {
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.3)',
+    backgroundColor: 'rgba(139, 92, 246, 0.05)',
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'column',
+    gap: 8,
+    flex: 1,
+    height: 70,
+    shadowColor: '#8b5cf6',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  actionLabel: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#8b5cf6',
+    textAlign: 'center',
+    fontWeight: '600',
+  },
   petImage: {
     width: 110,
     height: 110,
     imageRendering: 'pixelated' as any,
-    marginTop: 80, // Moved down a bit more
+    marginTop: 40,
   },
   petName: {
     fontFamily: 'Silkscreen_400Regular',
@@ -869,24 +939,6 @@ const styles = StyleSheet.create({
     textAlign: 'left',
     opacity: 0.8,
   },
-    staminaLabel: {
-      fontFamily: 'Silkscreen_400Regular',
-      fontSize: 8,
-      color: '#ffffff',
-      textAlign: 'right',
-      marginBottom: 4,
-    },
-    staminaContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 4,
-    },
-    staminaText: {
-      fontFamily: 'Silkscreen_400Regular',
-      fontSize: 10,
-      color: '#f59e0b',
-      fontWeight: 'bold',
-    },
   statsGrid: {
     flexDirection: 'row',
     justifyContent: 'space-around',
@@ -953,12 +1005,13 @@ const styles = StyleSheet.create({
   },
   collectionTitle: {
     fontFamily: 'PressStart2P_400Regular',
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: 'bold',
-    color: '#0ea5e9',
+    color: '#8b5cf6',
     textAlign: 'center',
     marginTop: 0,
-    marginBottom: 8,
+    marginBottom: 16,
+    alignSelf: 'center',
   },
   activePetTitleAbove: {
     fontFamily: 'PressStart2P_400Regular',
@@ -978,12 +1031,17 @@ const styles = StyleSheet.create({
   },
   petSlot: {
     width: '30%',
-    borderWidth: 2,
-    borderColor: '#0ea5e9',
-    borderRadius: 8,
-    backgroundColor: 'rgba(14, 165, 233, 0.05)',
-    padding: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.3)',
+    borderRadius: 12,
+    backgroundColor: 'rgba(139, 92, 246, 0.05)',
+    padding: 12,
     marginBottom: 8,
+    shadowColor: '#8b5cf6',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   petSlotHeader: {
     flexDirection: 'row',
@@ -1016,7 +1074,12 @@ const styles = StyleSheet.create({
   },
   activePetSlot: {
     borderColor: '#8b5cf6',
-    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+    backgroundColor: 'rgba(139, 92, 246, 0.15)',
+    shadowColor: '#8b5cf6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
   },
   barStatsContainer: {
     width: '100%',
@@ -1059,39 +1122,6 @@ const styles = StyleSheet.create({
       fontWeight: 'bold',
       width: 30,
       textAlign: 'right',
-    },
-  adoptButtons: {
-    flexDirection: 'row',
-    gap: 4,
-    justifyContent: 'center',
-    marginTop: 12,
-    paddingHorizontal: 40,
-    width: '100%',
-  },
-  adoptButton: {
-    flex: 1,
-    alignItems: 'center',
-    paddingVertical: 24,
-    paddingHorizontal: 28,
-    borderWidth: 2,
-    borderColor: '#8b5cf6',
-    borderRadius: 8,
-    backgroundColor: 'rgba(139, 92, 246, 0.1)',
-  },
-    adoptButtonText: {
-      fontFamily: 'PressStart2P_400Regular',
-      fontSize: 14,
-      fontWeight: 'bold',
-      color: '#8b5cf6',
-      marginTop: 8,
-      marginBottom: 4,
-    },
-    adoptButtonSubtext: {
-      fontFamily: 'Silkscreen_400Regular',
-      fontSize: 10,
-      color: '#0f172a',
-      textAlign: 'center',
-      opacity: 0.8,
     },
     // Equipped Items Styles
     equippedItem: {
@@ -1388,15 +1418,172 @@ const styles = StyleSheet.create({
       marginVertical: 4,
       marginHorizontal: -8,
     },
-    sectionTitle: {
-      fontFamily: 'PressStart2P_400Regular',
-      fontSize: 10,
-      fontWeight: 'bold',
-      color: '#0f172a',
-      textAlign: 'center',
-      marginBottom: 8,
-      alignSelf: 'center',
-    },
+  sectionTitle: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#8b5cf6',
+    textAlign: 'center',
+    marginBottom: 16,
+    alignSelf: 'center',
+  },
+  statsCard: {
+    width: '95%',
+    alignSelf: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.98)',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.3)',
+    shadowColor: '#8b5cf6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  closetCard: {
+    width: '95%',
+    alignSelf: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.98)',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.3)',
+    shadowColor: '#8b5cf6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  trophiesCard: {
+    width: '95%',
+    alignSelf: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.98)',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.3)',
+    shadowColor: '#8b5cf6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  petsCollectionCard: {
+    width: '95%',
+    alignSelf: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.98)',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.3)',
+    shadowColor: '#8b5cf6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  petsList: {
+    gap: 12,
+  },
+  petListItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(139, 92, 246, 0.05)',
+    borderRadius: 12,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.2)',
+    shadowColor: '#8b5cf6',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  activePetListItem: {
+    backgroundColor: 'rgba(139, 92, 246, 0.15)',
+    borderColor: '#8b5cf6',
+    shadowColor: '#8b5cf6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  petListImageContainer: {
+    position: 'relative',
+    marginRight: 16,
+  },
+  petListImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    imageRendering: 'pixelated' as any,
+  },
+  petListInfo: {
+    flex: 1,
+  },
+  petListName: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 14,
+    color: '#0f172a',
+    fontWeight: 'bold',
+    marginBottom: 4,
+  },
+  petListLevel: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 12,
+    color: '#8b5cf6',
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  petListStats: {
+    flexDirection: 'row',
+    gap: 16,
+  },
+  petListStat: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#64748b',
+    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  petListActions: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  activeText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#8b5cf6',
+    fontWeight: 'bold',
+    backgroundColor: 'rgba(139, 92, 246, 0.2)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+  swapButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.3)',
+    gap: 6,
+  },
+  swapButtonText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#8b5cf6',
+    fontWeight: '600',
+  },
     // Trophies Styles
     trophiesContainer: {
       padding: 8,

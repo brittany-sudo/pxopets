@@ -156,9 +156,12 @@ export default function PlayerHomeScreen() {
                 <FontAwesome name="heart" size={14} color="#8b5cf6" />
                 <Text style={styles.primaryButtonText}>Pets</Text>
               </Pressable>
-              <Pressable style={[styles.actionButton, styles.secondaryButton]}>
-                <FontAwesome name="exchange" size={14} color="#8b5cf6" />
-                <Text style={styles.secondaryButtonText}>Trade</Text>
+              <Pressable 
+                style={[styles.actionButton, styles.secondaryButton]}
+                onPress={() => router.push('/(tabs)/inventory')}
+              >
+                <FontAwesome name="archive" size={14} color="#8b5cf6" />
+                <Text style={styles.secondaryButtonText}>Inventory</Text>
               </Pressable>
               <Pressable 
                 style={[styles.actionButton, styles.accentButton]}
@@ -170,12 +173,12 @@ export default function PlayerHomeScreen() {
             </RNView>
             <RNView style={styles.actionButtonsRow}>
               <Pressable style={[styles.actionButton, styles.warningButton]}>
-                <FontAwesome name="trophy" size={14} color="#8b5cf6" />
-                <Text style={styles.warningButtonText}>Trophies</Text>
+                <FontAwesome name="exchange" size={14} color="#8b5cf6" />
+                <Text style={styles.warningButtonText}>Trades</Text>
               </Pressable>
               <Pressable style={[styles.actionButton, styles.successButton]}>
-                <FontAwesome name="bank" size={14} color="#8b5cf6" />
-                <Text style={styles.successButtonText}>Bank</Text>
+                <FontAwesome name="shopping-cart" size={14} color="#8b5cf6" />
+                <Text style={styles.successButtonText}>My Shop</Text>
               </Pressable>
               <Pressable style={[styles.actionButton, styles.infoButton]}>
                 <FontAwesome name="users" size={14} color="#8b5cf6" />

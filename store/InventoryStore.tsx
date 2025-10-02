@@ -40,7 +40,7 @@ type InventoryContextType = {
 const DEFAULT_STATE: InventoryState = {
   mainInventory: [],
   safetyDepositBox: {},
-  maxMainInventory: 20,
+  maxMainInventory: 24,
   devMode: false,
 };
 

@@ -199,21 +199,21 @@ export default function ExploreScreen() {
           <FontAwesome name="gamepad" size={20} color="#8b5cf6" />
           <Text style={styles.navButtonText}>BATTLE</Text>
         </Pressable>
-        <Pressable style={styles.navButton} onPress={() => Alert.alert('Trade', 'Trading system coming soon!')}>
-          <FontAwesome name="exchange" size={20} color="#8b5cf6" />
-          <Text style={styles.navButtonText}>TRADE</Text>
+        <Pressable style={styles.navButton} onPress={() => Alert.alert('Auctions', 'Auction system coming soon!')}>
+          <FontAwesome name="gavel" size={20} color="#8b5cf6" />
+          <Text style={styles.navButtonText}>AUCTIONS</Text>
         </Pressable>
-        <Pressable style={styles.navButton} onPress={() => Alert.alert('User Shop', 'User shops coming soon!')}>
-          <FontAwesome name="shopping-cart" size={20} color="#8b5cf6" />
-          <Text style={styles.navButtonText}>SHOP</Text>
-        </Pressable>
-        <Pressable style={styles.navButton} onPress={() => Alert.alert('Inventory', 'Inventory coming soon!')}>
-          <FontAwesome name="archive" size={20} color="#8b5cf6" />
-          <Text style={styles.navButtonText}>INVENTORY</Text>
-        </Pressable>
-        <Pressable style={styles.navButton} onPress={() => Alert.alert('Bank', 'Bank coming soon!')}>
+        <Pressable style={styles.navButton} onPress={() => router.navigate('/(tabs)/bank')}>
           <FontAwesome name="bank" size={20} color="#8b5cf6" />
           <Text style={styles.navButtonText}>BANK</Text>
+        </Pressable>
+            <Pressable style={styles.navButton} onPress={() => router.navigate('/(tabs)/stocks')}>
+              <FontAwesome name="line-chart" size={20} color="#8b5cf6" />
+              <Text style={styles.navButtonText}>STOCKS</Text>
+            </Pressable>
+        <Pressable style={styles.navButton} onPress={() => router.navigate('/(tabs)/nursery')}>
+          <FontAwesome name="leaf" size={20} color="#8b5cf6" />
+          <Text style={styles.navButtonText}>NURSERY</Text>
         </Pressable>
       </RNView>
 
@@ -261,27 +261,27 @@ const styles = StyleSheet.create({
     borderTopColor: 'rgba(139, 92, 246, 0.2)',
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(139, 92, 246, 0.2)',
-    paddingVertical: 8,
-    paddingHorizontal: 4,
+    paddingVertical: 12,
+    paddingHorizontal: 8,
     justifyContent: 'space-around',
     alignItems: 'center',
   },
   navButton: {
     alignItems: 'center',
-    paddingVertical: 8,
-    paddingHorizontal: 6,
-    borderRadius: 8,
-    minWidth: 60,
+    paddingVertical: 12,
+    paddingHorizontal: 10,
+    borderRadius: 10,
+    minWidth: 70,
     backgroundColor: 'rgba(139, 92, 246, 0.05)',
     borderWidth: 1,
     borderColor: 'rgba(139, 92, 246, 0.2)',
   },
   navButtonText: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 8,
+    fontSize: 9,
     color: '#8b5cf6',
     fontWeight: 'bold',
-    marginTop: 2,
+    marginTop: 4,
     textAlign: 'center',
   },
   scrollContent: {
