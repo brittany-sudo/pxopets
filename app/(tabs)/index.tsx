@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, ScrollView, View as RNView, Pressable, Image } from 'react-native';
 import { Text, View } from '@/components/Themed';
+import DeveloperPanel from '@/components/DeveloperPanel';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 export default function NewsScreen() {
+  const [showDevPanel, setShowDevPanel] = useState(false);
   const newsArticles = [
     {
       id: 1,
@@ -164,7 +166,24 @@ export default function NewsScreen() {
             <Text style={styles.lotteryText}>Draw at midnight Pxopia time</Text>
           </RNView>
         </RNView>
+
+        {/* Dev Panel Button */}
+        <RNView style={styles.devPanelContainer}>
+          <Pressable 
+            style={styles.devPanelButton}
+            onPress={() => setShowDevPanel(true)}
+          >
+            <FontAwesome name="cog" size={16} color="#8b5cf6" />
+            <Text style={styles.devPanelText}>DEV PANEL</Text>
+          </Pressable>
+        </RNView>
       </ScrollView>
+
+      {/* Dev Panel Modal */}
+      <DeveloperPanel 
+        visible={showDevPanel} 
+        onClose={() => setShowDevPanel(false)} 
+      />
     </View>
   );
 }
@@ -413,5 +432,29 @@ const styles = StyleSheet.create({
     fontSize: 9,
     color: '#64748b',
     opacity: 0.7,
+  },
+  // Dev Panel Styles
+  devPanelContainer: {
+    width: '95%',
+    alignSelf: 'center',
+    marginBottom: 20,
+  },
+  devPanelButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.3)',
+    gap: 8,
+  },
+  devPanelText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#8b5cf6',
+    fontWeight: '600',
   },
 });

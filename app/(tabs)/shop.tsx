@@ -3,7 +3,7 @@ import { StyleSheet, ScrollView, View as RNView, Pressable, Image, Alert } from 
 import { Text, View } from '@/components/Themed';
 import PixelButton from '@/components/PixelButton';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { useGame } from '@/store/GameStore';
+import { useSimpleGame } from '@/store/SimpleGameStore';
 
 // Import lunchbox images
 const gameLunchboxImage = require('@/assets/images/game-lunchbox.png');
@@ -13,8 +13,17 @@ const rocketLunchboxImage = require('@/assets/images/rocket-lunchbox.png');
 const dragonLunchboxImage = require('@/assets/images/dragon-lunchbox.png');
 
 export default function ShopScreen() {
-  const { state, addCoins, spendCoins, addTickets, spendTickets, addStamina, spendStamina, addFood } = useGame();
+  const { state, spendTickets, addFood, addBackground, hasBackground, hydrated } = useSimpleGame();
   const [selectedCategory, setSelectedCategory] = useState('tickets');
+  
+  // Wait for data to load before rendering
+  if (!hydrated) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.loadingText}>Loading...</Text>
+      </View>
+    );
+  }
 
   const categories = [
     { id: 'tickets', name: 'TICKETS', icon: 'ticket' },
@@ -188,34 +197,37 @@ export default function ShopScreen() {
 
   const backgroundItems = [
     {
-      id: 'bg_neon',
-      name: 'NEON CITY',
-      price: 150,
+      id: 'bg_vapoburbs',
+      name: 'VAPOBURBS',
+      price: 50,
       currency: 'tickets',
+      image: require('@/assets/images/bg-vapoburbs.png'),
       icon: 'image',
-      color: '#00ff88',
-      description: 'Cyberpunk vibes',
-      rarity: 'epic',
-    },
-    {
-      id: 'bg_forest',
-      name: 'MYSTIC FOREST',
-      price: 100,
-      currency: 'tickets',
-      icon: 'tree',
-      color: '#10b981',
-      description: 'Enchanted woodland',
-      rarity: 'rare',
-    },
-    {
-      id: 'bg_space',
-      name: 'COSMIC VOID',
-      price: 300,
-      currency: 'tickets',
-      icon: 'rocket',
       color: '#8b5cf6',
-      description: 'Stellar adventure',
-      rarity: 'legendary',
+      description: 'Suburban pixel vibes',
+      rarity: 'common',
+    },
+    {
+      id: 'bg_barrelhaven',
+      name: 'BARRELHAVEN WARREN',
+      price: 50,
+      currency: 'tickets',
+      image: require('@/assets/images/bg-barrelhaven-warren.png'),
+      icon: 'image',
+      color: '#92400e',
+      description: 'Cozy wine cellar',
+      rarity: 'common',
+    },
+    {
+      id: 'bg_vineyard',
+      name: 'VINEYARD',
+      price: 50,
+      currency: 'tickets',
+      image: require('@/assets/images/vineyard-bg.png'),
+      icon: 'image',
+      color: '#65a30d',
+      description: 'Lush grape fields',
+      rarity: 'common',
     },
     {
       id: 'bg_beach',
@@ -299,6 +311,26 @@ export default function ShopScreen() {
   };
 
   const handlePurchase = (item: any) => {
+    // Check if it's a background
+    if (item.id && item.id.startsWith('bg_')) {
+      // Check if already owned
+      if (hasBackground(item.id)) {
+        Alert.alert('Already Owned', 'You already own this background!');
+        return;
+      }
+      
+      // Check if they have enough tickets
+      if (state.tickets >= item.price) {
+        spendTickets(item.price);
+        addBackground(item.id);
+        Alert.alert('Purchased!', `You bought ${item.name}! Check your closet to equip it.`);
+      } else {
+        Alert.alert('Not enough tickets!', 'You need more tickets to buy this background.');
+      }
+      return;
+    }
+
+    // Handle other purchases (foods, etc)
     if (item.currency === 'USD') {
       Alert.alert(
         'Premium Purchase',
@@ -306,11 +338,7 @@ export default function ShopScreen() {
         [
           { text: 'Cancel', style: 'cancel' },
           { text: 'Test Purchase', onPress: () => {
-            // In real app, this would trigger payment
-            // For demo, add tickets based on the item
-            const ticketAmount = parseInt(item.name.split(' ')[0]);
-            addTickets(ticketAmount);
-            Alert.alert('Success!', `Test purchase completed! You received ${ticketAmount} tickets!`);
+            Alert.alert('Success!', `Test purchase completed!`);
           }}
         ]
       );
@@ -323,19 +351,10 @@ export default function ShopScreen() {
       }
     } else if (item.currency === 'stamina') {
       if (state.stamina >= item.price) {
-        spendStamina(item.price);
         addFood(item.id, 1);
         Alert.alert('Purchased!', `You bought ${item.name}! It's been added to your food inventory.`);
       } else {
         Alert.alert('Not enough stamina!', 'You need more stamina to buy this item.');
-      }
-    } else {
-      // Legacy coin currency
-      if (state.coins >= item.price) {
-        spendCoins(item.price);
-        Alert.alert('Purchased!', `You bought ${item.name}!`);
-      } else {
-        Alert.alert('Not enough coins!', 'You need more coins to buy this item.');
       }
     }
   };
@@ -399,7 +418,10 @@ export default function ShopScreen() {
                 </RNView>
               )}
               <RNView style={styles.activityHeader}>
-                <RNView style={styles.activityIconContainer}>
+                <RNView style={[
+                  styles.activityIconContainer,
+                  selectedCategory === 'backgrounds' && styles.backgroundIconContainer
+                ]}>
                   {selectedCategory === 'special-items' ? (
                     <Image 
                       source={
@@ -411,6 +433,11 @@ export default function ShopScreen() {
                         gameLunchboxImage
                       } 
                       style={styles.lunchboxIcon} 
+                    />
+                  ) : selectedCategory === 'backgrounds' && item.image ? (
+                    <Image 
+                      source={item.image} 
+                      style={styles.backgroundThumbnail} 
                     />
                   ) : (
                     <FontAwesome name={item.icon as any} size={16} color={item.color} />
@@ -424,6 +451,15 @@ export default function ShopScreen() {
                   <Text style={styles.staminaText}>⚡ {item.stamina}</Text>
                 </RNView>
               )}
+              
+              {/* Show OWNED badge for backgrounds */}
+              {item.id && item.id.startsWith('bg_') && hasBackground(item.id) && (
+                <RNView style={styles.ownedBadge}>
+                  <FontAwesome name="check-circle" size={12} color="#10b981" />
+                  <Text style={styles.ownedText}>OWNED</Text>
+                </RNView>
+              )}
+              
               <RNView style={styles.activityFooter}>
                 <RNView style={styles.ticketPriceContainer}>
                   <Text style={styles.activityPrice}>
@@ -454,7 +490,14 @@ export default function ShopScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f0f9ff',
+    backgroundColor: '#fafafa',
+  },
+  loadingText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 14,
+    color: '#8b5cf6',
+    textAlign: 'center',
+    marginTop: 100,
   },
   scrollContent: {
     alignItems: 'center',
@@ -467,44 +510,45 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
-    gap: 8,
-    marginBottom: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.98)', // Clean white background
+    gap: 6,
+    marginBottom: 16,
+    backgroundColor: '#ffffff',
     borderWidth: 1,
-    borderColor: 'rgba(139, 92, 246, 0.3)', // Purple border
-    borderRadius: 12, // Rounded like games page
-    padding: 16, // More padding
+    borderColor: 'rgba(139, 92, 246, 0.15)',
+    borderRadius: 16,
+    padding: 12,
     width: '95%',
     alignSelf: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3, // Android shadow
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 2,
   },
   categoryTab: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    backgroundColor: 'rgba(139, 92, 246, 0.05)', // Subtle background
-    borderRadius: 8, // More rounded
-    borderWidth: 1,
-    borderColor: 'rgba(139, 92, 246, 0.3)',
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    backgroundColor: 'transparent',
+    borderRadius: 10,
+    borderWidth: 0,
   },
   categoryTabActive: {
-    backgroundColor: '#8b5cf6', // Solid purple background
+    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+    borderWidth: 1,
     borderColor: '#8b5cf6',
   },
   categoryText: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 12, // Larger text like games page
-    color: '#8b5cf6',
-    fontWeight: '500',
+    fontSize: 9,
+    color: '#94a3b8',
+    fontWeight: 'bold',
+    letterSpacing: 0.3,
   },
   categoryTextActive: {
-    color: '#ffffff', // White text on purple background
+    color: '#8b5cf6',
     fontWeight: 'bold',
   },
   shopTitle: {
@@ -518,25 +562,26 @@ const styles = StyleSheet.create({
   itemsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     width: '100%',
-    gap: 12,
+    paddingHorizontal: 8,
+    gap: 8,
   },
   itemCard: {
-    width: '45%',
-    backgroundColor: 'rgba(255, 255, 255, 0.98)', // Clean white background
-    borderRadius: 12, // More rounded like games page
-    borderWidth: 1, // Thinner border
-    borderColor: 'rgba(139, 92, 246, 0.3)', // Purple border
+    width: '48%',
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
     padding: 16,
-    marginBottom: 16,
+    marginBottom: 12,
     alignItems: 'center',
     position: 'relative',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3, // Android shadow
+    shadowOpacity: 0.06,
+    shadowRadius: 10,
+    elevation: 2,
   },
   popularCard: {
     borderColor: '#f59e0b',
@@ -603,18 +648,49 @@ const styles = StyleSheet.create({
     height: 40,
     resizeMode: 'contain',
   },
+  backgroundThumbnail: {
+    width: 140,
+    height: 80,
+    resizeMode: 'cover',
+    borderRadius: 10,
+  },
+  backgroundIconContainer: {
+    width: 150,
+    height: 90,
+    borderRadius: 12,
+    backgroundColor: 'transparent',
+  },
+  ownedBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#10b981',
+    marginBottom: 8,
+  },
+  ownedText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 9,
+    color: '#10b981',
+    fontWeight: 'bold',
+  },
   itemName: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 14, // Larger like games page
-    color: '#1f2937', // Darker, more premium color
+    fontSize: 12,
+    color: '#0f172a',
     fontWeight: 'bold',
+    letterSpacing: 0.3,
     textAlign: 'center',
     marginBottom: 4,
   },
   itemDescription: {
-    fontFamily: 'monospace',
-    fontSize: 11, // Larger text
-    color: '#6b7280', // Softer gray like games page
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 9,
+    color: '#94a3b8',
     lineHeight: 14,
     textAlign: 'center',
     marginBottom: 8,

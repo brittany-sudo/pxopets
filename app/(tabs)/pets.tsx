@@ -1,18 +1,35 @@
-import React, { useState } from 'react';
-import { Image, StyleSheet, View as RNView, ScrollView, Pressable, Modal, Alert } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { Image, StyleSheet, View as RNView, ScrollView, Pressable, Modal, Alert, Animated } from 'react-native';
 import { Text, View } from '@/components/Themed';
-import { useGame } from '@/store/GameStore';
+import { useSimpleGame } from '@/store/SimpleGameStore';
+import { usePets } from '@/store/PetStore';
+import { useInventory } from '@/store/InventoryStore';
 import PixelButton from '@/components/PixelButton';
-import { Link } from 'expo-router';
+import { Link, router, useFocusEffect } from 'expo-router';
 import BorderedBox from '@/components/BorderedBox';
 import JazzyTitle from '@/components/JazzyTitle';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 export default function PetsScreen() {
-  const { state, increaseHappiness, hydrated } = useGame();
-  const [activePet, setActivePet] = useState('juno'); // Default to Juno
-  const [selectedBackground, setSelectedBackground] = useState('bg1'); // Default background
-  const [showBackgroundModal, setShowBackgroundModal] = useState(false);
+  const scrollViewRef = useRef<ScrollView>(null);
+  const { state: gameState, hydrated: gameHydrated } = useSimpleGame();
+  const { 
+    state: petState, 
+    setActivePet, 
+    feedPet, 
+    playWithPet, 
+    updatePetBackground, 
+    getBackgroundOwner,
+    getActivePet,
+    canAdoptMore,
+    resetAllPets,
+    toggleDevMode,
+    hydrated: petsHydrated 
+  } = usePets();
+  const { state: inventoryState, removeItem, hydrated: inventoryHydrated } = useInventory();
+  
+  const [showClosetModal, setShowClosetModal] = useState(false);
+  const [closetTab, setClosetTab] = useState<'backgrounds' | 'skins' | 'subpxos'>('backgrounds');
   const [showFeedModal, setShowFeedModal] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [selectedFood, setSelectedFood] = useState(null);
@@ -20,6 +37,69 @@ export default function PetsScreen() {
   const [equippedAccessory, setEquippedAccessory] = useState('none');
   const [showFeedSuccess, setShowFeedSuccess] = useState(false);
   const [lastFedStamina, setLastFedStamina] = useState(0);
+  
+  // Animation values for hearts
+  const heartsOpacity = useRef(new Animated.Value(0)).current;
+  const heartsSlideUp = useRef(new Animated.Value(30)).current;
+  const heartsBob = useRef(new Animated.Value(0)).current;
+  
+  const activePet = getActivePet();
+  
+  // Reset scroll position when screen comes into focus
+  useFocusEffect(
+    React.useCallback(() => {
+      scrollViewRef.current?.scrollTo({ y: 0, animated: false });
+    }, [])
+  );
+  
+  // Animate hearts when feeding
+  useEffect(() => {
+    if (showFeedSuccess) {
+      // Reset animation values
+      heartsOpacity.setValue(0);
+      heartsSlideUp.setValue(30);
+      heartsBob.setValue(0);
+      
+      // Fade in and slide up animation
+      Animated.parallel([
+        Animated.timing(heartsOpacity, {
+          toValue: 1,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+        Animated.timing(heartsSlideUp, {
+          toValue: 0,
+          duration: 800,
+          useNativeDriver: true,
+        }),
+      ]).start(() => {
+        // Once at the top, start bobbing animation
+        Animated.loop(
+          Animated.sequence([
+            Animated.timing(heartsBob, {
+              toValue: -8,
+              duration: 1000,
+              useNativeDriver: true,
+            }),
+            Animated.timing(heartsBob, {
+              toValue: 0,
+              duration: 1000,
+              useNativeDriver: true,
+            }),
+          ])
+        ).start();
+      });
+    }
+  }, [showFeedSuccess]);
+  
+  // Wait for data to load before rendering
+  if (!gameHydrated || !petsHydrated || !inventoryHydrated) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.loadingText}>Loading...</Text>
+      </View>
+    );
+  }
   
   const pets = {
     juno: {
@@ -36,9 +116,9 @@ export default function PetsScreen() {
       hp: 85,
       atk: 42
     },
-    noxia: {
-      name: 'NOXIA',
-      image: require('@/assets/images/purple-guy.png'),
+    lallazo: {
+      name: 'LALLAZO',
+      image: require('@/assets/images/lallazo.png'),
       level: 5,
       hp: 92,
       atk: 38
@@ -52,21 +132,39 @@ export default function PetsScreen() {
     }
   };
 
-  // Expanded background collection (ready for hundreds)
-  const backgrounds = {
-    bg1: { id: 'bg1', name: 'Forest', image: require('@/assets/images/bg1.png'), unlocked: true, rarity: 'common' },
-    bg2: { id: 'bg2', name: 'Harbor', image: require('@/assets/images/loomers-background.png'), unlocked: true, rarity: 'common' },
-    bg3: { id: 'bg3', name: 'Crescent Oasis', image: require('@/assets/images/crescent-background.png'), unlocked: true, rarity: 'common' },
-    bg4: { id: 'bg4', name: 'Mountain Peak', image: require('@/assets/images/bg1.png'), unlocked: false, rarity: 'common', cost: 50 },
-    bg5: { id: 'bg5', name: 'Desert Oasis', image: require('@/assets/images/bg1.png'), unlocked: false, rarity: 'common', cost: 75 },
-    bg6: { id: 'bg6', name: 'Space Station', image: require('@/assets/images/bg1.png'), unlocked: false, rarity: 'rare', cost: 150 },
-    bg7: { id: 'bg7', name: 'Crystal Cave', image: require('@/assets/images/bg1.png'), unlocked: false, rarity: 'rare', cost: 200 },
-    bg8: { id: 'bg8', name: 'Underwater Palace', image: require('@/assets/images/bg1.png'), unlocked: false, rarity: 'epic', cost: 500 },
-    bg9: { id: 'bg9', name: 'Cloud City', image: require('@/assets/images/bg1.png'), unlocked: false, rarity: 'epic', cost: 750 },
-    bg10: { id: 'bg10', name: 'Volcano Lair', image: require('@/assets/images/bg1.png'), unlocked: false, rarity: 'legendary', cost: 1000 },
-    bg11: { id: 'bg11', name: 'Rainbow Falls', image: require('@/assets/images/bg1.png'), unlocked: false, rarity: 'legendary', cost: 1500 },
-    // Ready to add hundreds more...
+  // Background collection - bg1 is default and always available
+  // All available backgrounds in the game
+  const allBackgrounds: { [key: string]: { id: string; name: string; image: any; rarity: string } } = {
+    bg1: { 
+      id: 'bg1', 
+      name: 'Default', 
+      image: require('@/assets/images/bg1.png'), 
+      rarity: 'common' 
+    },
+    bg_vapoburbs: {
+      id: 'bg_vapoburbs',
+      name: 'Vapoburbs',
+      image: require('@/assets/images/bg-vapoburbs.png'),
+      rarity: 'common'
+    },
+    bg_barrelhaven: {
+      id: 'bg_barrelhaven',
+      name: 'Barrelhaven Warren',
+      image: require('@/assets/images/bg-barrelhaven-warren.png'),
+      rarity: 'common'
+    },
+    bg_vineyard: {
+      id: 'bg_vineyard',
+      name: 'Vineyard',
+      image: require('@/assets/images/vineyard-bg.png'),
+      rarity: 'common'
+    },
   };
+
+  // Filter to only show backgrounds the player owns
+  const ownedBackgrounds = Object.values(allBackgrounds).filter(bg => 
+    gameState.ownedBackgrounds.includes(bg.id)
+  );
 
   const equipment = {
     weapons: {
@@ -83,20 +181,112 @@ export default function PetsScreen() {
     }
   };
 
-  // Food inventory system (QuickStop store items)
-  const foodInventory = {
-    cosmicburger: { id: 'cosmicburger', name: 'Cosmic Burger', stamina: 12, quantity: 2, image: require('@/assets/images/cosmicburger.png') },
-    cupnoddle: { id: 'cupnoddle', name: 'Cup Noodles', stamina: 18, quantity: 1, image: require('@/assets/images/cupnoddle.png') },
-    chocolate: { id: 'chocolate', name: 'Chocolate', stamina: 15, quantity: 3, image: require('@/assets/images/chocolate.png') },
-    pouchdrink: { id: 'pouchdrink', name: 'Energy Drink', stamina: 22, quantity: 1, image: require('@/assets/images/pouchdrink.png') },
-    coffee: { id: 'coffee', name: 'Coffee', stamina: 8, quantity: 4, image: require('@/assets/images/cosmicburger.png') }, // placeholder
-    donut: { id: 'donut', name: 'Donut', stamina: 20, quantity: 2, image: require('@/assets/images/cosmicburger.png') }, // placeholder
-    sandwich: { id: 'sandwich', name: 'Sandwich', stamina: 25, quantity: 1, image: require('@/assets/images/cosmicburger.png') }, // placeholder
-    soda: { id: 'soda', name: 'Soda', stamina: 10, quantity: 3, image: require('@/assets/images/cosmicburger.png') } // placeholder
+  // Image map for food items - maps item IDs to their actual image files
+  const foodImageMap: { [key: string]: any } = {
+    // QuickStop items (by item ID from store)
+    's1': require('@/assets/images/chocolate.png'), // Protein Bar
+    's2': require('@/assets/images/hotchips.png'), // Hot Chips
+    's3': require('@/assets/images/slushee.png'), // Slushee
+    's4': require('@/assets/images/lil-soda.png'), // Lil Soda
+    's5': require('@/assets/images/cupnoodle.png'), // Cup O'Noodle
+    's6': require('@/assets/images/regularhotdog.png'), // Quickdog
+    's7': require('@/assets/images/potatochomps.png'), // Quick Chips
+    's8': require('@/assets/images/saturnsoda.png'), // Saturn Soda
+    's9': require('@/assets/images/nuggets.png'), // Nuggets
+    'l1': require('@/assets/images/gumballs.png'), // Space Bubblegum
+    'l2': require('@/assets/images/cosmicburger.png'), // Cosmic Burger
+    'l3': require('@/assets/images/pouchdrink.png'), // Punch Pouch
+    'l4': require('@/assets/images/chocodonut.png'), // Choco-Donut
+    
+    // Generic food/drink names (in case they're stored differently)
+    'cosmicburger': require('@/assets/images/cosmicburger.png'),
+    'cupnoddle': require('@/assets/images/cupnoddle.png'),
+    'cupnoodle': require('@/assets/images/cupnoodle.png'),
+    'chocolate': require('@/assets/images/chocolate.png'),
+    'pouchdrink': require('@/assets/images/pouchdrink.png'),
+    'energydrink': require('@/assets/images/energydrink.png'),
+    'quickstopcoffee': require('@/assets/images/quickstopcoffee.png'),
+    'chocodonut': require('@/assets/images/chocodonut.png'),
+    'slushee': require('@/assets/images/slushee.png'),
+    'slushee3': require('@/assets/images/slushee3.png'),
+    'milkshake': require('@/assets/images/milkshake.png'),
+    'milkshakes': require('@/assets/images/milkshakes.png'),
+    'hotchips': require('@/assets/images/hotchips.png'),
+    'potatochomps': require('@/assets/images/potatochomps.png'),
+    'regularhotdog': require('@/assets/images/regularhotdog.png'),
+    'quickdog': require('@/assets/images/regularhotdog.png'),
+    'lil-soda': require('@/assets/images/lil-soda.png'),
+    'icecreamsandwich': require('@/assets/images/icecreamsandwich.png'),
+    'gumballs': require('@/assets/images/gumballs.png'),
+    'nuggets': require('@/assets/images/nuggets.png'),
+    'saturnsoda': require('@/assets/images/saturnsoda.png'),
+    'glowcorn': require('@/assets/images/glowcorn.png'),
+    
+    // Arcade/Rink items
+    'arcadefries': require('@/assets/images/arcadefries.png'),
+    'flamingoburger': require('@/assets/images/flamingoburger.png'),
+    'galaxysundae': require('@/assets/images/galaxysundae.png'),
+    'glowshake': require('@/assets/images/glowshake.png'),
+    'rinkpizza': require('@/assets/images/rinkpizza.png'),
+    'rinkpopcorn': require('@/assets/images/rinkpopcorn.png'),
+    'rinkpretzel': require('@/assets/images/rinkpretzel.png'),
+    
+    // Seafood items
+    'clamchowder': require('@/assets/images/clamchowder.png'),
+    'fishstew': require('@/assets/images/fishstew.png'),
+    'shrimpcocktail': require('@/assets/images/shrimpcocktail.png'),
+    'pickledherring': require('@/assets/images/pickledherring.png'),
+    'blue-tbone': require('@/assets/images/blue-tbone.png'),
+    
+    // Specialty items
+    'moonpetal-tea': require('@/assets/images/moonpetal-tea.png'),
+    'stardust-sourdough': require('@/assets/images/stardust-sourdough.png'),
+    'moonproof-loaf': require('@/assets/images/moonproof-loaf.png'),
+    
+    // Cocktails/Drinks
+    'aurora-highball': require('@/assets/images/aurora-highball.png'),
+    'pink-sand-shaker': require('@/assets/images/pink-sand-shaker.png'),
+    'mirage-martini': require('@/assets/images/mirage-martini.png'),
+    'solar-flare-sling': require('@/assets/images/solar-flare-sling.png'),
+    'starlight-sour': require('@/assets/images/starlight-sour.png'),
   };
 
+  // Get food items from actual inventory (food, drink, snack categories)
+  const availableFoods = inventoryState.mainInventory
+    .filter(item => ['food', 'drink', 'snack'].includes(item.category))
+    .map(item => {
+      // Get the image from the map or use default
+      const imageName = item.id || 'cosmicburger';
+      const imageSource = foodImageMap[imageName] || require('@/assets/images/cosmicburger.png');
+      
+      return {
+        id: item.id,
+        name: item.name,
+        stamina: 15, // Default stamina boost - can be enhanced later with item-specific values
+        quantity: item.quantity,
+        image: imageSource
+      };
+    });
+
   const getBackgroundImage = (bgId: string) => {
-    return backgrounds[bgId]?.image || backgrounds.bg1.image;
+    return allBackgrounds[bgId]?.image || allBackgrounds.bg1.image;
+  };
+
+  const getPetImage = (imageName: string) => {
+    const imageMap: { [key: string]: any } = {
+      'tigerguy': require('@/assets/images/tigerguy.png'),
+      'plumeca': require('@/assets/images/plumeca.png'),
+      'coco-guy': require('@/assets/images/coco-guy.png'),
+      'lallazo': require('@/assets/images/lallazo.png'),
+      'robot-guy': require('@/assets/images/robot-guy.png'),
+      'sheep-guy': require('@/assets/images/sheep-guy.png'),
+      'bull-guy': require('@/assets/images/bull-guy.png'),
+      'storm-guy': require('@/assets/images/storm-guy.png'),
+      'fish-guys': require('@/assets/images/fish-guys.png'),
+      'sappo': require('@/assets/images/sappo.png'),
+      'gazo': require('@/assets/images/gazo.png'),
+    };
+    return imageMap[imageName] || require('@/assets/images/tigerguy.png');
   };
 
   const purchaseItem = (item: any, type: string) => {
@@ -129,35 +319,22 @@ export default function PetsScreen() {
   };
 
   const feedSelectedFood = () => {
-    if (selectedFood) {
+    if (selectedFood && activePet) {
+      // Remove food item from inventory
+      removeItem(selectedFood.id, 1);
+      
+      // Feed pet with stamina boost
+      feedPet(activePet.id, selectedFood.stamina);
+      
+      // Close modal and show success
       setShowFeedModal(false);
       setShowFeedSuccess(true);
-      setSelectedFood(null);
       
-      // Hide success message after 2 seconds
+      // Hide success message after 5 seconds
       setTimeout(() => {
         setShowFeedSuccess(false);
-      }, 2000);
-    }
-  };
-
-  // Pagination logic
-  const itemsPerPage = 6;
-  const availableFoods = Object.values(foodInventory).filter(food => food.quantity > 0);
-  const totalPages = Math.ceil(availableFoods.length / itemsPerPage);
-  const startIndex = currentPage * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentPageItems = availableFoods.slice(startIndex, endIndex);
-
-  const nextPage = () => {
-    if (currentPage < totalPages - 1) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
-
-  const prevPage = () => {
-    if (currentPage > 0) {
-      setCurrentPage(currentPage - 1);
+        setSelectedFood(null);
+      }, 5000);
     }
   };
 
@@ -171,11 +348,9 @@ export default function PetsScreen() {
     }
   };
 
-  if (!hydrated) return <View style={styles.container}><Text>Loading...</Text></View>;
-
   return (
     <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView ref={scrollViewRef} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {/* Header Row */}
         <RNView style={styles.headerRow}>
           <Text style={styles.locationTitle}>MY PETS</Text>
@@ -183,126 +358,206 @@ export default function PetsScreen() {
 
         {/* Active Pet Card */}
         <RNView style={styles.activePetCard}>
-          <RNView style={styles.petImageContainer}>
-            <Image
-              source={getBackgroundImage(selectedBackground)}
-              style={styles.petBackgroundImage}
-              resizeMode="cover"
-            />
-            <Image
-              source={pets[activePet].image}
-              style={styles.petImage}
-            />
-            
-            {/* Pet info on left side of image */}
-            <RNView style={styles.petInfoOverlay}>
-              <Text style={styles.petName}>{pets[activePet].name}</Text>
-              <Text style={styles.petLevel}>Level {pets[activePet].level}</Text>
+          {activePet ? (
+            <RNView style={styles.petImageContainer}>
+              <Image
+                source={getBackgroundImage(activePet.background)}
+                style={styles.petBackgroundImage}
+                resizeMode="cover"
+              />
+              <Image
+                source={getPetImage(activePet.image)}
+                style={styles.petImage}
+              />
+              
+              {/* Hearts animation above pet's head when feeding */}
+              {showFeedSuccess && (
+                <Animated.Image
+                  source={require('@/assets/images/pxo-hearts.png')}
+                  style={[
+                    styles.feedHeartsAnimation,
+                    {
+                      opacity: heartsOpacity,
+                      transform: [
+                        { translateY: Animated.add(heartsSlideUp, heartsBob) }
+                      ]
+                    }
+                  ]}
+                  resizeMode="contain"
+                />
+              )}
+              
+              {/* Pet info on left side of image */}
+              <RNView style={styles.petInfoOverlay}>
+                <Text style={styles.petName}>{activePet.name}</Text>
+                <Text style={styles.petLevel}>Level {activePet.level}</Text>
+                <RNView style={styles.petOverlayStaminaRow}>
+                  <FontAwesome name="bolt" size={12} color="#f59e0b" />
+                  <Text style={styles.petOverlayStamina}>{activePet.stamina}</Text>
+                </RNView>
+              </RNView>
+
+              {/* Feed Success Overlay - Appears at bottom of pet image */}
+              {showFeedSuccess && (
+                <RNView style={styles.feedSuccessOverlayInline}>
+                  <Text style={styles.feedSuccessInlineText}>
+                    {activePet?.name} devoured {selectedFood?.name}!
+                  </Text>
+                  <RNView style={styles.feedSuccessInlineStamina}>
+                    <FontAwesome name="bolt" size={12} color="#fbbf24" />
+                    <Text style={styles.feedSuccessInlineStaminaText}>+{selectedFood?.stamina || 0}</Text>
+                  </RNView>
+                </RNView>
+              )}
             </RNView>
-            
-          </RNView>
+          ) : (
+            <RNView style={styles.noPetsContainer}>
+              <FontAwesome name="heart" size={48} color="#8b5cf6" />
+              <Text style={styles.noPetsTitle}>No Pets Adopted</Text>
+              <Text style={styles.noPetsText}>Visit the Nursery to adopt your first pet!</Text>
+              <Pressable 
+                style={styles.nurseryButton}
+                onPress={() => router.push('/(tabs)/nursery')}
+              >
+                <FontAwesome name="leaf" size={16} color="#ffffff" />
+                <Text style={styles.nurseryButtonText}>GO TO NURSERY</Text>
+              </Pressable>
+            </RNView>
+          )}
 
           {/* Action boxes underneath */}
-          <RNView style={styles.actionBoxes}>
-            <Pressable 
-              style={styles.actionBox}
-              onPress={() => {
-                setCurrentPage(0);
-                setShowFeedModal(true);
-              }}
-            >
-              <FontAwesome name="cutlery" size={18} color="#8b5cf6" />
-              <Text style={styles.actionLabel}>FEED</Text>
-            </Pressable>
-            <Pressable style={styles.actionBox}>
-              <FontAwesome name="futbol-o" size={18} color="#8b5cf6" />
-              <Text style={styles.actionLabel}>PLAY</Text>
-            </Pressable>
-            <Pressable style={styles.actionBox}>
-              <FontAwesome name="map" size={18} color="#8b5cf6" />
-              <Text style={styles.actionLabel}>EXPLORE</Text>
-            </Pressable>
-          </RNView>
+          {activePet && (
+            <RNView style={styles.actionBoxes}>
+              <Pressable 
+                style={styles.actionBox}
+                onPress={() => {
+                  if (activePet) {
+                    setCurrentPage(0);
+                    setShowFeedModal(true);
+                  }
+                }}
+              >
+                <FontAwesome name="cutlery" size={18} color="#8b5cf6" />
+                <Text style={styles.actionLabel}>FEED</Text>
+              </Pressable>
+              <Pressable 
+                style={styles.actionBox}
+                onPress={() => {
+                  if (activePet) {
+                    playWithPet(activePet.id);
+                    Alert.alert('Play Time!', `You played with ${activePet.name}! Their happiness increased!`);
+                  }
+                }}
+              >
+                <FontAwesome name="futbol-o" size={18} color="#8b5cf6" />
+                <Text style={styles.actionLabel}>PLAY</Text>
+              </Pressable>
+              <Pressable 
+                style={styles.actionBox}
+                onPress={() => setShowClosetModal(true)}
+              >
+                <FontAwesome name="tags" size={18} color="#8b5cf6" />
+                <Text style={styles.actionLabel}>CLOSET</Text>
+              </Pressable>
+            </RNView>
+          )}
+
+          {/* About Section - Inside the pet card */}
+          {activePet && (
+            <>
+              <Text style={styles.aboutTitle}>ABOUT</Text>
+              <RNView style={styles.aboutContainer}>
+                <RNView style={styles.aboutRow}>
+                  <Text style={styles.aboutLabel}>Personality:</Text>
+                  <Text style={styles.aboutValue}>Shy, Playful</Text>
+                </RNView>
+                <RNView style={styles.aboutRow}>
+                  <Text style={styles.aboutLabel}>Fav Hobby:</Text>
+                  <Text style={styles.aboutValue}>?</Text>
+                </RNView>
+              </RNView>
+            </>
+          )}
+
+          {/* Stats Section - Inside the pet card */}
+          {activePet && (
+            <>
+              <Text style={styles.statsTitle}>STATS</Text>
+              <RNView style={styles.barStatsContainer}>
+                {/* HP First - Colored based on value */}
+                <RNView style={styles.barStatRow}>
+                  <Text style={[styles.barStatLabel, activePet.hp < 30 ? styles.hpLow : styles.hpGood]}>HP</Text>
+                  <RNView style={styles.barStatBar}>
+                    <RNView style={[
+                      styles.barStatFill, 
+                      activePet.hp < 30 ? styles.hpLowFill : styles.hpGoodFill,
+                      { width: `${Math.min(100, (activePet.hp / 100) * 100)}%` }
+                    ]} />
+                  </RNView>
+                  <Text style={[styles.barStatValue, activePet.hp < 30 ? styles.hpLow : styles.hpGood]}>{activePet.hp}</Text>
+                </RNView>
+                <RNView style={styles.barStatRow}>
+                  <Text style={styles.barStatLabel}>ATK</Text>
+                  <RNView style={styles.barStatBar}>
+                    <RNView style={[styles.barStatFill, { width: `${Math.min(100, (activePet.atk / 100) * 100)}%` }]} />
+                  </RNView>
+                  <Text style={styles.barStatValue}>{activePet.atk}</Text>
+                </RNView>
+                <RNView style={styles.barStatRow}>
+                  <Text style={styles.barStatLabel}>DEF</Text>
+                  <RNView style={styles.barStatBar}>
+                    <RNView style={[styles.barStatFill, { width: `${activePet.def}%` }]} />
+                  </RNView>
+                  <Text style={styles.barStatValue}>{activePet.def}</Text>
+                </RNView>
+                <RNView style={styles.barStatRow}>
+                  <Text style={styles.barStatLabel}>SPD</Text>
+                  <RNView style={styles.barStatBar}>
+                    <RNView style={[styles.barStatFill, { width: `${activePet.spd}%` }]} />
+                  </RNView>
+                  <Text style={styles.barStatValue}>{activePet.spd}</Text>
+                </RNView>
+                <RNView style={styles.barStatRow}>
+                  <Text style={styles.barStatLabel}>LUCK</Text>
+                  <RNView style={styles.barStatBar}>
+                    <RNView style={[styles.barStatFill, { width: `${activePet.luck}%` }]} />
+                  </RNView>
+                  <Text style={styles.barStatValue}>{activePet.luck}</Text>
+                </RNView>
+                <RNView style={styles.barStatRow}>
+                  <Text style={styles.barStatLabel}>INT</Text>
+                  <RNView style={styles.barStatBar}>
+                    <RNView style={[styles.barStatFill, { width: `${activePet.int}%` }]} />
+                  </RNView>
+                  <Text style={styles.barStatValue}>{activePet.int}</Text>
+                </RNView>
+                <RNView style={styles.barStatRow}>
+                  <Text style={styles.barStatLabel}>CHARM</Text>
+                  <RNView style={styles.barStatBar}>
+                    <RNView style={[styles.barStatFill, { width: `${activePet.charm}%` }]} />
+                  </RNView>
+                  <Text style={styles.barStatValue}>{activePet.charm}</Text>
+                </RNView>
+                <RNView style={styles.barStatRow}>
+                  <Text style={styles.barStatLabel}>DEX</Text>
+                  <RNView style={styles.barStatBar}>
+                    <RNView style={[styles.barStatFill, { width: `${activePet.dex}%` }]} />
+                  </RNView>
+                  <Text style={styles.barStatValue}>{activePet.dex}</Text>
+                </RNView>
+              </RNView>
+            </>
+          )}
         </RNView>
 
-        {/* Stats Section */}
-        <RNView style={styles.statsCard}>
-          <Text style={styles.sectionTitle}>STATS</Text>
-          <RNView style={styles.barStatsContainer}>
-            <RNView style={styles.barStatRow}>
-              <Text style={styles.barStatLabel}>ATK</Text>
-              <RNView style={styles.barStatBar}>
-                <RNView style={[styles.barStatFill, { width: `${Math.min(100, (state.pet.level * 10) % 100)}%` }]} />
-              </RNView>
-              <Text style={styles.barStatValue}>{Math.min(100, (state.pet.level * 10) % 100)}</Text>
-            </RNView>
-            <RNView style={styles.barStatRow}>
-              <Text style={styles.barStatLabel}>DEF</Text>
-              <RNView style={styles.barStatBar}>
-                <RNView style={[styles.barStatFill, { width: `${Math.min(100, (state.pet.level * 8) % 100)}%` }]} />
-              </RNView>
-              <Text style={styles.barStatValue}>{Math.min(100, (state.pet.level * 8) % 100)}</Text>
-            </RNView>
-            <RNView style={styles.barStatRow}>
-              <Text style={styles.barStatLabel}>SPD</Text>
-              <RNView style={styles.barStatBar}>
-                <RNView style={[styles.barStatFill, { width: `${Math.min(100, (state.pet.level * 12) % 100)}%` }]} />
-              </RNView>
-              <Text style={styles.barStatValue}>{Math.min(100, (state.pet.level * 12) % 100)}</Text>
-            </RNView>
-            <RNView style={styles.barStatRow}>
-              <Text style={styles.barStatLabel}>HP</Text>
-              <RNView style={styles.barStatBar}>
-                <RNView style={[styles.barStatFill, { width: `${Math.min(100, (state.pet.level * 15) % 100)}%` }]} />
-              </RNView>
-              <Text style={styles.barStatValue}>{Math.min(100, (state.pet.level * 15) % 100)}</Text>
-            </RNView>
-            <RNView style={styles.barStatRow}>
-              <Text style={styles.barStatLabel}>LUCK</Text>
-              <RNView style={styles.barStatBar}>
-                <RNView style={[styles.barStatFill, { width: `${Math.min(100, (state.pet.level * 7) % 100)}%` }]} />
-              </RNView>
-              <Text style={styles.barStatValue}>{Math.min(100, (state.pet.level * 7) % 100)}</Text>
-            </RNView>
-            <RNView style={styles.barStatRow}>
-              <Text style={styles.barStatLabel}>INT</Text>
-              <RNView style={styles.barStatBar}>
-                <RNView style={[styles.barStatFill, { width: `${Math.min(100, (state.pet.level * 9) % 100)}%` }]} />
-              </RNView>
-              <Text style={styles.barStatValue}>{Math.min(100, (state.pet.level * 9) % 100)}</Text>
-            </RNView>
-            <RNView style={styles.barStatRow}>
-              <Text style={styles.barStatLabel}>CHARM</Text>
-              <RNView style={styles.barStatBar}>
-                <RNView style={[styles.barStatFill, { width: `${Math.min(100, (state.pet.level * 6) % 100)}%` }]} />
-              </RNView>
-              <Text style={styles.barStatValue}>{Math.min(100, (state.pet.level * 6) % 100)}</Text>
-            </RNView>
-            <RNView style={styles.barStatRow}>
-              <Text style={styles.barStatLabel}>DEX</Text>
-              <RNView style={styles.barStatBar}>
-                <RNView style={[styles.barStatFill, { width: `${Math.min(100, (state.pet.level * 11) % 100)}%` }]} />
-              </RNView>
-              <Text style={styles.barStatValue}>{Math.min(100, (state.pet.level * 11) % 100)}</Text>
-            </RNView>
-          </RNView>
-        </RNView>
-
-        {/* Closet Section */}
-        <RNView style={styles.closetCard}>
-          <Text style={styles.sectionTitle}>CLOSET</Text>
+        {/* Closet Section - Only show if there's an active pet */}
+        {activePet && (
+          <>
+          <Text style={styles.closetTitle}>CLOSET</Text>
+          <RNView style={styles.closetCard}>
           <RNView style={styles.closetContainer}>
             {/* Row 1 */}
             <RNView style={styles.closetRow}>
-              {/* Background Button */}
-              <Pressable 
-                style={styles.equippedItem}
-                onPress={() => setShowBackgroundModal(true)}
-              >
-                <Text style={styles.equippedItemName}>Background</Text>
-                <Text style={styles.equippedItemValue}>{backgrounds[selectedBackground]?.name}</Text>
-              </Pressable>
-
               {/* Weapon */}
               <Pressable 
                 style={styles.equippedItem}
@@ -320,27 +575,6 @@ export default function PetsScreen() {
                 <Text style={styles.equippedItemName}>Accessory</Text>
                 <Text style={styles.equippedItemValue}>{equipment.accessories[equippedAccessory]?.name}</Text>
               </Pressable>
-            </RNView>
-
-            {/* Row 2 */}
-            <RNView style={styles.closetRow}>
-              {/* Hat */}
-              <Pressable 
-                style={styles.equippedItem}
-                onPress={() => purchaseItem({ id: 'none', name: 'None', unlocked: true }, 'hat')}
-              >
-                <Text style={styles.equippedItemName}>Hat</Text>
-                <Text style={styles.equippedItemValue}>None</Text>
-              </Pressable>
-
-              {/* Shoes */}
-              <Pressable 
-                style={styles.equippedItem}
-                onPress={() => purchaseItem({ id: 'none', name: 'None', unlocked: true }, 'shoes')}
-              >
-                <Text style={styles.equippedItemName}>Shoes</Text>
-                <Text style={styles.equippedItemValue}>None</Text>
-              </Pressable>
 
               {/* Glasses */}
               <Pressable 
@@ -352,7 +586,7 @@ export default function PetsScreen() {
               </Pressable>
             </RNView>
 
-            {/* Row 3 */}
+            {/* Row 2 */}
             <RNView style={styles.closetRow}>
               {/* Necklace */}
               <Pressable 
@@ -383,308 +617,303 @@ export default function PetsScreen() {
             </RNView>
           </RNView>
         </RNView>
+        </>
+        )}
 
-        {/* Trophies Section */}
-        <RNView style={styles.trophiesCard}>
-          <Text style={styles.sectionTitle}>TROPHIES</Text>
-          <RNView style={styles.trophiesContainer}>
-            <RNView style={styles.trophyRow}>
-              <RNView style={styles.trophyItem}>
-                <FontAwesome name="trophy" size={20} color="#fbbf24" />
-                <Text style={styles.trophyName}>Speed Champion</Text>
-              </RNView>
-              <RNView style={styles.trophyItem}>
-                <FontAwesome name="star" size={20} color="#f59e0b" />
-                <Text style={styles.trophyName}>Explorer</Text>
-              </RNView>
-              <RNView style={styles.trophyItem}>
-                <FontAwesome name="medal" size={20} color="#8b5cf6" />
-                <Text style={styles.trophyName}>Battle Master</Text>
-              </RNView>
-            </RNView>
-            <RNView style={styles.trophyRow}>
-              <RNView style={styles.trophyItem}>
-                <FontAwesome name="crown" size={20} color="#ec4899" />
-                <Text style={styles.trophyName}>Royal Pet</Text>
-              </RNView>
-              <RNView style={styles.trophyItem}>
-                <FontAwesome name="diamond" size={20} color="#06b6d4" />
-                <Text style={styles.trophyName}>Treasure Hunter</Text>
-              </RNView>
-              <RNView style={styles.trophyItem}>
-                <FontAwesome name="heart" size={20} color="#ef4444" />
-                <Text style={styles.trophyName}>Best Friend</Text>
-              </RNView>
-            </RNView>
-          </RNView>
-        </RNView>
-
-        <Text style={styles.collectionTitle}>ALL PETS</Text>
-        <RNView style={styles.petsCollectionCard}>
-          <RNView style={styles.petsList}>
-            {/* Pet 1 - JUNO */}
-            <Pressable 
-              style={[styles.petListItem, activePet === 'juno' && styles.activePetListItem]}
-              onPress={() => setActivePet('juno')}
-            >
-              <RNView style={styles.petListImageContainer}>
-                <Image source={require('@/assets/images/tigerguy.png')} style={styles.petListImage} />
-              </RNView>
-              <RNView style={styles.petListInfo}>
-                <Text style={styles.petListName}>JUNO</Text>
-                <Text style={styles.petListLevel}>Level {pets.juno.level}</Text>
-                <RNView style={styles.petListStats}>
-                  <Text style={styles.petListStat}>HP: {pets.juno.hp}</Text>
-                  <Text style={styles.petListStat}>ATK: {pets.juno.atk}</Text>
-                </RNView>
-              </RNView>
-              <RNView style={styles.petListActions}>
-                {activePet === 'juno' ? (
-                  <Text style={styles.activeText}>ACTIVE</Text>
-                ) : (
-                  <Pressable style={styles.swapButton}>
-                    <FontAwesome name="exchange" size={14} color="#8b5cf6" />
-                    <Text style={styles.swapButtonText}>SWAP</Text>
-                  </Pressable>
-                )}
-              </RNView>
-            </Pressable>
-
-            {/* Pet 2 - FREKKI */}
-            <Pressable 
-              style={[styles.petListItem, activePet === 'frekki' && styles.activePetListItem]}
-              onPress={() => setActivePet('frekki')}
-            >
-              <RNView style={styles.petListImageContainer}>
-                <Image source={require('@/assets/images/coco-guy.png')} style={styles.petListImage} />
-              </RNView>
-              <RNView style={styles.petListInfo}>
-                <Text style={styles.petListName}>FREKKI</Text>
-                <Text style={styles.petListLevel}>Level {pets.frekki.level}</Text>
-                <RNView style={styles.petListStats}>
-                  <Text style={styles.petListStat}>HP: {pets.frekki.hp}</Text>
-                  <Text style={styles.petListStat}>ATK: {pets.frekki.atk}</Text>
-                </RNView>
-              </RNView>
-              <RNView style={styles.petListActions}>
-                {activePet === 'frekki' ? (
-                  <Text style={styles.activeText}>ACTIVE</Text>
-                ) : (
-                  <Pressable style={styles.swapButton}>
-                    <FontAwesome name="exchange" size={14} color="#8b5cf6" />
-                    <Text style={styles.swapButtonText}>SWAP</Text>
-                  </Pressable>
-                )}
-              </RNView>
-            </Pressable>
-
-            {/* Pet 3 - NOXIA */}
-            <Pressable 
-              style={[styles.petListItem, activePet === 'noxia' && styles.activePetListItem]}
-              onPress={() => setActivePet('noxia')}
-            >
-              <RNView style={styles.petListImageContainer}>
-                <Image source={require('@/assets/images/purple-guy.png')} style={styles.petListImage} />
-              </RNView>
-              <RNView style={styles.petListInfo}>
-                <Text style={styles.petListName}>NOXIA</Text>
-                <Text style={styles.petListLevel}>Level {pets.noxia.level}</Text>
-                <RNView style={styles.petListStats}>
-                  <Text style={styles.petListStat}>HP: {pets.noxia.hp}</Text>
-                  <Text style={styles.petListStat}>ATK: {pets.noxia.atk}</Text>
-                </RNView>
-              </RNView>
-              <RNView style={styles.petListActions}>
-                {activePet === 'noxia' ? (
-                  <Text style={styles.activeText}>ACTIVE</Text>
-                ) : (
-                  <Pressable style={styles.swapButton}>
-                    <FontAwesome name="exchange" size={14} color="#8b5cf6" />
-                    <Text style={styles.swapButtonText}>SWAP</Text>
-                  </Pressable>
-                )}
-              </RNView>
-            </Pressable>
-
-            {/* Pet 4 - TECHNOR */}
-            <Pressable 
-              style={[styles.petListItem, activePet === 'technor' && styles.activePetListItem]}
-              onPress={() => setActivePet('technor')}
-            >
-              <RNView style={styles.petListImageContainer}>
-                <Image source={require('@/assets/images/robot-guy.png')} style={styles.petListImage} />
-              </RNView>
-              <RNView style={styles.petListInfo}>
-                <Text style={styles.petListName}>TECHNOR</Text>
-                <Text style={styles.petListLevel}>Level {pets.technor.level}</Text>
-                <RNView style={styles.petListStats}>
-                  <Text style={styles.petListStat}>HP: {pets.technor.hp}</Text>
-                  <Text style={styles.petListStat}>ATK: {pets.technor.atk}</Text>
-                </RNView>
-              </RNView>
-              <RNView style={styles.petListActions}>
-                {activePet === 'technor' ? (
-                  <Text style={styles.activeText}>ACTIVE</Text>
-                ) : (
-                  <Pressable style={styles.swapButton}>
-                    <FontAwesome name="exchange" size={14} color="#8b5cf6" />
-                    <Text style={styles.swapButtonText}>SWAP</Text>
-                  </Pressable>
-                )}
-              </RNView>
-            </Pressable>
-          </RNView>
-        </RNView>
-      </ScrollView>
-
-      {/* Background Selection Modal */}
-        <Modal
-          visible={showBackgroundModal}
-          animationType="fade"
-          transparent={true}
-        >
-        <View style={styles.modalContainer}>
-          <RNView style={styles.modalContentWrapper}>
-            <RNView style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>BACKGROUND COLLECTION</Text>
-              <Pressable 
-                style={styles.closeButton}
-                onPress={() => setShowBackgroundModal(false)}
-              >
-                <FontAwesome name="times" size={20} color="#0ea5e9" />
-              </Pressable>
-            </RNView>
-            
-            <ScrollView style={styles.modalContent}>
-              <RNView style={styles.backgroundCollection}>
-                {Object.values(backgrounds)
-                  .filter(bg => bg.unlocked)
-                  .map((bg) => (
-                  <Pressable
-                    key={bg.id}
-                    style={[
-                      styles.backgroundCard,
-                      selectedBackground === bg.id && styles.selectedBackgroundCard
-                    ]}
-                    onPress={() => {
-                      setSelectedBackground(bg.id);
-                      setShowBackgroundModal(false);
-                    }}
+        {/* Only show Adopted Pets section if there's at least 1 pet */}
+        {petState.adoptedPets.length > 0 && (
+          <>
+            <Text style={styles.collectionTitle}>ALL PETS ({petState.adoptedPets.length}/{petState.maxPets})</Text>
+            <RNView style={styles.petsCollectionCard}>
+              <RNView style={styles.petsList}>
+                {petState.adoptedPets.map((pet) => (
+                  <Pressable 
+                    key={pet.id}
+                    style={[styles.petListItem, activePet?.id === pet.id && styles.activePetListItem]}
+                    onPress={() => setActivePet(pet.id)}
                   >
-                    <Image source={bg.image} style={styles.backgroundPreview} />
-                    <RNView style={styles.backgroundInfo}>
-                      <Text style={styles.backgroundCardName}>
-                        {bg.name}
-                      </Text>
-                      <Text style={[
-                        styles.backgroundRarity,
-                        { color: getRarityColor(bg.rarity) }
-                      ]}>
-                        {bg.rarity.toUpperCase()}
-                      </Text>
-                      <FontAwesome 
-                        name="check-circle" 
-                        size={16} 
-                        color="#10b981" 
-                        style={styles.unlockedIcon}
-                      />
+                    <Image source={getPetImage(pet.image)} style={styles.petListImage} />
+                    <RNView style={styles.petListInfo}>
+                      <Text style={styles.petListName}>{pet.name}</Text>
+                      <Text style={styles.petListLevel}>Level {pet.level}</Text>
+                      <RNView style={styles.petStaminaRow}>
+                        <FontAwesome name="bolt" size={12} color="#f59e0b" />
+                        <Text style={styles.petStaminaText}>{pet.stamina}</Text>
+                      </RNView>
+                    </RNView>
+                    <RNView style={styles.petListActions}>
+                      {activePet?.id === pet.id ? (
+                        <RNView style={styles.activeButton}>
+                          <Text style={styles.activeText}>ACTIVE</Text>
+                        </RNView>
+                      ) : (
+                        <Pressable style={styles.swapButton}>
+                          <FontAwesome name="exchange" size={14} color="#8b5cf6" />
+                          <Text style={styles.swapButtonText}>SWAP</Text>
+                        </Pressable>
+                      )}
                     </RNView>
                   </Pressable>
                 ))}
+                
+                {/* Add Pet Button - Show if under limit */}
+                {canAdoptMore() && (
+                  <Pressable 
+                    style={styles.addPetButton}
+                    onPress={() => router.push('/(tabs)/nursery')}
+                  >
+                    <FontAwesome name="plus" size={16} color="rgba(139, 92, 246, 0.4)" />
+                    <Text style={styles.addPetText}>ADOPT</Text>
+                  </Pressable>
+                )}
               </RNView>
-            </ScrollView>
-          </RNView>
-        </View>
-      </Modal>
+            </RNView>
+          </>
+        )}
 
-      {/* Food Selection Modal */}
+        {/* Dev Mode Reset Button */}
+        {petState.devMode && (
+          <RNView style={styles.devModeCard}>
+            <Text style={styles.devModeTitle}>DEV MODE</Text>
+            <Pressable 
+              style={styles.resetButton}
+              onPress={() => {
+                Alert.alert(
+                  'Reset All Pets',
+                  'This will permanently delete all adopted pets. Are you sure?',
+                  [
+                    { text: 'Cancel', style: 'cancel' },
+                    {
+                      text: 'Reset',
+                      style: 'destructive',
+                      onPress: () => {
+                        resetAllPets();
+                        Alert.alert('Reset Complete', 'All pets have been removed!');
+                      }
+                    }
+                  ]
+                );
+              }}
+            >
+              <FontAwesome name="trash" size={16} color="#ef4444" />
+              <Text style={styles.resetButtonText}>RESET ALL PETS</Text>
+            </Pressable>
+          </RNView>
+        )}
+      </ScrollView>
+
+      {/* Closet Modal */}
       <Modal
-        visible={showFeedModal}
-        animationType="fade"
+        visible={showClosetModal}
+        animationType="slide"
         transparent={true}
       >
-        <View style={styles.modalContainer}>
-          <RNView style={styles.modalContentWrapper}>
-            <RNView style={styles.modalHeader}>
+        <RNView style={styles.closetModalOverlay}>
+          <RNView style={styles.closetModalContainer}>
+            {/* Header */}
+            <RNView style={styles.closetModalHeader}>
+              <Text style={styles.closetModalTitle}>CLOSET</Text>
               <Pressable 
-                style={styles.closeButton}
-                onPress={() => setShowFeedModal(false)}
+                style={styles.closetCloseButton}
+                onPress={() => setShowClosetModal(false)}
               >
-                <FontAwesome name="times" size={14} color="#8b5cf6" />
+                <FontAwesome name="times" size={24} color="#64748b" />
               </Pressable>
             </RNView>
             
-            <RNView style={styles.paginationContainer}>
-              {/* Food Grid and Arrow Row */}
-              <RNView style={styles.foodAndArrowRow}>
-                <RNView style={styles.foodGrid}>
-                  {currentPageItems.map((food) => (
+            {/* Tabs */}
+            <RNView style={styles.closetModalTabs}>
+              <Pressable 
+                style={[styles.closetModalTab, closetTab === 'backgrounds' && styles.closetModalTabActive]}
+                onPress={() => setClosetTab('backgrounds')}
+              >
+                <Text style={[styles.closetModalTabText, closetTab === 'backgrounds' && styles.closetModalTabTextActive]}>
+                  BACKGROUNDS
+                </Text>
+              </Pressable>
+              <Pressable 
+                style={[styles.closetModalTab, closetTab === 'skins' && styles.closetModalTabActive]}
+                onPress={() => setClosetTab('skins')}
+              >
+                <Text style={[styles.closetModalTabText, closetTab === 'skins' && styles.closetModalTabTextActive]}>
+                  SKINS
+                </Text>
+              </Pressable>
+              <Pressable 
+                style={[styles.closetModalTab, closetTab === 'subpxos' && styles.closetModalTabActive]}
+                onPress={() => setClosetTab('subpxos')}
+              >
+                <Text style={[styles.closetModalTabText, closetTab === 'subpxos' && styles.closetModalTabTextActive]}>
+                  SUBPXOS
+                </Text>
+              </Pressable>
+            </RNView>
+            
+            {/* Content */}
+            <ScrollView 
+              style={styles.closetModalScrollView}
+              contentContainerStyle={styles.closetModalContent}
+            >
+              {/* Backgrounds Tab */}
+              {closetTab === 'backgrounds' && (
+                <>
+                  {ownedBackgrounds.length > 0 ? (
+                    ownedBackgrounds.map((bg) => {
+                      const bgOwner = getBackgroundOwner(bg.id);
+                      const isEquippedToCurrentPet = activePet?.background === bg.id;
+                      const isEquippedToOtherPet = bgOwner && bgOwner.id !== activePet?.id;
+                      
+                      return (
+                        <Pressable
+                          key={bg.id}
+                          style={[
+                            styles.closetBgCard,
+                            isEquippedToCurrentPet && styles.closetBgCardSelected,
+                            isEquippedToOtherPet && styles.closetBgCardDisabled
+                          ]}
+                          onPress={() => {
+                            if (activePet && !isEquippedToOtherPet) {
+                              const success = updatePetBackground(activePet.id, bg.id);
+                              if (success) {
+                                setShowClosetModal(false);
+                              } else {
+                                Alert.alert('Already Equipped', 'This background is equipped to another pet!');
+                              }
+                            }
+                          }}
+                          disabled={isEquippedToOtherPet}
+                        >
+                          <RNView style={styles.closetBgImageContainer}>
+                            <Image source={bg.image} style={styles.closetBgImage} />
+                            {isEquippedToOtherPet && (
+                              <RNView style={styles.equippedBadgeOverlay}>
+                                <Text style={styles.equippedBadgeText}>EQUIPPED</Text>
+                              </RNView>
+                            )}
+                          </RNView>
+                          <RNView style={styles.closetBgInfo}>
+                            <Text style={styles.closetBgName}>{bg.name}</Text>
+                            {isEquippedToCurrentPet && (
+                              <FontAwesome name="check-circle" size={18} color="#8b5cf6" />
+                            )}
+                          </RNView>
+                        </Pressable>
+                      );
+                    })
+                  ) : (
+                    <RNView style={styles.closetEmptyState}>
+                      <Text style={styles.closetEmptyText}>No backgrounds owned yet. Visit the shop!</Text>
+                    </RNView>
+                  )}
+                </>
+              )}
+
+              {/* Skins Tab */}
+              {closetTab === 'skins' && (
+                <RNView style={styles.closetEmptyState}>
+                  <Text style={styles.closetEmptyText}>No skins available yet. Coming soon!</Text>
+                </RNView>
+              )}
+
+              {/* SubPxos Tab */}
+              {closetTab === 'subpxos' && (
+                <RNView style={styles.closetEmptyState}>
+                  <Text style={styles.closetEmptyText}>No SubPxos available yet. Pets for your Pxopet coming soon!</Text>
+                </RNView>
+              )}
+            </ScrollView>
+          </RNView>
+        </RNView>
+      </Modal>
+
+      {/* Food Selection Modal - Sleek Co-Star Style */}
+      <Modal
+        visible={showFeedModal}
+        animationType="slide"
+        transparent={true}
+      >
+        <RNView style={styles.feedModalOverlay}>
+          <RNView style={styles.feedModalContainer}>
+            {/* Header */}
+            <RNView style={styles.feedModalHeader}>
+              <Text style={styles.feedModalTitle}>FEED {activePet?.name.toUpperCase()}</Text>
+              <Pressable 
+                style={styles.feedCloseButton}
+                onPress={() => {
+                  setShowFeedModal(false);
+                  setSelectedFood(null);
+                }}
+              >
+                <FontAwesome name="times" size={20} color="#64748b" />
+              </Pressable>
+            </RNView>
+
+            {/* Food Grid */}
+            <ScrollView style={styles.feedModalScrollView} contentContainerStyle={styles.feedModalContent}>
+              {availableFoods.length > 0 ? (
+                <RNView style={styles.feedGrid}>
+                  {availableFoods.map((food) => (
                     <Pressable
                       key={food.id}
                       style={[
-                        styles.foodCard,
-                        selectedFood?.id === food.id && styles.selectedFoodCard
+                        styles.feedCard,
+                        selectedFood?.id === food.id && styles.feedCardSelected
                       ]}
                       onPress={() => selectFood(food)}
                     >
-                      <Text style={styles.foodQuantity}>x{food.quantity}</Text>
-                      <RNView style={styles.foodInfo}>
-                        <Image source={food.image} style={styles.foodImage} />
-                        <Text style={styles.foodName}>{food.name}</Text>
-                        <RNView style={styles.staminaContainer}>
-                          <Text style={styles.foodStamina}>+{food.stamina}</Text>
-                          <FontAwesome name="bolt" size={8} color="#fbbf24" />
-                        </RNView>
+                      <Image source={food.image} style={styles.feedImage} />
+                      <Text style={styles.feedName}>{food.name}</Text>
+                      <Text style={styles.feedQuantity}>x{food.quantity}</Text>
+                      <RNView style={styles.feedStaminaTag}>
+                        <FontAwesome name="bolt" size={10} color="#fbbf24" />
+                        <Text style={styles.feedStaminaText}>+{food.stamina}</Text>
                       </RNView>
                     </Pressable>
                   ))}
                 </RNView>
-
-                {/* Single Arrow - Right when on first page, Left when on other pages */}
-                {totalPages > 1 && (
+              ) : (
+                <RNView style={styles.emptyFoodState}>
+                  <FontAwesome name="frown-o" size={40} color="rgba(139, 92, 246, 0.3)" style={{ marginBottom: 16 }} />
+                  <Text style={styles.emptyFoodText}>No food in inventory</Text>
+                  <Text style={styles.emptyFoodSubtext}>Play games or visit shops to get food!</Text>
                   <Pressable 
-                    style={styles.arrowButton}
-                    onPress={currentPage === 0 ? nextPage : prevPage}
+                    style={styles.exploreButton}
+                    onPress={() => {
+                      setShowFeedModal(false);
+                      router.push('/(tabs)/explore');
+                    }}
                   >
-                    <FontAwesome 
-                      name={currentPage === 0 ? "chevron-right" : "chevron-left"} 
-                      size={18} 
-                      color="#14b8a6" 
-                    />
+                    <FontAwesome name="compass" size={14} color="#ffffff" />
+                    <Text style={styles.exploreButtonText}>Go to Explore</Text>
                   </Pressable>
-                )}
-              </RNView>
+                </RNView>
+              )}
+            </ScrollView>
 
-              {/* Feed Pet Button - Centered with inventory */}
-              <Pressable 
-                style={[
-                  styles.feedButton,
-                  !selectedFood && styles.feedButtonDisabled
-                ]}
-                onPress={feedSelectedFood}
-                disabled={!selectedFood}
-              >
-                <Text style={[
-                  styles.feedButtonText,
-                  !selectedFood && styles.feedButtonTextDisabled
-                ]}>
-                  FEED PET
-                </Text>
-              </Pressable>
-            </RNView>
+            {/* Feed Button */}
+            {availableFoods.length > 0 && (
+              <RNView style={styles.feedModalFooter}>
+                <Pressable 
+                  style={[
+                    styles.feedModalButton,
+                    !selectedFood && styles.feedModalButtonDisabled
+                  ]}
+                  onPress={feedSelectedFood}
+                  disabled={!selectedFood}
+                >
+                  <Text style={[
+                    styles.feedModalButtonText,
+                    !selectedFood && styles.feedModalButtonTextDisabled
+                  ]}>
+                    SELECT
+                  </Text>
+                </Pressable>
+              </RNView>
+            )}
           </RNView>
-        </View>
+        </RNView>
       </Modal>
 
-      {/* Feed Success Message */}
-      {showFeedSuccess && (
-        <View style={styles.successOverlay}>
-          <View style={styles.successMessage}>
-            <Text style={styles.successText}>Pet Fed!</Text>
-            <Text style={styles.successStamina}>+{selectedFood?.stamina || 0} ⚡</Text>
-          </View>
-        </View>
-      )}
     </View>
   );
 }
@@ -694,17 +923,25 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#ffffff',
   },
+  loadingText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 14,
+    color: '#8b5cf6',
+    textAlign: 'center',
+    marginTop: 100,
+  },
   scrollContent: {
-    padding: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 20,
     paddingBottom: 100,
   },
   headerRow: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 10,
-    marginBottom: 8,
-    paddingHorizontal: 40,
-    height: 40,
+    marginTop: -8,
+    marginBottom: 4,
+    paddingHorizontal: 20,
+    height: 32,
   },
   locationTitle: {
     fontFamily: 'PressStart2P_400Regular',
@@ -725,11 +962,12 @@ const styles = StyleSheet.create({
     textAlign: 'left',
   },
   activePetCard: {
-    width: '95%',
+    width: '100%',
     alignSelf: 'center',
     backgroundColor: 'rgba(255, 255, 255, 0.98)',
     borderRadius: 16,
-    padding: 20,
+    padding: 16,
+    marginTop: 0,
     marginBottom: 20,
     borderWidth: 1,
     borderColor: 'rgba(139, 92, 246, 0.3)',
@@ -748,7 +986,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(139, 92, 246, 0.05)',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 16,
+    marginBottom: 4,
     padding: 0,
     position: 'relative',
     overflow: 'hidden',
@@ -800,23 +1038,15 @@ const styles = StyleSheet.create({
       marginBottom: 4,
       alignSelf: 'center',
     },
-    closetTitle: {
-      fontFamily: 'PressStart2P_400Regular',
-      fontSize: 10,
-      fontWeight: 'bold',
-      color: '#0f172a',
-      textAlign: 'center',
-      marginBottom: 2,
-      alignSelf: 'center',
-    },
     closetContainer: {
-      padding: 6,
-      minHeight: 160,
+      padding: 4,
+      minHeight: 100,
     },
     closetRow: {
       flexDirection: 'row',
       justifyContent: 'space-between',
-      marginBottom: 2,
+      gap: 8,
+      marginBottom: 8,
     },
     closetSubtitle: {
       fontFamily: 'Silkscreen_400Regular',
@@ -890,16 +1120,18 @@ const styles = StyleSheet.create({
   actionBoxes: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    gap: 12,
-    marginTop: 8,
+    gap: 10,
+    marginTop: 4,
+    marginBottom: 16,
   },
   actionBox: {
-    borderWidth: 1,
-    borderColor: 'rgba(139, 92, 246, 0.3)',
-    backgroundColor: 'rgba(139, 92, 246, 0.05)',
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    borderRadius: 12,
+    flex: 1,
+    borderWidth: 1.5,
+    borderColor: 'rgba(139, 92, 246, 0.4)',
+    backgroundColor: 'rgba(139, 92, 246, 0.08)',
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'column',
@@ -923,7 +1155,7 @@ const styles = StyleSheet.create({
     width: 110,
     height: 110,
     imageRendering: 'pixelated' as any,
-    marginTop: 40,
+    marginTop: 50,
   },
   petName: {
     fontFamily: 'Silkscreen_400Regular',
@@ -1083,13 +1315,14 @@ const styles = StyleSheet.create({
   },
   barStatsContainer: {
     width: '100%',
-    marginBottom: 16,
+    marginBottom: 12,
+    paddingHorizontal: 4,
   },
     barStatRow: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      marginBottom: 6,
+      marginBottom: 8,
       paddingHorizontal: 10,
     },
     barStatLabel: {
@@ -1128,13 +1361,12 @@ const styles = StyleSheet.create({
       alignItems: 'center',
       justifyContent: 'center',
       padding: 8,
-      backgroundColor: 'rgba(14, 165, 233, 0.05)',
-      borderRadius: 6,
+      backgroundColor: 'rgba(139, 92, 246, 0.03)',
+      borderRadius: 8,
       borderWidth: 1,
-      borderColor: 'rgba(14, 165, 233, 0.2)',
-      minHeight: 50,
+      borderColor: 'rgba(139, 92, 246, 0.2)',
+      minHeight: 45,
       flex: 1,
-      marginHorizontal: 2,
     },
     equippedItemName: {
       fontFamily: 'Silkscreen_400Regular',
@@ -1169,6 +1401,141 @@ const styles = StyleSheet.create({
       shadowRadius: 8,
       elevation: 8,
     },
+    // New Closet Modal Styles
+    closetModalOverlay: {
+      flex: 1,
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      justifyContent: 'flex-end',
+    },
+    closetModalContainer: {
+      backgroundColor: '#ffffff',
+      borderTopLeftRadius: 24,
+      borderTopRightRadius: 24,
+      height: '80%',
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: -4 },
+      shadowOpacity: 0.1,
+      shadowRadius: 12,
+      elevation: 20,
+    },
+    closetModalHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: 20,
+      paddingTop: 20,
+      paddingBottom: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: '#f1f5f9',
+    },
+    closetModalTitle: {
+      fontFamily: 'Silkscreen_400Regular',
+      fontSize: 16,
+      color: '#0f172a',
+      fontWeight: 'bold',
+    },
+    closetModalCloseButton: {
+      padding: 4,
+    },
+    closetModalTabs: {
+      flexDirection: 'row',
+      paddingHorizontal: 20,
+      paddingVertical: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: '#f1f5f9',
+    },
+    closetModalTab: {
+      flex: 1,
+      paddingVertical: 10,
+      alignItems: 'center',
+      borderBottomWidth: 3,
+      borderBottomColor: 'transparent',
+    },
+    closetModalTabActive: {
+      borderBottomColor: '#8b5cf6',
+    },
+    closetModalTabText: {
+      fontFamily: 'Silkscreen_400Regular',
+      fontSize: 10,
+      color: '#94a3b8',
+      fontWeight: 'bold',
+    },
+    closetModalTabTextActive: {
+      color: '#8b5cf6',
+    },
+    closetModalScrollView: {
+      flex: 1,
+    },
+    closetModalContent: {
+      padding: 20,
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 12,
+    },
+    closetBgCard: {
+      width: '47%',
+      backgroundColor: '#f8fafc',
+      borderRadius: 12,
+      borderWidth: 2,
+      borderColor: '#e2e8f0',
+      overflow: 'hidden',
+    },
+  closetBgCardSelected: {
+    borderColor: '#8b5cf6',
+    borderWidth: 3,
+  },
+  closetBgCardDisabled: {
+    opacity: 0.5,
+    borderColor: '#94a3b8',
+  },
+  closetBgImageContainer: {
+    position: 'relative',
+    width: '100%',
+  },
+  closetBgImage: {
+      width: '100%',
+      height: 100,
+      resizeMode: 'cover',
+    },
+    closetBgInfo: {
+      padding: 12,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      backgroundColor: '#ffffff',
+    },
+    closetBgName: {
+      fontFamily: 'Silkscreen_400Regular',
+      fontSize: 10,
+      color: '#0f172a',
+      fontWeight: 'bold',
+    },
+  closetEmptyState: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 60,
+  },
+  equippedBadgeOverlay: {
+    position: 'absolute',
+    top: 6,
+    right: 6,
+    backgroundColor: '#94a3b8',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  equippedBadgeText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 8,
+    color: '#ffffff',
+    fontWeight: 'bold',
+  },
     modalHeader: {
       flexDirection: 'row',
       justifyContent: 'center',
@@ -1427,6 +1794,52 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     alignSelf: 'center',
   },
+  aboutTitle: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 9,
+    fontWeight: 'bold',
+    color: '#8b5cf6',
+    textAlign: 'center',
+    marginTop: 8,
+    marginBottom: 10,
+  },
+  aboutContainer: {
+    width: '95%',
+    alignSelf: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.98)',
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.3)',
+    gap: 8,
+  },
+  aboutRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  aboutLabel: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#64748b',
+    fontWeight: 'bold',
+  },
+  aboutValue: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#0f172a',
+    fontWeight: 'bold',
+  },
+  statsTitle: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 9,
+    fontWeight: 'bold',
+    color: '#8b5cf6',
+    textAlign: 'center',
+    marginTop: 8,
+    marginBottom: 10,
+  },
   statsCard: {
     width: '95%',
     alignSelf: 'center',
@@ -1442,12 +1855,21 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 5,
   },
+  closetTitle: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#8b5cf6',
+    textAlign: 'center',
+    marginBottom: 16,
+    alignSelf: 'center',
+  },
   closetCard: {
     width: '95%',
     alignSelf: 'center',
     backgroundColor: 'rgba(255, 255, 255, 0.98)',
-    borderRadius: 16,
-    padding: 20,
+    borderRadius: 12,
+    padding: 12,
     marginBottom: 20,
     borderWidth: 1,
     borderColor: 'rgba(139, 92, 246, 0.3)',
@@ -1518,13 +1940,13 @@ const styles = StyleSheet.create({
     marginRight: 16,
   },
   petListImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 45,
+    height: 45,
     imageRendering: 'pixelated' as any,
   },
   petListInfo: {
     flex: 1,
+    marginLeft: 16,
   },
   petListName: {
     fontFamily: 'Silkscreen_400Regular',
@@ -1538,7 +1960,19 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#8b5cf6',
     fontWeight: '600',
-    marginBottom: 8,
+    marginBottom: 2,
+  },
+  petStaminaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginTop: 2,
+  },
+  petStaminaText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 11,
+    color: '#f59e0b',
+    fontWeight: 'bold',
   },
   petListStats: {
     flexDirection: 'row',
@@ -1557,15 +1991,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  activeButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(139, 92, 246, 0.2)',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.3)',
+  },
   activeText: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 10,
     color: '#8b5cf6',
     fontWeight: 'bold',
-    backgroundColor: 'rgba(139, 92, 246, 0.2)',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
   },
   swapButton: {
     flexDirection: 'row',
@@ -1583,6 +2023,173 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: '#8b5cf6',
     fontWeight: '600',
+  },
+  // Pet System Styles
+  noPetsContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 40,
+  },
+  noPetsTitle: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 14,
+    color: '#8b5cf6',
+    fontWeight: 'bold',
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  noPetsText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 12,
+    color: '#64748b',
+    textAlign: 'center',
+  },
+  petHappiness: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#ef4444',
+    fontWeight: 'bold',
+  },
+  petOverlayStaminaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginTop: 2,
+  },
+  petOverlayStamina: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#f59e0b',
+    fontWeight: 'bold',
+  },
+  noAdoptedPetsContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 40,
+  },
+  noAdoptedPetsTitle: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 12,
+    color: '#8b5cf6',
+    fontWeight: 'bold',
+    marginTop: 12,
+    marginBottom: 8,
+  },
+  noAdoptedPetsText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#64748b',
+    textAlign: 'center',
+  },
+  devModeCard: {
+    width: '95%',
+    alignSelf: 'center',
+    backgroundColor: 'rgba(239, 68, 68, 0.05)',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(239, 68, 68, 0.3)',
+    shadowColor: '#ef4444',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  devModeTitle: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 10,
+    color: '#ef4444',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  resetButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(239, 68, 68, 0.3)',
+    gap: 8,
+  },
+  resetButtonText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#ef4444',
+    fontWeight: '600',
+  },
+  // Nursery Button Styles
+  nurseryButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#8b5cf6',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 12,
+    marginTop: 16,
+    borderWidth: 2,
+    borderColor: '#7c3aed',
+    shadowColor: '#8b5cf6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 5,
+    gap: 8,
+  },
+  nurseryButtonText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 12,
+    color: '#ffffff',
+    fontWeight: 'bold',
+  },
+  nurseryButtonSmall: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#8b5cf6',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 10,
+    marginTop: 12,
+    borderWidth: 1,
+    borderColor: '#7c3aed',
+    shadowColor: '#8b5cf6',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+    gap: 6,
+  },
+  nurseryButtonTextSmall: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#ffffff',
+    fontWeight: 'bold',
+  },
+  // Add Pet Button
+  addPetButton: {
+    width: '100%',
+    minHeight: 50,
+    backgroundColor: 'rgba(139, 92, 246, 0.03)',
+    borderRadius: 12,
+    borderWidth: 1.5,
+    borderColor: 'rgba(139, 92, 246, 0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 8,
+    flexDirection: 'column',
+    gap: 4,
+  },
+  addPetText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 9,
+    color: 'rgba(139, 92, 246, 0.6)',
+    fontWeight: 'bold',
   },
     // Trophies Styles
     trophiesContainer: {
@@ -1606,6 +2213,280 @@ const styles = StyleSheet.create({
       color: '#0f172a',
       textAlign: 'center',
       marginTop: 2,
+    },
+    // Feed Modal - Co-Star Style
+    feedModalOverlay: {
+      flex: 1,
+      backgroundColor: 'rgba(0, 0, 0, 0.6)',
+      justifyContent: 'flex-end',
+    },
+    feedModalContainer: {
+      backgroundColor: '#ffffff',
+      borderTopLeftRadius: 24,
+      borderTopRightRadius: 24,
+      minHeight: '70%',
+      maxHeight: '85%',
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: -4 },
+      shadowOpacity: 0.2,
+      shadowRadius: 12,
+      elevation: 10,
+    },
+    feedModalHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: 20,
+      paddingTop: 16,
+      paddingBottom: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: '#f1f5f9',
+    },
+    feedModalTitle: {
+      fontFamily: 'PressStart2P_400Regular',
+      fontSize: 13,
+      color: '#8b5cf6',
+      fontWeight: 'bold',
+    },
+    feedCloseButton: {
+      padding: 8,
+      marginTop: -4,
+    },
+    feedModalScrollView: {
+      flex: 1,
+    },
+    feedModalContent: {
+      padding: 20,
+    },
+    feedGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 10,
+    },
+    feedCard: {
+      width: '47%',
+      backgroundColor: '#f8fafc',
+      borderRadius: 12,
+      padding: 12,
+      alignItems: 'center',
+      borderWidth: 2,
+      borderColor: '#e2e8f0',
+    },
+    feedCardSelected: {
+      borderColor: '#8b5cf6',
+      backgroundColor: 'rgba(139, 92, 246, 0.05)',
+      borderWidth: 3,
+    },
+    feedImage: {
+      width: 48,
+      height: 48,
+      marginBottom: 6,
+      imageRendering: 'pixelated' as any,
+    },
+    feedName: {
+      fontFamily: 'Silkscreen_400Regular',
+      fontSize: 9,
+      color: '#0f172a',
+      fontWeight: 'bold',
+      textAlign: 'center',
+      marginBottom: 3,
+    },
+    feedQuantity: {
+      fontFamily: 'Silkscreen_400Regular',
+      fontSize: 8,
+      color: '#64748b',
+      marginBottom: 6,
+    },
+    feedStaminaTag: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 3,
+      backgroundColor: 'rgba(251, 191, 36, 0.1)',
+      paddingHorizontal: 6,
+      paddingVertical: 3,
+      borderRadius: 6,
+    },
+    feedStaminaText: {
+      fontFamily: 'Silkscreen_400Regular',
+      fontSize: 8,
+      color: '#f59e0b',
+      fontWeight: 'bold',
+    },
+    emptyFoodState: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: 80,
+      paddingHorizontal: 40,
+    },
+    emptyFoodText: {
+      fontFamily: 'PressStart2P_400Regular',
+      fontSize: 11,
+      color: '#8b5cf6',
+      marginBottom: 16,
+      textAlign: 'center',
+      lineHeight: 20,
+    },
+    emptyFoodSubtext: {
+      fontFamily: 'Silkscreen_400Regular',
+      fontSize: 11,
+      color: '#64748b',
+      textAlign: 'center',
+      marginBottom: 20,
+    },
+    exploreButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: '#8b5cf6',
+      paddingVertical: 12,
+      paddingHorizontal: 20,
+      borderRadius: 10,
+      gap: 8,
+      shadowColor: '#8b5cf6',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.3,
+      shadowRadius: 4,
+      elevation: 3,
+    },
+    exploreButtonText: {
+      fontFamily: 'Silkscreen_400Regular',
+      fontSize: 12,
+      color: '#ffffff',
+      fontWeight: '600',
+    },
+    feedModalFooter: {
+      padding: 20,
+      paddingBottom: 32,
+      borderTopWidth: 0,
+      backgroundColor: '#ffffff',
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: -2 },
+      shadowOpacity: 0.05,
+      shadowRadius: 8,
+      elevation: 5,
+    },
+    feedModalButton: {
+      backgroundColor: '#8b5cf6',
+      paddingVertical: 18,
+      borderRadius: 16,
+      alignItems: 'center',
+      shadowColor: '#8b5cf6',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.3,
+      shadowRadius: 8,
+      elevation: 4,
+    },
+    feedModalButtonDisabled: {
+      backgroundColor: '#cbd5e1',
+      shadowColor: '#64748b',
+      shadowOpacity: 0.1,
+    },
+    feedModalButtonText: {
+      fontFamily: 'PressStart2P_400Regular',
+      fontSize: 12,
+      color: '#ffffff',
+      fontWeight: 'bold',
+      letterSpacing: 1,
+    },
+    feedModalButtonTextDisabled: {
+      color: '#94a3b8',
+    },
+    // Feed Success - Redesigned
+    feedSuccessOverlay: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.7)',
+      justifyContent: 'center',
+      alignItems: 'center',
+      zIndex: 1000,
+    },
+    feedSuccessCard: {
+      backgroundColor: '#ffffff',
+      borderRadius: 20,
+      padding: 32,
+      alignItems: 'center',
+      shadowColor: '#8b5cf6',
+      shadowOffset: { width: 0, height: 8 },
+      shadowOpacity: 0.3,
+      shadowRadius: 16,
+      elevation: 10,
+      minWidth: 280,
+    },
+    feedSuccessTitle: {
+      fontFamily: 'Silkscreen_400Regular',
+      fontSize: 14,
+      color: '#0f172a',
+      textAlign: 'center',
+      marginBottom: 8,
+    },
+    feedSuccessItem: {
+      fontFamily: 'PressStart2P_400Regular',
+      fontSize: 12,
+      color: '#8b5cf6',
+      textAlign: 'center',
+      marginBottom: 16,
+    },
+    feedSuccessStamina: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+      backgroundColor: 'rgba(251, 191, 36, 0.1)',
+      paddingHorizontal: 16,
+      paddingVertical: 8,
+      borderRadius: 12,
+    },
+    feedSuccessStaminaText: {
+      fontFamily: 'Silkscreen_400Regular',
+      fontSize: 16,
+      color: '#f59e0b',
+      fontWeight: 'bold',
+    },
+    // Feed Success Inline Overlay - Appears at bottom of pet image
+    feedSuccessOverlayInline: {
+      position: 'absolute',
+      bottom: 0,
+      left: 0,
+      right: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.7)',
+      paddingVertical: 8,
+      paddingHorizontal: 12,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      borderBottomLeftRadius: 12,
+      borderBottomRightRadius: 12,
+    },
+    feedSuccessInlineText: {
+      fontFamily: 'Silkscreen_400Regular',
+      fontSize: 9,
+      color: '#ffffff',
+      fontWeight: 'bold',
+      flex: 1,
+      marginRight: 8,
+    },
+    feedSuccessInlineStamina: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 3,
+    },
+    feedSuccessInlineStaminaText: {
+      fontFamily: 'Silkscreen_400Regular',
+      fontSize: 9,
+      color: '#fbbf24',
+      fontWeight: 'bold',
+    },
+    // Hearts animation that appears above pet's head
+    feedHeartsAnimation: {
+      position: 'absolute',
+      top: 50,
+      left: '52%',
+      marginLeft: -25,
+      width: 50,
+      height: 50,
+      imageRendering: 'pixelated' as any,
+      zIndex: 10,
     },
     successOverlay: {
       position: 'absolute',
@@ -1641,6 +2522,127 @@ const styles = StyleSheet.create({
       color: '#ffffff',
       fontSize: 14,
       fontWeight: 'bold',
+    },
+    // HP Color Styles
+    hpGood: {
+      color: '#22c55e',
+    },
+    hpLow: {
+      color: '#ef4444',
+    },
+    hpGoodFill: {
+      backgroundColor: '#22c55e',
+    },
+    hpLowFill: {
+      backgroundColor: '#ef4444',
+    },
+    // Closet Modal Styles - Co-Star Chic
+    closetHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: 24,
+      paddingVertical: 20,
+      borderBottomWidth: 1,
+      borderBottomColor: '#f1f5f9',
+    },
+    closetModalTitle: {
+      fontFamily: 'Silkscreen_400Regular',
+      fontSize: 16,
+      color: '#0f172a',
+      fontWeight: 'bold',
+      letterSpacing: 0.5,
+    },
+    closetCloseButton: {
+      padding: 4,
+    },
+    closetTabs: {
+      flexDirection: 'row',
+      backgroundColor: '#fafafa',
+      paddingHorizontal: 8,
+    },
+    closetTab: {
+      flex: 1,
+      paddingVertical: 14,
+      alignItems: 'center',
+      borderBottomWidth: 3,
+      borderBottomColor: 'transparent',
+    },
+    closetTabActive: {
+      borderBottomColor: '#8b5cf6',
+    },
+    closetTabText: {
+      fontFamily: 'Silkscreen_400Regular',
+      fontSize: 9,
+      color: '#94a3b8',
+      fontWeight: 'bold',
+      letterSpacing: 0.5,
+    },
+    closetTabTextActive: {
+      color: '#8b5cf6',
+    },
+    closetContent: {
+      flex: 1,
+      backgroundColor: '#ffffff',
+      minHeight: 400,
+    },
+    closetBackgroundCollection: {
+      padding: 16,
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 12,
+      minHeight: 300,
+    },
+    closetBackgroundCard: {
+      width: '47%',
+      aspectRatio: 16 / 9,
+      borderRadius: 12,
+      overflow: 'hidden',
+      backgroundColor: '#f8fafc',
+      borderWidth: 2,
+      borderColor: '#e2e8f0',
+    },
+    closetBackgroundCardSelected: {
+      borderColor: '#8b5cf6',
+      borderWidth: 3,
+    },
+    closetBackgroundImage: {
+      width: '100%',
+      height: '100%',
+    },
+    closetBackgroundOverlay: {
+      position: 'absolute',
+      bottom: 0,
+      left: 0,
+      right: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.6)',
+      paddingVertical: 8,
+      paddingHorizontal: 12,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    closetBackgroundName: {
+      fontFamily: 'Silkscreen_400Regular',
+      fontSize: 9,
+      color: '#ffffff',
+      fontWeight: 'bold',
+    },
+    closetSelectedIcon: {
+      marginLeft: 8,
+    },
+    closetSection: {
+      padding: 48,
+      alignItems: 'center',
+      justifyContent: 'center',
+      minHeight: 300,
+    },
+    closetEmptyText: {
+      fontFamily: 'Silkscreen_400Regular',
+      fontSize: 11,
+      color: '#94a3b8',
+      textAlign: 'center',
+      lineHeight: 20,
     },
   });
 

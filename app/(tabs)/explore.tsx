@@ -13,15 +13,15 @@ const pxoburbsIconImage = require('@/assets/images/pxoburbs-icon.png');
 const lilPaletteImage = require('@/assets/images/lil-palette.png');
 const cosmicBurgerImage = require('@/assets/images/cosmicburger.png');
 const lilAnchorImage = require('@/assets/images/lil-anchor.png');
-const lilWineCasketImage = require('@/assets/images/lil-wine-casket.png');
-const lilTotemGuyImage = require('@/assets/images/lil-totem-guy.png');
+const barrelhavenIconImage = require('@/assets/images/barrelhaven-icon.png');
+const stardiverForestIconImage = require('@/assets/images/stardiver-forest-icon.png');
 const lilPopcornImage = require('@/assets/images/lil-popcorn.png');
 const lilScarecrowImage = require('@/assets/images/lil-scarecrow.png');
 const lilGnomeImage = require('@/assets/images/lil-gnome.png');
-const lilGnomehatImage = require('@/assets/images/lil-gnomehat.png');
+const lullabyDownsIconImage = require('@/assets/images/lullaby-downs-icon.png');
 const lilTentGossImage = require('@/assets/images/lil-tent-goss.png');
 const lilPotImage = require('@/assets/images/lil-pot.png');
-const lilTrailerImage = require('@/assets/images/lil-trailer.png');
+const crescentOasisIconImage = require('@/assets/images/crescent-oasis-icon.png');
 const lilBayouImage = require('@/assets/images/lil-bayou.png');
 const loomersTinyImage = require('@/assets/images/loomers-tiny.png');
 const mapOfPxopiaImage = require('@/assets/images/map-of-pxopia.png');
@@ -53,7 +53,7 @@ export default function ExploreScreen() {
       icon: "sun-o",
       color: "#f59e0b",
       description: "A desert mirage where atomic age meets cosmic wonder.",
-      image: lilTrailerImage
+      image: crescentOasisIconImage
     },
     {
       id: "vintage-hollow",
@@ -61,7 +61,7 @@ export default function ExploreScreen() {
       icon: "glass",
       color: "#8b5cf6",
       description: "A medieval vineyard where wine flows as freely as the rolling hills.",
-      image: lilWineCasketImage
+      image: barrelhavenIconImage
     },
     {
       id: "artisan",
@@ -77,7 +77,7 @@ export default function ExploreScreen() {
       icon: "leaf",
       color: "#10b981",
       description: "An enchanted woodland where celestial bodies bloom as foliage.",
-      image: lilTotemGuyImage
+      image: stardiverForestIconImage
     },
     {
       id: "lullaby-downs",
@@ -85,7 +85,7 @@ export default function ExploreScreen() {
       icon: "moon-o",
       color: "#6b7280",
       description: "A dreamy valley where sleepy melodies drift through moonlit meadows.",
-      image: lilGnomehatImage
+      image: lullabyDownsIconImage
     },
     {
       id: "bayou-nocturne",

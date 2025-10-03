@@ -10,6 +10,7 @@ import { useEffect } from 'react';
 import { GameProvider } from '@/store/GameStore';
 import { SimpleGameProvider } from '@/store/SimpleGameStore';
 import { InventoryProvider } from '@/store/InventoryStore';
+import { PetProvider } from '@/store/PetStore';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/components/useColorScheme';
@@ -63,6 +64,7 @@ function RootLayoutNav() {
         <GameProvider>
           <SimpleGameProvider>
             <InventoryProvider>
+              <PetProvider>
               <Stack>
               <Stack.Screen name="(tabs)" options={{ header: () => <AppHeader /> }} />
               <Stack.Screen name="adoption" options={{ headerShown: false }} />
@@ -81,6 +83,7 @@ function RootLayoutNav() {
               <Stack.Screen name="quickstop" options={{ headerShown: false }} />
               <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
               </Stack>
+              </PetProvider>
             </InventoryProvider>
           </SimpleGameProvider>
         </GameProvider>

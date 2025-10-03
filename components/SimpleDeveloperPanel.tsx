@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Modal, StyleSheet, Pressable, Alert, TextInput } from 'react-native';
+import { Modal, StyleSheet, Pressable, Alert, TextInput, ScrollView } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useSimpleGame } from '@/store/SimpleGameStore';
+import { usePets } from '@/store/PetStore';
 
 interface SimpleDeveloperPanelProps {
   visible: boolean;
@@ -19,6 +20,7 @@ export default function SimpleDeveloperPanel({ visible, onClose }: SimpleDevelop
     setCurrency, 
     resetGame 
   } = useSimpleGame();
+  const { resetAllPets } = usePets();
   
   const [customTickets, setCustomTickets] = useState('');
   const [customStamina, setCustomStamina] = useState('');
@@ -72,10 +74,19 @@ export default function SimpleDeveloperPanel({ visible, onClose }: SimpleDevelop
   const handleResetGame = () => {
     Alert.alert(
       'Reset Game',
-      'Are you sure you want to reset all progress? This cannot be undone!',
+      'This will reset:\n• All currency (tickets, gems, stamina)\n• All pets\n• Purchased backgrounds\n\nAre you sure?',
       [
         { text: 'Cancel', style: 'cancel' },
-        { text: 'Reset', style: 'destructive', onPress: resetGame }
+        { 
+          text: 'Reset Everything', 
+          style: 'destructive', 
+          onPress: () => {
+            resetGame();
+            resetAllPets();
+            Alert.alert('Reset Complete', 'All progress has been wiped!');
+            onClose();
+          }
+        }
       ]
     );
   };
@@ -96,7 +107,11 @@ export default function SimpleDeveloperPanel({ visible, onClose }: SimpleDevelop
             </Pressable>
           </View>
 
-          <View style={styles.content}>
+          <ScrollView 
+            style={styles.scrollView}
+            contentContainerStyle={styles.content}
+            showsVerticalScrollIndicator={true}
+          >
             {/* Tickets Control */}
             <View style={styles.currencyControl}>
               <Text style={styles.currencyLabel}>Tickets: {state.tickets}</Text>
@@ -164,9 +179,10 @@ export default function SimpleDeveloperPanel({ visible, onClose }: SimpleDevelop
 
             {/* Reset Game */}
             <Pressable style={styles.resetButton} onPress={handleResetGame}>
-              <Text style={styles.resetButtonText}>Reset Game</Text>
+              <FontAwesome name="trash" size={16} color="#fff" style={{ marginRight: 8 }} />
+              <Text style={styles.resetButtonText}>Reset Everything</Text>
             </Pressable>
-          </View>
+          </ScrollView>
         </View>
       </View>
     </Modal>
@@ -183,17 +199,25 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: '#f8f9fa',
     borderRadius: 16,
-    padding: 20,
     width: '90%',
     maxHeight: '80%',
     borderWidth: 2,
     borderColor: '#8b5cf6',
+    overflow: 'hidden',
+  },
+  scrollView: {
+    flex: 1,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20,
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 16,
+    backgroundColor: '#f8f9fa',
+    borderBottomWidth: 2,
+    borderBottomColor: '#e5e7eb',
   },
   title: {
     fontSize: 24,
@@ -207,6 +231,8 @@ const styles = StyleSheet.create({
   },
   content: {
     backgroundColor: 'transparent',
+    padding: 20,
+    paddingBottom: 40,
   },
   currencyControl: {
     marginBottom: 24,
@@ -259,9 +285,12 @@ const styles = StyleSheet.create({
   resetButton: {
     backgroundColor: '#ef4444',
     paddingHorizontal: 20,
-    paddingVertical: 12,
+    paddingVertical: 14,
     borderRadius: 8,
     alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 8,
   },
   resetButtonText: {
     color: '#fff',

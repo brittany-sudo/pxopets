@@ -1,25 +1,71 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, View as RNView, ScrollView, Image, Pressable, TextInput, Animated } from 'react-native';
+import { StyleSheet, View as RNView, ScrollView, Image, Pressable, TextInput, Animated, Alert, Modal, KeyboardAvoidingView, Platform } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { useSimpleGame } from '@/store/SimpleGameStore';
 import { useInventory } from '@/store/InventoryStore';
+import { usePets } from '@/store/PetStore';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 
 export default function PlayerHomeScreen() {
-  const { state, hydrated, addStamina } = useSimpleGame();
+  const scrollViewRef = useRef<ScrollView>(null);
+  const { state, hydrated, addStamina, claimStreakReward, setHometown, setAvatar, setPlayerTag } = useSimpleGame();
   const { state: inventoryState, addItem, clearAllItems } = useInventory();
+  const { state: petState, getActivePet, resetAllPets } = usePets();
+  
+  const activePet = getActivePet();
+  
+  const getPetImage = (imageName: string) => {
+    const imageMap: { [key: string]: any } = {
+      'tigerguy': require('@/assets/images/tigerguy.png'),
+      'plumeca': require('@/assets/images/plumeca.png'),
+      'coco-guy': require('@/assets/images/coco-guy.png'),
+      'lallazo': require('@/assets/images/lallazo.png'),
+      'robot-guy': require('@/assets/images/robot-guy.png'),
+      'sheep-guy': require('@/assets/images/sheep-guy.png'),
+      'bull-guy': require('@/assets/images/bull-guy.png'),
+      'storm-guy': require('@/assets/images/storm-guy.png'),
+      'fish-guys': require('@/assets/images/fish-guys.png'),
+      'sappo': require('@/assets/images/sappo.png'),
+      'gazo': require('@/assets/images/gazo.png'),
+    };
+    return imageMap[imageName] || require('@/assets/images/tigerguy.png');
+  };
+
+  const getAvatarImage = (imageName: string) => {
+    const avatarMap: { [key: string]: any } = {
+      'avatar1.png': require('@/assets/images/avatar1.png'),
+      'avatar2.png': require('@/assets/images/avatar2.png'),
+      'avatar3.png': require('@/assets/images/avatar3.png'),
+      'avatar4.png': require('@/assets/images/avatar4.png'),
+      'avatar5.png': require('@/assets/images/avatar5.png'),
+    };
+    return avatarMap[imageName] || require('@/assets/images/avatar1.png');
+  };
   
   // Daily rewards state
   const [isFlashing, setIsFlashing] = useState(true);
   const [rewardClaimed, setRewardClaimed] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
+  const [streakCelebration, setStreakCelebration] = useState(false);
+  const [showHometownModal, setShowHometownModal] = useState(false);
+  const [showAvatarModal, setShowAvatarModal] = useState(false);
+  const [tempPlayerTag, setTempPlayerTag] = useState(state.playerTag);
   
   // Animation values
   const celebrationScale = useRef(new Animated.Value(0)).current;
   const celebrationOpacity = useRef(new Animated.Value(0)).current;
   const celebrationTranslateY = useRef(new Animated.Value(0)).current;
   const buttonScale = useRef(new Animated.Value(1)).current;
+  const streakCelebrationScale = useRef(new Animated.Value(0)).current;
+  const streakCelebrationOpacity = useRef(new Animated.Value(0)).current;
+
+  // Reset scroll position when screen comes into focus
+  useFocusEffect(
+    React.useCallback(() => {
+      scrollViewRef.current?.scrollTo({ y: 0, animated: false });
+    }, [])
+  );
 
   // Flash animation for the gem icon
   useEffect(() => {
@@ -97,54 +143,114 @@ export default function PlayerHomeScreen() {
       }, 1200);
     }
   };
+
+  const handleClaimStreakReward = () => {
+    const success = claimStreakReward();
+    if (success) {
+      setStreakCelebration(true);
+      
+      // Celebration animation
+      Animated.parallel([
+        Animated.spring(streakCelebrationScale, {
+          toValue: 1.2,
+          tension: 150,
+          friction: 6,
+          useNativeDriver: true,
+        }),
+        Animated.timing(streakCelebrationOpacity, {
+          toValue: 1,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+      ]).start();
+
+      // Fade out after 2 seconds
+      setTimeout(() => {
+        Animated.parallel([
+          Animated.timing(streakCelebrationOpacity, {
+            toValue: 0,
+            duration: 400,
+            useNativeDriver: true,
+          }),
+          Animated.timing(streakCelebrationScale, {
+            toValue: 0.8,
+            duration: 400,
+            useNativeDriver: true,
+          }),
+        ]).start(() => {
+          setStreakCelebration(false);
+          streakCelebrationScale.setValue(0);
+          streakCelebrationOpacity.setValue(0);
+        });
+      }, 2000);
+    }
+  };
+
+  // Calculate streak progress
+  const streakProgress = Math.min(state.loginStreak, 3);
+  const streakPercentage = (streakProgress / 3) * 100;
+  const canClaimStreak = state.loginStreak >= 3 && !state.streakRewardClaimed;
+
+  // Hometown locations
+  const locations = [
+    { name: "Pxoburbs", color: "#8b5cf6", icon: "home" },
+    { name: "Loomer's Wharf", color: "#0ea5e9", icon: "anchor" },
+    { name: "Crescent Oasis", color: "#f59e0b", icon: "sun-o" },
+    { name: "Barrelhaven", color: "#92400e", icon: "glass" },
+    { name: "Shakespeare's Quarter", color: "#ec4899", icon: "paint-brush" },
+    { name: "Stardiver Forest", color: "#10b981", icon: "leaf" },
+    { name: "Lullaby Downs", color: "#6b7280", icon: "moon-o" },
+    { name: "Bayou Nocturne", color: "#1f2937", icon: "tint" },
+    { name: "Lumen Bazaar", color: "#fbbf24", icon: "lightbulb-o" },
+    { name: "Twilight Atoll", color: "#f97316", icon: "music" },
+    { name: "Thistledown", color: "#7c3aed", icon: "book" },
+    { name: "Midwinter Crossing", color: "#94a3b8", icon: "snowflake-o" },
+    { name: "Gossamer Midway", color: "#dc2626", icon: "star" },
+  ];
+
+  const currentLocation = locations.find(loc => loc.name === state.hometown) || locations[0];
   
   if (!hydrated) return <View style={styles.container}><Text>Loading...</Text></View>;
 
   return (
     <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView ref={scrollViewRef} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
 
         {/* Player Profile Card */}
         <RNView style={styles.playerProfileCard}>
-          {/* Pokemon-style Header */}
+          {/* Profile Header - Avatar on Right */}
           <RNView style={styles.profileHeader}>
-            <RNView style={styles.avatarContainer}>
-              <RNView style={styles.avatarFrame}>
-                <Image
-                  source={require('@/assets/images/tigerguy.png')}
-                  style={styles.playerAvatar}
-                  resizeMode="contain"
-                />
-              </RNView>
-            </RNView>
             <RNView style={styles.playerInfo}>
               <Text style={styles.playerName}>PxopetMaster</Text>
-              <Text style={styles.playerTitle}>Adventure Seeker</Text>
-              <RNView style={styles.bioContainer}>
-                <TextInput
-                  style={styles.bioInput}
-                  defaultValue="Collecting rare pets & exploring pixel worlds! 🌟"
-                  maxLength={50}
-                  multiline={false}
-                />
+              <Text style={styles.playerTitle}>{state.playerTag}</Text>
+              <RNView>
+                <Text style={styles.hometownLabel}>Hometown:</Text>
+                <Pressable 
+                  style={[styles.hometownBadge, { borderColor: currentLocation.color, backgroundColor: `${currentLocation.color}15` }]}
+                  onPress={() => setShowHometownModal(true)}
+                >
+                  <FontAwesome name={currentLocation.icon as any} size={11} color={currentLocation.color} />
+                  <Text style={[styles.playerHometown, { color: currentLocation.color }]}>{state.hometown}</Text>
+                </Pressable>
               </RNView>
             </RNView>
+            <Pressable 
+              style={styles.avatarFrame}
+              onPress={() => {
+                setTempPlayerTag(state.playerTag);
+                setShowAvatarModal(true);
+              }}
+            >
+              <Image
+                source={getAvatarImage(state.selectedAvatar)}
+                style={styles.playerAvatar}
+                resizeMode="contain"
+              />
+            </Pressable>
           </RNView>
           
-          <RNView style={styles.statsContainer}>
-            <RNView style={[styles.statItem, { paddingLeft: 10 }]}>
-              <Text style={styles.statLabel}>LEVEL</Text>
-              <Text style={styles.statValue}>12</Text>
-            </RNView>
-            <RNView style={styles.statItem}>
-              <Text style={styles.statLabel}>HP</Text>
-              <Text style={styles.statValue}>85/100</Text>
-            </RNView>
-            <RNView style={[styles.statItem, { paddingRight: 10 }]}>
-              <Text style={styles.statLabel}>EXP</Text>
-              <Text style={styles.statValue}>2,450</Text>
-            </RNView>
-          </RNView>
+          {/* Divider */}
+          <RNView style={styles.profileDivider} />
           
           {/* Co-star Style Action Buttons */}
           <RNView style={styles.profileStats}>
@@ -186,197 +292,141 @@ export default function PlayerHomeScreen() {
               </Pressable>
             </RNView>
           </RNView>
-        </RNView>
 
-
-        {/* Visual Inventory */}
-        <RNView style={styles.inventorySection}>
-          <Text style={styles.sectionTitle}>Inventory</Text>
-          {inventoryState.mainInventory.length === 0 ? (
-            <Text style={styles.inventoryText}>No items yet - buy something from a shop or try the trapper's shack!</Text>
-          ) : (
-            <RNView style={styles.inventoryGrid}>
-              {(() => {
-                // Group items by name + image + category to handle duplicates
-                const groupedItems = inventoryState.mainInventory.reduce((acc, item) => {
-                  const key = `${item.name}-${item.image}-${item.category}`;
-                  if (acc[key]) {
-                    acc[key].quantity += item.quantity;
-                  } else {
-                    acc[key] = { ...item };
-                  }
-                  return acc;
-                }, {} as Record<string, any>);
-                
-                return Object.values(groupedItems).map((item, index) => {
-                  return (
-                  <RNView key={`${item.name}-${item.image}-${index}`} style={item.image === 'slushee3' ? styles.specialtyInventoryItem : item.category === 'fishing' ? styles.fishingInventoryItem : styles.inventoryItem}>
-                  {item.category === 'fishing' ? (
-                    <Image 
-                      source={
-                        item.image === 'grumpycrab' ? require('@/assets/images/grumpycrab.png') :
-                        item.image === 'oldbottle' ? require('@/assets/images/oldbottle.png') :
-                        item.image === 'clumpofseaweed' ? require('@/assets/images/clumpofseaweed.png') :
-                        item.image === 'fishbones' ? require('@/assets/images/fishbones.png') :
-                        item.image === 'driftwoodnecklace' ? require('@/assets/images/driftwoodnecklace.png') :
-                        item.image === 'brasscoin' ? require('@/assets/images/brasscoin.png') :
-                        item.image === 'messageinabottle' ? require('@/assets/images/messageinabottle.png') :
-                        item.image === 'sirenscale' ? require('@/assets/images/sirenscale.png') :
-                        item.image === 'micropearl' ? require('@/assets/images/micropearl.png') :
-                        item.image === 'soggyboot' ? require('@/assets/images/soggyboot.png') :
-                        item.image === 'clamchowder' ? require('@/assets/images/clamchowder.png') :
-                        item.image === 'fogsailboat' ? require('@/assets/images/fogchildssailboat.png') :
-                        item.image === 'winecask' ? require('@/assets/images/lil-wine-casket.png') :
-                        item.image === 'oldlantern' ? require('@/assets/images/oldlantern.png') :
-                        item.image === 'singingconch' ? require('@/assets/images/singingconch.png') :
-                        require('@/assets/images/chocolate.png')
-                      }
-                      style={styles.fishingInventoryImage}
-                    />
-                  ) : (
-                    <Image 
-                      source={
-                        item.image === 'chocolate' ? require('@/assets/images/chocolate.png') :
-                        item.image === 'cupnoodle' ? require('@/assets/images/cupnoodle.png') :
-                        item.image === 'cupnoddle' ? require('@/assets/images/cupnoddle.png') :
-                        item.image === 'hotchips' ? require('@/assets/images/hotchips.png') :
-                      item.image === 'lil-soda' ? require('@/assets/images/lil-soda.png') :
-                        item.image === 'regularhotdog' ? require('@/assets/images/regularhotdog.png') :
-                        item.image === 'potatochomps' ? require('@/assets/images/potatochomps.png') :
-                        item.image === 'saturnsoda' ? require('@/assets/images/saturnsoda.png') :
-                        item.image === 'slushee' ? require('@/assets/images/slushee.png') :
-                        item.image === 'nuggets' ? require('@/assets/images/nuggets.png') :
-                        item.image === 'milkshakes' ? require('@/assets/images/milkshakes.png') :
-                        item.image === 'glowcorn' ? require('@/assets/images/glowcorn.png') :
-                        item.image === 'gumballs' ? require('@/assets/images/gumballs.png') :
-                        item.image === 'chocodonut' ? require('@/assets/images/chocodonut.png') :
-                        item.image === 'cosmicburger' ? require('@/assets/images/cosmicburger.png') :
-                        item.image === 'pouchdrink' ? require('@/assets/images/pouchdrink.png') :
-                        item.image === 'game-lunchbox' ? require('@/assets/images/game-lunchbox.png') :
-                        item.image === 'cute-lunchbox' ? require('@/assets/images/cute-lunchbox.png') :
-                        item.image === 'whale-lunchbox' ? require('@/assets/images/whale-lunchbox.png') :
-                        item.image === 'rocket-lunchbox' ? require('@/assets/images/rocket-lunchbox.png') :
-                        item.image === 'dragon-lunchbox' ? require('@/assets/images/dragon-lunchbox.png') :
-                        item.image === 'quickstopcoffee' ? require('@/assets/images/quickstopcoffee.png') :
-                        item.image === 'slushee3' ? require('@/assets/images/slushee3.png') :
-                        item.image === 'moonbeandreamcatcher.png' ? require('@/assets/images/moonbeandreamcatcher.png') :
-                        item.image === 'keycard.png' ? require('@/assets/images/keycard.png') :
-                        item.image === 'mirage-martini.png' ? require('@/assets/images/mirage-martini.png') :
-                        item.image === 'solar-flare-sling.png' ? require('@/assets/images/solar-flare-sling.png') :
-                        item.image === 'aurora-highball.png' ? require('@/assets/images/aurora-highball.png') :
-                        item.image === 'pink-sand-shaker.png' ? require('@/assets/images/pink-sand-shaker.png') :
-                        item.image === 'starlight-sour.png' ? require('@/assets/images/starlight-sour.png') :
-                        item.image === 'lunar-lagoon.png' ? require('@/assets/images/lunar-lagoon.png') :
-                        // Default fallback - show chocolate for unknown items
-                        require('@/assets/images/chocolate.png') // default fallback
-                      } 
-                      style={
-                        item.image === 'slushee3' ? styles.specialtyInventoryImage :
-                        item.image === 'quickstopcoffee' ? styles.coffeeInventoryImage :
-                        item.image === 'lil-soda' || item.image === 'saturnsoda' ? styles.sodaInventoryImage :
-                        styles.inventoryImage
-                      } 
-                    />
-                  )}
-                  {item.quantity > 1 && (
-                    <Text style={styles.inventoryCount}>x{item.quantity}</Text>
-                  )}
+          {/* Compact Active Pet Section - Inside Profile Card */}
+          <RNView style={styles.compactPetSection}>
+            <Text style={styles.compactPetTitle}>ACTIVE PET</Text>
+            {activePet ? (
+              <RNView style={styles.compactPetBar}>
+                <Image
+                  source={getPetImage(activePet.image)}
+                  style={styles.compactPetSprite}
+                  resizeMode="contain"
+                />
+                <RNView style={styles.compactPetInfo}>
+                  <Text style={styles.compactPetName}>{activePet.name}</Text>
+                  <Text style={styles.compactPetLevel}>Lv.{activePet.level}</Text>
                 </RNView>
-                )
-                });
-              })()}
-            </RNView>
-          )}
-          
-          {/* Dev Tool - Clear Inventory */}
-          <Pressable 
-            style={styles.clearInventoryButton}
-            onPress={() => clearAllItems()}
-          >
-            <FontAwesome name="trash" size={14} color="#ffffff" />
-            <Text style={styles.clearInventoryButtonText}>Clear Inventory</Text>
-          </Pressable>
+                <RNView style={styles.compactPetStats}>
+                  <RNView style={styles.compactStatItem}>
+                    <Text style={styles.compactStatLabel}>HP</Text>
+                    <Text style={styles.compactStatValue}>{activePet.hp}</Text>
+                  </RNView>
+                  <RNView style={styles.compactStatItem}>
+                    <Text style={styles.compactStatLabel}>ATK</Text>
+                    <Text style={styles.compactStatValue}>{activePet.atk}</Text>
+                  </RNView>
+                  <RNView style={styles.compactStatItem}>
+                    <Text style={styles.compactStatLabel}>DEF</Text>
+                    <Text style={styles.compactStatValue}>{activePet.def}</Text>
+                  </RNView>
+                </RNView>
+                <Pressable 
+                  style={styles.compactPetLink}
+                  onPress={() => router.push('/(tabs)/pets')}
+                >
+                  <FontAwesome name="chevron-right" size={12} color="#8b5cf6" />
+                </Pressable>
+              </RNView>
+            ) : (
+              <Pressable 
+                style={styles.compactPetBarEmpty}
+                onPress={() => router.push('/(tabs)/nursery')}
+              >
+                <FontAwesome name="plus-circle" size={16} color="#8b5cf6" />
+                <Text style={styles.compactPetEmptyText}>Adopt a pet</Text>
+              </Pressable>
+            )}
+          </RNView>
         </RNView>
 
-        {/* Active Pet Section - Moved below inventory */}
-        <RNView style={styles.petSection}>
-          <Text style={styles.sectionTitle}>Active Pet</Text>
-          <RNView style={styles.petHeader}>
+        {/* Trophies Section - Separate Card */}
+        <RNView style={styles.trophiesCard}>
+          <Text style={styles.trophiesTitle}>TROPHIES</Text>
+          <RNView style={styles.trophiesRow}>
             <Image
-              source={require('@/assets/images/tigerguy.png')}
-              style={styles.petImage}
+              source={require('@/assets/images/pxomillionaire-trophy.png')}
+              style={styles.trophySprite}
               resizeMode="contain"
             />
-            <RNView style={styles.petInfo}>
-              <Text style={styles.petName}>TigerGuy</Text>
-              <Text style={styles.petLevel}>Level 12</Text>
-            </RNView>
-          </RNView>
-          
-          <RNView style={styles.hpBarContainer}>
-            <Text style={styles.hpLabel}>HP</Text>
-            <RNView style={styles.hpBarBackground}>
-              <RNView style={[styles.hpBarFill, { width: '85%' }]} />
-            </RNView>
-            <Text style={styles.hpText}>85/100</Text>
-          </RNView>
-          
-          <RNView style={styles.expBarContainer}>
-            <Text style={styles.expLabel}>EXP</Text>
-            <RNView style={styles.expBarBackground}>
-              <RNView style={[styles.expBarFill, { width: '60%' }]} />
-            </RNView>
-            <Text style={styles.expText}>1200/2000</Text>
-          </RNView>
-          
-          {/* Condensed Stats - Single row with transparent cyan border */}
-          <RNView style={styles.condensedStatsContainer}>
-            <RNView style={styles.statItem}>
-              <Text style={styles.statLabel}>ATK</Text>
-              <Text style={styles.statValue}>120</Text>
-            </RNView>
-            <RNView style={styles.statItem}>
-              <Text style={styles.statLabel}>DEF</Text>
-              <Text style={styles.statValue}>96</Text>
-            </RNView>
-            <RNView style={styles.statItem}>
-              <Text style={styles.statLabel}>SPD</Text>
-              <Text style={styles.statValue}>144</Text>
-            </RNView>
-            <RNView style={styles.statItem}>
-              <Text style={styles.statLabel}>HP</Text>
-              <Text style={styles.statValue}>100</Text>
-            </RNView>
-            <RNView style={styles.statItem}>
-              <Text style={styles.statLabel}>SPC</Text>
-              <Text style={styles.statValue}>88</Text>
-            </RNView>
-            <RNView style={styles.statItem}>
-              <Text style={styles.statLabel}>LUK</Text>
-              <Text style={styles.statValue}>72</Text>
-            </RNView>
+            <Image
+              source={require('@/assets/images/nap-trophy.png')}
+              style={styles.trophySprite}
+              resizeMode="contain"
+            />
+            <Image
+              source={require('@/assets/images/festival-trophy.png')}
+              style={styles.trophySprite}
+              resizeMode="contain"
+            />
           </RNView>
         </RNView>
+
 
         {/* Daily Quests Section - Moved from News */}
         <RNView style={styles.dailyQuestsContainer}>
           <Text style={styles.sectionTitle}>Daily Quests</Text>
           
           {/* Quest 1 - Daily Login */}
-          <RNView style={styles.questItem}>
-            <FontAwesome name="calendar" size={16} color="#8b5cf6" style={styles.questIcon} />
+          <Pressable 
+            style={[
+              styles.questItem,
+              canClaimStreak && styles.questItemClaimable,
+              state.streakRewardClaimed && state.loginStreak >= 3 && styles.questItemClaimed
+            ]}
+            onPress={canClaimStreak ? handleClaimStreakReward : undefined}
+            disabled={!canClaimStreak}
+          >
+            <FontAwesome 
+              name={state.streakRewardClaimed && state.loginStreak >= 3 ? "check-circle" : "calendar"} 
+              size={16} 
+              color={state.streakRewardClaimed && state.loginStreak >= 3 ? "#10b981" : "#8b5cf6"} 
+              style={styles.questIcon} 
+            />
             <RNView style={styles.questContent}>
               <Text style={styles.questName}>Daily Login Streak</Text>
-              <Text style={styles.questDescription}>Log in for 3 consecutive days</Text>
+              <Text style={styles.questDescription}>
+                {state.streakRewardClaimed && state.loginStreak >= 3 
+                  ? "Reward claimed! Keep the streak going!" 
+                  : "Log in for 3 consecutive days"}
+              </Text>
               <RNView style={styles.questProgress}>
-                <Text style={styles.questProgressText}>Progress: 2/3 days</Text>
+                <Text style={styles.questProgressText}>Progress: {streakProgress}/3 days</Text>
                 <RNView style={styles.progressBar}>
-                  <RNView style={[styles.progressFill, { width: '67%' }]} />
+                  <RNView style={[styles.progressFill, { width: `${streakPercentage}%` }]} />
                 </RNView>
               </RNView>
             </RNView>
-            <Text style={styles.questReward}>+10 ⚡</Text>
-          </RNView>
+            {canClaimStreak ? (
+              <Pressable style={styles.claimButton} onPress={handleClaimStreakReward}>
+                <Text style={styles.claimButtonText}>CLAIM</Text>
+              </Pressable>
+            ) : (
+              <Text style={[
+                styles.questReward,
+                state.streakRewardClaimed && state.loginStreak >= 3 && styles.questRewardClaimed
+              ]}>
+                {state.streakRewardClaimed && state.loginStreak >= 3 ? "✓" : "+25 ⚡"}
+              </Text>
+            )}
+            
+            {/* Streak Celebration */}
+            {streakCelebration && (
+              <Animated.View 
+                style={[
+                  styles.streakCelebrationContainer,
+                  {
+                    opacity: streakCelebrationOpacity,
+                    transform: [{ scale: streakCelebrationScale }]
+                  }
+                ]}
+              >
+                <RNView style={styles.streakCelebrationBadge}>
+                  <Text style={styles.streakCelebrationText}>+25 ⚡</Text>
+                </RNView>
+              </Animated.View>
+            )}
+          </Pressable>
 
           {/* Quest 2 - Pet Care */}
           <RNView style={styles.questItem}>
@@ -410,50 +460,178 @@ export default function PlayerHomeScreen() {
             <Text style={styles.questReward}>+25 ⚡</Text>
           </RNView>
 
-          {/* Daily Reward Section - At Bottom of Quests */}
-          <RNView style={styles.dailyRewardContainer}>
-            <Animated.View style={{ transform: [{ scale: buttonScale }] }}>
-              <Pressable onPress={handleDailyReward} disabled={rewardClaimed}>
-                <RNView style={[styles.dailyRewardSection, rewardClaimed && styles.claimedSection]}>
-                  <FontAwesome 
-                    name="bolt" 
-                    size={32} 
-                    color={rewardClaimed ? "#64748b" : (isFlashing ? "#8b5cf6" : "#f59e0b")} 
-                    style={styles.flashingGem}
-                  />
-                  <Text style={[styles.dailyRewardText, rewardClaimed && styles.claimedText]}>
-                    {rewardClaimed ? "Daily Reward: Claimed!" : "Daily Reward: Tap to claim!"}
-                  </Text>
-                </RNView>
-              </Pressable>
-            </Animated.View>
-            
-            {/* Celebration Effect */}
-            {showCelebration && (
-              <Animated.View 
-                style={[
-                  styles.celebrationContainer,
-                  {
-                    transform: [
-                      { scale: celebrationScale },
-                      { translateY: celebrationTranslateY }
-                    ],
-                    opacity: celebrationOpacity,
+        </RNView>
+
+        {/* Reset Pets Button */}
+        <RNView style={styles.devModeSection}>
+          <Pressable 
+            style={styles.resetPetsButton}
+            onPress={() => {
+              Alert.alert(
+                'Reset All Pets',
+                'Are you sure you want to delete all your pets? This action cannot be undone.',
+                [
+                  { text: 'Cancel', style: 'cancel' },
+                  { 
+                    text: 'Reset', 
+                    style: 'destructive',
+                    onPress: () => {
+                      resetAllPets();
+                      Alert.alert('Success', 'All pets have been reset!');
+                    }
                   }
-                ]}
-              >
-                <Animated.View style={[styles.gradientBackground, { transform: [{ scale: celebrationScale }] }]}>
-                  <RNView style={styles.celebrationContent}>
-                    <Text style={styles.celebrationText}>5</Text>
-                    <FontAwesome name="bolt" size={16} color="#f59e0b" />
-                  </RNView>
-                </Animated.View>
-              </Animated.View>
-            )}
-          </RNView>
+                ]
+              );
+            }}
+          >
+            <FontAwesome name="trash" size={16} color="#ef4444" />
+            <Text style={styles.resetPetsButtonText}>Reset All Pets</Text>
+          </Pressable>
         </RNView>
 
       </ScrollView>
+
+      {/* Hometown Selection Modal */}
+      <Modal
+        visible={showHometownModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowHometownModal(false)}
+      >
+        <Pressable 
+          style={styles.modalOverlay}
+          onPress={() => setShowHometownModal(false)}
+        >
+          <Pressable 
+            style={styles.hometownModalContent}
+            onPress={(e) => e.stopPropagation()}
+          >
+            <Text style={styles.hometownModalTitle}>Choose Your Hometown</Text>
+            <Text style={styles.hometownModalSubtitle}>Where do you call home in Pxopia?</Text>
+            
+            <ScrollView 
+              style={styles.locationsList}
+              showsVerticalScrollIndicator={false}
+            >
+              {locations.map((location, index) => (
+                <Pressable
+                  key={location.name}
+                  style={[
+                    styles.locationItem,
+                    state.hometown === location.name && styles.locationItemSelected
+                  ]}
+                  onPress={() => {
+                    setHometown(location.name);
+                    setTimeout(() => setShowHometownModal(false), 200);
+                  }}
+                >
+                  <RNView style={[styles.locationIconContainer, { backgroundColor: `${location.color}20` }]}>
+                    <FontAwesome name={location.icon as any} size={18} color={location.color} />
+                  </RNView>
+                  <Text style={[styles.locationName, { color: location.color }]}>
+                    {location.name}
+                  </Text>
+                  {state.hometown === location.name && (
+                    <FontAwesome name="check-circle" size={20} color={location.color} style={styles.checkIcon} />
+                  )}
+                </Pressable>
+              ))}
+            </ScrollView>
+
+            <Pressable
+              style={styles.closeModalButton}
+              onPress={() => setShowHometownModal(false)}
+            >
+              <Text style={styles.closeModalButtonText}>Close</Text>
+            </Pressable>
+          </Pressable>
+        </Pressable>
+      </Modal>
+
+      {/* Avatar Customization Modal */}
+      <Modal
+        visible={showAvatarModal}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setShowAvatarModal(false)}
+      >
+        <KeyboardAvoidingView 
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.avatarModalContainer}
+        >
+          <Pressable 
+            style={styles.avatarModalOverlay}
+            onPress={() => setShowAvatarModal(false)}
+          />
+          <RNView style={styles.avatarModalContent}>
+            <RNView style={styles.avatarModalHeader}>
+              <Text style={styles.avatarModalTitle}>CUSTOMIZE PROFILE</Text>
+              <Pressable onPress={() => setShowAvatarModal(false)}>
+                <FontAwesome name="times" size={18} color="#8b5cf6" />
+              </Pressable>
+            </RNView>
+
+            <ScrollView 
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={styles.avatarModalScroll}
+            >
+              {/* Player Tag Input */}
+              <RNView style={styles.tagSection}>
+                <Text style={styles.tagSectionTitle}>Player Tag</Text>
+                <TextInput
+                  style={styles.tagInput}
+                  value={tempPlayerTag}
+                  onChangeText={setTempPlayerTag}
+                  placeholder="Enter your tag"
+                  maxLength={30}
+                />
+              </RNView>
+
+              {/* Avatar Grid */}
+              <RNView style={styles.avatarSection}>
+                <Text style={styles.avatarSectionTitle}>Choose Avatar</Text>
+                <Text style={styles.avatarSectionSubtitle}>
+                  {state.collectedAvatars.length} / 50 collected
+                </Text>
+                <RNView style={styles.avatarGrid}>
+                  {state.collectedAvatars.map((avatar, index) => (
+                    <Pressable
+                      key={avatar}
+                      style={[
+                        styles.avatarGridItem,
+                        state.selectedAvatar === avatar && styles.avatarGridItemSelected
+                      ]}
+                      onPress={() => setAvatar(avatar)}
+                    >
+                      <Image
+                        source={getAvatarImage(avatar)}
+                        style={styles.avatarGridImage}
+                        resizeMode="contain"
+                      />
+                      {state.selectedAvatar === avatar && (
+                        <RNView style={styles.avatarSelectedBadge}>
+                          <FontAwesome name="check" size={10} color="#ffffff" />
+                        </RNView>
+                      )}
+                    </Pressable>
+                  ))}
+                </RNView>
+              </RNView>
+            </ScrollView>
+
+            {/* Save Button */}
+            <Pressable
+              style={styles.saveProfileButton}
+              onPress={() => {
+                setPlayerTag(tempPlayerTag);
+                setShowAvatarModal(false);
+              }}
+            >
+              <Text style={styles.saveProfileButtonText}>Save Changes</Text>
+            </Pressable>
+          </RNView>
+        </KeyboardAvoidingView>
+      </Modal>
     </View>
   );
 }
@@ -488,41 +666,46 @@ const styles = StyleSheet.create({
   playerProfileCard: {
     width: '95%',
     alignSelf: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.98)',
-    borderRadius: 12,
-    padding: 20,
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    paddingTop: 16,
+    paddingBottom: 16,
+    paddingHorizontal: 16,
     marginBottom: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(139, 92, 246, 0.3)',
+    borderWidth: 2,
+    borderColor: '#8b5cf6',
     shadowColor: '#8b5cf6',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 5,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
+    elevation: 3,
   },
   profileHeader: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 0,
     marginBottom: 12,
-  },
-  avatarContainer: {
-    position: 'relative',
-    marginRight: 16,
   },
   avatarFrame: {
     width: 80,
     height: 80,
-    borderRadius: 40,
-    backgroundColor: 'rgba(20, 184, 166, 0.15)',
-    borderWidth: 1,
-    borderColor: '#14b8a6',
+    borderRadius: 6,
+    backgroundColor: 'rgba(139, 92, 246, 0.08)',
+    borderWidth: 2,
+    borderColor: '#8b5cf6',
     alignItems: 'center',
     justifyContent: 'center',
   },
   playerAvatar: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
+    width: 64,
+    height: 64,
+    borderRadius: 8,
+  },
+  profileDivider: {
+    height: 1,
+    backgroundColor: 'rgba(139, 92, 246, 0.2)',
+    marginVertical: 14,
   },
   levelBadge: {
     position: 'absolute',
@@ -545,20 +728,48 @@ const styles = StyleSheet.create({
   },
   playerInfo: {
     flex: 1,
+    justifyContent: 'center',
+    marginRight: 12,
   },
   playerName: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#000000',
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#0f172a',
     marginBottom: 4,
   },
   playerTitle: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 14,
-    color: '#6b7280',
+    fontSize: 16,
+    color: '#8b5cf6',
     fontWeight: '400',
     marginBottom: 4,
+    letterSpacing: -0.5,
+  },
+  hometownLabel: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#94a3b8',
+    marginBottom: 4,
+    marginTop: 6,
+  },
+  hometownBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    backgroundColor: 'rgba(139, 92, 246, 0.08)',
+    borderWidth: 1.5,
+    borderColor: '#8b5cf6',
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    gap: 6,
+  },
+  playerHometown: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 11,
+    color: '#8b5cf6',
+    fontWeight: '600',
   },
   bioContainer: {
     marginTop: 4,
@@ -629,17 +840,17 @@ const styles = StyleSheet.create({
   actionButton: {
     flex: 1,
     alignItems: 'center',
-    padding: 12,
-    borderRadius: 12,
+    padding: 10,
+    borderRadius: 10,
     marginHorizontal: 3,
-    borderWidth: 1,
-    borderColor: 'rgba(139, 92, 246, 0.3)',
-    backgroundColor: 'rgba(139, 92, 246, 0.05)',
+    borderWidth: 1.5,
+    borderColor: 'rgba(139, 92, 246, 0.4)',
+    backgroundColor: 'rgba(139, 92, 246, 0.06)',
     shadowColor: '#8b5cf6',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 3,
+    elevation: 2,
   },
   primaryButton: {
     backgroundColor: 'rgba(139, 92, 246, 0.1)',
@@ -661,45 +872,51 @@ const styles = StyleSheet.create({
   },
   primaryButtonText: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 10,
+    fontSize: 11,
     color: '#8b5cf6',
     marginTop: 4,
     fontWeight: '500',
+    letterSpacing: -0.5,
   },
   secondaryButtonText: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 10,
+    fontSize: 11,
     color: '#8b5cf6',
     marginTop: 4,
     fontWeight: '500',
+    letterSpacing: -0.5,
   },
   accentButtonText: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 10,
+    fontSize: 11,
     color: '#8b5cf6',
     marginTop: 4,
     fontWeight: '500',
+    letterSpacing: -0.5,
   },
   warningButtonText: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 10,
+    fontSize: 11,
     color: '#8b5cf6',
     marginTop: 4,
     fontWeight: '500',
+    letterSpacing: -0.5,
   },
   successButtonText: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 10,
+    fontSize: 11,
     color: '#8b5cf6',
     marginTop: 4,
     fontWeight: '500',
+    letterSpacing: -0.5,
   },
   infoButtonText: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 10,
+    fontSize: 11,
     color: '#8b5cf6',
     marginTop: 4,
     fontWeight: '500',
+    letterSpacing: -0.5,
   },
   sectionTitle: {
     fontFamily: 'PressStart2P_400Regular',
@@ -723,6 +940,48 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 5,
+  },
+  noPetContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 32,
+    paddingHorizontal: 16,
+  },
+  noPetTitle: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 14,
+    color: '#0f172a',
+    fontWeight: 'bold',
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  noPetText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#64748b',
+    textAlign: 'center',
+    marginBottom: 16,
+    lineHeight: 16,
+  },
+  nurseryButtonHome: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#8b5cf6',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 8,
+    gap: 8,
+    shadowColor: '#8b5cf6',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  nurseryButtonHomeText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#ffffff',
+    fontWeight: 'bold',
   },
   petHeader: {
     flexDirection: 'row',
@@ -748,6 +1007,12 @@ const styles = StyleSheet.create({
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 14,
     color: '#999999',
+  },
+  petHappiness: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 12,
+    color: '#ef4444',
+    fontWeight: 'bold',
   },
   hpBarContainer: {
     flexDirection: 'row',
@@ -837,34 +1102,143 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(20, 184, 166, 0.4)', // Transparent cyan border
     marginBottom: 8,
   },
-  statItem: {
-    alignItems: 'center',
-  },
-  statLabel: {
-    fontFamily: 'Silkscreen_400Regular',
-    fontSize: 11,
-    fontWeight: 'bold',
-    color: '#999999',
-    marginBottom: 4,
-  },
-  statValue: {
-    fontFamily: 'Silkscreen_400Regular',
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#000000',
+  petActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 12,
+    marginTop: 12,
   },
   petActionButton: {
-    backgroundColor: '#000000',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 6,
-    alignSelf: 'flex-start',
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.3)',
+    borderRadius: 8,
+    padding: 12,
+    gap: 8,
   },
   petActionText: {
-    fontFamily: 'monospace',
+    fontFamily: 'Silkscreen_400Regular',
     fontSize: 12,
-    color: '#ffffff',
-    fontWeight: '500',
+    color: '#8b5cf6',
+    fontWeight: 'bold',
+  },
+  // Compact Pet Section & Bar Styles (Pokemon-style horizontal sprite bar)
+  compactPetSection: {
+    marginTop: 14,
+    paddingTop: 14,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(139, 92, 246, 0.2)',
+  },
+  compactPetTitle: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 14,
+    color: '#64748b',
+    marginBottom: 4,
+    textAlign: 'left',
+    fontWeight: 'bold',
+  },
+  compactPetBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(139, 92, 246, 0.06)',
+    borderRadius: 10,
+    padding: 10,
+    borderWidth: 1.5,
+    borderColor: 'rgba(139, 92, 246, 0.3)',
+    gap: 8,
+  },
+  compactPetSprite: {
+    width: 40,
+    height: 40,
+  },
+  compactPetInfo: {
+    flex: 1,
+  },
+  compactPetName: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 15,
+    fontWeight: 'bold',
+    color: '#0f172a',
+    marginBottom: 2,
+  },
+  compactPetLevel: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 13,
+    color: '#64748b',
+  },
+  compactPetStats: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginRight: 4,
+  },
+  compactStatItem: {
+    alignItems: 'center',
+    marginHorizontal: 4,
+  },
+  compactStatLabel: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 9,
+    color: '#64748b',
+    marginBottom: 2,
+    textAlign: 'center',
+  },
+  compactStatValue: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#8b5cf6',
+    textAlign: 'center',
+  },
+  compactPetLink: {
+    padding: 6,
+    marginLeft: 4,
+  },
+  compactPetBarEmpty: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(139, 92, 246, 0.05)',
+    borderRadius: 8,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.2)',
+    borderStyle: 'dashed',
+    gap: 8,
+  },
+  compactPetEmptyText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 13,
+    color: '#8b5cf6',
+  },
+  // Compact Trophies Styles (inside profile card)
+  compactTrophiesSection: {
+    marginTop: 14,
+    paddingTop: 14,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(139, 92, 246, 0.2)',
+  },
+  compactTrophiesTitle: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 14,
+    color: '#64748b',
+    marginBottom: 6,
+    textAlign: 'center',
+    fontWeight: 'bold',
+  },
+  compactTrophiesRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 8,
+  },
+  trophySprite: {
+    width: 36,
+    height: 36,
   },
   actionsSection: {
     marginBottom: 24,
@@ -1098,26 +1472,6 @@ const styles = StyleSheet.create({
     color: '#ef4444',
     fontWeight: '600',
   },
-  inventoryGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  inventoryCount: {
-    position: 'absolute',
-    top: -4,
-    right: -4,
-    backgroundColor: '#8b5cf6',
-    color: '#ffffff',
-    fontFamily: 'monospace',
-    fontSize: 10,
-    fontWeight: 'bold',
-    paddingHorizontal: 4,
-    paddingVertical: 2,
-    borderRadius: 8,
-    minWidth: 16,
-    textAlign: 'center',
-  },
   emptySlot: {
     fontFamily: 'monospace',
     fontSize: 20,
@@ -1213,6 +1567,16 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(14, 165, 233, 0.2)',
     padding: 12,
     marginBottom: 8,
+    position: 'relative',
+  },
+  questItemClaimable: {
+    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+    borderColor: 'rgba(139, 92, 246, 0.4)',
+    borderWidth: 2,
+  },
+  questItemClaimed: {
+    backgroundColor: 'rgba(16, 185, 129, 0.05)',
+    borderColor: 'rgba(16, 185, 129, 0.2)',
   },
   questIcon: {
     marginRight: 12,
@@ -1266,13 +1630,63 @@ const styles = StyleSheet.create({
     textAlign: 'right',
     flexShrink: 0,
   },
+  questRewardClaimed: {
+    color: '#10b981',
+    fontSize: 16,
+  },
+  claimButton: {
+    backgroundColor: '#8b5cf6',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 6,
+    shadowColor: '#8b5cf6',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  claimButtonText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    fontWeight: 'bold',
+    color: '#ffffff',
+  },
+  streakCelebrationContainer: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    marginLeft: -50,
+    marginTop: -20,
+    zIndex: 1000,
+    pointerEvents: 'none',
+  },
+  streakCelebrationBadge: {
+    backgroundColor: '#8b5cf6',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 20,
+    shadowColor: '#8b5cf6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.6,
+    shadowRadius: 8,
+    elevation: 10,
+    borderWidth: 2,
+    borderColor: '#ffffff',
+  },
+  streakCelebrationText: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 12,
+    color: '#ffffff',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
   dailyQuestsContainer: {
     width: '95%',
     alignSelf: 'center',
     backgroundColor: 'rgba(255, 255, 255, 0.98)',
     borderRadius: 12,
     padding: 16,
-    marginTop: 16,
+    marginTop: 0,
     borderWidth: 1,
     borderColor: 'rgba(139, 92, 246, 0.3)',
     shadowColor: '#8b5cf6',
@@ -1280,6 +1694,309 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 5,
+  },
+  trophiesCard: {
+    width: '95%',
+    alignSelf: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.98)',
+    borderRadius: 12,
+    padding: 16,
+    marginTop: 8,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.3)',
+    shadowColor: '#8b5cf6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  trophiesTitle: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 14,
+    color: '#64748b',
+    marginBottom: 6,
+    textAlign: 'center',
+    fontWeight: 'bold',
+  },
+  trophiesRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 8,
+  },
+  trophiesContainer: {
+    gap: 12,
+  },
+  trophyRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    gap: 8,
+  },
+  trophyItem: {
+    flex: 1,
+    alignItems: 'center',
+    backgroundColor: 'rgba(139, 92, 246, 0.05)',
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.2)',
+  },
+  trophyName: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 8,
+    color: '#64748b',
+    marginTop: 8,
+    textAlign: 'center',
+  },
+  // Dev Mode Styles
+  devModeSection: {
+    width: '95%',
+    alignSelf: 'center',
+    marginTop: 30,
+    marginBottom: 20,
+  },
+  resetPetsButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(239, 68, 68, 0.3)',
+    gap: 8,
+  },
+  resetPetsButtonText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#ef4444',
+    fontWeight: '600',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  hometownModalContent: {
+    width: '90%',
+    maxHeight: '80%',
+    backgroundColor: '#ffffff',
+    borderRadius: 20,
+    padding: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 8,
+    borderWidth: 2,
+    borderColor: '#8b5cf6',
+  },
+  hometownModalTitle: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 14,
+    color: '#8b5cf6',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  hometownModalSubtitle: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 12,
+    color: '#64748b',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  locationsList: {
+    maxHeight: 400,
+  },
+  locationItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 10,
+    backgroundColor: '#f8fafc',
+    borderWidth: 2,
+    borderColor: 'transparent',
+  },
+  locationItemSelected: {
+    borderColor: '#8b5cf6',
+    backgroundColor: 'rgba(139, 92, 246, 0.08)',
+  },
+  locationIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  locationName: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 13,
+    flex: 1,
+    fontWeight: '600',
+  },
+  checkIcon: {
+    marginLeft: 8,
+  },
+  closeModalButton: {
+    marginTop: 20,
+    backgroundColor: '#8b5cf6',
+    paddingVertical: 14,
+    paddingHorizontal: 24,
+    borderRadius: 12,
+    alignItems: 'center',
+    shadowColor: '#8b5cf6',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  closeModalButtonText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 13,
+    color: '#ffffff',
+    fontWeight: '600',
+  },
+  // Avatar Customization Modal Styles
+  avatarModalContainer: {
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
+  avatarModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  avatarModalContent: {
+    backgroundColor: '#ffffff',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    paddingTop: 16,
+    paddingBottom: 20,
+    paddingHorizontal: 18,
+    maxHeight: '80%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 10,
+  },
+  avatarModalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 14,
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(139, 92, 246, 0.15)',
+  },
+  avatarModalTitle: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 11,
+    color: '#8b5cf6',
+    letterSpacing: 0.5,
+  },
+  avatarModalScroll: {
+    paddingBottom: 10,
+  },
+  tagSection: {
+    marginBottom: 18,
+  },
+  tagSectionTitle: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 12,
+    color: '#8b5cf6',
+    marginBottom: 6,
+    fontWeight: '600',
+  },
+  tagInput: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 13,
+    backgroundColor: 'rgba(139, 92, 246, 0.05)',
+    borderWidth: 1.5,
+    borderColor: 'rgba(139, 92, 246, 0.2)',
+    borderRadius: 10,
+    padding: 12,
+    color: '#1e293b',
+  },
+  avatarSection: {
+    marginBottom: 14,
+  },
+  avatarSectionTitle: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 12,
+    color: '#8b5cf6',
+    marginBottom: 3,
+    fontWeight: '600',
+  },
+  avatarSectionSubtitle: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#94a3b8',
+    marginBottom: 10,
+  },
+  avatarGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    justifyContent: 'flex-start',
+  },
+  avatarGridItem: {
+    width: 60,
+    height: 60,
+    backgroundColor: 'rgba(139, 92, 246, 0.08)',
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: 'rgba(139, 92, 246, 0.25)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
+  },
+  avatarGridItemSelected: {
+    borderColor: '#8b5cf6',
+    backgroundColor: 'rgba(139, 92, 246, 0.15)',
+    borderWidth: 2.5,
+  },
+  avatarGridImage: {
+    width: '75%',
+    height: '75%',
+    borderRadius: 6,
+  },
+  avatarSelectedBadge: {
+    position: 'absolute',
+    top: -5,
+    right: -5,
+    backgroundColor: '#8b5cf6',
+    borderRadius: 10,
+    width: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#ffffff',
+  },
+  saveProfileButton: {
+    backgroundColor: '#8b5cf6',
+    paddingVertical: 14,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginTop: 6,
+    shadowColor: '#8b5cf6',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 6,
+    elevation: 4,
+  },
+  saveProfileButtonText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 13,
+    color: '#ffffff',
+    fontWeight: '600',
+    letterSpacing: -0.3,
   },
 });
 

@@ -173,6 +173,7 @@ export default function InventoryScreen() {
                         item.image === 'pink-sand-shaker.png' ? require('@/assets/images/pink-sand-shaker.png') :
                         item.image === 'starlight-sour.png' ? require('@/assets/images/starlight-sour.png') :
                         item.image === 'lunar-lagoon.png' ? require('@/assets/images/lunar-lagoon.png') :
+                        item.image === 'pxogulp-jug.png' ? require('@/assets/images/pxogulp-jug.png') :
                         // Default fallback - show chocolate for unknown items
                         require('@/assets/images/chocolate.png') // default fallback
                       } 
@@ -335,6 +336,7 @@ export default function InventoryScreen() {
                         selectedItem.image === 'pink-sand-shaker.png' ? require('@/assets/images/pink-sand-shaker.png') :
                         selectedItem.image === 'starlight-sour.png' ? require('@/assets/images/starlight-sour.png') :
                         selectedItem.image === 'lunar-lagoon.png' ? require('@/assets/images/lunar-lagoon.png') :
+                        selectedItem.image === 'pxogulp-jug.png' ? require('@/assets/images/pxogulp-jug.png') :
                         require('@/assets/images/chocolate.png')
                       )
                     }

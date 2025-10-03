@@ -7,12 +7,19 @@ import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
 import { SPACING, FONT_SIZES, BORDER_RADIUS, ICON_SIZES, SHADOWS } from '@/constants/Styles';
 import { useSimpleGame } from '@/store/SimpleGameStore';
+import { usePets } from '@/store/PetStore';
 
 export default function AppHeader() {
   const colorScheme = useColorScheme() ?? 'light';
   const { state } = useSimpleGame();
+  const { checkAndAddDailyStamina } = usePets();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const refreshRotation = useRef(new Animated.Value(0)).current;
+  
+  // Check and add daily stamina when component mounts or when route changes
+  useEffect(() => {
+    checkAndAddDailyStamina();
+  }, []);
   
   // Weather that changes 2-3 times per day based on time periods
   const getCurrentWeather = () => {
@@ -117,7 +124,7 @@ export default function AppHeader() {
         
         <View style={styles.logoContainer}>
           <Image 
-            source={require('@/assets/images/pxopets-logo-2.png')} 
+            source={require('@/assets/images/pxopets-nav-logo.png')} 
             style={styles.logo}
             resizeMode="contain"
           />
@@ -243,7 +250,7 @@ const styles = StyleSheet.create({
   },
   greeting: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 16, // Increased for better visibility
+    fontSize: 12,
     fontWeight: '500',
   },
   weatherContainer: {
