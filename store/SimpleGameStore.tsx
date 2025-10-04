@@ -25,6 +25,8 @@ type SimpleGameState = {
   selectedAvatar: string; // current avatar image name
   playerTag: string; // player's custom title/tag
   collectedAvatars: string[]; // array of avatar image names the player has collected
+  pxogulpRefillsToday: number; // number of Pxogulp refills used today
+  lastPxogulpRefillDate: string; // date string in YYYY-MM-DD format
 };
 
 type SimpleGameContextType = {
@@ -50,6 +52,8 @@ type SimpleGameContextType = {
   setAvatar: (avatar: string) => void;
   setPlayerTag: (tag: string) => void;
   addAvatar: (avatar: string) => void;
+  canRefillPxogulp: () => boolean;
+  usePxogulpRefill: () => boolean;
   hydrated: boolean;
 };
 
@@ -101,7 +105,9 @@ const DEFAULT_STATE: SimpleGameState = {
   hometown: 'Pxoburbs', // Default hometown
   selectedAvatar: 'avatar1.png', // Default avatar
   playerTag: 'Adventure Seeker', // Default tag
-  collectedAvatars: ['avatar1.png', 'avatar2.png', 'avatar3.png', 'avatar4.png', 'avatar5.png'], // Starting avatars (all for testing)
+  collectedAvatars: ['avatar1.png', 'avatar2.png', 'avatar3.png', 'avatar4.png', 'avatar5.png', 'avatar6.png', 'avatar7.png', 'avatar8.png'], // Starting avatars (all for testing)
+  pxogulpRefillsToday: 0, // No refills used today
+  lastPxogulpRefillDate: '', // No refills yet
 };
 
 const STORAGE_KEY = 'simple-game-state-v2';
@@ -118,6 +124,10 @@ export function SimpleGameProvider({ children }: { children: React.ReactNode }) 
         if (stored) {
           const parsedState = JSON.parse(stored);
           // Handle migration from old save format
+          const newAvatars = ['avatar6.png', 'avatar7.png', 'avatar8.png'];
+          const existingAvatars = parsedState.collectedAvatars ?? DEFAULT_STATE.collectedAvatars;
+          const migratedAvatars = [...new Set([...existingAvatars, ...newAvatars])]; // Remove duplicates and add new avatars
+          
           const migratedState = {
             ...DEFAULT_STATE,
             ...parsedState,
@@ -129,7 +139,9 @@ export function SimpleGameProvider({ children }: { children: React.ReactNode }) 
             hometown: parsedState.hometown ?? DEFAULT_STATE.hometown,
             selectedAvatar: parsedState.selectedAvatar ?? DEFAULT_STATE.selectedAvatar,
             playerTag: parsedState.playerTag ?? DEFAULT_STATE.playerTag,
-            collectedAvatars: parsedState.collectedAvatars ?? DEFAULT_STATE.collectedAvatars,
+            collectedAvatars: migratedAvatars,
+            pxogulpRefillsToday: parsedState.pxogulpRefillsToday ?? DEFAULT_STATE.pxogulpRefillsToday,
+            lastPxogulpRefillDate: parsedState.lastPxogulpRefillDate ?? DEFAULT_STATE.lastPxogulpRefillDate,
           };
           setState(migratedState);
         }
@@ -370,6 +382,37 @@ export function SimpleGameProvider({ children }: { children: React.ReactNode }) 
     });
   };
 
+  const canRefillPxogulp = (): boolean => {
+    const today = getTodayDateString();
+    
+    // If it's a new day, reset the refill count
+    if (state.lastPxogulpRefillDate !== today) {
+      setState(prev => ({
+        ...prev,
+        pxogulpRefillsToday: 0,
+        lastPxogulpRefillDate: today
+      }));
+      return true; // Can refill on a new day
+    }
+    
+    // Check if under the daily limit
+    return state.pxogulpRefillsToday < 3;
+  };
+
+  const usePxogulpRefill = (): boolean => {
+    if (!canRefillPxogulp()) {
+      return false;
+    }
+    
+    setState(prev => ({
+      ...prev,
+      pxogulpRefillsToday: prev.pxogulpRefillsToday + 1,
+      lastPxogulpRefillDate: getTodayDateString()
+    }));
+    
+    return true;
+  };
+
   const value: SimpleGameContextType = {
     state,
     addTickets,
@@ -393,6 +436,8 @@ export function SimpleGameProvider({ children }: { children: React.ReactNode }) 
     setAvatar,
     setPlayerTag,
     addAvatar,
+    canRefillPxogulp,
+    usePxogulpRefill,
     hydrated,
   };
 

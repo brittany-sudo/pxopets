@@ -39,7 +39,11 @@ export default function PlayerHomeScreen() {
       'avatar3.png': require('@/assets/images/avatar3.png'),
       'avatar4.png': require('@/assets/images/avatar4.png'),
       'avatar5.png': require('@/assets/images/avatar5.png'),
+      'avatar6.png': require('@/assets/images/avatar6.png'),
+      'avatar7.png': require('@/assets/images/avatar7.png'),
+      'avatar8.png': require('@/assets/images/avatar8.png'),
     };
+    
     return avatarMap[imageName] || require('@/assets/images/avatar1.png');
   };
   
@@ -1878,7 +1882,7 @@ const styles = StyleSheet.create({
     paddingTop: 16,
     paddingBottom: 20,
     paddingHorizontal: 18,
-    maxHeight: '80%',
+    maxHeight: '90%',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -4 },
     shadowOpacity: 0.15,

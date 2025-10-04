@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { StyleSheet, ScrollView, View as RNView, Image, Pressable, Alert, Animated, TouchableOpacity } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { useInventory } from '@/store/InventoryStore';
 import { useSimpleGame } from '@/store/SimpleGameStore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -61,7 +61,6 @@ export default function ShopScreen() {
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [coffeeClaimedToday, setCoffeeClaimedToday] = useState(false);
   const [lastCoffeeClaim, setLastCoffeeClaim] = useState<string | null>(null);
-  const [slusheeClaimedToday, setSlusheeClaimedToday] = useState(false);
   const [showSlusheeConfirm, setShowSlusheeConfirm] = useState(false);
   const [showSlusheeSuccess, setShowSlusheeSuccess] = useState(false);
   const [showCoffeeCooldown, setShowCoffeeCooldown] = useState(false);
@@ -69,10 +68,26 @@ export default function ShopScreen() {
   const [showPxogulpConfirm, setShowPxogulpConfirm] = useState(false);
   const [showPxogulpSuccess, setShowPxogulpSuccess] = useState(false);
   const [showNotEnoughGems, setShowNotEnoughGems] = useState(false);
+  const [showPxogulpRefillMenu, setShowPxogulpRefillMenu] = useState(false);
+  const [showRefillSuccess, setShowRefillSuccess] = useState(false);
+  const [showNoJugAlert, setShowNoJugAlert] = useState(false);
+  const [showFilledJugAlert, setShowFilledJugAlert] = useState(false);
+  const [showDailyLimitAlert, setShowDailyLimitAlert] = useState(false);
   const glowAnimation = useRef(new Animated.Value(0.2)).current;
   const scrollViewRef = useRef<ScrollView>(null);
-  const { addItem, state: inventoryState } = useInventory();
-  const { state: gameState, addCoins, addTickets, spendTickets, hydrated, setCurrency } = useSimpleGame();
+  const slideAnimation = useRef(new Animated.Value(300)).current;
+  const { addItem, removeItem, state: inventoryState } = useInventory();
+  const { state: gameState, addCoins, addTickets, spendTickets, hydrated, setCurrency, canRefillPxogulp, usePxogulpRefill } = useSimpleGame();
+
+  // Random soda flavors for Pxogulp refill (text only)
+  const sodaFlavors = [
+    { id: '1', name: 'Cosmic Cherry' },
+    { id: '2', name: 'Neon Grape' },
+    { id: '3', name: 'Stellar Strawberry' },
+    { id: '4', name: 'Galaxy Grape' },
+    { id: '5', name: 'Lunar Lemon' },
+    { id: '6', name: 'Solar Orange' },
+  ];
 
   // Limited time items that can only be bought with tickets
   const [limitedItems, setLimitedItems] = useState([
@@ -176,12 +191,31 @@ export default function ShopScreen() {
     loadCoffeeClaimStatus();
   }, []);
 
-  // Scroll to top when component mounts
+  // Scroll to top whenever screen comes into focus
+  useFocusEffect(
+    React.useCallback(() => {
+      if (scrollViewRef.current) {
+        scrollViewRef.current.scrollTo({ y: 0, animated: false });
+      }
+    }, [])
+  );
+
+  // Animate Pxogulp refill menu
   useEffect(() => {
-    if (scrollViewRef.current) {
-      scrollViewRef.current.scrollTo({ y: 0, animated: false });
+    if (showPxogulpRefillMenu) {
+      Animated.timing(slideAnimation, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    } else {
+      Animated.timing(slideAnimation, {
+        toValue: 300,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
     }
-  }, []);
+  }, [showPxogulpRefillMenu]);
 
   // Pulsing glow animation for limited time items
   useEffect(() => {
@@ -237,7 +271,6 @@ export default function ShopScreen() {
       // For now, let's just reset both to false to test
       // In a real app, you'd use AsyncStorage or another persistent storage
       setCoffeeClaimedToday(false);
-      setSlusheeClaimedToday(false);
       
       console.log('Daily claims reset for:', today);
     };
@@ -418,10 +451,6 @@ export default function ShopScreen() {
   };
 
   const handleMonthlySlushee = () => {
-    if (slusheeClaimedToday) {
-      Alert.alert("Already Claimed", "You've already claimed your monthly slushee today! Come back tomorrow!");
-      return;
-    }
     if (gameState.tickets < 3) {
       Alert.alert("Not Enough Tickets", "You need 3 tickets to buy a monthly slushee!");
       return;
@@ -429,13 +458,28 @@ export default function ShopScreen() {
     setShowSlusheePopup(true);
   };
 
-  // Check if player owns the Pxogulp jug
+  // Check if player owns any Pxogulp jug (empty or filled) - for purchase button
   const ownsPxogulpJug = () => {
-    return inventoryState?.mainInventory?.some(item => item.id === 'pxogulp-jug') || false;
+    return inventoryState?.mainInventory?.some(item => 
+      item.id === 'pxogulp-refillable-jug' || 
+      (item.id && item.id.startsWith('pxogulp-filled-'))
+    ) || false;
+  };
+
+  // Check if player owns an empty Pxogulp jug - for refill button
+  const ownsEmptyPxogulpJug = () => {
+    return inventoryState?.mainInventory?.some(item => 
+      item.id === 'pxogulp-refillable-jug'
+    ) || false;
   };
 
   // Handle Pxogulp jug purchase
   const handlePxogulpPurchase = () => {
+    console.log('Pxogulp purchase button clicked');
+    console.log('Current gems:', gameState.gems);
+    console.log('Owns jug:', ownsPxogulpJug());
+    console.log('Inventory items:', inventoryState?.mainInventory?.map(item => item.name));
+    
     if (ownsPxogulpJug()) {
       Alert.alert("Already Owned", "You already own the Pxogulp Refillable Jug!");
       return;
@@ -444,25 +488,35 @@ export default function ShopScreen() {
       setShowNotEnoughGems(true);
       return;
     }
+    console.log('Opening purchase confirmation...');
     setShowPxogulpConfirm(true);
   };
 
   const confirmPxogulpPurchase = () => {
+    console.log('Starting Pxogulp purchase...');
+    console.log('Current gems:', gameState.gems);
+    
     // Deduct gems
     setCurrency(gameState.tickets, gameState.stamina, gameState.coins, gameState.gems - 50);
     
     // Add to inventory
     const success = addItem({
-      id: 'pxogulp-jug',
+      id: 'pxogulp-refillable-jug',
       name: 'Pxogulp Refillable Jug',
       price: 50,
       image: 'pxogulp-jug.png',
       category: 'special',
-      description: 'A refillable jug that can be filled with your choice of 6 sodas!'
+      description: 'A refillable jug that can be filled with your choice of 6 sodas!',
+      isFilled: false
     }, 1);
+    
+    console.log('Add item success:', success);
+    console.log('Current inventory:', inventoryState?.mainInventory?.length);
     
     if (!success) {
       console.log('Failed to add Pxogulp jug to inventory');
+      Alert.alert("Error", "Failed to add item to inventory!");
+      return;
     }
     
     setShowPxogulpConfirm(false);
@@ -488,9 +542,6 @@ export default function ShopScreen() {
       category: 'drink',
       description: 'A refreshing monthly slushee!'
     }, 1);
-    
-    // Mark slushee as claimed for today
-    setSlusheeClaimedToday(true);
     
     setShowSlusheeConfirm(false);
     setShowSlusheeSuccess(true);
@@ -526,6 +577,42 @@ export default function ShopScreen() {
     } else {
       Alert.alert("Not Enough Tickets", `You need ${item.price} ticket${item.price > 1 ? 's' : ''} to buy ${item.name}.\n\nYou have ${gameState.tickets} tickets.`);
     }
+  };
+
+  const handleSodaFlavorSelect = (soda: any) => {
+    // Close the refill menu first
+    setShowPxogulpRefillMenu(false);
+    
+    // Check if we can still refill (in case limit was reached between opening menu and selecting)
+    if (!usePxogulpRefill()) {
+      setShowDailyLimitAlert(true);
+      return;
+    }
+    
+    // Remove the empty jug first
+    removeItem('pxogulp-refillable-jug', 1);
+    
+    // Wait a bit for the remove to complete, then add the filled jug
+    setTimeout(() => {
+      const filledJugId = `pxogulp-filled-${Date.now()}`;
+      const success = addItem({
+        id: filledJugId,
+        name: `Pxogulp ${soda.name}`,
+        price: 0,
+        image: 'pxogulp-jug.png',
+        category: 'drink' as const,
+        description: `Pxogulp jug filled with ${soda.name} - +20 stamina`,
+        isFilled: true,
+        originalSoda: soda.name
+      }, 1);
+      
+      if (success) {
+        // Show success popup after a brief delay
+        setTimeout(() => {
+          setShowRefillSuccess(true);
+        }, 300);
+      }
+    }, 100);
   };
 
   return (
@@ -577,7 +664,20 @@ export default function ShopScreen() {
             
             <Pressable 
               style={styles.freeOptionItem}
-              onPress={ownsPxogulpJug() ? () => Alert.alert("Pxogulp Refill", "Choose your soda flavor!") : () => Alert.alert("Pxogulp Required", "You need to purchase the Pxogulp Refillable Jug first!")}
+              onPress={() => {
+                if (ownsEmptyPxogulpJug()) {
+                  if (canRefillPxogulp()) {
+                    setShowPxogulpRefillMenu(true);
+                  } else {
+                    setShowDailyLimitAlert(true);
+                  }
+                } else if (ownsPxogulpJug()) {
+                  // Player has a filled jug, show custom modal
+                  setShowFilledJugAlert(true);
+                } else {
+                  setShowNoJugAlert(true);
+                }
+              }}
             >
               <FontAwesome name="tint" size={20} color="#8b5cf6" />
               <Text style={styles.freeOptionItemText}>Pxogulp Refill</Text>
@@ -593,12 +693,55 @@ export default function ShopScreen() {
           </RNView>
         </RNView>
 
+        {/* Featured Item - Pxogulp Jug (only show if not owned) */}
+        {!ownsPxogulpJug() && (
+          <RNView style={styles.shopInventoryCard}>
+            <RNView style={styles.pxogulpContainer}>
+              <RNView style={styles.pxogulpImageContainer}>
+                <Image source={pxogulpJugImage} style={styles.pxogulpImage} />
+                <RNView style={styles.pxogulpGlow} />
+              </RNView>
+              <RNView style={styles.pxogulpContent}>
+                <RNView style={styles.pxogulpPriceContainer}>
+                  <RNView style={styles.priceBadge}>
+                    <FontAwesome name="diamond" size={10} color="#06b6d4" />
+                    <Text style={styles.pxogulpPrice}>50 GEMS</Text>
+                  </RNView>
+                  <RNView style={styles.valueBadge}>
+                    <Text style={styles.valueText}>GREAT VALUE!</Text>
+                  </RNView>
+                </RNView>
+                <Text style={styles.pxogulpTitle}>PXOGULP REFILLABLE JUG</Text>
+                <Text style={styles.pxogulpSubtitle}>Premium Hydration System</Text>
+                <RNView style={styles.pxogulpFeatures}>
+                  <RNView style={styles.featureItem}>
+                    <FontAwesome name="tint" size={12} color="#06b6d4" />
+                    <Text style={styles.featureText}>6 Soda Choices</Text>
+                  </RNView>
+                  <RNView style={styles.featureItem}>
+                    <FontAwesome name="refresh" size={12} color="#8b5cf6" />
+                    <Text style={styles.featureText}>3 Refills/Day</Text>
+                  </RNView>
+                  <RNView style={styles.featureItem}>
+                    <FontAwesome name="bolt" size={12} color="#f59e0b" />
+                    <Text style={styles.featureText}>20 Stamina Each</Text>
+                  </RNView>
+                </RNView>
+                <Pressable style={styles.pxogulpButton} onPress={handlePxogulpPurchase}>
+                  <FontAwesome name="shopping-cart" size={14} color="#ffffff" />
+                  <Text style={styles.pxogulpButtonText}>PURCHASE</Text>
+                </Pressable>
+              </RNView>
+            </RNView>
+          </RNView>
+        )}
+
         {/* Shop Inventory */}
         <RNView style={styles.lotteryCard}>
           <RNView style={styles.stockHeader}>
             <Text style={styles.sectionTitle}>CURRENT STOCK</Text>
             <RNView style={styles.countdownBadge}>
-              <FontAwesome name="clock-o" size={10} color="#8b5cf6" />
+              <FontAwesome name="clock-o" size={10} color="#06b6d4" />
               <Text style={styles.countdownText}>{formatTime(countdown)}</Text>
             </RNView>
           </RNView>
@@ -746,55 +889,45 @@ export default function ShopScreen() {
           </RNView>
         </RNView>
 
-        {/* Featured Item - Pxogulp Jug */}
-        <RNView style={styles.shopInventoryCard}>
-          <RNView style={styles.pxogulpContainer}>
-            <RNView style={styles.pxogulpImageContainer}>
-              <Image source={pxogulpJugImage} style={styles.pxogulpImage} />
-              <RNView style={styles.pxogulpGlow} />
-            </RNView>
-            <RNView style={styles.pxogulpContent}>
-              <Text style={styles.pxogulpTitle}>PXOGULP REFILLABLE JUG</Text>
-              <Text style={styles.pxogulpSubtitle}>Premium Hydration System</Text>
-              <RNView style={styles.pxogulpFeatures}>
-                <RNView style={styles.featureItem}>
-                  <FontAwesome name="tint" size={12} color="#06b6d4" />
-                  <Text style={styles.featureText}>6 Soda Choices</Text>
-                </RNView>
-                <RNView style={styles.featureItem}>
-                  <FontAwesome name="refresh" size={12} color="#8b5cf6" />
-                  <Text style={styles.featureText}>3 Refills/Day</Text>
-                </RNView>
-                <RNView style={styles.featureItem}>
-                  <FontAwesome name="bolt" size={12} color="#f59e0b" />
-                  <Text style={styles.featureText}>20 Stamina Each</Text>
-                </RNView>
+        {/* Owned Pxogulp Jug (only show if owned) */}
+        {ownsPxogulpJug() && (
+          <RNView style={styles.shopInventoryCard}>
+            <RNView style={[styles.pxogulpContainer, styles.pxogulpOwnedContainer]}>
+              <RNView style={styles.pxogulpDefunctOverlay} />
+              <RNView style={styles.pxogulpImageContainer}>
+                <Image source={pxogulpJugImage} style={styles.pxogulpImage} />
               </RNView>
-              <RNView style={styles.pxogulpPriceContainer}>
-                <RNView style={styles.priceBadge}>
-                  <FontAwesome name="diamond" size={14} color="#06b6d4" />
-                  <Text style={styles.pxogulpPrice}>50 GEMS</Text>
-                </RNView>
-                {!ownsPxogulpJug() && (
-                  <RNView style={styles.valueBadge}>
-                    <Text style={styles.valueText}>GREAT VALUE!</Text>
+              <RNView style={styles.pxogulpContent}>
+                <RNView style={styles.pxogulpPriceContainer}>
+                  <RNView style={styles.priceBadge}>
+                    <FontAwesome name="diamond" size={10} color="#06b6d4" />
+                    <Text style={styles.pxogulpPrice}>50 GEMS</Text>
                   </RNView>
-                )}
-              </RNView>
-              {ownsPxogulpJug() ? (
+                </RNView>
+                <Text style={styles.pxogulpTitle}>PXOGULP REFILLABLE JUG</Text>
+                <Text style={styles.pxogulpSubtitle}>Premium Hydration System</Text>
+                <RNView style={styles.pxogulpFeatures}>
+                  <RNView style={styles.featureItem}>
+                    <FontAwesome name="tint" size={12} color="#06b6d4" />
+                    <Text style={styles.featureText}>6 Soda Choices</Text>
+                  </RNView>
+                  <RNView style={styles.featureItem}>
+                    <FontAwesome name="refresh" size={12} color="#8b5cf6" />
+                    <Text style={styles.featureText}>3 Refills/Day</Text>
+                  </RNView>
+                  <RNView style={styles.featureItem}>
+                    <FontAwesome name="bolt" size={12} color="#f59e0b" />
+                    <Text style={styles.featureText}>20 Stamina Each</Text>
+                  </RNView>
+                </RNView>
                 <Pressable style={[styles.pxogulpButton, styles.ownedButton]} disabled>
                   <FontAwesome name="check-circle" size={14} color="#ffffff" />
                   <Text style={[styles.pxogulpButtonText, styles.ownedText]}>OWNED</Text>
                 </Pressable>
-              ) : (
-                <Pressable style={styles.pxogulpButton} onPress={handlePxogulpPurchase}>
-                  <FontAwesome name="shopping-cart" size={14} color="#ffffff" />
-                  <Text style={styles.pxogulpButtonText}>PURCHASE</Text>
-                </Pressable>
-              )}
+              </RNView>
             </RNView>
           </RNView>
-        </RNView>
+        )}
 
       </ScrollView>
 
@@ -826,29 +959,23 @@ export default function ShopScreen() {
       {/* Slushee Popup Modal */}
       {showSlusheePopup && (
         <RNView style={styles.modalOverlay}>
-          <RNView style={styles.coffeePopup}>
-            <RNView style={styles.popupHeader}>
-              <Text style={styles.popupTitle}>MONTHLY SLUSHEE!</Text>
-            </RNView>
-            <RNView style={styles.ticketBadge}>
-              <FontAwesome name="ticket" size={10} color="#8b5cf6" />
-              <Text style={styles.ticketBadgeText}>3 TICKETS</Text>
-            </RNView>
-            <Image source={slushee3Image} style={styles.coffeePopupImage} />
-            <Text style={styles.coffeePopupText}>
+          <RNView style={styles.slusheePopup}>
+            <Text style={styles.slusheeTitle}>MONTHLY SLUSHEE</Text>
+            <Image source={slushee3Image} style={styles.slusheeIcon} />
+            <Text style={styles.slusheeMessage}>
               A refreshing monthly slushee for 3 tickets!
             </Text>
             <Pressable 
-              style={styles.coffeePopupButton}
+              style={styles.slusheeButton}
               onPress={handleSlusheeConfirm}
             >
-              <Text style={styles.coffeePopupButtonText}>BUY FOR 3 TICKETS</Text>
+              <Text style={styles.slusheeButtonText}>BUY</Text>
             </Pressable>
             <Pressable 
-              style={styles.coffeePopupCancelButton}
+              style={styles.slusheeCancelButton}
               onPress={() => setShowSlusheePopup(false)}
             >
-              <Text style={styles.coffeePopupCancelButtonText}>CANCEL</Text>
+              <Text style={styles.slusheeCancelButtonText}>CANCEL</Text>
             </Pressable>
           </RNView>
         </RNView>
@@ -857,29 +984,23 @@ export default function ShopScreen() {
       {/* Slushee Confirmation Modal */}
       {showSlusheeConfirm && (
         <RNView style={styles.modalOverlay}>
-          <RNView style={styles.coffeePopup}>
-            <RNView style={styles.popupHeader}>
-              <Text style={styles.popupTitle}>CONFIRM PURCHASE</Text>
-            </RNView>
-            <RNView style={styles.confirmBadge}>
-              <FontAwesome name="check-circle" size={10} color="#8b5cf6" />
-              <Text style={styles.confirmBadgeText}>CONFIRM</Text>
-            </RNView>
-            <Image source={slushee3Image} style={styles.coffeePopupImage} />
-            <Text style={styles.coffeePopupText}>
+          <RNView style={styles.slusheePopup}>
+            <Text style={styles.slusheeTitle}>CONFIRM PURCHASE</Text>
+            <Image source={slushee3Image} style={styles.slusheeIcon} />
+            <Text style={styles.slusheeMessage}>
               Buy Monthly Slushee for 3 tickets?
             </Text>
             <Pressable 
-              style={styles.coffeePopupButton}
+              style={styles.slusheeButton}
               onPress={handleSlusheePurchase}
             >
-              <Text style={styles.coffeePopupButtonText}>CONFIRM PURCHASE</Text>
+              <Text style={styles.slusheeButtonText}>BUY</Text>
             </Pressable>
             <Pressable 
-              style={styles.coffeePopupCancelButton}
+              style={styles.slusheeCancelButton}
               onPress={() => setShowSlusheeConfirm(false)}
             >
-              <Text style={styles.coffeePopupCancelButtonText}>CANCEL</Text>
+              <Text style={styles.slusheeCancelButtonText}>CANCEL</Text>
             </Pressable>
           </RNView>
         </RNView>
@@ -888,19 +1009,17 @@ export default function ShopScreen() {
       {/* Slushee Success Modal */}
       {showSlusheeSuccess && (
         <RNView style={styles.modalOverlay}>
-          <RNView style={styles.coffeePopup}>
-            <RNView style={styles.popupHeader}>
-              <Text style={styles.popupTitle}>PURCHASE SUCCESSFUL!</Text>
-            </RNView>
-            <Image source={slushee3Image} style={styles.coffeePopupImage} />
-            <Text style={styles.coffeePopupText}>
+          <RNView style={styles.slusheePopup}>
+            <Text style={styles.slusheeTitle}>PURCHASE SUCCESSFUL!</Text>
+            <Image source={slushee3Image} style={styles.slusheeIcon} />
+            <Text style={styles.slusheeMessage}>
               Monthly Slushee was added to your inventory!
             </Text>
             <Pressable 
-              style={styles.coffeePopupButton}
+              style={styles.slusheeButton}
               onPress={() => setShowSlusheeSuccess(false)}
             >
-              <Text style={styles.coffeePopupButtonText}>CONTINUE</Text>
+              <Text style={styles.slusheeButtonText}>OK</Text>
             </Pressable>
           </RNView>
         </RNView>
@@ -1144,6 +1263,150 @@ export default function ShopScreen() {
           </RNView>
         </RNView>
       )}
+
+      {/* Pxogulp Refill Menu Modal */}
+      {showPxogulpRefillMenu && (
+        <RNView style={styles.bottomSheetOverlay}>
+          <Pressable 
+            style={styles.bottomSheetBackdrop}
+            onPress={() => setShowPxogulpRefillMenu(false)}
+          />
+          <Animated.View 
+            style={[
+              styles.pxogulpRefillMenu,
+              { transform: [{ translateY: slideAnimation }] }
+            ]}
+          >
+            <RNView style={styles.refillMenuHeader}>
+              <RNView style={styles.refillMenuTitleContainer}>
+                <Text style={styles.refillMenuTitle}>PXOGULP REFILL</Text>
+                <Text style={styles.refillMenuCount}>
+                  {3 - gameState.pxogulpRefillsToday} REFILLS LEFT TODAY
+                </Text>
+                <RNView style={styles.refillMenuDivider} />
+              </RNView>
+              <Pressable 
+                style={styles.closeButton}
+                onPress={() => setShowPxogulpRefillMenu(false)}
+              >
+                <FontAwesome name="times" size={16} color="#8b5cf6" />
+              </Pressable>
+            </RNView>
+            <Text style={styles.refillMenuSubtitle}>Choose your soda flavor:</Text>
+            <RNView style={styles.sodaFlavorsGrid}>
+              {sodaFlavors.map((soda) => (
+                <Pressable 
+                  key={soda.id} 
+                  style={styles.sodaFlavorButton}
+                  onPress={() => handleSodaFlavorSelect(soda)}
+                >
+                  <Text style={styles.sodaFlavorButtonText}>{soda.name}</Text>
+                </Pressable>
+              ))}
+            </RNView>
+          </Animated.View>
+        </RNView>
+      )}
+
+      {/* Filled Jug Alert Modal */}
+      {showFilledJugAlert && (
+        <RNView style={styles.modalOverlay}>
+          <RNView style={styles.coffeePopup}>
+            <RNView style={styles.popupHeader}>
+              <Text style={styles.popupTitle}>JUG ALREADY FILLED</Text>
+            </RNView>
+            <RNView style={styles.filledBadge}>
+              <FontAwesome name="tint" size={10} color="#06b6d4" />
+              <Text style={styles.filledBadgeText}>FILLED</Text>
+            </RNView>
+            <Image source={pxogulpJugImage} style={styles.coffeePopupImage} />
+            <Text style={styles.coffeePopupText}>
+              Your Pxogulp jug is already filled!{'\n'}
+              Drink it first to empty it, then you can refill it again.
+            </Text>
+            <Pressable 
+              style={styles.coffeePopupButton}
+              onPress={() => setShowFilledJugAlert(false)}
+            >
+              <Text style={styles.coffeePopupButtonText}>OK</Text>
+            </Pressable>
+          </RNView>
+        </RNView>
+      )}
+
+      {/* Daily Limit Alert Modal */}
+      {showDailyLimitAlert && (
+        <RNView style={styles.modalOverlay}>
+          <RNView style={styles.dailyLimitPopup}>
+            <Text style={styles.dailyLimitTitle}>DAILY LIMIT REACHED</Text>
+            <Text style={styles.dailyLimitMessage}>
+              You've used all 3 Pxogulp refills for today! Come back tomorrow for more refills.
+            </Text>
+            <Pressable 
+              style={styles.dailyLimitButton}
+              onPress={() => setShowDailyLimitAlert(false)}
+            >
+              <Text style={styles.dailyLimitButtonText}>OK</Text>
+            </Pressable>
+          </RNView>
+        </RNView>
+      )}
+
+      {/* Refill Success Popup */}
+      {showRefillSuccess && (
+        <RNView style={styles.modalOverlay}>
+          <RNView style={styles.coffeePopup}>
+            <RNView style={styles.popupHeader}>
+              <Text style={styles.popupTitle}>JUG REFILLED!</Text>
+            </RNView>
+            <RNView style={styles.successBadge}>
+              <FontAwesome name="check-circle" size={10} color="#22c55e" />
+              <Text style={styles.successBadgeText}>SUCCESS</Text>
+            </RNView>
+            <Image source={pxogulpJugImage} style={styles.coffeePopupImage} />
+            <Text style={styles.coffeePopupText}>
+              You filled your jug with soda!{'\n'}+20 stamina was added to your Pxogulp jug
+            </Text>
+            <Pressable 
+              style={styles.coffeePopupButton}
+              onPress={() => setShowRefillSuccess(false)}
+            >
+              <Text style={styles.coffeePopupButtonText}>AWESOME!</Text>
+            </Pressable>
+            <Pressable 
+              style={styles.coffeePopupCancelButton}
+              onPress={() => {
+                setShowRefillSuccess(false);
+                router.navigate('/(tabs)/inventory');
+              }}
+            >
+              <Text style={styles.coffeePopupCancelButtonText}>GO TO INVENTORY</Text>
+            </Pressable>
+          </RNView>
+        </RNView>
+      )}
+
+      {/* No Jug Alert Modal */}
+      {showNoJugAlert && (
+        <RNView style={styles.modalOverlay}>
+          <RNView style={styles.coffeePopup}>
+            <RNView style={styles.popupHeader}>
+              <Text style={styles.popupTitle}>PXOGULP REQUIRED</Text>
+            </RNView>
+            <FontAwesome name="tint" size={40} color="#06b6d4" />
+            <Text style={styles.coffeePopupText}>
+              You need to purchase the Pxogulp Refillable Jug first!{'\n'}
+              Visit the shop section to buy one for 50 gems.
+            </Text>
+            <Pressable 
+              style={styles.coffeePopupButton}
+              onPress={() => setShowNoJugAlert(false)}
+            >
+              <Text style={styles.coffeePopupButtonText}>OK</Text>
+            </Pressable>
+          </RNView>
+        </RNView>
+      )}
     </View>
   );
 }
@@ -1154,7 +1417,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8fafc',
   },
   scrollContent: {
-    paddingBottom: 80,
+    paddingBottom: 20,
   },
   // Header
   headerRow: {
@@ -1192,7 +1455,7 @@ const styles = StyleSheet.create({
   shopInventoryCard: {
     backgroundColor: 'transparent',
     marginHorizontal: 20,
-    marginBottom: 20,
+    marginBottom: 30,
     padding: 0,
     borderRadius: 0,
     borderWidth: 0,
@@ -1220,8 +1483,10 @@ const styles = StyleSheet.create({
   lotteryCard: {
     backgroundColor: '#ffffff',
     marginHorizontal: 20,
-    marginBottom: 20,
-    padding: 20,
+    marginBottom: 8,
+    padding: 12,
+    paddingLeft: 20,
+    paddingBottom: 16,
     borderRadius: 16,
     borderWidth: 2,
     borderColor: '#8b5cf6',
@@ -1236,19 +1501,19 @@ const styles = StyleSheet.create({
     fontFamily: 'PressStart2P_400Regular',
     fontSize: 12,
     color: '#8b5cf6',
-    marginBottom: 16,
+    marginBottom: 0,
   },
   // Badges
   countdownBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+    backgroundColor: 'rgba(6, 182, 212, 0.1)',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
     gap: 4,
     borderWidth: 1,
-    borderColor: 'rgba(139, 92, 246, 0.2)',
+    borderColor: 'rgba(6, 182, 212, 0.2)',
   },
   premiumBadge: {
     flexDirection: 'row',
@@ -1329,13 +1594,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    gap: 12,
+    gap: 4,
   },
   inventoryItem: {
     width: '48%',
     backgroundColor: 'rgba(139, 92, 246, 0.05)',
     borderRadius: 8,
-    padding: 8,
+    padding: 6,
     borderWidth: 1,
     borderColor: 'rgba(139, 92, 246, 0.2)',
     alignItems: 'center',
@@ -1576,7 +1841,7 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
     borderRadius: 12,
     marginTop: 0,
-    marginBottom: 10, // More space between header and Marty
+    marginBottom: -15, // Much less space between header and Marty
   },
   speechBubble: {
     backgroundColor: 'rgba(6, 182, 212, 0.1)',
@@ -1771,9 +2036,12 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   stockHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
-    paddingBottom: 8,
+    marginBottom: 4,
+    paddingBottom: 4,
+    paddingTop: 4,
   },
   stockTitle: {
     fontFamily: 'Silkscreen_400Regular',
@@ -1792,7 +2060,7 @@ const styles = StyleSheet.create({
   countdownText: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 10,
-    color: '#8b5cf6',
+    color: '#06b6d4',
     fontWeight: 'bold',
     marginLeft: 4,
     letterSpacing: 0.5,
@@ -2087,6 +2355,194 @@ const styles = StyleSheet.create({
     color: '#22c55e',
     fontWeight: 'bold',
   },
+  filledBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(6, 182, 212, 0.1)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    gap: 4,
+  },
+  filledBadgeText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 8,
+    color: '#06b6d4',
+    fontWeight: 'bold',
+  },
+  limitBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(245, 158, 11, 0.1)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    gap: 4,
+  },
+  limitBadgeText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 8,
+    color: '#f59e0b',
+    fontWeight: 'bold',
+  },
+  limitInfo: {
+    backgroundColor: 'rgba(245, 158, 11, 0.05)',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+    marginBottom: 16,
+  },
+  limitInfoText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#f59e0b',
+    textAlign: 'center',
+    fontWeight: 'bold',
+  },
+  // Daily Limit Popup
+  dailyLimitPopup: {
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    padding: 24,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#f59e0b',
+    shadowColor: '#f59e0b',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 8,
+    maxWidth: 300,
+    minWidth: 280,
+  },
+  dailyLimitTitle: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 12,
+    color: '#f59e0b',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  dailyLimitMessage: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 11,
+    color: '#0f172a',
+    textAlign: 'center',
+    lineHeight: 16,
+    marginBottom: 20,
+  },
+  dailyLimitButton: {
+    backgroundColor: '#f59e0b',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: '#d97706',
+    shadowColor: '#f59e0b',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  dailyLimitButtonText: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 10,
+    color: '#ffffff',
+    fontWeight: 'bold',
+  },
+  // Slushee Popup (matching daily limit format)
+  slusheePopup: {
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    padding: 24,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#8b5cf6',
+    shadowColor: '#8b5cf6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 5,
+    width: 320,
+  },
+  slusheeIcon: {
+    width: 50,
+    height: 50,
+    marginBottom: 16,
+    resizeMode: 'contain',
+  },
+  slusheeTitle: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 10,
+    color: '#8b5cf6',
+    fontWeight: 'bold',
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  slusheeMessage: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 12,
+    color: '#374151',
+    textAlign: 'center',
+    marginBottom: 20,
+    lineHeight: 16,
+  },
+  slusheeButton: {
+    backgroundColor: '#8b5cf6',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#7c3aed',
+    shadowColor: '#8b5cf6',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
+    marginBottom: 8,
+    minWidth: 120,
+  },
+  slusheeButtonText: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 10,
+    color: '#ffffff',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  slusheeCancelButton: {
+    backgroundColor: 'transparent',
+    paddingHorizontal: 24,
+    paddingVertical: 8,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#d1d5db',
+  },
+  slusheeCancelButtonText: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 8,
+    color: '#6b7280',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  // Small Buy Button
+  smallBuyButton: {
+    backgroundColor: '#8b5cf6',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#7c3aed',
+    shadowColor: '#8b5cf6',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    elevation: 3,
+  },
+  smallBuyButtonText: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 8,
+    color: '#ffffff',
+    fontWeight: 'bold',
+  },
   cooldownBadge: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -2229,22 +2685,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#8b5cf6',
     fontWeight: '500',
-  },
-  // Slushee Popup Modal Styles
-  slusheePopup: {
-    backgroundColor: '#ffffff',
-    padding: 28,
-    borderRadius: 16,
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#8b5cf6',
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.15,
-    shadowRadius: 24,
-    elevation: 12,
-    width: 320,
-    marginTop: -100,
   },
   slusheePopupTitle: {
     fontFamily: 'Silkscreen_400Regular',
@@ -2558,44 +2998,60 @@ const styles = StyleSheet.create({
   // Pxogulp Jug Styles
   pxogulpContainer: {
     backgroundColor: '#ffffff',
-    borderRadius: 16,
+    borderRadius: 12,
     borderWidth: 2,
     borderColor: '#06b6d4',
-    padding: 20,
+    padding: 16,
     marginHorizontal: 0,
     shadowColor: '#06b6d4',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.2,
-    shadowRadius: 12,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 6,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 16,
+    gap: 12,
+  },
+  pxogulpOwnedContainer: {
+    borderColor: 'rgba(139, 92, 246, 0.3)',
+    shadowColor: 'rgba(139, 92, 246, 0.3)',
+    shadowOpacity: 0.05,
+    elevation: 1,
+  },
+  pxogulpDefunctOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(255, 255, 255, 0.6)',
+    borderRadius: 16,
+    zIndex: 10,
   },
   pxogulpImageContainer: {
     position: 'relative',
     alignItems: 'center',
     justifyContent: 'center',
-    width: 80,
-    height: 80,
+    width: 60,
+    height: 60,
   },
   pxogulpImage: {
-    width: 70,
-    height: 70,
+    width: 50,
+    height: 50,
     resizeMode: 'contain',
     zIndex: 2,
   },
   pxogulpGlow: {
     position: 'absolute',
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     backgroundColor: 'rgba(6, 182, 212, 0.2)',
     shadowColor: '#06b6d4',
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.6,
-    shadowRadius: 15,
-    elevation: 5,
+    shadowRadius: 12,
+    elevation: 4,
   },
   pxogulpContent: {
     flex: 1,
@@ -2604,7 +3060,7 @@ const styles = StyleSheet.create({
   pxogulpTitle: {
     fontFamily: 'PressStart2P_400Regular',
     fontSize: 11,
-    color: '#06b6d4',
+    color: '#8b5cf6',
     fontWeight: 'bold',
     marginBottom: 4,
     lineHeight: 14,
@@ -2612,54 +3068,54 @@ const styles = StyleSheet.create({
   },
   pxogulpSubtitle: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 9,
+    fontSize: 8,
     color: '#64748b',
-    marginBottom: 12,
+    marginBottom: 8,
     fontStyle: 'italic',
   },
   pxogulpFeatures: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
-    marginBottom: 12,
+    gap: 6,
+    marginBottom: 8,
   },
   featureItem: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: 'rgba(6, 182, 212, 0.1)',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
-    gap: 4,
+    paddingHorizontal: 6,
+    paddingVertical: 3,
+    borderRadius: 6,
+    gap: 3,
     borderWidth: 1,
     borderColor: 'rgba(6, 182, 212, 0.2)',
   },
   featureText: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 8,
+    fontSize: 7,
     color: '#06b6d4',
     fontWeight: '600',
   },
   pxogulpPriceContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    marginBottom: 12,
+    gap: 4,
+    marginBottom: 6,
   },
   priceBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: 'rgba(6, 182, 212, 0.15)',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 12,
-    gap: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+    gap: 4,
     borderWidth: 1,
     borderColor: '#06b6d4',
   },
   pxogulpPrice: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 12,
+    fontSize: 10,
     color: '#06b6d4',
     fontWeight: 'bold',
   },
@@ -2682,10 +3138,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#06b6d4',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 10,
-    gap: 6,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
+    gap: 4,
     borderWidth: 1,
     borderColor: '#0891b2',
     shadowColor: '#06b6d4',
@@ -2713,5 +3169,105 @@ const styles = StyleSheet.create({
   },
   ownedText: {
     color: '#ffffff',
+  },
+  // Pxogulp Refill Menu Styles
+  bottomSheetOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 1000,
+  },
+  bottomSheetBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  pxogulpRefillMenu: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: '#ffffff',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 24,
+    paddingBottom: 40,
+    maxHeight: '80%',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  refillMenuHeader: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+    marginBottom: 16,
+    position: 'relative',
+  },
+  refillMenuTitleContainer: {
+    alignItems: 'center',
+  },
+  refillMenuTitle: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 14,
+    color: '#8b5cf6',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  refillMenuCount: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#64748b',
+    textAlign: 'center',
+    marginTop: 4,
+    marginBottom: 8,
+  },
+  refillMenuDivider: {
+    width: 40,
+    height: 1,
+    backgroundColor: 'rgba(139, 92, 246, 0.3)',
+    marginTop: 6,
+    borderRadius: 0.5,
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    padding: 8,
+    borderRadius: 20,
+    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+  },
+  refillMenuSubtitle: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 12,
+    color: '#64748b',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  sodaFlavorsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  sodaFlavorButton: {
+    width: '48%',
+    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+    borderRadius: 8,
+    padding: 12,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.3)',
+    marginBottom: 8,
+  },
+  sodaFlavorButtonText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 11,
+    color: '#8b5cf6',
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });

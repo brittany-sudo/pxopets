@@ -3,6 +3,8 @@ import { StyleSheet, Modal, Pressable, Alert, ScrollView } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { useSimpleGame } from '@/store/SimpleGameStore';
 import { usePets } from '@/store/PetStore';
+import { useInventory } from '@/store/InventoryStore';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 interface DeveloperPanelProps {
@@ -12,19 +14,41 @@ interface DeveloperPanelProps {
 
 export default function DeveloperPanel({ visible, onClose }: DeveloperPanelProps) {
   const { state, addTickets, addStamina, addGems, setCurrency, resetGame } = useSimpleGame();
-  const { resetAllPets } = usePets();
+  const { resetAllPets, getActivePet, addStaminaToPet } = usePets();
+  const { clearAllItems } = useInventory();
+
+  const clearCoffeeCooldown = async () => {
+    try {
+      await AsyncStorage.removeItem('lastCoffeeClaim');
+      console.log('Coffee cooldown cleared');
+    } catch (error) {
+      console.error('Error clearing coffee cooldown:', error);
+    }
+  };
+
+  const clearTrapperGameData = async () => {
+    try {
+      await AsyncStorage.removeItem('trapperDailyTraps');
+      await AsyncStorage.removeItem('trapperLastReset');
+      console.log('Trapper game data cleared');
+    } catch (error) {
+      console.error('Error clearing trapper game data:', error);
+    }
+  };
 
   const handleAddTickets = (amount: number) => {
     console.log('Adding tickets:', amount);
     addTickets(amount);
-    Alert.alert('Added!', `+${amount} Tickets! New total: ${state.tickets + amount}`);
   };
 
   const handleAddStamina = (amount: number) => {
-    console.log('Adding stamina:', amount, 'Current stamina:', state.stamina);
-    addStamina(amount);
-    console.log('After adding, stamina should be:', state.stamina + amount);
-    Alert.alert('Added!', `+${amount} Stamina! New total: ${state.stamina + amount}`);
+    const activePet = getActivePet();
+    if (!activePet) {
+      Alert.alert('No Active Pet', 'You need an active pet to add stamina!');
+      return;
+    }
+    console.log('Adding stamina to pet:', activePet.name, amount);
+    addStaminaToPet(activePet.id, amount);
   };
 
   const handleClearTickets = () => {
@@ -84,15 +108,18 @@ export default function DeveloperPanel({ visible, onClose }: DeveloperPanelProps
   const handleResetEverything = () => {
     Alert.alert(
       'Reset Everything',
-      'This will reset:\n• All currency (tickets, gems, stamina)\n• All pets\n• Purchased backgrounds\n\nAre you sure?',
+      'This will reset:\n• All currency (tickets, gems, stamina)\n• All pets\n• All inventory items\n• Pxogulp refill counts\n• Coffee cooldown\n• Purchased backgrounds\n• Trapper game daily progress\n\nAre you sure?',
       [
         { text: 'Cancel', style: 'cancel' },
         {
           text: 'Reset Everything',
           style: 'destructive',
-          onPress: () => {
+          onPress: async () => {
             resetGame();
             resetAllPets();
+            clearAllItems();
+            await clearCoffeeCooldown();
+            await clearTrapperGameData();
             Alert.alert('Reset Complete', 'All progress has been wiped!');
             onClose();
           }

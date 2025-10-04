@@ -3,11 +3,18 @@ import { StyleSheet, View as RNView } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useSimpleGame } from '@/store/SimpleGameStore';
+import { usePets } from '@/store/PetStore';
 
 export default function SimpleCurrencyDisplay() {
   const { state } = useSimpleGame();
+  const { state: petState } = usePets();
 
-  console.log('SimpleCurrencyDisplay render - tickets:', state.tickets, 'stamina:', state.stamina, 'coins:', state.coins);
+  // Calculate total stamina from all pets
+  const getTotalPetStamina = () => {
+    return petState.adoptedPets.reduce((total, pet) => total + (pet.stamina || 0), 0);
+  };
+
+  console.log('SimpleCurrencyDisplay render - tickets:', state.tickets, 'stamina:', getTotalPetStamina(), 'coins:', state.coins);
 
   return (
     <View style={styles.container}>
@@ -20,7 +27,7 @@ export default function SimpleCurrencyDisplay() {
       {/* Stamina */}
       <View style={styles.currencyItem}>
         <FontAwesome name="bolt" size={20} color="#FFD700" />
-        <Text style={styles.currencyText}>{state.stamina}</Text>
+        <Text style={styles.currencyText}>{getTotalPetStamina()}</Text>
       </View>
 
       {/* Gems */}

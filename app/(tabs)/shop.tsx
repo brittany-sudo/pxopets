@@ -15,6 +15,11 @@ const dragonLunchboxImage = require('@/assets/images/dragon-lunchbox.png');
 export default function ShopScreen() {
   const { state, spendTickets, addFood, addBackground, hasBackground, hydrated } = useSimpleGame();
   const [selectedCategory, setSelectedCategory] = useState('tickets');
+  const [showBackgroundConfirm, setShowBackgroundConfirm] = useState(false);
+  const [showBackgroundSuccess, setShowBackgroundSuccess] = useState(false);
+  const [showBackgroundAlreadyOwned, setShowBackgroundAlreadyOwned] = useState(false);
+  const [showBackgroundNotEnoughTickets, setShowBackgroundNotEnoughTickets] = useState(false);
+  const [selectedBackground, setSelectedBackground] = useState<any>(null);
   
   // Wait for data to load before rendering
   if (!hydrated) {
@@ -230,13 +235,36 @@ export default function ShopScreen() {
       rarity: 'common',
     },
     {
-      id: 'bg_beach',
-      name: 'SUNSET BEACH',
-      price: 75,
+      id: 'bg_hovercar_races',
+      name: 'HOVERCAR RACES',
+      price: 50,
       currency: 'tickets',
-      icon: 'sun-o',
-      color: '#f59e0b',
-      description: 'Tropical paradise',
+      image: require('@/assets/images/bg-hovercar-races.png'),
+      icon: 'car',
+      color: '#dc2626',
+      description: 'High-speed racing action',
+      rarity: 'common',
+    },
+    {
+      id: 'bg_fortune_tent',
+      name: 'FORTUNE TENT',
+      price: 50,
+      currency: 'tickets',
+      image: require('@/assets/images/bg-fortune-tent.png'),
+      icon: 'magic',
+      color: '#7c3aed',
+      description: 'Mystical fortune telling',
+      rarity: 'common',
+    },
+    {
+      id: 'bg_swamp_lagoon',
+      name: 'SWAMP LAGOON',
+      price: 50,
+      currency: 'tickets',
+      image: require('@/assets/images/bg-swamp-lagoon.png'),
+      icon: 'leaf',
+      color: '#059669',
+      description: 'Mysterious swamp waters',
       rarity: 'common',
     },
   ];
@@ -315,17 +343,18 @@ export default function ShopScreen() {
     if (item.id && item.id.startsWith('bg_')) {
       // Check if already owned
       if (hasBackground(item.id)) {
-        Alert.alert('Already Owned', 'You already own this background!');
+        setSelectedBackground(item);
+        setShowBackgroundAlreadyOwned(true);
         return;
       }
       
       // Check if they have enough tickets
       if (state.tickets >= item.price) {
-        spendTickets(item.price);
-        addBackground(item.id);
-        Alert.alert('Purchased!', `You bought ${item.name}! Check your closet to equip it.`);
+        setSelectedBackground(item);
+        setShowBackgroundConfirm(true);
       } else {
-        Alert.alert('Not enough tickets!', 'You need more tickets to buy this background.');
+        setSelectedBackground(item);
+        setShowBackgroundNotEnoughTickets(true);
       }
       return;
     }
@@ -366,6 +395,15 @@ export default function ShopScreen() {
       case 'epic': return '#8b5cf6';
       case 'legendary': return '#f59e0b';
       default: return '#6b7280';
+    }
+  };
+
+  const handleBackgroundConfirm = () => {
+    if (selectedBackground) {
+      spendTickets(selectedBackground.price);
+      addBackground(selectedBackground.id);
+      setShowBackgroundConfirm(false);
+      setShowBackgroundSuccess(true);
     }
   };
 
@@ -483,6 +521,101 @@ export default function ShopScreen() {
           ))}
         </RNView>
       </ScrollView>
+
+      {/* Background Purchase Confirmation Modal */}
+      {showBackgroundConfirm && selectedBackground && (
+        <RNView style={styles.modalOverlay}>
+          <RNView style={styles.backgroundConfirmPopup}>
+            <Text style={styles.backgroundConfirmTitle}>PURCHASE CONFIRMATION</Text>
+            <RNView style={styles.backgroundConfirmItemContainer}>
+              <Image 
+                source={selectedBackground.image} 
+                style={styles.backgroundConfirmImage} 
+              />
+            </RNView>
+            <Text style={styles.backgroundConfirmText}>
+              Purchase {selectedBackground.name} for {selectedBackground.price} tickets?
+            </Text>
+            <RNView style={styles.backgroundConfirmButtons}>
+              <Pressable 
+                style={styles.backgroundConfirmCancelButton}
+                onPress={() => setShowBackgroundConfirm(false)}
+              >
+                <Text style={styles.backgroundConfirmCancelText}>CANCEL</Text>
+              </Pressable>
+              <Pressable 
+                style={styles.backgroundConfirmBuyButton}
+                onPress={handleBackgroundConfirm}
+              >
+                <Text style={styles.backgroundConfirmBuyText}>BUY</Text>
+              </Pressable>
+            </RNView>
+          </RNView>
+        </RNView>
+      )}
+
+      {/* Background Purchase Success Modal */}
+      {showBackgroundSuccess && selectedBackground && (
+        <RNView style={styles.modalOverlay}>
+          <RNView style={styles.backgroundSuccessPopup}>
+            <RNView style={styles.backgroundSuccessIconContainer}>
+              <FontAwesome name="check-circle" size={40} color="#10b981" />
+            </RNView>
+            <Text style={styles.backgroundSuccessTitle}>PURCHASED!</Text>
+            <Text style={styles.backgroundSuccessText}>
+              You bought {selectedBackground.name}! Check your closet to equip it.
+            </Text>
+            <Pressable 
+              style={styles.backgroundSuccessButton}
+              onPress={() => setShowBackgroundSuccess(false)}
+            >
+              <Text style={styles.backgroundSuccessButtonText}>OK</Text>
+            </Pressable>
+          </RNView>
+        </RNView>
+      )}
+
+      {/* Background Already Owned Modal */}
+      {showBackgroundAlreadyOwned && selectedBackground && (
+        <RNView style={styles.modalOverlay}>
+          <RNView style={styles.backgroundAlreadyOwnedPopup}>
+            <RNView style={styles.backgroundAlreadyOwnedIconContainer}>
+              <FontAwesome name="exclamation-triangle" size={40} color="#f59e0b" />
+            </RNView>
+            <Text style={styles.backgroundAlreadyOwnedTitle}>ALREADY OWNED</Text>
+            <Text style={styles.backgroundAlreadyOwnedText}>
+              You already own this background!
+            </Text>
+            <Pressable 
+              style={styles.backgroundAlreadyOwnedButton}
+              onPress={() => setShowBackgroundAlreadyOwned(false)}
+            >
+              <Text style={styles.backgroundAlreadyOwnedButtonText}>OK</Text>
+            </Pressable>
+          </RNView>
+        </RNView>
+      )}
+
+      {/* Background Not Enough Tickets Modal */}
+      {showBackgroundNotEnoughTickets && selectedBackground && (
+        <RNView style={styles.modalOverlay}>
+          <RNView style={styles.backgroundNotEnoughTicketsPopup}>
+            <RNView style={styles.backgroundNotEnoughTicketsIconContainer}>
+              <FontAwesome name="ticket" size={40} color="#ef4444" />
+            </RNView>
+            <Text style={styles.backgroundNotEnoughTicketsTitle}>NOT ENOUGH TICKETS</Text>
+            <Text style={styles.backgroundNotEnoughTicketsText}>
+              You need {selectedBackground.price} tickets to buy this background.
+            </Text>
+            <Pressable 
+              style={styles.backgroundNotEnoughTicketsButton}
+              onPress={() => setShowBackgroundNotEnoughTickets(false)}
+            >
+              <Text style={styles.backgroundNotEnoughTicketsButtonText}>OK</Text>
+            </Pressable>
+          </RNView>
+        </RNView>
+      )}
     </View>
   );
 }
@@ -728,5 +861,245 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: '#fbbf24',
     fontWeight: 'bold',
+  },
+  // Background Purchase Modal Styles
+  modalOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1000,
+  },
+  backgroundConfirmPopup: {
+    backgroundColor: '#ffffff',
+    padding: 28,
+    borderRadius: 16,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#8b5cf6',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 24,
+    elevation: 12,
+    width: 320,
+  },
+  backgroundConfirmTitle: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 14,
+    color: '#1e293b',
+    marginBottom: 20,
+    textAlign: 'center',
+    fontWeight: '600',
+    letterSpacing: 0.5,
+  },
+  backgroundConfirmItemContainer: {
+    marginBottom: 20,
+  },
+  backgroundConfirmImage: {
+    width: 200,
+    height: 120,
+    resizeMode: 'cover',
+    borderRadius: 12,
+  },
+  backgroundConfirmText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 12,
+    color: '#64748b',
+    textAlign: 'center',
+    marginBottom: 24,
+    lineHeight: 18,
+  },
+  backgroundConfirmButtons: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  backgroundConfirmCancelButton: {
+    backgroundColor: '#f1f5f9',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+  },
+  backgroundConfirmCancelText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#64748b',
+    fontWeight: '600',
+  },
+  backgroundConfirmBuyButton: {
+    backgroundColor: '#8b5cf6',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    shadowColor: '#8b5cf6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  backgroundConfirmBuyText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#ffffff',
+    fontWeight: '600',
+  },
+  backgroundSuccessPopup: {
+    backgroundColor: '#ffffff',
+    padding: 28,
+    borderRadius: 16,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#10b981',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 24,
+    elevation: 12,
+    width: 320,
+  },
+  backgroundSuccessIconContainer: {
+    marginBottom: 16,
+  },
+  backgroundSuccessTitle: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 14,
+    color: '#1e293b',
+    marginBottom: 12,
+    textAlign: 'center',
+    fontWeight: '600',
+    letterSpacing: 0.5,
+  },
+  backgroundSuccessText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 12,
+    color: '#64748b',
+    textAlign: 'center',
+    marginBottom: 24,
+    lineHeight: 18,
+  },
+  backgroundSuccessButton: {
+    backgroundColor: '#10b981',
+    paddingVertical: 12,
+    paddingHorizontal: 32,
+    borderRadius: 8,
+    shadowColor: '#10b981',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  backgroundSuccessButtonText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#ffffff',
+    fontWeight: '600',
+  },
+  backgroundAlreadyOwnedPopup: {
+    backgroundColor: '#ffffff',
+    padding: 28,
+    borderRadius: 16,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#f59e0b',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 24,
+    elevation: 12,
+    width: 320,
+  },
+  backgroundAlreadyOwnedIconContainer: {
+    marginBottom: 16,
+  },
+  backgroundAlreadyOwnedTitle: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 14,
+    color: '#1e293b',
+    marginBottom: 12,
+    textAlign: 'center',
+    fontWeight: '600',
+    letterSpacing: 0.5,
+  },
+  backgroundAlreadyOwnedText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 12,
+    color: '#64748b',
+    textAlign: 'center',
+    marginBottom: 24,
+    lineHeight: 18,
+  },
+  backgroundAlreadyOwnedButton: {
+    backgroundColor: '#f59e0b',
+    paddingVertical: 12,
+    paddingHorizontal: 32,
+    borderRadius: 8,
+    shadowColor: '#f59e0b',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  backgroundAlreadyOwnedButtonText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#ffffff',
+    fontWeight: '600',
+  },
+  backgroundNotEnoughTicketsPopup: {
+    backgroundColor: '#ffffff',
+    padding: 28,
+    borderRadius: 16,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#ef4444',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 24,
+    elevation: 12,
+    width: 320,
+  },
+  backgroundNotEnoughTicketsIconContainer: {
+    marginBottom: 16,
+  },
+  backgroundNotEnoughTicketsTitle: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 14,
+    color: '#1e293b',
+    marginBottom: 12,
+    textAlign: 'center',
+    fontWeight: '600',
+    letterSpacing: 0.5,
+  },
+  backgroundNotEnoughTicketsText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 12,
+    color: '#64748b',
+    textAlign: 'center',
+    marginBottom: 24,
+    lineHeight: 18,
+  },
+  backgroundNotEnoughTicketsButton: {
+    backgroundColor: '#ef4444',
+    paddingVertical: 12,
+    paddingHorizontal: 32,
+    borderRadius: 8,
+    shadowColor: '#ef4444',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  backgroundNotEnoughTicketsButtonText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#ffffff',
+    fontWeight: '600',
   },
 });

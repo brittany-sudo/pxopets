@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, ScrollView, View as RNView, Pressable, Image } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import DeveloperPanel from '@/components/DeveloperPanel';
@@ -6,6 +6,43 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 export default function NewsScreen() {
   const [showDevPanel, setShowDevPanel] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
+  
+  // Update time every second
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    
+    return () => clearInterval(timer);
+  }, []);
+  
+  // Get current date
+  const getCurrentDate = () => {
+    const date = new Date();
+    const options: Intl.DateTimeFormatOptions = { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    };
+    return date.toLocaleDateString('en-US', options);
+  };
+  
+  // Get Pxopian Standard Time (PST) - a fictional time zone
+  const getPxopianTime = () => {
+    // Pxopian Standard Time is 3 hours ahead of UTC (like EST but fictional)
+    const pxopianTime = new Date(currentTime.getTime() + (3 * 60 * 60 * 1000));
+    
+    const options: Intl.DateTimeFormatOptions = {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true
+    };
+    
+    return pxopianTime.toLocaleTimeString('en-US', options);
+  };
+  
   const newsArticles = [
     {
       id: 1,
@@ -82,7 +119,8 @@ export default function NewsScreen() {
             resizeMode="contain"
           />
           <Text style={styles.headerTitle}>PXOPIA NEWS</Text>
-          <Text style={styles.headerDate}>January 1, 1991</Text>
+          <Text style={styles.headerDate}>{getCurrentDate()}</Text>
+          <Text style={styles.headerTime}>Pxopian Standard Time: {getPxopianTime()}</Text>
         </RNView>
 
         {/* Featured News Section */}
@@ -232,6 +270,14 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: '#64748b',
     textAlign: 'center',
+  },
+  headerTime: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#8b5cf6',
+    textAlign: 'center',
+    marginTop: 2,
+    opacity: 0.8,
   },
   featuredContainer: {
     width: '95%',

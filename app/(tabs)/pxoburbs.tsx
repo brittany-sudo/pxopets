@@ -1,45 +1,51 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, ScrollView, View as RNView, Image, Pressable } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { router, Link } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Import the banner image
-const staticTvImage = require('@/assets/images/static-tv.png');
 const pxoburbsSkylineImage = require('@/assets/images/thepxoburbs-main.png');
-const cosmicBurgerImage = require('@/assets/images/cosmicburger.png');
-const lilSodaImage = require('@/assets/images/lil-soda.png');
-const lilArcadeImage = require('@/assets/images/lil-arcade.png');
-const lilMovieReelImage = require('@/assets/images/lil-movie-reel.png');
-const rolerImage = require('@/assets/images/roler.png');
-const makeoutHillImage = require('@/assets/images/makeout-hill.png');
-const lilRadioImage = require('@/assets/images/lil-radio.png');
-const lilMailImage = require('@/assets/images/lil-mail.png');
-const lilMallImage = require('@/assets/images/lil-mall.png');
-const lilPxosupplyImage = require('@/assets/images/lil-pxosupply.png');
-const lilRubberduckImage = require('@/assets/images/lil-rubberduck.png');
-const lilTagImage = require('@/assets/images/lil-tag.png');
-const lilComputer90Image = require('@/assets/images/lil-computer90.png');
 
 export default function PxoburbsScreen() {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
 
-  const toggleFavorite = (activityId: string) => {
-    setFavorites(prev => {
-      const newFavorites = new Set(prev);
+  // Load starred activities from storage
+  useEffect(() => {
+    loadStarredActivities();
+  }, []);
+
+  const loadStarredActivities = async () => {
+    try {
+      const saved = await AsyncStorage.getItem('starredActivities');
+      if (saved) {
+        setFavorites(new Set(JSON.parse(saved)));
+      }
+    } catch (error) {
+      console.error('Failed to load starred activities:', error);
+    }
+  };
+
+  const toggleFavorite = async (activityId: string) => {
+    try {
+      const newFavorites = new Set(favorites);
       if (newFavorites.has(activityId)) {
         newFavorites.delete(activityId);
       } else {
         newFavorites.add(activityId);
       }
-      return newFavorites;
-    });
+      setFavorites(newFavorites);
+      await AsyncStorage.setItem('starredActivities', JSON.stringify([...newFavorites]));
+    } catch (error) {
+      console.error('Failed to save starred activities:', error);
+    }
   };
 
 
   const activities = [
     {
-      id: 'mall-food-court',
+      id: 'pxoburbs-mall',
       name: 'Pxoburbs Mall',
       description: 'Multi-level shopping complex with food court, retail stores, and entertainment.',
       lightning: 25,
@@ -47,20 +53,20 @@ export default function PxoburbsScreen() {
       icon: 'shopping-bag'
     },
     {
-      id: 'corner-store',
+      id: 'quickstop',
       name: 'Quickstop Corner Store',
       description: 'Marty\'s 24/7 convenience store with snacks, lottery tickets, and special imports.',
       lightning: 12,
       difficulty: 'Easy',
-      icon: 'chips'
+      icon: 'shopping-cart'
     },
     {
-      id: 'roller-rink',
+      id: 'starlight-roller-rink',
       name: 'Starlight Roller Rink',
       description: 'Retro roller skating rink with disco lights and classic arcade games.',
       lightning: 20,
       difficulty: 'Easy',
-      icon: 'roler'
+      icon: 'circle'
     },
     {
       id: 'makeout-hill',
@@ -68,7 +74,7 @@ export default function PxoburbsScreen() {
       description: 'Romantic overlook with panoramic city views, perfect for couples and stargazing.',
       lightning: 15,
       difficulty: 'Medium',
-      icon: 'makeout-hill'
+      icon: 'heart'
     },
     {
       id: 'midnight-rewind',
@@ -76,10 +82,10 @@ export default function PxoburbsScreen() {
       description: 'Classic video rental store with rare films, cult classics, and vintage VHS tapes.',
       lightning: 10,
       difficulty: 'Easy',
-      icon: 'lil-movie-reel.png'
+      icon: 'film'
     },
     {
-      id: 'radio-station',
+      id: 'pxo-radio',
       name: 'PXO 101.8 FM',
       description: 'Independent community radio station with local music and live broadcasts.',
       lightning: 18,
@@ -108,7 +114,7 @@ export default function PxoburbsScreen() {
       description: 'Public swimming facility with Olympic-sized pool and recreational areas.',
       lightning: 8,
       difficulty: 'Easy',
-      icon: 'tree'
+      icon: 'tint'
     },
     {
       id: 'frog-market-thrift',
@@ -116,7 +122,7 @@ export default function PxoburbsScreen() {
       description: 'Eclectic thrift store with vintage clothing, retro furniture, and unique collectibles.',
       lightning: 16,
       difficulty: 'Easy',
-      image: 'lil-tag'
+      icon: 'tag'
     }
   ];
 
@@ -151,32 +157,7 @@ export default function PxoburbsScreen() {
         {/* Activities List */}
         {activities.map((activity) => {
           const getActivityIcon = () => {
-            const iconContent = (() => {
-              switch (activity.id) {
-                case 'corner-store':
-                  return <Image source={cosmicBurgerImage} style={styles.activityImageIcon} />;
-                case 'frog-market-thrift':
-                  return <Image source={lilTagImage} style={styles.activityImageIcon} />;
-                case 'roller-rink':
-                  return <Image source={rolerImage} style={styles.activityImageIcon} />;
-                case 'makeout-hill':
-                  return <Image source={makeoutHillImage} style={styles.activityImageIcon} />;
-                case 'radio-station':
-                  return <Image source={lilRadioImage} style={styles.activityImageIcon} />;
-                case 'midnight-rewind':
-                  return <Image source={lilMovieReelImage} style={styles.activityImageIcon} />;
-                case 'mall-food-court':
-                  return <Image source={lilMallImage} style={styles.activityImageIcon} />;
-                case 'post-office':
-                  return <Image source={lilMailImage} style={styles.activityImageIcon} />;
-                case 'pet-supply':
-                  return <Image source={lilPxosupplyImage} style={styles.activityImageIcon} />;
-                case 'community-pool':
-                  return <Image source={lilRubberduckImage} style={styles.activityImageIcon} />;
-                default:
-                  return <FontAwesome name={activity.icon as any} size={20} color="#8b5cf6" style={styles.activityIcon} />;
-              }
-            })();
+            const iconContent = <FontAwesome name={activity.icon as any} size={20} color="#8b5cf6" style={styles.activityIcon} />;
 
             return (
               <RNView style={styles.activityIconContainer}>
@@ -213,19 +194,19 @@ export default function PxoburbsScreen() {
             );
 
             switch (activity.id) {
-              case 'corner-store':
+              case 'quickstop':
                 return <Link href="/quickstop" asChild><Pressable key={activity.id} style={styles.activityItem}>{content}{star}</Pressable></Link>;
               case 'frog-market-thrift':
                 return <Link href="/frog-market-thrift" asChild><Pressable key={activity.id} style={styles.activityItem}>{content}{star}</Pressable></Link>;
-              case 'roller-rink':
+              case 'starlight-roller-rink':
                 return <Link href="/(tabs)/starlight-roller-rink" asChild><Pressable key={activity.id} style={styles.activityItem}>{content}{star}</Pressable></Link>;
               case 'makeout-hill':
                 return <Link href="/(tabs)/makeout-hill" asChild><Pressable key={activity.id} style={styles.activityItem}>{content}{star}</Pressable></Link>;
-              case 'radio-station':
+              case 'pxo-radio':
                 return <Pressable key={activity.id} style={styles.activityItem} onPress={() => router.navigate('/(tabs)/pxo-radio')}>{content}{star}</Pressable>;
               case 'midnight-rewind':
                 return <Pressable key={activity.id} style={styles.activityItem} onPress={() => router.navigate('/(tabs)/midnight-rewind')}>{content}{star}</Pressable>;
-              case 'mall-food-court':
+              case 'pxoburbs-mall':
                 return <Pressable key={activity.id} style={styles.activityItem} onPress={() => router.navigate('/(tabs)/pxoburbs-mall')}>{content}{star}</Pressable>;
               case 'post-office':
                 return <Pressable key={activity.id} style={styles.activityItem} onPress={() => router.navigate('/(tabs)/post-office')}>{content}{star}</Pressable>;
@@ -361,13 +342,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 28,
   },
-  activityImageIcon: {
-    width: 42,
-    height: 42,
-    alignSelf: 'center',
-    imageRendering: 'pixelated' as any,
-    resizeMode: 'contain',
-  },
   activityIconContainer: {
     width: 45,
     height: 45,
@@ -378,13 +352,8 @@ const styles = StyleSheet.create({
     marginRight: 12,
     flexShrink: 0,
   },
-  arcadeImageIcon: {
-    width: 36,
-    height: 36,
-    marginRight: 12,
-    alignSelf: 'center',
-    imageRendering: 'pixelated' as any,
-    resizeMode: 'contain',
+  activityIcon: {
+    textAlign: 'center',
   },
   activityText: {
     flex: 1,

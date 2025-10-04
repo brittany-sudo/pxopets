@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Image, StyleSheet, View as RNView, ScrollView, Pressable, Modal, Alert, Animated } from 'react-native';
+import { Image, StyleSheet, View as RNView, ScrollView, Pressable, Modal, Alert, Animated, Dimensions, PanResponder } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { useSimpleGame } from '@/store/SimpleGameStore';
 import { usePets } from '@/store/PetStore';
@@ -9,6 +9,7 @@ import { Link, router, useFocusEffect } from 'expo-router';
 import BorderedBox from '@/components/BorderedBox';
 import JazzyTitle from '@/components/JazzyTitle';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function PetsScreen() {
   const scrollViewRef = useRef<ScrollView>(null);
@@ -38,6 +39,11 @@ export default function PetsScreen() {
   const [showFeedSuccess, setShowFeedSuccess] = useState(false);
   const [lastFedStamina, setLastFedStamina] = useState(0);
   
+  // Pet drag position state
+  const [petPosition, setPetPosition] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  
   // Animation values for hearts
   const heartsOpacity = useRef(new Animated.Value(0)).current;
   const heartsSlideUp = useRef(new Animated.Value(30)).current;
@@ -45,7 +51,109 @@ export default function PetsScreen() {
   
   const activePet = getActivePet();
   
-  // Reset scroll position when screen comes into focus
+  // Save pet position to AsyncStorage
+  const savePetPosition = async (position: { x: number, y: number }) => {
+    try {
+      await AsyncStorage.setItem('petPosition', JSON.stringify(position));
+    } catch (error) {
+      console.error('Failed to save pet position:', error);
+    }
+  };
+  
+  // Load pet position from AsyncStorage
+  const loadPetPosition = async () => {
+    try {
+      const savedPosition = await AsyncStorage.getItem('petPosition');
+      if (savedPosition) {
+        const position = JSON.parse(savedPosition);
+        setPetPosition(position);
+      }
+    } catch (error) {
+      console.error('Failed to load pet position:', error);
+    }
+  };
+  
+  // Load saved position on component mount
+  useEffect(() => {
+    loadPetPosition();
+  }, []);
+  
+  // Reset pet position to center
+  const resetPetPosition = () => {
+    const screenWidth = Dimensions.get('window').width;
+    const containerWidth = screenWidth - 40;
+    const petWidth = 88;
+    const petHeight = 88;
+    const containerHeight = 300;
+    
+    const centerX = (containerWidth - petWidth) / 2;
+    const centerY = (containerHeight - petHeight) / 2;
+    
+    const centerPosition = { x: centerX, y: centerY };
+    setPetPosition(centerPosition);
+    savePetPosition(centerPosition);
+  };
+  
+  // PanResponder for pet dragging
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: () => true,
+      onPanResponderGrant: (evt) => {
+        // Get absolute screen coordinates
+        const screenX = evt.nativeEvent.pageX;
+        const screenY = evt.nativeEvent.pageY;
+        const petWidth = 88;
+        const petHeight = 88;
+        
+        // Convert to background container coordinates
+        const containerX = screenX - 20; // Account for container padding
+        const containerY = screenY - 100; // Account for header height
+        
+        // Center the pet on the touch point
+        const newX = containerX - petWidth / 2;
+        const newY = containerY - petHeight / 2;
+        
+        // Apply boundary constraints
+        const screenWidth = Dimensions.get('window').width;
+        const containerWidth = screenWidth - 40;
+        const containerHeight = 300;
+        
+        const constrainedX = Math.max(0, Math.min(newX, containerWidth - petWidth));
+        const constrainedY = Math.max(0, Math.min(newY, containerHeight - petHeight));
+        
+        setPetPosition({ x: constrainedX, y: constrainedY });
+        setIsDragging(true);
+        return true;
+      },
+      onPanResponderMove: (evt, gestureState) => {
+        // Use the initial position plus the gesture movement
+        const newX = petPosition.x + gestureState.dx;
+        const newY = petPosition.y + gestureState.dy;
+        
+        // Simple boundary constraints
+        const screenWidth = Dimensions.get('window').width;
+        const containerWidth = screenWidth - 40;
+        const petWidth = 88;
+        const petHeight = 88;
+        const containerHeight = 300;
+        
+        const constrainedX = Math.max(0, Math.min(newX, containerWidth - petWidth));
+        const constrainedY = Math.max(0, Math.min(newY, containerHeight - petHeight));
+        
+        const newPosition = { x: constrainedX, y: constrainedY };
+        setPetPosition(newPosition);
+        // Save position as user drags
+        savePetPosition(newPosition);
+      },
+      onPanResponderRelease: () => {
+        setIsDragging(false);
+        setDragOffset({ x: 0, y: 0 });
+      },
+    })
+  ).current;
+  
+  // Reset scroll position when screen comes into focus (only bottom section)
   useFocusEffect(
     React.useCallback(() => {
       scrollViewRef.current?.scrollTo({ y: 0, animated: false });
@@ -111,7 +219,7 @@ export default function PetsScreen() {
     },
     frekki: {
       name: 'FREKKI',
-      image: require('@/assets/images/coco-guy.png'),
+      image: require('@/assets/images/frekki.png'),
       level: 3,
       hp: 85,
       atk: 42
@@ -159,6 +267,24 @@ export default function PetsScreen() {
       image: require('@/assets/images/vineyard-bg.png'),
       rarity: 'common'
     },
+    bg_hovercar_races: {
+      id: 'bg_hovercar_races',
+      name: 'Hovercar Races',
+      image: require('@/assets/images/bg-hovercar-races.png'),
+      rarity: 'common'
+    },
+    bg_fortune_tent: {
+      id: 'bg_fortune_tent',
+      name: 'Fortune Tent',
+      image: require('@/assets/images/bg-fortune-tent.png'),
+      rarity: 'common'
+    },
+    bg_swamp_lagoon: {
+      id: 'bg_swamp_lagoon',
+      name: 'Swamp Lagoon',
+      image: require('@/assets/images/bg-swamp-lagoon.png'),
+      rarity: 'common'
+    },
   };
 
   // Filter to only show backgrounds the player owns
@@ -183,6 +309,10 @@ export default function PetsScreen() {
 
   // Image map for food items - maps item IDs to their actual image files
   const foodImageMap: { [key: string]: any } = {
+    // QuickStop items (by actual inventory IDs)
+    'quickstop-coffee': require('@/assets/images/quickstopcoffee.png'),
+    'monthly-slushee': require('@/assets/images/slushee3.png'),
+    
     // QuickStop items (by item ID from store)
     's1': require('@/assets/images/chocolate.png'), // Protein Bar
     's2': require('@/assets/images/hotchips.png'), // Hot Chips
@@ -197,6 +327,9 @@ export default function PetsScreen() {
     'l2': require('@/assets/images/cosmicburger.png'), // Cosmic Burger
     'l3': require('@/assets/images/pouchdrink.png'), // Punch Pouch
     'l4': require('@/assets/images/chocodonut.png'), // Choco-Donut
+    
+    // Additional food items
+    'astro-tarts': require('@/assets/images/astro-tarts.png'), // Astro Tarts
     
     // Generic food/drink names (in case they're stored differently)
     'cosmicburger': require('@/assets/images/cosmicburger.png'),
@@ -252,12 +385,40 @@ export default function PetsScreen() {
   };
 
   // Get food items from actual inventory (food, drink, snack categories)
+  // Exclude Pxogulp refillable jugs as they are not feedable
   const availableFoods = inventoryState.mainInventory
-    .filter(item => ['food', 'drink', 'snack'].includes(item.category))
+    .filter(item => 
+      ['food', 'drink', 'snack'].includes(item.category) && 
+      !(item.name && item.name.toLowerCase().includes('pxogulp')) &&
+      !(item.id && item.id.includes('pxogulp'))
+    )
     .map(item => {
-      // Get the image from the map or use default
-      const imageName = item.id || 'cosmicburger';
-      const imageSource = foodImageMap[imageName] || require('@/assets/images/cosmicburger.png');
+      // Get the image from the map with multiple fallback strategies
+      let imageSource = null;
+      
+      // Try exact ID match first
+      if (item.id && foodImageMap[item.id]) {
+        imageSource = foodImageMap[item.id];
+      }
+      // Try image property if it exists
+      else if (item.image && foodImageMap[item.image]) {
+        imageSource = foodImageMap[item.image];
+      }
+      // Try name-based matching (convert to lowercase, remove spaces/special chars)
+      else if (item.name) {
+        const nameKey = item.name.toLowerCase().replace(/[^a-z0-9]/g, '');
+        const matchingKey = Object.keys(foodImageMap).find(key => 
+          key.toLowerCase().replace(/[^a-z0-9]/g, '') === nameKey
+        );
+        if (matchingKey) {
+          imageSource = foodImageMap[matchingKey];
+        }
+      }
+      
+      // Fallback to burger if no match found
+      if (!imageSource) {
+        imageSource = require('@/assets/images/cosmicburger.png');
+      }
       
       return {
         id: item.id,
@@ -277,6 +438,7 @@ export default function PetsScreen() {
       'tigerguy': require('@/assets/images/tigerguy.png'),
       'plumeca': require('@/assets/images/plumeca.png'),
       'coco-guy': require('@/assets/images/coco-guy.png'),
+      'frekki': require('@/assets/images/frekki.png'),
       'lallazo': require('@/assets/images/lallazo.png'),
       'robot-guy': require('@/assets/images/robot-guy.png'),
       'sheep-guy': require('@/assets/images/sheep-guy.png'),
@@ -350,7 +512,12 @@ export default function PetsScreen() {
 
   return (
     <View style={styles.container}>
-      <ScrollView ref={scrollViewRef} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        ref={scrollViewRef} 
+        contentContainerStyle={styles.scrollContent} 
+        showsVerticalScrollIndicator={false}
+        scrollEnabled={!isDragging}
+      >
         {/* Header Row */}
         <RNView style={styles.headerRow}>
           <Text style={styles.locationTitle}>MY PETS</Text>
@@ -365,10 +532,21 @@ export default function PetsScreen() {
                 style={styles.petBackgroundImage}
                 resizeMode="cover"
               />
-              <Image
-                source={getPetImage(activePet.image)}
-                style={styles.petImage}
-              />
+              <Animated.View
+                {...panResponder.panHandlers}
+                style={[
+                  styles.draggablePetContainer,
+                  {
+                    left: petPosition.x,
+                    top: petPosition.y,
+                  }
+                ]}
+              >
+                <Image
+                  source={getPetImage(activePet.image)}
+                  style={styles.petImage}
+                />
+              </Animated.View>
               
               {/* Hearts animation above pet's head when feeding */}
               {showFeedSuccess && (
@@ -377,6 +555,8 @@ export default function PetsScreen() {
                   style={[
                     styles.feedHeartsAnimation,
                     {
+                      left: petPosition.x + 44 - 20, // Center on pet (44 is half of 88) minus half heart width
+                      top: petPosition.y - 30, // Above pet's head
                       opacity: heartsOpacity,
                       transform: [
                         { translateY: Animated.add(heartsSlideUp, heartsBob) }
@@ -1152,10 +1332,14 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   petImage: {
-    width: 110,
-    height: 110,
+    width: 88, // 20% smaller than 110
+    height: 88, // 20% smaller than 110
     imageRendering: 'pixelated' as any,
-    marginTop: 50,
+  },
+  draggablePetContainer: {
+    position: 'absolute',
+    width: 88, // 20% smaller than 110
+    height: 88, // 20% smaller than 110
   },
   petName: {
     fontFamily: 'Silkscreen_400Regular',

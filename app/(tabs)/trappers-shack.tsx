@@ -1,17 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, ScrollView, View, Image, Pressable, Alert, Animated, Dimensions } from 'react-native';
+import { StyleSheet, ScrollView, View, Image, Pressable, Alert, Animated, Dimensions, View as RNView } from 'react-native';
 import { Text } from '@/components/Themed';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { router } from 'expo-router';
-import { useGame } from '@/store/GameStore';
+import { useSimpleGame } from '@/store/SimpleGameStore';
 import { useInventory } from '@/store/InventoryStore';
+import { usePets } from '@/store/PetStore';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Import images
 const trappersShackImage = require('@/assets/images/loomers-wharf-main.png');
 const oldSaltBgImage = require('@/assets/images/oldsaltbg.png');
 const trapperIconImage = require('@/assets/images/trappericon.png');
 const oldSaltImage = require('@/assets/images/oldsalt.png');
-const docksquidImage = require('@/assets/images/docksquid.png');
 const sardineImage = require('@/assets/images/sardine.png');
 const brassCoinImage = require('@/assets/images/brasscoin.png');
 const grumpyCrabImage = require('@/assets/images/grumpycrab.png');
@@ -30,14 +31,24 @@ const lobsterTrapImage = require('@/assets/images/lil-anchor.png');
 const fishingRodImage = require('@/assets/images/lil-anchor.png');
 
 export default function TrappersShackScreen() {
-  const { tickets, gems, stamina, addTickets, addGems, addStamina } = useGame();
+  const { state, addTickets, addGems, spendGems } = useSimpleGame();
+  const { tickets, gems } = state;
   const { addItem } = useInventory();
+  const { getActivePet, addStaminaToPet } = usePets();
   const [selectedTrap, setSelectedTrap] = useState<string | null>(null);
   const [trapResults, setTrapResults] = useState<any[]>([]);
   const [isTrapping, setIsTrapping] = useState(false);
   const [oldSaltAdvice, setOldSaltAdvice] = useState<string>('');
   const [apprenticeLevel, setApprenticeLevel] = useState(1);
   const [dailyTraps, setDailyTraps] = useState(3);
+  const [oldSaltDialogue, setOldSaltDialogue] = useState('');
+  const [showNoTrapsMessage, setShowNoTrapsMessage] = useState(false);
+  const [showPurchaseModal, setShowPurchaseModal] = useState(false);
+  const [showNoGemsModal, setShowNoGemsModal] = useState(false);
+  
+  // Get active pet and calculate stamina
+  const activePet = getActivePet();
+  const stamina = activePet?.stamina || 0;
   
   // Game state
   const [gamePhase, setGamePhase] = useState<'bait' | 'waiting' | 'tugging' | 'caught'>('bait');
@@ -50,6 +61,82 @@ export default function TrappersShackScreen() {
   const tugAnimation = useRef(new Animated.Value(0)).current;
   const lineAnimation = useRef(new Animated.Value(0)).current;
   const bobberAnimation = useRef(new Animated.Value(0)).current;
+
+  // Generate random Old Salt dialogue
+  useEffect(() => {
+    const randomDialogue = oldSaltDialogueList[Math.floor(Math.random() * oldSaltDialogueList.length)];
+    setOldSaltDialogue(randomDialogue);
+  }, []);
+
+  // Load daily traps from AsyncStorage
+  useEffect(() => {
+    loadDailyTraps();
+  }, []);
+
+  // Show no traps message with delay when traps reach 0
+  useEffect(() => {
+    if (dailyTraps === 0) {
+      const timer = setTimeout(() => {
+        setShowNoTrapsMessage(true);
+      }, 5000); // 5 second delay
+      
+      return () => clearTimeout(timer);
+    } else {
+      setShowNoTrapsMessage(false);
+    }
+  }, [dailyTraps]);
+
+  const loadDailyTraps = async () => {
+    try {
+      const today = new Date().toDateString();
+      const saved = await AsyncStorage.getItem('trapperDailyTraps');
+      const lastReset = await AsyncStorage.getItem('trapperLastReset');
+      
+      if (saved && lastReset === today) {
+        setDailyTraps(parseInt(saved));
+      } else {
+        // Reset to 3 traps for new day
+        setDailyTraps(3);
+        await AsyncStorage.setItem('trapperDailyTraps', '3');
+        await AsyncStorage.setItem('trapperLastReset', today);
+      }
+    } catch (error) {
+      console.error('Error loading daily traps:', error);
+      setDailyTraps(3);
+    }
+  };
+
+  const saveDailyTraps = async (traps: number) => {
+    try {
+      await AsyncStorage.setItem('trapperDailyTraps', traps.toString());
+    } catch (error) {
+      console.error('Error saving daily traps:', error);
+    }
+  };
+
+  const buyMoreTraps = () => {
+    if (!gems || gems < 1) {
+      setShowNoGemsModal(true);
+      return;
+    }
+    setShowPurchaseModal(true);
+  };
+
+  const confirmPurchase = () => {
+    const success = spendGems(1);
+    if (success) {
+      setDailyTraps(3);
+      saveDailyTraps(3);
+      setShowNoTrapsMessage(false);
+      setShowPurchaseModal(false);
+      // Show success message
+      setTimeout(() => {
+        Alert.alert('Success!', 'Old Salt grins. "Here are 3 more traps, apprentice. The sea awaits!"');
+      }, 100);
+    } else {
+      Alert.alert('Error', 'Failed to spend gems. Please try again.');
+    }
+  };
 
   const oldSaltAdviceList = [
     "The lobsters speak in their shells when the tide's just right...",
@@ -64,6 +151,29 @@ export default function TrappersShackScreen() {
     "The deepest secrets lie in the shallowest waters."
   ];
 
+  const oldSaltDialogueList = [
+    "Ahoy there, landlubber! Ready to learn the ways of the sea?",
+    "I've been fishing these waters since before you were a twinkle in your mother's eye!",
+    "The sea's been my mistress for sixty years, and she's never let me down.",
+    "Back in my day, we didn't have fancy baits - just a hook and a prayer!",
+    "I've seen storms that would make your hair turn white, and fish bigger than this shack!",
+    "The sea's a fickle mistress, but she rewards those who respect her ways.",
+    "I've lost more fish than you've had hot meals, but that's the way of the sea.",
+    "These waters hold secrets older than the oldest tree, and I know them all.",
+    "A true fisherman never gives up, even when the sea's being stubborn.",
+    "I've taught more apprentices than there are fish in the sea - you're in good hands!",
+    "The sea's been my teacher, my friend, and sometimes my enemy - but always my love.",
+    "I've seen the kraken rise from the depths and the mermaids sing their songs.",
+    "These old hands have pulled up treasures that would make a king jealous!",
+    "The sea's got a memory longer than the longest rope, and she never forgets.",
+    "I've weathered storms that would sink a battleship, but I'm still here!",
+    "The sea's taught me patience, respect, and the value of a good story.",
+    "I've seen fish that glow like lanterns and others that sing like birds!",
+    "The sea's my home, my life, and my greatest adventure all rolled into one.",
+    "I've got stories that would make your hair stand on end, but that's for another time.",
+    "The sea's a mystery wrapped in an enigma, and I'm still trying to solve it!"
+  ];
+
   const baitTypes = [
     {
       id: 'sardine',
@@ -72,7 +182,7 @@ export default function TrappersShackScreen() {
       image: sardineImage,
       description: 'Common bait, attracts basic catches',
       rarity: 'common',
-      cost: 1
+      cost: 15
     },
     {
       id: 'shrimp',
@@ -81,7 +191,7 @@ export default function TrappersShackScreen() {
       image: trapShrimpImage,
       description: 'Premium bait, better chances for rare finds',
       rarity: 'uncommon',
-      cost: 3
+      cost: 15
     },
     {
       id: 'mystery',
@@ -90,7 +200,7 @@ export default function TrappersShackScreen() {
       image: mysteryBaitImage,
       description: 'Old Salt\'s secret recipe - who knows what it attracts?',
       rarity: 'rare',
-      cost: 5
+      cost: 15
     }
   ];
 
@@ -160,17 +270,19 @@ export default function TrappersShackScreen() {
       return;
     }
 
-    // Check bait cost
-    const bait = baitTypes.find(b => b.id === baitId);
-    if (bait && tickets < bait.cost) {
-      Alert.alert('Not Enough Tickets', `You need ${bait.cost} tickets to use ${bait.name} bait.`);
+    // Check if pet has enough stamina
+    if (!activePet) {
+      Alert.alert('No Active Pet', 'You need an active pet to play this game!');
       return;
     }
 
-    // Deduct ticket cost
-    if (bait) {
-      addTickets(-bait.cost);
+    if (stamina < 15) {
+      Alert.alert('Not Enough Stamina', 'Your pet needs 15 stamina to use this bait.');
+      return;
     }
+
+    // Deduct stamina from pet
+    addStaminaToPet(activePet.id, -15);
 
     setSelectedBait(baitId);
     setGamePhase('waiting');
@@ -280,14 +392,23 @@ export default function TrappersShackScreen() {
       bait: bait?.name || 'Unknown',
       catch: caught,
       timestamp: new Date(),
-      ticketsEarned: caught.value,
+      ticketsEarned: Math.random() < 0.1 ? Math.floor(Math.random() * 5) + 1 : 0,
       oldSaltComment: "Well done, lad! The sea has blessed you today."
     };
     
     setTrapResults(prev => [newResult, ...prev.slice(0, 9)]);
     
+    // Add tickets if earned
+    if (newResult.ticketsEarned > 0) {
+      addTickets(newResult.ticketsEarned);
+    }
+    
     // Decrement daily traps and ensure it doesn't go below 0
-    setDailyTraps(prev => Math.max(0, prev - 1));
+    setDailyTraps(prev => {
+      const newValue = Math.max(0, prev - 1);
+      saveDailyTraps(newValue);
+      return newValue;
+    });
   };
 
   const resetGame = () => {
@@ -313,7 +434,7 @@ export default function TrappersShackScreen() {
     }
 
     if (stamina < trapType.stamina) {
-      Alert.alert('Too Tired', 'Old Salt shakes his head. "You\'re too tired, lad. Rest up before you try again."');
+      Alert.alert('Too Tired', `Old Salt shakes his head. "You're too tired, lad. You have ${stamina} stamina but need ${trapType.stamina}. Rest up before you try again."`);
       return;
     }
 
@@ -323,13 +444,17 @@ export default function TrappersShackScreen() {
 
     setSelectedTrap(trapType.id);
     setIsTrapping(true);
-    addStamina(-trapType.stamina);
-    setDailyTraps(prev => prev - 1);
+    addStaminaToPet(activePet.id, -trapType.stamina);
+    setDailyTraps(prev => {
+      const newValue = prev - 1;
+      saveDailyTraps(newValue);
+      return newValue;
+    });
 
     // Simulate trapping time with Old Salt's commentary
     setTimeout(() => {
       const randomReward = trapType.rewards[Math.floor(Math.random() * trapType.rewards.length)];
-      const ticketsEarned = Math.floor(Math.random() * 3) + 1;
+      const ticketsEarned = Math.random() < 0.1 ? Math.floor(Math.random() * 5) + 1 : 0;
       
       const newResult = {
         id: Date.now(),
@@ -343,7 +468,12 @@ export default function TrappersShackScreen() {
       setTrapResults(prev => [newResult, ...prev.slice(0, 9)]); // Keep last 10 results
       setIsTrapping(false);
       setSelectedTrap(null);
-      addTickets(ticketsEarned);
+      
+      // Add tickets if earned
+      if (ticketsEarned > 0) {
+        addTickets(ticketsEarned);
+      }
+      
       setOldSaltAdvice(''); // Clear advice after use
     }, 3000);
   };
@@ -381,17 +511,36 @@ export default function TrappersShackScreen() {
           <Text style={styles.backButtonText}>Back</Text>
         </Pressable>
 
-        {/* Header */}
-        <View style={styles.headerRow}>
+        {/* Header Row */}
+        <RNView style={styles.headerRow}>
           <Text style={styles.locationTitle}>TRAPPER'S SHACK</Text>
+        </RNView>
+
+        {/* Stats Bar */}
+        <View style={styles.statsBar}>
+          <View style={styles.statItem}>
+            <Text style={styles.statLabel}>TRAPS LEFT</Text>
+            <Text style={styles.statValue}>{dailyTraps}</Text>
+          </View>
+          <View style={styles.statDivider} />
+          <View style={styles.statItem}>
+            <View style={styles.staminaCostContainer}>
+              <FontAwesome name="bolt" size={24} color="#fbbf24" />
+              <Text style={styles.staminaCostValue}>15</Text>
+            </View>
+            <Text style={styles.staminaCostLabel}>EACH</Text>
+          </View>
         </View>
 
-
-        {/* Welcome Text */}
-        <View style={styles.welcomeContainer}>
-          <Text style={styles.welcomeText}>
-            At the very edge of the Wharf, where the planks are warped and the tide sometimes slaps at the door, stands Old Salt's stubborn shack. Inside, traps are stacked in haphazard piles, their ropes coiled like sleeping snakes. The air reeks of bait fish and wet rope, but also woodsmoke and old pipe tobacco.
-          </Text>
+        {/* Old Salt NPC */}
+        <View style={styles.npcContainer}>
+          <View style={styles.npcSpeechBubble}>
+            <Text style={styles.npcName}>OLD SALT</Text>
+            <Text style={styles.npcText}>
+              {oldSaltDialogue}
+            </Text>
+          </View>
+          <Image source={oldSaltImage} style={styles.npcImage} resizeMode="contain" />
         </View>
 
         {/* Old Salt's Advice */}
@@ -402,23 +551,6 @@ export default function TrappersShackScreen() {
           </View>
         )}
 
-        {/* Daily Traps Counter */}
-        <View style={styles.dailyCounter}>
-          <Text style={styles.trappingTitle}>TRAPPING WITH OLD SALT</Text>
-          <Text style={styles.counterText}>Traps Remaining Today: {dailyTraps}</Text>
-        </View>
-
-        {/* Old Salt NPC - Free Standing */}
-        <View style={styles.oldSaltContainer}>
-          <Image source={oldSaltImage} style={styles.oldSaltImage} resizeMode="contain" />
-          <View style={styles.speechBubble}>
-            <Text style={styles.characterName}>OLD SALT</Text>
-            <Text style={styles.speechText}>
-              "You're my apprentice now, lad. I'll let you run a few traps each day. Listen to the sea... she'll tell you her secrets if you know how to listen."
-            </Text>
-          </View>
-        </View>
-
         {/* Fishing Game */}
         <View style={styles.gameSection}>
           
@@ -427,9 +559,9 @@ export default function TrappersShackScreen() {
             <Image source={oldSaltBgImage} style={styles.gameBackground} resizeMode="cover" />
             
             {/* Bait Selection Overlay */}
-            {gamePhase === 'bait' && (
+            {gamePhase === 'bait' && dailyTraps > 0 && (
               <View style={styles.baitSelectionOverlay}>
-                <Text style={styles.gameInstruction}>Choose your bait, apprentice:</Text>
+                <Text style={styles.gameInstruction}>CHOOSE YOUR BAIT</Text>
                 <View style={styles.baitGrid}>
                   {baitTypes.map((bait) => (
                     <Pressable
@@ -437,10 +569,10 @@ export default function TrappersShackScreen() {
                       style={[
                         styles.baitCard,
                         selectedBait === bait.id && styles.selectedBait,
-                        (dailyTraps <= 0 || tickets < bait.cost) && styles.disabledBait
+                        (dailyTraps <= 0 || stamina < bait.cost) && styles.disabledBait
                       ]}
                       onPress={() => selectBait(bait.id)}
-                      disabled={dailyTraps <= 0 || tickets < bait.cost}
+                      disabled={dailyTraps <= 0 || stamina < bait.cost}
                     >
                       {bait.image ? (
                         <Image 
@@ -451,15 +583,26 @@ export default function TrappersShackScreen() {
                       ) : (
                         <Text style={styles.baitEmoji}>{bait.emoji}</Text>
                       )}
-                      <Text style={styles.baitName}>{bait.name}</Text>
-                      <Text style={styles.baitDescription}>{bait.description}</Text>
+                      <Text style={styles.baitName}>{bait.name.toUpperCase()}</Text>
                       <View style={styles.baitCost}>
-                        <FontAwesome name="ticket" size={14} color="#60a5fa" />
+                        <FontAwesome name="bolt" size={16} color="#fbbf24" />
                         <Text style={styles.baitCostText}>{bait.cost}</Text>
                       </View>
                     </Pressable>
                   ))}
                 </View>
+              </View>
+            )}
+
+            {/* No Traps Left - Show Buy More Option */}
+            {showNoTrapsMessage && (
+              <View style={styles.noTrapsContainer}>
+                <Text style={styles.noTrapsText}>No Traps Left Today!</Text>
+                <Text style={styles.noTrapsSubtext}>Old Salt has run out of traps for today</Text>
+                <Pressable style={styles.buyMoreTrapsButton} onPress={buyMoreTraps}>
+                  <FontAwesome name="diamond" size={16} color="#8b5cf6" />
+                  <Text style={styles.buyMoreTrapsText}>Buy 3 More Traps (1 Gem)</Text>
+                </Pressable>
               </View>
             )}
 
@@ -573,85 +716,76 @@ export default function TrappersShackScreen() {
                   <Text style={styles.catchDescription}>{currentCatch.description}</Text>
                   <Text style={styles.catchValue}>+{currentCatch.value} tickets</Text>
                 </View>
-                {dailyTraps > 0 ? (
+                {dailyTraps > 0 && (
                   <Pressable style={styles.resetButton} onPress={resetGame}>
                     <Text style={styles.resetButtonText}>Try Again</Text>
                   </Pressable>
-                ) : (
-                  <View style={styles.gameOverContainer}>
-                    <Text style={styles.gameOverText}>That's all for today!</Text>
-                    <Text style={styles.gameOverSubtext}>Thanks for fishing with Old Salt</Text>
-                  </View>
                 )}
               </View>
             )}
           </View>
         </View>
 
-        {/* Catch Log - Always Visible */}
-        <View style={styles.catchLogSection}>
-          {/* Docksquid NPC - Top right */}
-          <View style={styles.docksquidContainer}>
-            <View style={styles.docksquidSpeechBubble}>
-              <Text style={styles.docksquidCharacterName}>DOCKSQUID</Text>
-              <Text style={styles.docksquidSpeechText}>"Blub blub!"</Text>
+        {/* GBA Style Catch Log Section */}
+        <View style={styles.gbaCatchLogSection}>
+          {/* GBA Style Header */}
+          <View style={styles.gbaHeader}>
+            <View style={styles.gbaHeaderBorder}>
+              <Text style={styles.gbaTitle}>CATCH LOG</Text>
             </View>
-            <Image source={docksquidImage} style={styles.docksquidImage} resizeMode="contain" />
           </View>
           
-          {/* Catch Log Title - Above the blue border */}
-          <Text style={styles.catchLogTitle}>CATCH LOG</Text>
           
-          {/* Catch Log Container */}
-          <View style={styles.catchLogContainer}>
-              {trapResults.length > 0 ? (
-                <View style={styles.catchLogList}>
-                  {trapResults.slice(0, 6).map((result, index) => (
-                    <View key={result.id} style={styles.catchLogItem}>
-                      <View style={styles.catchLogIcon}>
-                        {result.catch && result.catch.image ? (
-                          <Image 
-                            source={
-                              result.catch.image === 'grumpycrab' ? require('@/assets/images/grumpycrab.png') :
-                              result.catch.image === 'oldbottle' ? require('@/assets/images/oldbottle.png') :
-                              result.catch.image === 'clumpofseaweed' ? require('@/assets/images/clumpofseaweed.png') :
-                              result.catch.image === 'fishbones' ? require('@/assets/images/fishbones.png') :
-                              result.catch.image === 'driftwoodnecklace' ? require('@/assets/images/driftwoodnecklace.png') :
-                              result.catch.image === 'brasscoin' ? require('@/assets/images/brasscoin.png') :
-                              result.catch.image === 'messageinabottle' ? require('@/assets/images/messageinabottle.png') :
-                              result.catch.image === 'sirenscale' ? require('@/assets/images/sirenscale.png') :
-                              result.catch.image === 'micropearl' ? require('@/assets/images/micropearl.png') :
-                              result.catch.image === 'soggyboot' ? require('@/assets/images/soggyboot.png') :
-                              result.catch.image === 'clamchowder' ? require('@/assets/images/clamchowder.png') :
-                              result.catch.image === 'fogsailboat' ? require('@/assets/images/fogchildssailboat.png') :
-                              result.catch.image === 'winecask' ? require('@/assets/images/lil-wine-casket.png') :
-                              result.catch.image === 'oldlantern' ? require('@/assets/images/oldlantern.png') :
-                              result.catch.image === 'singingconch' ? require('@/assets/images/singingconch.png') :
-                              require('@/assets/images/chocolate.png')
-                            } 
-                            style={styles.catchLogImage} 
-                            resizeMode="contain" 
-                          />
-                        ) : (
-                          <Text style={styles.catchLogEmoji}>{result.catch ? result.catch.emoji : getRewardEmoji(result.reward)}</Text>
-                        )}
-                      </View>
-                      <View style={styles.catchLogInfo}>
-                        <Text style={styles.catchLogName}>{result.catch ? result.catch.name : (result.bait || result.trap)}</Text>
-                        <Text style={styles.catchLogBait}>{result.catch ? result.bait : 'Unknown'}</Text>
-                      </View>
-                      <View style={styles.catchLogValue}>
-                        <FontAwesome name="ticket" size={10} color="#0ea5e9" />
-                        <Text style={styles.catchLogTickets}>+{result.ticketsEarned}</Text>
-                      </View>
+          {/* GBA Style Catch Log */}
+          <View style={styles.gbaCatchLogContainer}>
+            {trapResults.length > 0 ? (
+              <View style={styles.gbaCatchLogList}>
+                {trapResults.slice(0, 6).map((result, index) => (
+                  <View key={result.id} style={styles.gbaCatchLogItem}>
+                    <View style={styles.gbaCatchLogIcon}>
+                      {result.catch && result.catch.image ? (
+                        <Image 
+                          source={
+                            result.catch.image === 'grumpycrab' ? require('@/assets/images/grumpycrab.png') :
+                            result.catch.image === 'oldbottle' ? require('@/assets/images/oldbottle.png') :
+                            result.catch.image === 'clumpofseaweed' ? require('@/assets/images/clumpofseaweed.png') :
+                            result.catch.image === 'fishbones' ? require('@/assets/images/fishbones.png') :
+                            result.catch.image === 'driftwoodnecklace' ? require('@/assets/images/driftwoodnecklace.png') :
+                            result.catch.image === 'brasscoin' ? require('@/assets/images/brasscoin.png') :
+                            result.catch.image === 'messageinabottle' ? require('@/assets/images/messageinabottle.png') :
+                            result.catch.image === 'sirenscale' ? require('@/assets/images/sirenscale.png') :
+                            result.catch.image === 'micropearl' ? require('@/assets/images/micropearl.png') :
+                            result.catch.image === 'soggyboot' ? require('@/assets/images/soggyboot.png') :
+                            result.catch.image === 'clamchowder' ? require('@/assets/images/clamchowder.png') :
+                            result.catch.image === 'fogsailboat' ? require('@/assets/images/fogchildssailboat.png') :
+                            result.catch.image === 'winecask' ? require('@/assets/images/lil-wine-casket.png') :
+                            result.catch.image === 'oldlantern' ? require('@/assets/images/oldlantern.png') :
+                            result.catch.image === 'singingconch' ? require('@/assets/images/singingconch.png') :
+                            require('@/assets/images/chocolate.png')
+                          } 
+                          style={styles.gbaCatchLogImage} 
+                          resizeMode="contain" 
+                        />
+                      ) : (
+                        <Text style={styles.gbaCatchLogEmoji}>{result.catch ? result.catch.emoji : getRewardEmoji(result.reward)}</Text>
+                      )}
                     </View>
-                  ))}
-                </View>
-              ) : (
-                <View style={styles.emptyLog}>
-                  <Text style={styles.emptyLogText}>No catches yet today</Text>
-                  <Text style={styles.emptyLogSubtext}>Start fishing to fill your log!</Text>
-                </View>
+                    <View style={styles.gbaCatchLogInfo}>
+                      <Text style={styles.gbaCatchLogName}>{result.catch ? result.catch.name : (result.bait || result.trap)}</Text>
+                      <Text style={styles.gbaCatchLogBait}>{result.catch ? result.bait : 'Unknown'}</Text>
+                    </View>
+                    <View style={styles.gbaCatchLogValue}>
+                      <FontAwesome name="ticket" size={8} color="#0ea5e9" />
+                      <Text style={styles.gbaCatchLogTickets}>+{result.ticketsEarned}</Text>
+                    </View>
+                  </View>
+                ))}
+              </View>
+            ) : (
+              <View style={styles.gbaEmptyLog}>
+                <Text style={styles.gbaEmptyLogText}>No catches yet today</Text>
+                <Text style={styles.gbaEmptyLogSubtext}>Start fishing to fill your log!</Text>
+              </View>
             )}
           </View>
         </View>
@@ -665,6 +799,38 @@ export default function TrappersShackScreen() {
         )}
 
       </ScrollView>
+
+      {/* Custom Purchase Modal */}
+      {showPurchaseModal && (
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>Buy More Traps</Text>
+            <Text style={styles.modalText}>Spend 1 gem to get 3 more traps for today?</Text>
+            <View style={styles.modalButtons}>
+              <Pressable style={styles.modalCancelButton} onPress={() => setShowPurchaseModal(false)}>
+                <Text style={styles.modalCancelText}>Cancel</Text>
+              </Pressable>
+              <Pressable style={styles.modalConfirmButton} onPress={confirmPurchase}>
+                <FontAwesome name="diamond" size={16} color="#8b5cf6" />
+                <Text style={styles.modalConfirmText}>Buy Traps</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      )}
+
+      {/* Custom No Gems Modal */}
+      {showNoGemsModal && (
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>Not Enough Gems</Text>
+            <Text style={styles.modalText}>You need at least 1 gem to buy more traps!</Text>
+            <Pressable style={styles.modalCloseButton} onPress={() => setShowNoGemsModal(false)}>
+              <Text style={styles.modalCloseText}>OK</Text>
+            </Pressable>
+          </View>
+        </View>
+      )}
     </View>
   );
 }
@@ -672,15 +838,16 @@ export default function TrappersShackScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'transparent',
+    backgroundColor: '#f8fafc',
   },
   scrollContent: {
-    alignItems: 'center',
-    paddingBottom: 20,
+    paddingTop: 50,
+    paddingBottom: 100,
+    paddingHorizontal: 16,
   },
   backButton: {
     position: 'absolute',
-    top: 20,
+    top: 10,
     left: 20,
     zIndex: 1000,
     flexDirection: 'row',
@@ -699,7 +866,7 @@ const styles = StyleSheet.create({
   },
   headerRow: {
     position: 'absolute',
-    top: 20,
+    top: 10,
     left: 80,
     right: 80,
     zIndex: 999,
@@ -711,163 +878,155 @@ const styles = StyleSheet.create({
   locationTitle: {
     fontFamily: 'PressStart2P_400Regular',
     fontSize: 10,
-    color: '#0f172a',
+    color: '#0ea5e9',
     fontWeight: 'bold',
     letterSpacing: 1,
     textAlign: 'center',
     textTransform: 'uppercase',
   },
-  bannerContainer: {
-    width: '100%',
-    height: 250,
-    borderWidth: 3,
-    borderColor: '#0ea5e9',
-    borderRadius: 4,
-    marginTop: 60,
-    marginBottom: 20,
+  statsBar: {
+    flexDirection: 'row',
+    backgroundColor: '#ffffff',
+    marginHorizontal: 0,
+    marginTop: 5,
+    marginBottom: 16,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    paddingVertical: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  statItem: {
+    flex: 1,
     alignItems: 'center',
-    justifyContent: 'flex-end',
-    backgroundColor: 'transparent',
-    overflow: 'hidden',
   },
-  bannerImage: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'cover',
-    marginTop: 0,
+  statLabel: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#64748b',
+    marginBottom: 4,
   },
-  welcomeContainer: {
+  statValue: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 16,
+    color: '#0ea5e9',
+  },
+  statDivider: {
+    width: 1,
+    backgroundColor: '#e2e8f0',
+    marginVertical: 4,
+  },
+  staminaCostContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    marginBottom: 2,
+  },
+  staminaCostValue: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 16,
+    color: '#fbbf24',
+  },
+  staminaCostLabel: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#0f172a',
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  debugText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 12,
+    color: '#ef4444',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginTop: 4,
+  },
+  npcContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    marginBottom: 16,
+  },
+  npcImage: {
+    width: 60,
+    height: 60,
+    marginLeft: 12,
+  },
+  npcSpeechBubble: {
+    flex: 1,
     backgroundColor: 'rgba(14, 165, 233, 0.05)',
-    borderRadius: 12,
-    padding: 16,
-    marginHorizontal: 20,
-    marginTop: 60,
-    marginBottom: 20,
+    padding: 12,
+    borderRadius: 6,
     borderWidth: 1,
     borderColor: 'rgba(14, 165, 233, 0.2)',
   },
-  welcomeTitle: {
-    fontFamily: 'PressStart2P_400Regular',
-    fontSize: 12,
-    color: '#0f172a',
-    textAlign: 'center',
-    marginBottom: 8,
-  },
-  welcomeText: {
-    fontFamily: 'Silkscreen_400Regular',
-    fontSize: 9,
-    color: '#64748b',
-    textAlign: 'center',
-    lineHeight: 13,
-    marginBottom: 8,
-  },
-  welcomeSubtext: {
-    fontFamily: 'Silkscreen_400Regular',
-    fontSize: 8,
-    color: '#0ea5e9',
-    textAlign: 'center',
-    lineHeight: 12,
-    fontStyle: 'italic',
-  },
-  oldSaltContainer: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginHorizontal: 20,
-    marginTop: 8,
-    marginBottom: 8,
-  },
-  oldSaltImage: {
-    width: 60,
-    height: 60,
-    marginRight: 12,
-  },
-  speechBubble: {
-    backgroundColor: 'rgba(14, 165, 233, 0.1)',
-    padding: 12,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: 'rgba(14, 165, 233, 0.3)',
-    maxWidth: 300,
-    marginRight: 8,
-  },
-  characterName: {
+  npcName: {
     fontFamily: 'PressStart2P_400Regular',
     fontSize: 8,
     color: '#0ea5e9',
     marginBottom: 4,
-    textAlign: 'left',
   },
-  speechText: {
+  npcText: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 10,
     color: '#0f172a',
-    textAlign: 'left',
     lineHeight: 14,
   },
   adviceContainer: {
-    backgroundColor: 'rgba(14, 165, 233, 0.1)',
+    backgroundColor: '#ffffff',
     borderRadius: 8,
-    padding: 12,
-    marginHorizontal: 20,
+    padding: 16,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: 'rgba(14, 165, 233, 0.3)',
+    borderColor: '#e2e8f0',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
   },
   adviceTitle: {
     fontFamily: 'PressStart2P_400Regular',
     fontSize: 8,
-    color: '#0f172a',
-    marginBottom: 4,
+    color: '#0ea5e9',
+    marginBottom: 6,
   },
   adviceText: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 9,
-    color: '#0ea5e9',
-    fontStyle: 'italic',
-    lineHeight: 12,
-  },
-  dailyCounter: {
-    backgroundColor: 'rgba(14, 165, 233, 0.05)',
-    borderRadius: 6,
-    padding: 2,
-    marginHorizontal: 20,
-    marginBottom: 4,
-    alignItems: 'center',
-  },
-  trappingTitle: {
-    fontFamily: 'PressStart2P_400Regular',
-    fontSize: 8,
-    color: '#0f172a',
-    textAlign: 'center',
-    marginBottom: 4,
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-  },
-  counterText: {
-    fontFamily: 'Silkscreen_400Regular',
     fontSize: 10,
     color: '#0f172a',
-    fontWeight: 'bold',
+    fontStyle: 'italic',
+    lineHeight: 14,
   },
   gameSection: {
     width: '100%',
-    paddingHorizontal: 20,
     marginBottom: 20,
   },
   gameContainer: {
     position: 'relative',
-    height: 420,
+    height: 400,
     borderRadius: 12,
     overflow: 'hidden',
-    marginTop: 16,
+    backgroundColor: '#ffffff',
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   gameInstruction: {
-    fontFamily: 'Silkscreen_400Regular',
-    fontSize: 12,
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 14,
     color: '#ffffff',
     textAlign: 'center',
     marginBottom: 20,
-    fontWeight: '600',
     letterSpacing: 0.5,
   },
   baitSelection: {
@@ -878,69 +1037,85 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'space-between',
     gap: 12,
+    paddingHorizontal: 16,
   },
   baitCard: {
     width: '30%',
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: '#ffffff',
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
-    backdropFilter: 'blur(10px)',
+    borderWidth: 2,
+    borderColor: '#e2e8f0',
+    borderTopColor: '#f1f5f9',
+    borderLeftColor: '#f1f5f9',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   selectedBait: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    borderColor: '#ffffff',
-    borderWidth: 2,
+    backgroundColor: 'rgba(14, 165, 233, 0.1)',
+    borderColor: '#0ea5e9',
+    borderTopColor: '#38bdf8',
+    borderLeftColor: '#38bdf8',
+    shadowColor: '#0ea5e9',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
   },
   disabledBait: {
-    opacity: 0.4,
-    backgroundColor: 'rgba(100, 116, 139, 0.1)',
-    borderColor: 'rgba(100, 116, 139, 0.2)',
+    opacity: 0.5,
+    backgroundColor: '#f8fafc',
+    borderColor: '#cbd5e1',
+    shadowOpacity: 0,
+    elevation: 0,
   },
   baitEmoji: {
-    fontSize: 24,
-    marginBottom: 8,
+    fontSize: 20,
+    marginBottom: 6,
   },
   baitImage: {
-    width: 40,
-    height: 40,
-    marginBottom: 8,
+    width: 28,
+    height: 28,
+    marginBottom: 6,
   },
   mysteryBaitImage: {
-    width: 20,
-    height: 20,
-    marginBottom: 8,
-    marginTop: 10,
+    width: 18,
+    height: 18,
+    marginBottom: 6,
+    marginTop: 6,
   },
   baitName: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 10,
-    color: '#ffffff',
+    fontSize: 9,
+    color: '#0f172a',
     textAlign: 'center',
-    marginBottom: 6,
+    marginBottom: 3,
     fontWeight: '600',
   },
   baitDescription: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 8,
-    color: 'rgba(255, 255, 255, 0.8)',
+    fontSize: 7,
+    color: '#64748b',
     textAlign: 'center',
-    lineHeight: 12,
-    marginBottom: 8,
+    lineHeight: 9,
+    marginBottom: 6,
   },
   baitCost: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    marginTop: 4,
+    gap: 3,
+    marginTop: 2,
   },
   baitCostText: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 11,
-    color: '#60a5fa',
+    fontSize: 12,
+    color: '#fbbf24',
     fontWeight: '600',
+    marginLeft: 3,
   },
   gameBackground: {
     position: 'absolute',
@@ -1127,28 +1302,165 @@ const styles = StyleSheet.create({
     color: 'rgba(255, 255, 255, 0.8)',
     textAlign: 'center',
     fontWeight: '400',
+    marginBottom: 12,
+  },
+  buyMoreTrapsButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(139, 92, 246, 0.2)',
+    borderWidth: 1,
+    borderColor: '#8b5cf6',
+    borderRadius: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    gap: 6,
+  },
+  buyMoreTrapsText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#8b5cf6',
+    fontWeight: '600',
+  },
+  noTrapsContainer: {
+    position: 'absolute',
+    top: '50%',
+    left: 20,
+    right: 20,
+    transform: [{ translateY: -50 }],
+    alignItems: 'center',
+    paddingVertical: 20,
+    paddingHorizontal: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+    zIndex: 1000,
+  },
+  noTrapsText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 14,
+    color: '#ffffff',
+    textAlign: 'center',
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  noTrapsSubtext: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: 'rgba(255, 255, 255, 0.8)',
+    textAlign: 'center',
+    fontWeight: '400',
+    marginBottom: 16,
+  },
+  modalOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 2000,
+  },
+  modalContainer: {
+    backgroundColor: '#1e293b',
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#8b5cf6',
+    paddingVertical: 20,
+    paddingHorizontal: 24,
+    marginHorizontal: 20,
+    minWidth: 280,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 12,
+    color: '#8b5cf6',
+    textAlign: 'center',
+    marginBottom: 12,
+  },
+  modalText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#ffffff',
+    textAlign: 'center',
+    marginBottom: 20,
+    lineHeight: 14,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  modalCancelButton: {
+    backgroundColor: 'rgba(107, 114, 128, 0.2)',
+    borderWidth: 1,
+    borderColor: '#6b7280',
+    borderRadius: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+  },
+  modalCancelText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#9ca3af',
+    fontWeight: '600',
+  },
+  modalConfirmButton: {
+    backgroundColor: 'rgba(139, 92, 246, 0.2)',
+    borderWidth: 1,
+    borderColor: '#8b5cf6',
+    borderRadius: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  modalConfirmText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#8b5cf6',
+    fontWeight: '600',
+  },
+  modalCloseButton: {
+    backgroundColor: 'rgba(139, 92, 246, 0.2)',
+    borderWidth: 1,
+    borderColor: '#8b5cf6',
+    borderRadius: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 24,
+  },
+  modalCloseText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#8b5cf6',
+    fontWeight: '600',
   },
   catchLogSection: {
     width: '100%',
-    paddingHorizontal: 20,
-    marginTop: -8,
     marginBottom: 20,
   },
   catchLogTitle: {
     fontFamily: 'PressStart2P_400Regular',
-    fontSize: 12,
+    fontSize: 10,
     color: '#0f172a',
     textAlign: 'left',
     textTransform: 'uppercase',
-    marginBottom: 8,
-    marginTop: -4,
+    marginBottom: 12,
   },
   catchLogContainer: {
-    backgroundColor: 'rgba(14, 165, 233, 0.05)',
+    backgroundColor: '#ffffff',
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: 'rgba(14, 165, 233, 0.2)',
-    padding: 12,
+    borderColor: '#e2e8f0',
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
   },
   catchLogList: {
     gap: 8,
@@ -1156,11 +1468,11 @@ const styles = StyleSheet.create({
   catchLogItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(14, 165, 233, 0.1)',
+    backgroundColor: '#f8fafc',
     borderRadius: 6,
-    padding: 8,
+    padding: 10,
     borderWidth: 1,
-    borderColor: 'rgba(14, 165, 233, 0.3)',
+    borderColor: '#e2e8f0',
   },
   catchLogIcon: {
     width: 32,
@@ -1180,24 +1492,25 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   catchLogName: {
-    fontFamily: 'PressStart2P_400Regular',
-    fontSize: 8,
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 9,
     color: '#0f172a',
     marginBottom: 2,
+    fontWeight: '600',
   },
   catchLogBait: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 6,
+    fontSize: 7,
     color: '#64748b',
   },
   catchLogValue: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: 3,
   },
   catchLogTickets: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 8,
+    fontSize: 9,
     color: '#0ea5e9',
     fontWeight: 'bold',
   },
@@ -1214,6 +1527,139 @@ const styles = StyleSheet.create({
   emptyLogSubtext: {
     fontFamily: 'Silkscreen_400Regular',
     fontSize: 6,
+    color: '#94a3b8',
+  },
+  // GBA Style Catch Log Styles
+  gbaCatchLogSection: {
+    width: '100%',
+    marginBottom: 20,
+  },
+  gbaHeader: {
+    marginBottom: 12,
+  },
+  gbaHeaderBorder: {
+    backgroundColor: '#0ea5e9',
+    borderWidth: 2,
+    borderColor: '#0284c7',
+    borderTopColor: '#38bdf8',
+    borderLeftColor: '#38bdf8',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    alignItems: 'center',
+  },
+  gbaTitle: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 10,
+    color: '#ffffff',
+    textShadowColor: '#0284c7',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 0,
+  },
+  gbaDocksquidContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+    paddingHorizontal: 8,
+  },
+  gbaDocksquidImage: {
+    width: 40,
+    height: 40,
+    marginRight: 8,
+  },
+  gbaDocksquidSpeechBubble: {
+    backgroundColor: '#ffffff',
+    borderWidth: 2,
+    borderColor: '#0f172a',
+    borderTopColor: '#64748b',
+    borderLeftColor: '#64748b',
+    paddingVertical: 6,
+    paddingHorizontal: 8,
+    flex: 1,
+  },
+  gbaDocksquidName: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 6,
+    color: '#0f172a',
+    marginBottom: 2,
+  },
+  gbaDocksquidText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 8,
+    color: '#0f172a',
+    lineHeight: 10,
+  },
+  gbaCatchLogContainer: {
+    backgroundColor: '#ffffff',
+    borderWidth: 2,
+    borderColor: '#0f172a',
+    borderTopColor: '#64748b',
+    borderLeftColor: '#64748b',
+    padding: 8,
+  },
+  gbaCatchLogList: {
+    gap: 4,
+  },
+  gbaCatchLogItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f8fafc',
+    borderWidth: 1,
+    borderColor: '#0f172a',
+    borderTopColor: '#e2e8f0',
+    borderLeftColor: '#e2e8f0',
+    padding: 6,
+  },
+  gbaCatchLogIcon: {
+    width: 24,
+    height: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 8,
+  },
+  gbaCatchLogImage: {
+    width: 20,
+    height: 20,
+  },
+  gbaCatchLogEmoji: {
+    fontSize: 12,
+  },
+  gbaCatchLogInfo: {
+    flex: 1,
+  },
+  gbaCatchLogName: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 9,
+    color: '#0f172a',
+    marginBottom: 1,
+  },
+  gbaCatchLogBait: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 8,
+    color: '#64748b',
+  },
+  gbaCatchLogValue: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+  },
+  gbaCatchLogTickets: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 9,
+    color: '#0ea5e9',
+  },
+  gbaEmptyLog: {
+    alignItems: 'center',
+    paddingVertical: 16,
+  },
+  gbaEmptyLogText: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 10,
+    color: '#64748b',
+    marginBottom: 4,
+  },
+  gbaEmptyLogSubtext: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 8,
     color: '#94a3b8',
   },
   docksquidContainer: {

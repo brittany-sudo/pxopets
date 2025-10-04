@@ -1,70 +1,77 @@
 import React, { useState } from 'react';
-import { StyleSheet, ScrollView, View as RNView, Image, Pressable, Alert } from 'react-native';
+import { StyleSheet, ScrollView, View as RNView, Image, Pressable, Alert, Modal } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { router } from 'expo-router';
+import BorderedBox from '@/components/BorderedBox';
+import JazzyTitle from '@/components/JazzyTitle';
 
 export default function PostOfficeScreen() {
-  const [mailCount, setMailCount] = useState(3);
-  const [packageCount, setPackageCount] = useState(1);
-  const [stamps, setStamps] = useState(12);
+  const [showDeliveryModal, setShowDeliveryModal] = useState(false);
+  const [showPOBoxModal, setShowPOBoxModal] = useState(false);
+  const [showStampsModal, setShowStampsModal] = useState(false);
+  const [showPostcardsModal, setShowPostcardsModal] = useState(false);
 
-  const handleSendMail = () => {
-    if (mailCount > 0) {
-      setMailCount(prev => prev - 1);
-      Alert.alert(
-        "📮 Mail Sent!",
-        "Your letter has been sent to its destination. The recipient will be happy to hear from you!"
-      );
-    } else {
-      Alert.alert(
-        "📮 No Mail",
-        "You don't have any mail to send right now. Check back later!"
-      );
+  // Delivery quests data
+  const availableDeliveries = [
+    {
+      id: 1,
+      recipient: 'Marty at QuickStop',
+      item: 'Coffee Beans',
+      reward: '50 tickets',
+      location: 'QuickStop',
+      description: 'Deliver fresh coffee beans to Marty for the morning rush!'
+    },
+    {
+      id: 2,
+      recipient: 'Vinnie at Shop',
+      item: 'Rare Gem',
+      reward: '100 tickets',
+      location: 'Shop',
+      description: 'Transport this valuable gem safely to Vinnie.'
+    },
+    {
+      id: 3,
+      recipient: 'Pool Attendant',
+      item: 'Pool Supplies',
+      reward: '75 tickets',
+      location: 'Community Pool',
+      description: 'Deliver maintenance supplies to the pool area.'
     }
+  ];
+
+
+  const handleMakeDelivery = () => {
+    setShowDeliveryModal(true);
   };
 
-  const handleSendPackage = () => {
-    if (packageCount > 0) {
-      setPackageCount(prev => prev - 1);
-      Alert.alert(
-        "📦 Package Sent!",
-        "Your package has been shipped! It will arrive at its destination within 2-3 business days."
-      );
-    } else {
-      Alert.alert(
-        "📦 No Packages",
-        "You don't have any packages to send right now. Check back later!"
-      );
-    }
+
+  const handleGoToPOBox = () => {
+    setShowPOBoxModal(true);
   };
 
   const handleBuyStamps = () => {
-    setStamps(prev => prev + 5);
-    Alert.alert(
-      "🪙 Stamps Purchased!",
-      "You bought 5 stamps for 1 ticket each. You now have " + (stamps + 5) + " stamps total!"
-    );
-  };
-
-  const handleGoToPOBox = () => {
-    Alert.alert(
-      "📮 PO Box Access",
-      "You've accessed your PO Box! You can store mail and packages here for pickup."
-    );
+    setShowStampsModal(true);
   };
 
   const handleBuyPostcards = () => {
+    setShowPostcardsModal(true);
+  };
+
+  const acceptDelivery = (delivery: any) => {
     Alert.alert(
-      "📮 Postcards Purchased!",
-      "You bought 3 postcards for 1 ticket each. Perfect for sending quick messages to friends!"
+      "📦 Delivery Accepted!",
+      `You're now delivering ${delivery.item} to ${delivery.recipient} at ${delivery.location}. Complete the delivery to earn ${delivery.reward}!`,
+      [
+        { text: "Got it!", onPress: () => setShowDeliveryModal(false) }
+      ]
     );
   };
 
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Back Button - Fixed Position */}
+        {/* Back Button */}
         <Pressable 
           style={styles.backButton}
           onPress={() => router.navigate('/(tabs)/pxoburbs')}
@@ -78,86 +85,198 @@ export default function PostOfficeScreen() {
           <Text style={styles.locationTitle}>POST OFFICE</Text>
         </RNView>
 
-        {/* Post Office Header */}
-        <RNView style={styles.headerContainer}>
-          <Text style={styles.postOfficeTitle}>PXOBURBS POST OFFICE</Text>
-          <Text style={styles.tagline}>Connecting Pxopia, One Letter at a Time</Text>
-        </RNView>
+        {/* Main Image */}
+        <Image source={require('@/assets/images/pxopost-header.png')} style={styles.mainImage} />
 
-        {/* Post Office Image */}
-        <RNView style={styles.imageContainer}>
+        {/* Postal Worker NPC */}
+        <RNView style={styles.npcContainer}>
+          <RNView style={styles.speechBubble}>
+            <Text style={styles.characterName}>POSTAL WORKER</Text>
+            <Text style={styles.speechText}>"Welcome to Pxoburbs Post Office! How can I help you today?"</Text>
+          </RNView>
           <Image 
-            source={require('@/assets/images/post-office-header.png')} 
-            style={styles.postOfficeImage} 
+            source={require('@/assets/images/pxopost-worker.png')} 
+            style={styles.npcImage} 
             resizeMode="contain" 
           />
         </RNView>
 
-        {/* Mail Services */}
-        <RNView style={styles.servicesContainer}>
-          <Text style={styles.servicesTitle}>MAIL SERVICES</Text>
-          
-          <Pressable style={styles.serviceButton} onPress={handleSendMail}>
-            <FontAwesome name="envelope" size={20} color="#8b5cf6" />
-            <RNView style={styles.serviceInfo}>
-              <Text style={styles.serviceName}>Send Mail</Text>
-              <Text style={styles.serviceDescription}>Send letters to friends</Text>
-              <Text style={styles.serviceCount}>Available: {mailCount}</Text>
+        {/* Services Grid */}
+        <RNView style={styles.servicesGrid}>
+          {/* Make a Delivery */}
+          <Pressable style={styles.serviceCard} onPress={handleMakeDelivery}>
+            <RNView style={styles.serviceIconContainer}>
+              <FontAwesome name="truck" size={24} color="#8b5cf6" />
             </RNView>
+            <Text style={styles.serviceTitle}>MAKE A DELIVERY</Text>
+            <Text style={styles.serviceDescription}>Take on fetch quests and deliver items to NPCs</Text>
           </Pressable>
 
-          <Pressable style={styles.serviceButton} onPress={handleSendPackage}>
-            <FontAwesome name="gift" size={20} color="#10b981" />
-            <RNView style={styles.serviceInfo}>
-              <Text style={styles.serviceName}>Send Package</Text>
-              <Text style={styles.serviceDescription}>Ship items to friends</Text>
-              <Text style={styles.serviceCount}>Available: {packageCount}</Text>
+          {/* PO Box */}
+          <Pressable style={styles.serviceCard} onPress={handleGoToPOBox}>
+            <RNView style={styles.serviceIconContainer}>
+              <FontAwesome name="archive" size={24} color="#f59e0b" />
             </RNView>
+            <Text style={styles.serviceTitle}>PO BOX</Text>
+            <Text style={styles.serviceDescription}>Access your personal mailbox</Text>
           </Pressable>
 
-          <Pressable style={styles.serviceButton} onPress={handleGoToPOBox}>
-            <FontAwesome name="archive" size={20} color="#f59e0b" />
-            <RNView style={styles.serviceInfo}>
-              <Text style={styles.serviceName}>Go to PO Box</Text>
-              <Text style={styles.serviceDescription}>Access your personal mailbox</Text>
+          {/* Buy Stamps */}
+          <Pressable style={styles.serviceCard} onPress={handleBuyStamps}>
+            <RNView style={styles.serviceIconContainer}>
+              <FontAwesome name="ticket" size={24} color="#ec4899" />
             </RNView>
+            <Text style={styles.serviceTitle}>BUY STAMPS</Text>
+            <Text style={styles.serviceDescription}>Purchase stamps for sending mail</Text>
           </Pressable>
 
-          <Pressable style={styles.serviceButton} onPress={handleBuyPostcards}>
-            <FontAwesome name="picture-o" size={20} color="#ec4899" />
-            <RNView style={styles.serviceInfo}>
-              <Text style={styles.serviceName}>Buy Postcards</Text>
-              <Text style={styles.serviceDescription}>3 postcards for 1 ticket each</Text>
+          {/* Buy/Send Postcards */}
+          <Pressable style={styles.serviceCard} onPress={handleBuyPostcards}>
+            <RNView style={styles.serviceIconContainer}>
+              <FontAwesome name="picture-o" size={24} color="#7c3aed" />
             </RNView>
-          </Pressable>
-
-          <Pressable style={styles.serviceButton} onPress={handleBuyStamps}>
-            <FontAwesome name="ticket" size={20} color="#8b5cf6" />
-            <RNView style={styles.serviceInfo}>
-              <Text style={styles.serviceName}>Buy Stamps</Text>
-              <Text style={styles.serviceDescription}>5 stamps for 1 ticket</Text>
-              <Text style={styles.serviceCount}>Owned: {stamps}</Text>
-            </RNView>
+            <Text style={styles.serviceTitle}>POSTCARDS</Text>
+            <Text style={styles.serviceDescription}>Buy and send postcards to friends</Text>
           </Pressable>
         </RNView>
 
-        {/* Post Office Stats */}
-        <RNView style={styles.statsContainer}>
-          <Text style={styles.statsTitle}>POST OFFICE STATS</Text>
-          <RNView style={styles.statsRow}>
-            <Text style={styles.statLabel}>Letters Sent Today:</Text>
-            <Text style={styles.statValue}>{3 - mailCount}</Text>
-          </RNView>
-          <RNView style={styles.statsRow}>
-            <Text style={styles.statLabel}>Packages Shipped:</Text>
-            <Text style={styles.statValue}>{1 - packageCount}</Text>
-          </RNView>
-          <RNView style={styles.statsRow}>
-            <Text style={styles.statLabel}>Stamps in Collection:</Text>
-            <Text style={styles.statValue}>{stamps}</Text>
-          </RNView>
+        {/* Bulletin Board Image */}
+        <RNView style={styles.bulletinImageContainer}>
+          <Image 
+            source={require('@/assets/images/pxopost-bulletin.png')} 
+            style={styles.bulletinImage} 
+            resizeMode="contain" 
+          />
+        </RNView>
+
+        {/* About Section */}
+        <RNView style={styles.aboutContainer}>
+          <Text style={styles.aboutTitle}>About Pxoburbs Post Office</Text>
+          <Text style={styles.aboutText}>
+            The heart of communication in Pxoburbs! Here you can take on delivery quests, 
+            check community announcements, manage your mail, and connect with friends across Pxopia.
+          </Text>
         </RNView>
       </ScrollView>
+
+      {/* Delivery Modal */}
+      <Modal
+        visible={showDeliveryModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowDeliveryModal(false)}
+      >
+        <RNView style={styles.modalOverlay}>
+          <RNView style={styles.modalContent}>
+            <Text style={styles.modalTitle}>AVAILABLE DELIVERIES</Text>
+            <ScrollView style={styles.deliveryList}>
+              {availableDeliveries.map((delivery) => (
+                <Pressable 
+                  key={delivery.id} 
+                  style={styles.deliveryItem}
+                  onPress={() => acceptDelivery(delivery)}
+                >
+                  <RNView style={styles.deliveryHeader}>
+                    <Text style={styles.deliveryItemName}>{delivery.item}</Text>
+                    <Text style={styles.deliveryReward}>{delivery.reward}</Text>
+                  </RNView>
+                  <Text style={styles.deliveryRecipient}>To: {delivery.recipient}</Text>
+                  <Text style={styles.deliveryLocation}>Location: {delivery.location}</Text>
+                  <Text style={styles.deliveryDescription}>{delivery.description}</Text>
+                </Pressable>
+              ))}
+            </ScrollView>
+            <Pressable 
+              style={styles.closeButton}
+              onPress={() => setShowDeliveryModal(false)}
+            >
+              <Text style={styles.closeButtonText}>Close</Text>
+            </Pressable>
+          </RNView>
+        </RNView>
+      </Modal>
+
+
+      {/* PO Box Modal */}
+      <Modal
+        visible={showPOBoxModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowPOBoxModal(false)}
+      >
+        <RNView style={styles.modalOverlay}>
+          <RNView style={styles.modalContent}>
+            <Text style={styles.modalTitle}>YOUR PO BOX</Text>
+            <RNView style={styles.poBoxContent}>
+              <FontAwesome name="archive" size={48} color="#8b5cf6" />
+              <Text style={styles.poBoxText}>Your mailbox is empty</Text>
+              <Text style={styles.poBoxSubtext}>Check back later for mail and packages!</Text>
+            </RNView>
+            <Pressable 
+              style={styles.closeButton}
+              onPress={() => setShowPOBoxModal(false)}
+            >
+              <Text style={styles.closeButtonText}>Close</Text>
+            </Pressable>
+          </RNView>
+        </RNView>
+      </Modal>
+
+      {/* Stamps Modal */}
+      <Modal
+        visible={showStampsModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowStampsModal(false)}
+      >
+        <RNView style={styles.modalOverlay}>
+          <RNView style={styles.modalContent}>
+            <Text style={styles.modalTitle}>BUY STAMPS</Text>
+            <RNView style={styles.stampsContent}>
+              <FontAwesome name="ticket" size={48} color="#ec4899" />
+              <Text style={styles.stampsText}>5 Stamps for 1 Ticket</Text>
+              <Text style={styles.stampsSubtext}>Perfect for sending mail!</Text>
+              <Pressable style={styles.buyButton}>
+                <Text style={styles.buyButtonText}>BUY STAMPS</Text>
+              </Pressable>
+            </RNView>
+            <Pressable 
+              style={styles.closeButton}
+              onPress={() => setShowStampsModal(false)}
+            >
+              <Text style={styles.closeButtonText}>Close</Text>
+            </Pressable>
+          </RNView>
+        </RNView>
+      </Modal>
+
+      {/* Postcards Modal */}
+      <Modal
+        visible={showPostcardsModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowPostcardsModal(false)}
+      >
+        <RNView style={styles.modalOverlay}>
+          <RNView style={styles.modalContent}>
+            <Text style={styles.modalTitle}>POSTCARDS</Text>
+            <RNView style={styles.postcardsContent}>
+              <FontAwesome name="picture-o" size={48} color="#7c3aed" />
+              <Text style={styles.postcardsText}>3 Postcards for 1 Ticket Each</Text>
+              <Text style={styles.postcardsSubtext}>Send quick messages to friends!</Text>
+              <Pressable style={styles.buyButton}>
+                <Text style={styles.buyButtonText}>BUY POSTCARDS</Text>
+              </Pressable>
+            </RNView>
+            <Pressable 
+              style={styles.closeButton}
+              onPress={() => setShowPostcardsModal(false)}
+            >
+              <Text style={styles.closeButtonText}>Close</Text>
+            </Pressable>
+          </RNView>
+        </RNView>
+      </Modal>
     </View>
   );
 }
@@ -165,22 +284,14 @@ export default function PostOfficeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f0f9ff',
+    backgroundColor: '#f8fafc',
   },
   scrollContent: {
-    paddingBottom: 100,
-    paddingTop: 10,
-  },
-  headerRow: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 20,
-    paddingHorizontal: 4,
-    height: 40,
+    paddingBottom: 20,
   },
   backButton: {
     position: 'absolute',
-    top: 20, // Higher up, below the status bar
+    top: 10,
     left: 20,
     zIndex: 1000,
     flexDirection: 'row',
@@ -192,119 +303,293 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(139, 92, 246, 0.3)',
   },
-  locationTitle: {
-    fontFamily: 'PressStart2P_400Regular',
-    fontSize: 12,
-    color: '#0f172a',
-    fontWeight: 'bold',
-    letterSpacing: 1,
-    textAlign: 'center',
-  },
   backButtonText: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 12,
+    fontSize: 14,
     color: '#8b5cf6',
     marginLeft: 6,
   },
-  headerContainer: {
+  headerRow: {
     alignItems: 'center',
-    marginBottom: 30,
+    justifyContent: 'center',
+    marginTop: 5,
+    marginBottom: 0,
+    paddingHorizontal: 4,
+    height: 40,
   },
-  postOfficeTitle: {
+  locationTitle: {
     fontFamily: 'PressStart2P_400Regular',
-    fontSize: 20,
-    color: '#0f172a',
-    textAlign: 'center',
-    marginBottom: 8,
-  },
-  tagline: {
-    fontFamily: 'Silkscreen_400Regular',
-    fontSize: 14,
-    color: '#64748b',
-    textAlign: 'center',
-  },
-  imageContainer: {
-    width: '90%',
-    alignSelf: 'center',
-    marginBottom: 30,
-    alignItems: 'center',
-  },
-  postOfficeImage: {
-    width: '100%',
-    height: 200,
-  },
-  servicesContainer: {
-    marginBottom: 30,
-  },
-  servicesTitle: {
-    fontFamily: 'PressStart2P_400Regular',
-    fontSize: 16,
-    color: '#0f172a',
-    marginBottom: 16,
-    textAlign: 'center',
-  },
-  serviceButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(14, 165, 233, 0.05)',
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(14, 165, 233, 0.2)',
-  },
-  serviceInfo: {
-    flex: 1,
-    marginLeft: 12,
-  },
-  serviceName: {
-    fontFamily: 'Silkscreen_400Regular',
-    fontSize: 14,
-    color: '#0f172a',
-    fontWeight: 'bold',
-    marginBottom: 2,
-  },
-  serviceDescription: {
-    fontFamily: 'Silkscreen_400Regular',
     fontSize: 12,
-    color: '#64748b',
-    marginBottom: 4,
+    fontWeight: 'bold',
+    color: '#8b5cf6',
+    letterSpacing: 1,
+    textAlign: 'center',
   },
-  serviceCount: {
+  mainImage: {
+    width: '100%',
+    height: 250,
+    resizeMode: 'contain',
+    marginBottom: 0,
+  },
+  npcContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginHorizontal: 20,
+    marginTop: 0,
+    marginBottom: 20,
+    padding: 15,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+  },
+  speechBubble: {
+    flex: 1,
+    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+    padding: 15,
+    borderRadius: 12,
+    marginRight: 15,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.2)',
+  },
+  characterName: {
+    fontSize: 12,
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 10,
     color: '#8b5cf6',
     fontWeight: 'bold',
+    marginBottom: 8,
   },
-  statsContainer: {
-    backgroundColor: 'rgba(14, 165, 233, 0.05)',
-    borderRadius: 8,
-    padding: 16,
+  speechText: {
+    fontSize: 12,
+    fontFamily: 'Silkscreen_400Regular',
+    color: '#64748b',
+    lineHeight: 16,
+  },
+  npcImage: {
+    width: 80,
+    height: 80,
+  },
+  servicesGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    marginBottom: 20,
+  },
+  bulletinImageContainer: {
+    alignItems: 'center',
+    marginHorizontal: 20,
+    marginBottom: 20,
+  },
+  bulletinImage: {
+    width: '100%',
+    height: 150,
+  },
+  serviceCard: {
+    width: '48%',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: 12,
+    padding: 15,
+    marginBottom: 15,
     borderWidth: 1,
-    borderColor: 'rgba(14, 165, 233, 0.2)',
+    borderColor: '#e2e8f0',
+    alignItems: 'center',
   },
-  statsTitle: {
-    fontFamily: 'PressStart2P_400Regular',
-    fontSize: 14,
-    color: '#0f172a',
-    marginBottom: 12,
+  serviceIconContainer: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 10,
+  },
+  serviceTitle: {
+    fontSize: 12,
+    fontFamily: 'Silkscreen_400Regular',
+    color: '#8b5cf6',
+    fontWeight: 'bold',
     textAlign: 'center',
+    marginBottom: 5,
   },
-  statsRow: {
+  serviceDescription: {
+    fontSize: 10,
+    fontFamily: 'Silkscreen_400Regular',
+    color: '#64748b',
+    textAlign: 'center',
+    lineHeight: 14,
+  },
+  aboutContainer: {
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    marginHorizontal: 20,
+    padding: 15,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+  },
+  aboutTitle: {
+    fontSize: 14,
+    fontFamily: 'Silkscreen_400Regular',
+    color: '#8b5cf6',
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  aboutText: {
+    fontSize: 12,
+    fontFamily: 'Silkscreen_400Regular',
+    color: '#64748b',
+    lineHeight: 16,
+  },
+  // Modal styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 20,
+    margin: 20,
+    maxHeight: '80%',
+    width: '90%',
+  },
+  modalTitle: {
+    fontSize: 16,
+    fontFamily: 'Silkscreen_400Regular',
+    color: '#8b5cf6',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  deliveryList: {
+    maxHeight: 300,
+  },
+  deliveryItem: {
+    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+    padding: 15,
+    borderRadius: 8,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.2)',
+  },
+  deliveryHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 5,
   },
-  statLabel: {
+  deliveryItemName: {
+    fontSize: 14,
     fontFamily: 'Silkscreen_400Regular',
+    color: '#8b5cf6',
+    fontWeight: 'bold',
+  },
+  deliveryReward: {
     fontSize: 12,
+    fontFamily: 'Silkscreen_400Regular',
+    color: '#10b981',
+    fontWeight: 'bold',
+  },
+  deliveryRecipient: {
+    fontSize: 12,
+    fontFamily: 'Silkscreen_400Regular',
     color: '#64748b',
+    marginBottom: 2,
   },
-  statValue: {
-    fontFamily: 'Silkscreen_400Regular',
+  deliveryLocation: {
     fontSize: 12,
-    color: '#0f172a',
+    fontFamily: 'Silkscreen_400Regular',
+    color: '#64748b',
+    marginBottom: 5,
+  },
+  deliveryDescription: {
+    fontSize: 11,
+    fontFamily: 'Silkscreen_400Regular',
+    color: '#64748b',
+    lineHeight: 14,
+  },
+  poBoxContent: {
+    alignItems: 'center',
+    padding: 40,
+  },
+  poBoxText: {
+    fontSize: 16,
+    fontFamily: 'Silkscreen_400Regular',
+    color: '#8b5cf6',
+    fontWeight: 'bold',
+    marginTop: 15,
+    marginBottom: 5,
+  },
+  poBoxSubtext: {
+    fontSize: 12,
+    fontFamily: 'Silkscreen_400Regular',
+    color: '#64748b',
+    textAlign: 'center',
+  },
+  stampsContent: {
+    alignItems: 'center',
+    padding: 40,
+  },
+  stampsText: {
+    fontSize: 16,
+    fontFamily: 'Silkscreen_400Regular',
+    color: '#8b5cf6',
+    fontWeight: 'bold',
+    marginTop: 15,
+    marginBottom: 5,
+  },
+  stampsSubtext: {
+    fontSize: 12,
+    fontFamily: 'Silkscreen_400Regular',
+    color: '#64748b',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  postcardsContent: {
+    alignItems: 'center',
+    padding: 40,
+  },
+  postcardsText: {
+    fontSize: 16,
+    fontFamily: 'Silkscreen_400Regular',
+    color: '#8b5cf6',
+    fontWeight: 'bold',
+    marginTop: 15,
+    marginBottom: 5,
+  },
+  postcardsSubtext: {
+    fontSize: 12,
+    fontFamily: 'Silkscreen_400Regular',
+    color: '#64748b',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  buyButton: {
+    backgroundColor: '#8b5cf6',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  buyButtonText: {
+    fontSize: 12,
+    fontFamily: 'Silkscreen_400Regular',
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  closeButton: {
+    backgroundColor: '#e2e8f0',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+    marginTop: 15,
+    alignSelf: 'center',
+  },
+  closeButtonText: {
+    fontSize: 12,
+    fontFamily: 'Silkscreen_400Regular',
+    color: '#64748b',
     fontWeight: 'bold',
   },
 });

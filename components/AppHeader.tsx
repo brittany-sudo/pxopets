@@ -12,9 +12,14 @@ import { usePets } from '@/store/PetStore';
 export default function AppHeader() {
   const colorScheme = useColorScheme() ?? 'light';
   const { state } = useSimpleGame();
-  const { checkAndAddDailyStamina } = usePets();
+  const { checkAndAddDailyStamina, state: petState } = usePets();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const refreshRotation = useRef(new Animated.Value(0)).current;
+  
+  // Calculate total stamina from all pets
+  const getTotalPetStamina = () => {
+    return petState.adoptedPets.reduce((total, pet) => total + (pet.stamina || 0), 0);
+  };
   
   // Check and add daily stamina when component mounts or when route changes
   useEffect(() => {
@@ -165,7 +170,7 @@ export default function AppHeader() {
           <View style={styles.currencyItem}>
             <FontAwesome name="bolt" size={16} color="#f59e0b" />
             <Text style={[styles.currencyText, { color: colorScheme === 'dark' ? '#ffffff' : '#000000' }]}>
-              {state.stamina}
+              {getTotalPetStamina()}
             </Text>
           </View>
           <View style={styles.currencyItem}>

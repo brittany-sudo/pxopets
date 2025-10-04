@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, ScrollView, View as RNView, Image, Pressable } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { router } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Import the banner image
 const lullabyDownsMainImage = require('@/assets/images/lullaby-downs-main.png');
@@ -11,16 +12,35 @@ const lilGnomeImage = require('@/assets/images/lil-gnome.png');
 export default function LullabyDownsScreen() {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
 
-  const toggleFavorite = (activityId: string) => {
-    setFavorites(prev => {
-      const newFavorites = new Set(prev);
+  // Load starred activities from storage
+  useEffect(() => {
+    loadStarredActivities();
+  }, []);
+
+  const loadStarredActivities = async () => {
+    try {
+      const saved = await AsyncStorage.getItem('starredActivities');
+      if (saved) {
+        setFavorites(new Set(JSON.parse(saved)));
+      }
+    } catch (error) {
+      console.error('Failed to load starred activities:', error);
+    }
+  };
+
+  const toggleFavorite = async (activityId: string) => {
+    try {
+      const newFavorites = new Set(favorites);
       if (newFavorites.has(activityId)) {
         newFavorites.delete(activityId);
       } else {
         newFavorites.add(activityId);
       }
-      return newFavorites;
-    });
+      setFavorites(newFavorites);
+      await AsyncStorage.setItem('starredActivities', JSON.stringify([...newFavorites]));
+    } catch (error) {
+      console.error('Failed to save starred activities:', error);
+    }
   };
 
   const activities = [

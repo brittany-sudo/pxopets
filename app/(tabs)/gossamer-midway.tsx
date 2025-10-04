@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, ScrollView, View as RNView, Image, Pressable } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { router } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Import the banner image
 const gossamerMidwayMainImage = require('@/assets/images/gossamer-midway-main.png');
@@ -33,16 +34,35 @@ export default function GossamerMidwayScreen() {
     setTwinsGreeting(randomGreeting);
   }, []);
 
-  const toggleFavorite = (activityId: string) => {
-    setFavorites(prev => {
-      const newFavorites = new Set(prev);
+  // Load starred activities from storage
+  useEffect(() => {
+    loadStarredActivities();
+  }, []);
+
+  const loadStarredActivities = async () => {
+    try {
+      const saved = await AsyncStorage.getItem('starredActivities');
+      if (saved) {
+        setFavorites(new Set(JSON.parse(saved)));
+      }
+    } catch (error) {
+      console.error('Failed to load starred activities:', error);
+    }
+  };
+
+  const toggleFavorite = async (activityId: string) => {
+    try {
+      const newFavorites = new Set(favorites);
       if (newFavorites.has(activityId)) {
         newFavorites.delete(activityId);
       } else {
         newFavorites.add(activityId);
       }
-      return newFavorites;
-    });
+      setFavorites(newFavorites);
+      await AsyncStorage.setItem('starredActivities', JSON.stringify([...newFavorites]));
+    } catch (error) {
+      console.error('Failed to save starred activities:', error);
+    }
   };
 
 
@@ -74,42 +94,42 @@ export default function GossamerMidwayScreen() {
     {
       id: 'zodiac-carousel',
       name: 'Zodiac Carousel',
-      description: 'Ride celestial creatures representing the twelve zodiac signs.',
-      lightning: 40,
-      difficulty: 'Medium',
+      description: 'Ride celestial creatures through the constellations.',
+      lightning: 20,
+      difficulty: 'Easy',
       icon: 'star'
     },
     {
       id: 'star-candy-booth',
       name: 'Star Candy Booth',
-      description: 'Watch as they whip stars into cotton candy and celestial sweets.',
-      lightning: 20,
+      description: 'Taste the sweetness of captured starlight.',
+      lightning: 15,
       difficulty: 'Easy',
       icon: 'heart'
     },
     {
       id: 'celestial-mask-shop',
       name: 'Celestial Mask Shop',
-      description: 'Try on masks that transform you into cosmic beings.',
-      lightning: 15,
-      difficulty: 'Easy',
+      description: 'Transform into cosmic beings with magical masks.',
+      lightning: 25,
+      difficulty: 'Medium',
       icon: 'user'
     },
     {
       id: 'celestial-menagerie',
       name: 'Celestial Menagerie',
-      description: 'Pet and play with tiny celestial sprites in this magical petting zoo.',
-      lightning: 25,
-      difficulty: 'Easy',
+      description: 'Meet creatures from distant galaxies.',
+      lightning: 30,
+      difficulty: 'Medium',
       icon: 'paw'
     },
     {
       id: 'cosmic-ring-toss',
       name: 'Cosmic Ring Toss',
-      description: 'Toss rings at floating planets, stars, and celestial objects.',
-      lightning: 30,
-      difficulty: 'Medium',
-      icon: 'bullseye'
+      description: 'Test your aim with rings that orbit like planets.',
+      lightning: 20,
+      difficulty: 'Easy',
+      icon: 'circle'
     }
   ];
 

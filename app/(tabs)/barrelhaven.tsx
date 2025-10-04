@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, ScrollView, View as RNView, Image, Pressable } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { router } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Import the banner image
 const lilWineCasketImage = require('@/assets/images/lil-wine-casket.png');
@@ -11,30 +12,49 @@ const vineyardBgImage = require('@/assets/images/vineyard-bg.png');
 export default function BarrelhavenScreen() {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
 
-  const toggleFavorite = (activityId: string) => {
-    setFavorites(prev => {
-      const newFavorites = new Set(prev);
+  // Load starred activities from storage
+  useEffect(() => {
+    loadStarredActivities();
+  }, []);
+
+  const loadStarredActivities = async () => {
+    try {
+      const saved = await AsyncStorage.getItem('starredActivities');
+      if (saved) {
+        setFavorites(new Set(JSON.parse(saved)));
+      }
+    } catch (error) {
+      console.error('Failed to load starred activities:', error);
+    }
+  };
+
+  const toggleFavorite = async (activityId: string) => {
+    try {
+      const newFavorites = new Set(favorites);
       if (newFavorites.has(activityId)) {
         newFavorites.delete(activityId);
       } else {
         newFavorites.add(activityId);
       }
-      return newFavorites;
-    });
+      setFavorites(newFavorites);
+      await AsyncStorage.setItem('starredActivities', JSON.stringify([...newFavorites]));
+    } catch (error) {
+      console.error('Failed to save starred activities:', error);
+    }
   };
 
   const activities = [
     {
-      id: 'barrelhaven-pizza',
-      name: 'Barrelhaven Pizza',
+      id: 'wine-tasting',
+      name: 'Wine Tasting',
       description: 'Central piazza with cobblestone and vine-wrapped fountain.',
-      icon: 'home'
+      icon: 'glass'
     },
     {
       id: 'ivy-post',
-      name: 'The Ivy Post',
+      name: 'Ivy Post',
       description: 'Cozy tavern with thick beams and outdoor grape arbors.',
-      icon: 'glass'
+      icon: 'envelope'
     },
     {
       id: 'treading-fields',
@@ -56,8 +76,8 @@ export default function BarrelhavenScreen() {
     },
     {
       id: 'winery-chapel',
-      name: 'Winery Chapel & Grove',
-      description: 'Sunlit chapel with painted frescoes and cypress trees.',
+      name: 'Winery Chapel',
+      description: 'Peaceful chapel nestled among the vineyards.',
       icon: 'heart'
     }
   ];
@@ -90,10 +110,29 @@ export default function BarrelhavenScreen() {
         {/* Activities List */}
         {activities.map((activity) => {
           const handleActivityPress = () => {
-            if (activity.id === 'treading-fields') {
-              router.navigate('/(tabs)/treading-fields');
+            switch (activity.id) {
+              case 'treading-fields':
+                router.navigate('/(tabs)/treading-fields');
+                break;
+              case 'wine-tasting':
+                router.navigate('/(tabs)/wine-tasting');
+                break;
+              case 'ivy-post':
+                router.navigate('/(tabs)/ivy-post');
+                break;
+              case 'craftsmens-row':
+                router.navigate('/(tabs)/craftsmens-row');
+                break;
+              case 'cellar-row':
+                router.navigate('/(tabs)/cellar-row');
+                break;
+              case 'winery-chapel':
+                router.navigate('/(tabs)/winery-chapel');
+                break;
+              default:
+                // No navigation for now
+                break;
             }
-            // Add navigation for other locations here in the future
           };
 
           const content = (

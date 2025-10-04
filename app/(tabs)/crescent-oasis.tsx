@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, ScrollView, View as RNView, Image, Pressable } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { router } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Import activity icons
 const cosmicBurgerImage = require('@/assets/images/cosmicburger.png');
@@ -26,66 +27,97 @@ const crescentBackgroundImage = require('@/assets/images/crescent-background.png
 export default function CrescentOasisScreen() {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
 
-  const toggleFavorite = (activityId: string) => {
-    setFavorites(prev => {
-      const newFavorites = new Set(prev);
+  // Load starred activities from storage
+  useEffect(() => {
+    loadStarredActivities();
+  }, []);
+
+  const loadStarredActivities = async () => {
+    try {
+      const saved = await AsyncStorage.getItem('starredActivities');
+      if (saved) {
+        setFavorites(new Set(JSON.parse(saved)));
+      }
+    } catch (error) {
+      console.error('Failed to load starred activities:', error);
+    }
+  };
+
+  const toggleFavorite = async (activityId: string) => {
+    try {
+      const newFavorites = new Set(favorites);
       if (newFavorites.has(activityId)) {
         newFavorites.delete(activityId);
       } else {
         newFavorites.add(activityId);
       }
-      return newFavorites;
-    });
+      setFavorites(newFavorites);
+      await AsyncStorage.setItem('starredActivities', JSON.stringify([...newFavorites]));
+    } catch (error) {
+      console.error('Failed to save starred activities:', error);
+    }
   };
 
   const activities = [
     {
-      id: 'atomic-diner',
-      name: 'Atomic Diner',
-      description: 'Retro 50s diner with alien waitstaff.',
-      icon: 'lil-atomic-diner.png'
+      id: 'hovercar-speedway',
+      name: 'Hovercar Speedway',
+      description: 'Race hovercars across pink sand dunes.',
+      icon: 'car'
+    },
+    {
+      id: 'hippie-alien-radio',
+      name: 'Hippie Alien Radio',
+      description: 'Groovy alien DJ broadcasting cosmic tunes.',
+      icon: 'microphone'
+    },
+    {
+      id: 'cosmic-gas-station',
+      name: 'Cosmic Gas Station',
+      description: 'Fill up on stardust and cosmic fuel.',
+      icon: 'tint'
+    },
+    {
+      id: 'cosmic-drive-in',
+      name: 'Cosmic Drive-In',
+      description: 'Watch alien movies under the desert stars.',
+      icon: 'film'
+    },
+    {
+      id: 'sunset-rest-stop',
+      name: 'Sunset Rest Stop',
+      description: 'Relax and watch the cosmic sunset.',
+      icon: 'sun-o'
     },
     {
       id: 'moonbeam-motel',
       name: 'Moonbeam Motel',
       description: 'Sketchy motel with flickering neon signs.',
-      icon: 'motelkeys.png'
+      icon: 'bed'
     },
     {
       id: 'neon-casino',
       name: 'Neon Casino',
       description: 'Glowing slot machines and cosmic card tables.',
-      icon: 'lil-die.png'
+      icon: 'diamond'
     },
     {
-      id: 'hovercar-speedway',
-      name: 'Lucky Strike Speedway',
-      description: 'Race hovercars across pink sand dunes.',
-      icon: 'cosmicburger.png'
+      id: 'atomic-diner',
+      name: 'Atomic Diner',
+      description: 'Retro 50s diner with alien waitstaff.',
+      icon: 'cutlery'
     },
     {
-      id: 'hippie-alien-radio',
-      name: 'Visit Zephyr',
-      description: 'Groovy alien DJ broadcasting cosmic tunes.',
-      icon: 'cosmicburger.png'
+      id: 'cactus-garden',
+      name: 'Cactus Garden',
+      description: 'Desert garden with glowing cacti.',
+      icon: 'leaf'
     },
     {
-      id: 'cosmic-gas-station',
-      name: 'Cosmic Gas Station',
-      description: 'Fuel hovercars with stardust and space snacks.',
-      icon: 'cosmicburger.png'
-    },
-    {
-      id: 'cosmic-drive-in',
-      name: 'Cosmic Drive-In',
-      description: 'Watch alien movies under the stars.',
-      icon: 'cosmicburger.png'
-    },
-    {
-      id: 'sunset-rest-stop',
-      name: 'Sunset Rest Stop',
-      description: 'Meditate as the pink sun sets over dunes.',
-      icon: 'cosmicburger.png'
+      id: 'stargazing',
+      name: 'Stargazing',
+      description: 'Watch the cosmic dance of distant stars.',
+      icon: 'star'
     }
   ];
 

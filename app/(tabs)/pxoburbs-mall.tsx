@@ -86,10 +86,10 @@ export default function PxoburbsMallScreen() {
     { id: 's1', name: 'Radio Circuit', type: 'Electronics', description: 'Computer parts, tech accessories, and digital gadgets', price: 22, stock: 5, icon: 'computer', color: '#dbeafe', arrow: 'arrow-up' },
     { id: 's2', name: 'Retro Threads', type: 'Clothing', description: 'Trendy apparel for all ages', price: 15, stock: 8, icon: 'shopping-bag', color: '#dbeafe', arrow: 'arrow-right' },
     { id: 's3', name: 'Pixel Pages', type: 'Books', description: 'Books, magazines, and comics', price: 8, stock: 12, icon: 'book', color: '#dbeafe', arrow: 'arrow-left' },
-    { id: 's4', name: 'The Lost & Found', type: 'Service', description: 'Lost items and lost pet recovery services', price: 0, stock: 99, icon: 'search', color: '#dbeafe', arrow: 'arrow-down' },
     { id: 's5', name: 'Pxoburbs Spa', type: 'Beauty', description: 'Cosmetics and skincare', price: 12, stock: 10, icon: 'star', color: '#dbeafe', arrow: 'arrow-up' },
     { id: 's7', name: 'Pixel Playground', type: 'Entertainment', description: 'Classic arcade games and pinball machines', price: 5, stock: 15, icon: 'arcade', color: '#dbeafe', arrow: 'arrow-left' },
     { id: 'f1', name: 'Food Court', type: 'Dining', description: 'Burger Barn, Pizza Corner, Sushi Express, Ice Cream Dream, Coffee Corner, and Salad Station', price: 5, stock: 20, icon: 'cutlery', color: '#dbeafe', arrow: 'arrow-down' },
+    { id: 's4', name: 'Lost & Found Kiosk', type: 'Service', description: 'Random discarded items - take what you need!', price: 0, stock: 99, icon: 'search', color: '#fce7f3', arrow: 'arrow-down' },
   ]);
 
 

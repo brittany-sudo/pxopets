@@ -4,6 +4,8 @@ import { Text, View } from '@/components/Themed';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useSimpleGame } from '@/store/SimpleGameStore';
 import { usePets } from '@/store/PetStore';
+import { useInventory } from '@/store/InventoryStore';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface SimpleDeveloperPanelProps {
   visible: boolean;
@@ -20,7 +22,17 @@ export default function SimpleDeveloperPanel({ visible, onClose }: SimpleDevelop
     setCurrency, 
     resetGame 
   } = useSimpleGame();
-  const { resetAllPets } = usePets();
+  const { resetAllPets, getActivePet, addStaminaToPet } = usePets();
+  const { clearAllItems } = useInventory();
+
+  const clearCoffeeCooldown = async () => {
+    try {
+      await AsyncStorage.removeItem('lastCoffeeClaim');
+      console.log('Coffee cooldown cleared');
+    } catch (error) {
+      console.error('Error clearing coffee cooldown:', error);
+    }
+  };
   
   const [customTickets, setCustomTickets] = useState('');
   const [customStamina, setCustomStamina] = useState('');
@@ -36,11 +48,13 @@ export default function SimpleDeveloperPanel({ visible, onClose }: SimpleDevelop
   };
 
   const handleAdjustStamina = (amount: number) => {
-    if (amount < 0 && state.stamina + amount < 0) {
-      // Don't allow going below 0
+    const activePet = getActivePet();
+    if (!activePet) {
+      Alert.alert('No Active Pet', 'You need an active pet to add stamina!');
       return;
     }
-    addStamina(amount);
+    console.log('Adding stamina to pet:', activePet.name, amount);
+    addStaminaToPet(activePet.id, amount);
   };
 
   const handleAdjustGems = (amount: number) => {
@@ -74,15 +88,17 @@ export default function SimpleDeveloperPanel({ visible, onClose }: SimpleDevelop
   const handleResetGame = () => {
     Alert.alert(
       'Reset Game',
-      'This will reset:\n• All currency (tickets, gems, stamina)\n• All pets\n• Purchased backgrounds\n\nAre you sure?',
+      'This will reset:\n• All currency (tickets, gems, stamina)\n• All pets\n• All inventory items\n• Pxogulp refill counts\n• Coffee cooldown\n• Purchased backgrounds\n\nAre you sure?',
       [
         { text: 'Cancel', style: 'cancel' },
         { 
           text: 'Reset Everything', 
           style: 'destructive', 
-          onPress: () => {
+          onPress: async () => {
             resetGame();
             resetAllPets();
+            clearAllItems();
+            await clearCoffeeCooldown();
             Alert.alert('Reset Complete', 'All progress has been wiped!');
             onClose();
           }
@@ -134,7 +150,7 @@ export default function SimpleDeveloperPanel({ visible, onClose }: SimpleDevelop
 
             {/* Stamina Control */}
             <View style={styles.currencyControl}>
-              <Text style={styles.currencyLabel}>Stamina: {state.stamina}</Text>
+              <Text style={styles.currencyLabel}>Pet Stamina: {getActivePet()?.stamina || 'No Active Pet'}</Text>
               <View style={styles.controlRow}>
                 <Pressable style={styles.arrowButton} onPress={() => handleAdjustStamina(-10)}>
                   <FontAwesome name="minus" size={16} color="#fff" />

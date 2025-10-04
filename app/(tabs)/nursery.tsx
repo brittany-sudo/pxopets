@@ -10,6 +10,7 @@ import { router, useFocusEffect } from 'expo-router';
 const tigerguyImage = require('@/assets/images/tigerguy.png');
 const plumecaImage = require('@/assets/images/plumeca.png');
 const coconutGuyImage = require('@/assets/images/coco-guy.png');
+const frekkiImage = require('@/assets/images/frekki.png');
 const lallazoImage = require('@/assets/images/lallazo.png');
 const robotGuyImage = require('@/assets/images/robot-guy.png');
 const sheepGuyImage = require('@/assets/images/sheep-guy.png');
@@ -266,8 +267,8 @@ export default function NurseryScreen() {
       id: 'frekki',
       name: 'FREKKI',
       description: 'A loyal companion with balanced stats.',
-      image: coconutGuyImage,
-      imageName: 'coco-guy',
+      image: frekkiImage,
+      imageName: 'frekki',
       color: '#10b981'
     },
     {
