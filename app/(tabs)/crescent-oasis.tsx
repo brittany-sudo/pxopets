@@ -5,24 +5,10 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Import activity icons
-const cosmicBurgerImage = require('@/assets/images/cosmicburger.png');
-const lilAtomicDinerImage = require('@/assets/images/lil-atomic-diner.png');
-const lilChipImage = require('@/assets/images/lil-chip.png');
-const lilDieImage = require('@/assets/images/lil-die.png');
-const motelKeysImage = require('@/assets/images/motelkeys.png');
-
-// Image mapping for activities
-const activityImageMap: { [key: string]: any } = {
-  'cosmicburger.png': cosmicBurgerImage,
-  'lil-atomic-diner.png': lilAtomicDinerImage,
-  'lil-chip.png': lilChipImage,
-  'lil-die.png': lilDieImage,
-  'motelkeys.png': motelKeysImage,
-};
+// FontAwesome icons are imported at the top of the file
 
 // Import the banner image
-const crescentBackgroundImage = require('@/assets/images/crescent-background.png');
+const crescentBackgroundImage = require('@/assets/images/crescent-oasis-main.png');
 
 export default function CrescentOasisScreen() {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
@@ -60,22 +46,16 @@ export default function CrescentOasisScreen() {
 
   const activities = [
     {
-      id: 'hovercar-speedway',
-      name: 'Hovercar Speedway',
-      description: 'Race hovercars across pink sand dunes.',
-      icon: 'car'
+      id: 'neon-casino',
+      name: 'Neon Casino',
+      description: 'Glowing slot machines and cosmic card tables.',
+      icon: 'diamond'
     },
     {
-      id: 'hippie-alien-radio',
-      name: 'Hippie Alien Radio',
-      description: 'Groovy alien DJ broadcasting cosmic tunes.',
-      icon: 'microphone'
-    },
-    {
-      id: 'cosmic-gas-station',
-      name: 'Cosmic Gas Station',
-      description: 'Fill up on stardust and cosmic fuel.',
-      icon: 'tint'
+      id: 'atomic-diner',
+      name: 'Atomic Automat',
+      description: 'Retro 50s automat with alien waitstaff.',
+      icon: 'cutlery'
     },
     {
       id: 'cosmic-drive-in',
@@ -96,28 +76,16 @@ export default function CrescentOasisScreen() {
       icon: 'bed'
     },
     {
-      id: 'neon-casino',
-      name: 'Neon Casino',
-      description: 'Glowing slot machines and cosmic card tables.',
-      icon: 'diamond'
+      id: 'hovercar-speedway',
+      name: 'Lucky Strike Bowling',
+      description: 'Race hovercars across pink sand dunes.',
+      icon: 'car'
     },
     {
-      id: 'atomic-diner',
-      name: 'Atomic Diner',
-      description: 'Retro 50s diner with alien waitstaff.',
-      icon: 'cutlery'
-    },
-    {
-      id: 'cactus-garden',
-      name: 'Cactus Garden',
-      description: 'Desert garden with glowing cacti.',
-      icon: 'leaf'
-    },
-    {
-      id: 'stargazing',
-      name: 'Stargazing',
-      description: 'Watch the cosmic dance of distant stars.',
-      icon: 'star'
+      id: 'hippie-alien-radio',
+      name: 'THE SIGNAL DEN',
+      description: 'Groovy alien DJ broadcasting cosmic tunes.',
+      icon: 'microphone'
     }
   ];
 
@@ -136,7 +104,7 @@ export default function CrescentOasisScreen() {
 
         {/* Header Row */}
         <RNView style={styles.headerRow}>
-          <Text style={styles.locationTitle}>CRESCENT OASIS</Text>
+          <Text style={styles.locationTitle}>COSMIC OASIS</Text>
         </RNView>
 
         {/* Banner Image */}
@@ -161,12 +129,16 @@ export default function CrescentOasisScreen() {
                 router.navigate('/(tabs)/neon-casino');
               } else if (activity.id === 'hovercar-speedway') {
                 router.navigate('/(tabs)/lucky-strike-speedway');
+              } else if (activity.id === 'cosmic-drive-in') {
+                router.navigate('/(tabs)/cosmic-drive-in');
+              } else if (activity.id === 'hippie-alien-radio') {
+                router.navigate('/(tabs)/lone-airstream');
               }
             }}
           >
             <RNView style={styles.activityContent}>
               <RNView style={styles.activityIconContainer}>
-                <Image source={activityImageMap[activity.icon]} style={styles.activityIcon} />
+                <FontAwesome name={activity.icon as any} size={20} color="#ec4899" />
               </RNView>
               <RNView style={styles.activityText}>
                 <Text style={styles.activityName}>{activity.name}</Text>

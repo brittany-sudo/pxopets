@@ -199,7 +199,7 @@ export default function PlayerHomeScreen() {
   const locations = [
     { name: "Pxoburbs", color: "#8b5cf6", icon: "home" },
     { name: "Loomer's Wharf", color: "#0ea5e9", icon: "anchor" },
-    { name: "Crescent Oasis", color: "#f59e0b", icon: "sun-o" },
+    { name: "Cosmic Oasis", color: "#f59e0b", icon: "sun-o" },
     { name: "Barrelhaven", color: "#92400e", icon: "glass" },
     { name: "Shakespeare's Quarter", color: "#ec4899", icon: "paint-brush" },
     { name: "Stardiver Forest", color: "#10b981", icon: "leaf" },

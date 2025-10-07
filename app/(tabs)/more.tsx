@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { StyleSheet, ScrollView, View as RNView, Pressable } from 'react-native';
+import { StyleSheet, ScrollView, View as RNView, Pressable, Alert } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import BorderedBox from '@/components/BorderedBox';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useColorSchemeContext } from '@/components/ColorSchemeContext';
 import { useInventory } from '@/store/InventoryStore';
 import DevModePanel from '@/components/DevModePanel';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function MoreScreen() {
   const { colorScheme, toggleColorScheme, isDark } = useColorSchemeContext();
@@ -24,6 +25,30 @@ export default function MoreScreen() {
     
     // Reset tap count after 3 seconds
     setTimeout(() => setTapCount(0), 3000);
+  };
+
+  const resetPetPosition = async () => {
+    try {
+      // Calculate center position (same logic as in pets.tsx)
+      const screenWidth = 362; // Approximate container width
+      const containerWidth = screenWidth - 40;
+      const petWidth = 88;
+      const petHeight = 88;
+      const containerHeight = 200;
+      
+      const centerX = (containerWidth - petWidth) / 2;
+      const centerY = (containerHeight - petHeight) / 2;
+      
+      const centerPosition = { x: centerX, y: centerY };
+      
+      // Save the center position
+      await AsyncStorage.setItem('petPosition', JSON.stringify(centerPosition));
+      
+      Alert.alert('Position Reset', 'Pet position has been reset to center!');
+    } catch (error) {
+      console.error('Failed to reset pet position:', error);
+      Alert.alert('Error', 'Failed to reset pet position. Please try again.');
+    }
   };
 
   return (
@@ -62,6 +87,11 @@ export default function MoreScreen() {
             <FontAwesome name="question-circle" size={20} color="#0f172a" />
             <Text style={styles.menuText}>Help & Support</Text>
           </RNView>
+
+          <Pressable style={styles.menuItem} onPress={resetPetPosition}>
+            <FontAwesome name="refresh" size={20} color="#ef4444" />
+            <Text style={[styles.menuText, styles.resetText]}>Reset Pet Position</Text>
+          </Pressable>
 
           {inventoryState.devMode && (
             <Pressable style={styles.menuItem} onPress={() => setShowDevMode(true)}>
@@ -124,6 +154,9 @@ const styles = StyleSheet.create({
   },
   devModeText: {
     color: '#8b5cf6',
+  },
+  resetText: {
+    color: '#ef4444',
   },
   hiddenTitle: {
     fontFamily: 'PressStart2P_400Regular',

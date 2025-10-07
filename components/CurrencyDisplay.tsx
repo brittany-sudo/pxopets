@@ -8,7 +8,6 @@ export default function CurrencyDisplay() {
   const { state } = useGame();
 
   // Debug logging
-  console.log('CurrencyDisplay render - tickets:', state.tickets, 'dailyStamina:', state.dailyStamina, 'bonusStamina:', state.bonusStamina);
 
   // Calculate total stamina directly from state
   const totalStamina = state.dailyStamina + state.bonusStamina;

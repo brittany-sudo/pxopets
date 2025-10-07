@@ -19,11 +19,12 @@ const styles = StyleSheet.create({
     width: '85%',
     padding: 16,
     borderWidth: 1,
-    borderColor: '#06b6d4', // Cyan blue
-    backgroundColor: 'transparent', // No fill - just border
+    borderColor: 'rgba(255, 255, 255, 0.1)', // Subtle white border
+    backgroundColor: 'rgba(255, 255, 255, 0.03)', // Subtle white background
     marginVertical: 8,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 2,
+    borderRadius: 16,
+    backdropFilter: 'blur(10px)',
   },
 });

@@ -46,15 +46,15 @@ export default function BarrelhavenScreen() {
   const activities = [
     {
       id: 'wine-tasting',
-      name: 'Wine Tasting',
+      name: 'Vintner\'s Square',
       description: 'Central piazza with cobblestone and vine-wrapped fountain.',
       icon: 'glass'
     },
     {
       id: 'ivy-post',
-      name: 'Ivy Post',
+      name: 'The Ivy Post',
       description: 'Cozy tavern with thick beams and outdoor grape arbors.',
-      icon: 'envelope'
+      icon: 'beer'
     },
     {
       id: 'treading-fields',
@@ -70,8 +70,8 @@ export default function BarrelhavenScreen() {
     },
     {
       id: 'cellar-row',
-      name: 'Cellar Row',
-      description: 'Cool underground passages carved into the hillside.',
+      name: 'The Old Winery',
+      description: 'A communal winemaking hall that has existed for centuries.',
       icon: 'arrow-down'
     },
     {
@@ -117,15 +117,15 @@ export default function BarrelhavenScreen() {
               case 'wine-tasting':
                 router.navigate('/(tabs)/wine-tasting');
                 break;
-              case 'ivy-post':
-                router.navigate('/(tabs)/ivy-post');
-                break;
               case 'craftsmens-row':
                 router.navigate('/(tabs)/craftsmens-row');
                 break;
-              case 'cellar-row':
-                router.navigate('/(tabs)/cellar-row');
-                break;
+    case 'cellar-row':
+      router.navigate('/(tabs)/the-old-winery');
+      break;
+    case 'ivy-post':
+      router.navigate('/(tabs)/the-ivy-post');
+      break;
               case 'winery-chapel':
                 router.navigate('/(tabs)/winery-chapel');
                 break;

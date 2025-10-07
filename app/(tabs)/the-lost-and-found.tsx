@@ -22,7 +22,7 @@ export default function TheLostAndFoundScreen() {
     { id: 'old-fishing-net', name: 'Old Fishing Net', description: 'A tattered net that caught more seaweed than fish.', image: require('@/assets/images/lil-oldnet.png') },
     { id: 'fish-bones', name: 'Fish Bones', description: 'Leftover bones from a big catch at the docks.', image: require('@/assets/images/fishbones.png') },
     { id: 'fish-stew', name: 'Cold Fish Stew', description: 'A can of fish stew that went cold.', image: require('@/assets/images/fishstew.png') },
-    { id: 'wet-rag', name: 'Wet Rag', description: 'A soggy cloth that smells like the ocean.', image: require('@/assets/images/pooldonut.png') },
+    { id: 'love-note', name: 'Love Note', description: 'A heartfelt message found crumpled on the ground.', image: require('@/assets/images/love-note.png') },
     { id: 'broken-rod', name: 'Broken Fishing Rod', description: 'Half a fishing rod that snapped under pressure.', image: require('@/assets/images/pooldonut.png') },
     { id: 'seaweed', name: 'Dried Seaweed', description: 'Crispy seaweed that washed up on shore.', image: require('@/assets/images/pooldonut.png') },
     { id: 'driftwood', name: 'Driftwood', description: 'A piece of wood that traveled far across the sea.', image: require('@/assets/images/pooldonut.png') },
@@ -45,7 +45,11 @@ export default function TheLostAndFoundScreen() {
   // Load inventory items on component mount
   useEffect(() => {
     loadInventoryItems();
-    generateRandomItems();
+    // Generate initial 8 items if none exist
+    if (availableItems.length === 0) {
+      const shuffled = [...discardedItems].sort(() => 0.5 - Math.random());
+      setAvailableItems(shuffled.slice(0, 8));
+    }
   }, []);
 
   // Image mapping for inventory items
@@ -82,6 +86,7 @@ export default function TheLostAndFoundScreen() {
       'winecask': require('@/assets/images/lil-wine-casket.png'),
       'oldlantern': require('@/assets/images/oldlantern.png'),
       'singingconch': require('@/assets/images/singingconch.png'),
+      'love-note': require('@/assets/images/love-note.png'),
     };
     
     return imageMap[imageString] || require('@/assets/images/pooldonut.png');
@@ -98,13 +103,6 @@ export default function TheLostAndFoundScreen() {
     setInventoryItems(itemsArray);
   };
 
-  const generateRandomItems = () => {
-    // Only generate items if the available items list is empty
-    if (availableItems.length === 0) {
-      const shuffled = [...discardedItems].sort(() => 0.5 - Math.random());
-      setAvailableItems(shuffled.slice(0, 8));
-    }
-  };
 
   const claimItem = (item: any) => {
     // Add item directly to inventory with proper image mapping
@@ -116,9 +114,11 @@ export default function TheLostAndFoundScreen() {
              item.image === require('@/assets/images/fishbones.png') ? 'fishbones' :
              item.image === require('@/assets/images/soggyboot.png') ? 'soggyboot' :
              item.image === require('@/assets/images/lil-oldnet.png') ? 'oldnet' :
+             item.image === require('@/assets/images/love-note.png') ? 'love-note' :
              'pooldonut',
-      category: 'special',
-      description: item.description
+      category: item.id === 'love-note' ? 'lost' : 'special',
+      description: item.description,
+      rarity: item.id === 'love-note' ? 'uncommon' : 'common'
     }, 1);
 
     Alert.alert('Item Claimed!', `${item.name} has been added to your inventory!`);
@@ -173,15 +173,19 @@ export default function TheLostAndFoundScreen() {
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      {/* Header */}
-      <View style={styles.headerRow}>
-        <Pressable style={styles.backButton} onPress={() => router.back()}>
-          <FontAwesome name="arrow-left" size={16} color="#0ea5e9" />
-          <Text style={styles.backButtonText}>Back</Text>
-        </Pressable>
-        <Text style={styles.locationTitle}>LOST & FOUND KIOSK</Text>
-        <View style={styles.placeholder} />
-      </View>
+      {/* Back Button */}
+      <Pressable 
+        style={styles.backButton}
+        onPress={() => router.back()}
+      >
+        <FontAwesome name="arrow-left" size={12} color="#8b5cf6" />
+        <Text style={styles.backButtonText}>Back</Text>
+      </Pressable>
+
+      {/* Header Row */}
+      <RNView style={styles.headerRow}>
+        <Text style={styles.locationTitle}>LOST & FOUND{'\n'}KIOSK</Text>
+      </RNView>
 
       {/* Main Image */}
       <Image source={lostAndFoundImage} style={styles.mainImage} resizeMode="contain" />
@@ -198,20 +202,12 @@ export default function TheLostAndFoundScreen() {
       {/* Available Items Section */}
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Available Items</Text>
-          <Pressable style={styles.refreshButton} onPress={() => {
-            // Only refresh if there are no items available
-            if (availableItems.length === 0) {
-              generateRandomItems();
-            } else {
-              Alert.alert('Items Available', 'There are still items available in the Lost & Found!');
-            }
-          }}>
-            <FontAwesome name="refresh" size={14} color="#ffffff" />
-            <Text style={styles.refreshButtonText}>Refresh</Text>
+          <Text style={styles.sectionTitle}>FOUND ITEMS</Text>
+          <Pressable style={styles.returnButton} onPress={() => setShowDonateModal(true)}>
+            <Text style={styles.returnButtonText}>RETURN</Text>
           </Pressable>
         </View>
-        <Text style={styles.sectionSubtitle}>Tap to claim item</Text>
+        <Text style={styles.sectionSubtitle}>TAP TO CLAIM ITEM</Text>
         <View style={styles.itemsGrid}>
           {availableItems.map((item) => (
             <Pressable
@@ -220,23 +216,12 @@ export default function TheLostAndFoundScreen() {
               onPress={() => claimItem(item)}
             >
               <Image source={item.image} style={styles.itemImage} resizeMode="contain" />
-              <Text style={styles.itemName}>{item.name}</Text>
-              <Text style={styles.itemDescription}>{item.description}</Text>
-              <View style={styles.claimBadge}>
-                <FontAwesome name="hand-paper-o" size={10} color="#ffffff" />
-              </View>
+              <Text style={styles.itemName}>{item.name.toUpperCase()}</Text>
             </Pressable>
           ))}
         </View>
       </View>
 
-      {/* Donate Button */}
-      <View style={styles.donateButtonContainer}>
-        <Pressable style={styles.donateButton} onPress={() => setShowDonateModal(true)}>
-          <FontAwesome name="gift" size={16} color="#ffffff" />
-          <Text style={styles.donateButtonText}>Donate Items</Text>
-        </Pressable>
-      </View>
 
       {/* Donate Modal */}
       <Modal
@@ -320,109 +305,130 @@ export default function TheLostAndFoundScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: '#f1f5f9',
   },
   headerRow: {
-    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    backgroundColor: '#ffffff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e2e8f0',
+    justifyContent: 'center',
+    marginTop: 20,
+    marginBottom: 15,
+    paddingHorizontal: 4,
   },
   backButton: {
+    position: 'absolute',
+    top: 10,
+    left: 20,
+    zIndex: 1000,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(14, 165, 233, 0.1)',
+    backgroundColor: 'rgba(139, 92, 246, 0.1)',
     paddingHorizontal: 12,
     paddingVertical: 6,
-    borderRadius: 6,
-    gap: 4,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.3)',
   },
   backButtonText: {
-    fontSize: 12,
-    color: '#0ea5e9',
-    fontWeight: '600',
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 14,
+    color: '#8b5cf6',
+    marginLeft: 6,
   },
   locationTitle: {
-    fontSize: 16,
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 12,
     fontWeight: 'bold',
-    color: '#0f172a',
+    color: '#8b5cf6',
+    letterSpacing: 1,
     textAlign: 'center',
+    lineHeight: 16,
   },
   placeholder: {
     width: 60,
   },
   mainImage: {
     width: '100%',
-    height: 200,
-    marginBottom: 20,
+    height: 220,
+    marginBottom: 24,
+    shadowColor: '#8b5cf6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 8,
   },
   descriptionContainer: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     marginBottom: 20,
+    backgroundColor: 'rgba(6, 182, 212, 0.05)',
+    marginHorizontal: 40,
+    borderRadius: 12,
+    paddingVertical: 10,
+    borderWidth: 2,
+    borderColor: 'rgba(6, 182, 212, 0.3)',
+    shadowColor: '#06b6d4',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 3,
   },
   descriptionText: {
-    fontSize: 14,
-    color: '#64748b',
-    lineHeight: 20,
+    fontSize: 11,
+    fontFamily: 'Silkscreen_400Regular',
+    color: '#0f766e',
+    lineHeight: 14,
     textAlign: 'center',
+    letterSpacing: 0.2,
   },
   section: {
     paddingHorizontal: 20,
-    marginBottom: 30,
+    marginBottom: 32,
   },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 4,
+    marginBottom: 0,
+    paddingHorizontal: 4,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#0f172a',
+    fontSize: 16,
+    fontFamily: 'PressStart2P_400Regular',
+    color: '#1e293b',
+    letterSpacing: 1,
+    textAlign: 'left',
   },
   sectionSubtitle: {
-    fontSize: 12,
+    fontSize: 13,
+    fontFamily: 'Silkscreen_400Regular',
     color: '#64748b',
-    marginBottom: 15,
-  },
-  refreshButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#8b5cf6',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 6,
-    gap: 4,
-  },
-  refreshButtonText: {
-    fontSize: 12,
-    color: '#ffffff',
-    fontWeight: '600',
+    marginBottom: 20,
+    marginTop: -2,
+    marginLeft: 4,
+    letterSpacing: 0.5,
+    textAlign: 'left',
   },
   itemsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
+    paddingHorizontal: 4,
   },
   itemCard: {
-    width: '48%',
-    backgroundColor: '#ffffff',
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: '#e2e8f0',
-    padding: 10,
+    width: '30%',
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: 'rgba(139, 92, 246, 0.15)',
+    padding: 12,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
+    justifyContent: 'center',
+    shadowColor: '#8b5cf6',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 4,
     position: 'relative',
+    transform: [{ translateY: 0 }],
   },
   itemImage: {
     width: 32,
@@ -430,11 +436,13 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   itemName: {
-    fontSize: 11,
-    fontWeight: 'bold',
-    color: '#0f172a',
+    fontSize: 8,
+    fontFamily: 'PressStart2P_400Regular',
+    color: '#1e293b',
     textAlign: 'center',
-    marginBottom: 3,
+    lineHeight: 10,
+    letterSpacing: 0.4,
+    width: '100%',
   },
   itemDescription: {
     fontSize: 9,
@@ -475,14 +483,21 @@ const styles = StyleSheet.create({
   },
   claimBadge: {
     position: 'absolute',
-    top: 3,
-    right: 3,
-    backgroundColor: '#10b981',
-    borderRadius: 8,
-    width: 16,
-    height: 16,
+    top: 6,
+    right: 6,
+    backgroundColor: 'rgba(16, 185, 129, 0.9)',
+    borderRadius: 12,
+    width: 20,
+    height: 20,
     alignItems: 'center',
     justifyContent: 'center',
+    shadowColor: '#10b981',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
   },
   donateBadge: {
     position: 'absolute',
@@ -504,24 +519,24 @@ const styles = StyleSheet.create({
     color: '#64748b',
     textAlign: 'center',
   },
-  donateButtonContainer: {
-    paddingHorizontal: 20,
-    paddingBottom: 30,
+  returnButton: {
+    backgroundColor: 'rgba(139, 92, 246, 0.9)',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+    shadowColor: '#8b5cf6',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 4,
   },
-  donateButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#8b5cf6',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignSelf: 'center',
-    gap: 8,
-  },
-  donateButtonText: {
-    fontSize: 14,
+  returnButtonText: {
+    fontSize: 10,
+    fontFamily: 'PressStart2P_400Regular',
     color: '#ffffff',
-    fontWeight: '600',
+    letterSpacing: 0.5,
   },
   modalOverlay: {
     flex: 1,

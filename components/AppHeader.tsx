@@ -18,7 +18,7 @@ export default function AppHeader() {
   
   // Calculate total stamina from all pets
   const getTotalPetStamina = () => {
-    return petState.adoptedPets.reduce((total, pet) => total + (pet.stamina || 0), 0);
+    return petState.adoptedPets.reduce((total, pet) => total + (Number(pet.stamina) || 0), 0);
   };
   
   // Check and add daily stamina when component mounts or when route changes
@@ -107,14 +107,19 @@ export default function AppHeader() {
       const currentPath = pathname || '/(tabs)/index';
       router.replace(currentPath);
     } catch (error) {
-      console.log('Refresh error:', error);
       // Fallback to home if there's an issue
       router.replace('/(tabs)/index');
     }
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: colorScheme === 'dark' ? '#1a1a1a' : '#ffffff' }]}> 
+    <View style={[
+      styles.container, 
+      { 
+        backgroundColor: '#1a120d', // Always use dark background
+        borderBottomColor: '#333333'
+      }
+    ]}> 
       {/* Top Navigation Bar */}
       <View style={styles.topBar}>
         <Pressable 
@@ -124,7 +129,7 @@ export default function AppHeader() {
           ]}
           onPress={() => router.push('/more')}
         >
-          <FontAwesome name="bars" size={20} color={colorScheme === 'dark' ? '#ffffff' : '#6b46c1'} />
+          <FontAwesome name="bars" size={20} color="#ffffff" />
         </Pressable>
         
         <View style={styles.logoContainer}>
@@ -140,28 +145,19 @@ export default function AppHeader() {
             styles.iconButton,
             pressed && styles.iconButtonPressed
           ]}
-          onPress={handleRefresh}
+          onPress={() => router.push('/(tabs)/home')}
         >
-          <Animated.View style={{
-            transform: [{
-              rotate: refreshRotation.interpolate({
-                inputRange: [0, 1],
-                outputRange: ['0deg', '360deg'],
-              })
-            }]
-          }}>
-            <FontAwesome name="refresh" size={20} color={colorScheme === 'dark' ? '#ffffff' : '#6b46c1'} />
-          </Animated.View>
+          <FontAwesome name="home" size={20} color="#ffffff" />
         </Pressable>
       </View>
       
       {/* Stylized divider under logo and buttons */}
-      <View style={[styles.divider, { backgroundColor: colorScheme === 'dark' ? '#333333' : '#e5e5e5' }]} />
+      <View style={[styles.divider, { backgroundColor: '#333333' }]} />
       
       {/* User Info and Currency Bar */}
       <View style={styles.userBar}>
         <View style={styles.leftSection}>
-          <Text style={[styles.greeting, { color: colorScheme === 'dark' ? '#ffffff' : '#000000' }]}>
+          <Text style={[styles.greeting, { color: '#ffffff' }]}>
             Hello, Pxopete
           </Text>
         </View>
@@ -169,19 +165,19 @@ export default function AppHeader() {
         <View style={styles.currencyContainer}>
           <View style={styles.currencyItem}>
             <FontAwesome name="bolt" size={16} color="#f59e0b" />
-            <Text style={[styles.currencyText, { color: colorScheme === 'dark' ? '#ffffff' : '#000000' }]}>
+            <Text style={[styles.currencyText, { color: '#ffffff' }]}>
               {getTotalPetStamina()}
             </Text>
           </View>
           <View style={styles.currencyItem}>
             <FontAwesome name="ticket" size={16} color="#8b5cf6" />
-            <Text style={[styles.currencyText, { color: colorScheme === 'dark' ? '#ffffff' : '#000000' }]}>
+            <Text style={[styles.currencyText, { color: '#ffffff' }]}>
               {state.tickets}
             </Text>
           </View>
           <View style={styles.currencyItem}>
             <FontAwesome name="diamond" size={16} color="#06b6d4" />
-            <Text style={[styles.currencyText, { color: colorScheme === 'dark' ? '#ffffff' : '#000000' }]}>
+            <Text style={[styles.currencyText, { color: '#ffffff' }]}>
               {state.gems || 0}
             </Text>
           </View>
@@ -204,9 +200,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    paddingTop: 16, // iOS safe area padding
-    paddingBottom: 8,
-    minHeight: 70, // Consistent height
+    paddingTop: 16, // Restored original top padding
+    paddingBottom: 4, // Minimal bottom padding to move buttons closer to divider
+    minHeight: 70, // Restored original height
   },
   iconButton: {
     width: 44, // Smaller buttons (was 60)
@@ -291,8 +287,8 @@ const styles = StyleSheet.create({
   divider: {
     height: 1,
     marginHorizontal: 0,
-    marginVertical: -12, // Better spacing from logo
-    marginTop: -16, // Closer to logo but not too tight
+    marginVertical: -8, // Moved divider up closer to buttons
+    marginTop: -8, // Much closer to buttons
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,

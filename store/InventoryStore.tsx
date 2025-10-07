@@ -6,9 +6,10 @@ export type InventoryItem = {
   name: string;
   price: number;
   image: string;
-  category: 'food' | 'drink' | 'snack' | 'special' | 'ticket' | 'fishing';
+  category: 'food' | 'drink' | 'snack' | 'special' | 'ticket' | 'fishing' | 'lost';
   quantity: number;
   description?: string;
+  rarity?: 'common' | 'uncommon' | 'rare';
 };
 
 export type SafetyDepositBox = {
@@ -34,6 +35,7 @@ type InventoryContextType = {
   clearAllItems: () => void;
   resetInventory: () => void;
   toggleDevMode: () => void;
+  updateItemProperties: (itemId: string, updates: Partial<InventoryItem>) => void;
   hydrated: boolean;
 };
 
@@ -256,6 +258,31 @@ export function InventoryProvider({ children }: { children: React.ReactNode }) {
     setState(prev => ({ ...prev, devMode: !prev.devMode }));
   };
 
+  const updateItemProperties = (itemId: string, updates: Partial<InventoryItem>) => {
+    setState(prev => {
+      const newState = { ...prev };
+      
+      // Update in main inventory
+      const mainItemIndex = newState.mainInventory.findIndex(item => item.id === itemId);
+      if (mainItemIndex >= 0) {
+        newState.mainInventory[mainItemIndex] = {
+          ...newState.mainInventory[mainItemIndex],
+          ...updates
+        };
+      }
+      
+      // Update in safety deposit box
+      if (newState.safetyDepositBox[itemId]) {
+        newState.safetyDepositBox[itemId] = {
+          ...newState.safetyDepositBox[itemId],
+          ...updates
+        };
+      }
+      
+      return newState;
+    });
+  };
+
   const value: InventoryContextType = {
     state,
     addItem,
@@ -268,6 +295,7 @@ export function InventoryProvider({ children }: { children: React.ReactNode }) {
     clearAllItems,
     resetInventory,
     toggleDevMode,
+    updateItemProperties,
     hydrated,
   };
 

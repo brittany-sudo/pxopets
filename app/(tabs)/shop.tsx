@@ -267,6 +267,28 @@ export default function ShopScreen() {
       description: 'Mysterious swamp waters',
       rarity: 'common',
     },
+    {
+      id: 'bg_zodiac_carousel',
+      name: 'ZODIAC CAROUSEL',
+      price: 50,
+      currency: 'tickets',
+      image: require('@/assets/images/bg-zodiac-carousel.png'),
+      icon: 'star',
+      color: '#f59e0b',
+      description: 'Magical zodiac constellation',
+      rarity: 'common',
+    },
+    {
+      id: 'bg_twilight_sky',
+      name: 'TWILIGHT SKY',
+      price: 50,
+      currency: 'tickets',
+      image: require('@/assets/images/bg-twlight-sky.png'),
+      icon: 'moon',
+      color: '#6366f1',
+      description: 'Dreamy twilight atmosphere',
+      rarity: 'common',
+    },
   ];
 
   const specialItems = [
@@ -409,7 +431,37 @@ export default function ShopScreen() {
 
   return (
     <View style={styles.container}>
+      {/* Second Top Navigation */}
+      <RNView style={styles.secondNavContainer}>
+        <Pressable style={styles.navButton} onPress={() => Alert.alert('Inventory', 'View your inventory!')}>
+          <FontAwesome name="shopping-bag" size={20} color="#8b5cf6" />
+          <Text style={styles.navButtonText}>INVENTORY</Text>
+        </Pressable>
+        <Pressable style={styles.navButton} onPress={() => Alert.alert('Wishlist', 'Wishlist coming soon!')}>
+          <FontAwesome name="heart" size={20} color="#8b5cf6" />
+          <Text style={styles.navButtonText}>WISHLIST</Text>
+        </Pressable>
+        <Pressable style={styles.navButton} onPress={() => Alert.alert('Deals', 'Special deals!')}>
+          <FontAwesome name="tag" size={20} color="#8b5cf6" />
+          <Text style={styles.navButtonText}>DEALS</Text>
+        </Pressable>
+        <Pressable style={styles.navButton} onPress={() => Alert.alert('History', 'Purchase history!')}>
+          <FontAwesome name="history" size={20} color="#8b5cf6" />
+          <Text style={styles.navButtonText}>HISTORY</Text>
+        </Pressable>
+        <Pressable style={styles.navButton} onPress={() => Alert.alert('Settings', 'Shop settings!')}>
+          <FontAwesome name="cog" size={20} color="#8b5cf6" />
+          <Text style={styles.navButtonText}>SETTINGS</Text>
+        </Pressable>
+      </RNView>
+
       <ScrollView contentContainerStyle={styles.scrollContent}>
+        {/* Shop Header */}
+        <RNView style={styles.shopHeaderContainer}>
+          <Text style={styles.shopHeaderText}>
+            PXOBURBS MARKETPLACE
+          </Text>
+        </RNView>
 
         {/* Category Tabs */}
         <RNView style={styles.categoryTabs}>
@@ -422,11 +474,6 @@ export default function ShopScreen() {
               ]}
               onPress={() => setSelectedCategory(category.id)}
             >
-              <FontAwesome 
-                name={category.icon as any} 
-                size={16} 
-                color={selectedCategory === category.id ? '#0f172a' : '#8b5cf6'} 
-              />
               <Text style={[
                 styles.categoryText,
                 selectedCategory === category.id && styles.categoryTextActive
@@ -438,8 +485,9 @@ export default function ShopScreen() {
         </RNView>
 
 
-        {/* Items Grid */}
-        <RNView style={styles.itemsGrid}>
+        {/* Items Container */}
+        <RNView style={styles.itemsContainer}>
+          <RNView style={styles.itemsGrid}>
           {getCurrentItems().map((item) => (
             <Pressable
               key={item.id}
@@ -482,43 +530,66 @@ export default function ShopScreen() {
                   )}
                 </RNView>
               </RNView>
-              <Text style={styles.itemName}>{item.name}</Text>
-              <Text style={styles.itemDescription}>{item.description}</Text>
-              {item.stamina && (
-                <RNView style={styles.staminaContainer}>
-                  <Text style={styles.staminaText}>⚡ {item.stamina}</Text>
-                </RNView>
-              )}
-              
-              {/* Show OWNED badge for backgrounds */}
-              {item.id && item.id.startsWith('bg_') && hasBackground(item.id) && (
-                <RNView style={styles.ownedBadge}>
-                  <FontAwesome name="check-circle" size={12} color="#10b981" />
-                  <Text style={styles.ownedText}>OWNED</Text>
-                </RNView>
-              )}
-              
-              <RNView style={styles.activityFooter}>
-                <RNView style={styles.ticketPriceContainer}>
-                  <Text style={styles.activityPrice}>
-                    {item.currency === 'USD' ? '$' : ''}{item.price}
-                    {item.currency === 'stamina' && ' ⚡'}
-                  </Text>
-                  {item.currency === 'tickets' && (
-                    <FontAwesome name="ticket" size={10} color="#8b5cf6" />
+              {selectedCategory === 'backgrounds' ? (
+                <>
+                  <Text style={styles.backgroundItemName}>{item.name}</Text>
+                  <Text style={styles.backgroundItemDescription}>{item.description}</Text>
+                  
+                  {/* Show OWNED badge for backgrounds */}
+                  {item.id && item.id.startsWith('bg_') && hasBackground(item.id) ? (
+                    <RNView style={styles.backgroundOwnedBadge}>
+                      <FontAwesome name="check-circle" size={14} color="#10b981" />
+                      <Text style={styles.backgroundOwnedText}>OWNED</Text>
+                    </RNView>
+                  ) : (
+                    <RNView style={styles.backgroundPriceContainer}>
+                      <RNView style={styles.backgroundTicketContainer}>
+                        <FontAwesome name="ticket" size={16} color="#8b5cf6" />
+                        <Text style={styles.backgroundPriceText}>{item.price}</Text>
+                      </RNView>
+                      <Pressable 
+                        style={styles.backgroundBuyButton}
+                        onPress={() => handlePurchase(item)}
+                      >
+                        <Text style={styles.backgroundBuyButtonText}>BUY</Text>
+                      </Pressable>
+                    </RNView>
                   )}
-                </RNView>
-                {item.duration && (
-                  <Text style={styles.duration}>{item.duration}</Text>
-                )}
-                {item.bonus && (
-                  <RNView style={styles.bonusBadgeBottomRight}>
-                    <Text style={styles.bonusText}>{item.bonus}</Text>
+                </>
+              ) : (
+                <>
+                  <Text style={styles.itemName}>{item.name}</Text>
+                  <Text style={styles.itemDescription}>{item.description}</Text>
+                  {item.stamina && (
+                    <RNView style={styles.staminaContainer}>
+                      <Text style={styles.staminaText}>⚡ {item.stamina}</Text>
+                    </RNView>
+                  )}
+                  
+                  <RNView style={styles.activityFooter}>
+                    <RNView style={styles.ticketPriceContainer}>
+                      <Text style={styles.activityPrice}>
+                        {item.currency === 'USD' ? '$' : ''}{item.price}
+                        {item.currency === 'stamina' && ' ⚡'}
+                      </Text>
+                      {item.currency === 'tickets' && (
+                        <FontAwesome name="ticket" size={10} color="#8b5cf6" />
+                      )}
+                    </RNView>
+                    {item.duration && (
+                      <Text style={styles.duration}>{item.duration}</Text>
+                    )}
+                    {item.bonus && (
+                      <RNView style={styles.bonusBadgeBottomRight}>
+                        <Text style={styles.bonusText}>{item.bonus}</Text>
+                      </RNView>
+                    )}
                   </RNView>
-                )}
-              </RNView>
+                </>
+              )}
             </Pressable>
           ))}
+          </RNView>
         </RNView>
       </ScrollView>
 
@@ -623,7 +694,57 @@ export default function ShopScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fafafa',
+  },
+  secondNavContainer: {
+    flexDirection: 'row',
+    backgroundColor: '#f8fafc',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e2e8f0',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    justifyContent: 'space-around',
+    alignItems: 'center',
+  },
+  navButton: {
+    alignItems: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 6,
+    minWidth: 60,
+    backgroundColor: 'transparent',
+  },
+  navButtonText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 8,
+    color: '#64748b',
+    fontWeight: '500',
+    marginTop: 2,
+    textAlign: 'center',
+    letterSpacing: 0.5,
+  },
+  shopHeaderContainer: {
+    width: '100%',
+    backgroundColor: 'transparent',
+    paddingVertical: 8,
+    marginBottom: 16,
+    alignItems: 'center',
+  },
+  shopHeaderText: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 14,
+    color: '#0f172a',
+    textAlign: 'center',
+    fontWeight: 'bold',
+    letterSpacing: 1.2,
+    textTransform: 'uppercase',
+  },
+  itemsContainer: {
+    width: '100%',
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
+    padding: 12,
+    borderWidth: 2,
+    borderColor: '#0f172a',
   },
   loadingText: {
     fontFamily: 'Silkscreen_400Regular',
@@ -635,8 +756,8 @@ const styles = StyleSheet.create({
   scrollContent: {
     alignItems: 'center',
     justifyContent: 'flex-start',
-    paddingTop: 20,
-    paddingHorizontal: 20,
+    padding: 12,
+    flexGrow: 1,
     paddingBottom: 100,
   },
   categoryTabs: {
@@ -646,42 +767,39 @@ const styles = StyleSheet.create({
     gap: 6,
     marginBottom: 16,
     backgroundColor: '#ffffff',
-    borderWidth: 1,
-    borderColor: 'rgba(139, 92, 246, 0.15)',
-    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: '#0f172a',
+    borderRadius: 8,
     padding: 12,
-    width: '95%',
-    alignSelf: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 2,
+    width: '100%',
   },
   categoryTab: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 14,
     paddingVertical: 10,
-    backgroundColor: 'transparent',
-    borderRadius: 10,
-    borderWidth: 0,
+    paddingHorizontal: 16,
+    borderRadius: 4,
+    backgroundColor: '#f1f5f9',
+    borderWidth: 1,
+    borderColor: '#0f172a',
+    minWidth: 90,
+    justifyContent: 'center',
+    marginBottom: 4,
   },
   categoryTabActive: {
-    backgroundColor: 'rgba(139, 92, 246, 0.1)',
-    borderWidth: 1,
-    borderColor: '#8b5cf6',
+    backgroundColor: '#0f172a',
+    borderWidth: 2,
+    borderColor: '#0f172a',
   },
   categoryText: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 9,
-    color: '#94a3b8',
+    fontSize: 10,
+    color: '#64748b',
     fontWeight: 'bold',
-    letterSpacing: 0.3,
+    letterSpacing: 0.5,
   },
   categoryTextActive: {
-    color: '#8b5cf6',
+    color: '#ffffff',
     fontWeight: 'bold',
   },
   shopTitle: {
@@ -697,24 +815,18 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'space-between',
     width: '100%',
-    paddingHorizontal: 8,
     gap: 8,
   },
   itemCard: {
     width: '48%',
-    backgroundColor: '#ffffff',
-    borderRadius: 16,
+    backgroundColor: '#f8fafc',
+    borderRadius: 6,
     borderWidth: 1,
-    borderColor: '#e2e8f0',
-    padding: 16,
-    marginBottom: 12,
+    borderColor: '#0f172a',
+    padding: 10,
+    marginBottom: 8,
     alignItems: 'center',
     position: 'relative',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 10,
-    elevation: 2,
   },
   popularCard: {
     borderColor: '#f59e0b',
@@ -769,23 +881,100 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   activityIconContainer: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     backgroundColor: 'rgba(14, 165, 233, 0.1)',
     justifyContent: 'center',
     alignItems: 'center',
+    marginBottom: 8,
   },
   lunchboxIcon: {
-    width: 40,
-    height: 40,
+    width: 48,
+    height: 48,
     resizeMode: 'contain',
+    alignSelf: 'center',
   },
   backgroundThumbnail: {
-    width: 140,
-    height: 80,
+    width: 160,
+    height: 90,
     resizeMode: 'cover',
-    borderRadius: 10,
+    borderRadius: 12,
+  },
+  backgroundItemName: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 14,
+    color: '#0f172a',
+    fontWeight: 'bold',
+    letterSpacing: 0.5,
+    textAlign: 'center',
+    marginBottom: 6,
+    lineHeight: 18,
+  },
+  backgroundItemDescription: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#64748b',
+    lineHeight: 16,
+    textAlign: 'center',
+    marginBottom: 12,
+    paddingHorizontal: 8,
+  },
+  backgroundPriceContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+  },
+  backgroundTicketContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.3)',
+    gap: 6,
+  },
+  backgroundPriceText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 14,
+    color: '#8b5cf6',
+    fontWeight: 'bold',
+  },
+  backgroundBuyButton: {
+    backgroundColor: '#8b5cf6',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#7c3aed',
+  },
+  backgroundBuyButtonText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 12,
+    color: '#ffffff',
+    fontWeight: 'bold',
+  },
+  backgroundOwnedBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#10b981',
+    marginHorizontal: 8,
+  },
+  backgroundOwnedText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 12,
+    color: '#10b981',
+    fontWeight: 'bold',
   },
   backgroundIconContainer: {
     width: 150,

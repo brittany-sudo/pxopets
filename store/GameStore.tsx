@@ -247,13 +247,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return success;
     },
     addTickets: (amount) => {
-      console.log('GameStore addTickets called with:', amount);
       setState((s) => {
         const newTickets = s.tickets + Math.max(0, amount);
-        console.log('GameStore addTickets - old:', s.tickets, 'new:', newTickets);
-        const newState = { ...s, tickets: newTickets };
-        console.log('GameStore addTickets - new state:', newState);
-        return newState;
+        return { ...s, tickets: newTickets };
       });
     },
     spendTickets: (amount) => {

@@ -29,7 +29,7 @@ export default function DailiesScreen() {
     },
     {
       id: 'casino',
-      name: 'Crescent Oasis',
+      name: 'Cosmic Oasis',
       color: '#f59e0b',
       backgroundColor: '#f59e0b',
       icon: 'sun-o',
@@ -47,7 +47,7 @@ export default function DailiesScreen() {
       ]
     },
     {
-      id: 'vintage-hollow',
+      id: 'barrelhaven',
       name: 'Barrelhaven',
       color: '#8b5cf6',
       backgroundColor: '#8b5cf6',
@@ -191,6 +191,22 @@ export default function DailiesScreen() {
         { id: 'celestial-mask-shop', name: 'Celestial Mask Shop', route: '/(tabs)/celestial-mask-shop' },
         { id: 'celestial-menagerie', name: 'Celestial Menagerie', route: '/(tabs)/celestial-menagerie' },
         { id: 'cosmic-ring-toss', name: 'Cosmic Ring Toss', route: '/(tabs)/cosmic-ring-toss' }
+      ]
+    },
+    {
+      id: 'loomers-wharf',
+      name: 'Loomer\'s Wharf',
+      color: '#0ea5e9',
+      backgroundColor: '#0ea5e9',
+      icon: 'anchor',
+      activities: [
+        { id: 'old-net-pub', name: 'The Old Net Pub', route: '/(tabs)/old-net-pub' },
+        { id: 'whale-watching', name: 'Harbor Watch', route: '/(tabs)/whale-watching' },
+        { id: 'trappers-shack', name: 'Trapper\'s Shack', route: '/(tabs)/trappers-shack' },
+        { id: 'lighthouse-keeper', name: 'Lighthouse Keeper', route: '/(tabs)/lighthouse-keeper' },
+        { id: 'saltwick-pier', name: 'Saltwick Pier', route: '/(tabs)/saltwick-pier' },
+        { id: 'lowtide-pier', name: 'Lowtide Pier', route: '/(tabs)/lowtide-pier' },
+        { id: 'foggy-harbor', name: 'Foggy Harbor', route: '/(tabs)/foggy-harbor' }
       ]
     }
   ];

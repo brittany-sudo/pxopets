@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'flex-start',
     padding: 20,
-    paddingTop: 40,
+    paddingTop: 20,
     paddingBottom: 100,
   },
     headerRow: {
@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
   },
   backButtonText: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 12,
+    fontSize: 14,
     color: '#ec4899',
     marginLeft: 6,
     fontWeight: 'bold',
@@ -154,6 +154,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
     textAlign: 'center',
     flex: 1,
+    marginLeft: 16,
   },
   bannerImage: {
     width: '100%',

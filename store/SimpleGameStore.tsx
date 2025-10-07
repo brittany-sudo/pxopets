@@ -169,12 +169,10 @@ export function SimpleGameProvider({ children }: { children: React.ReactNode }) 
   }, [state, hydrated]);
 
   const addTickets = (amount: number) => {
-    console.log('Adding tickets:', amount);
-    setState(prev => {
-      const newState = { ...prev, tickets: prev.tickets + amount };
-      console.log('New state:', newState);
-      return newState;
-    });
+    setState(prev => ({
+      ...prev, 
+      tickets: prev.tickets + amount 
+    }));
   };
 
   const addStamina = (amount: number) => {
@@ -186,11 +184,9 @@ export function SimpleGameProvider({ children }: { children: React.ReactNode }) 
   };
 
   const addGems = (amount: number) => {
-    console.log('Adding gems:', amount, 'Current gems:', state.gems);
     setState(prev => {
       const currentGems = prev.gems || 0; // Fallback to 0 if undefined
       const newGems = currentGems + amount;
-      console.log('New gems:', newGems);
       return { ...prev, gems: newGems };
     });
   };
@@ -333,12 +329,6 @@ export function SimpleGameProvider({ children }: { children: React.ReactNode }) 
         newStreakRewardClaimed = false;
       }
 
-      console.log('Login streak updated:', {
-        prevStreak: prev.loginStreak,
-        newStreak,
-        lastLogin: prev.lastLoginDate,
-        today,
-      });
 
       return {
         ...prev,

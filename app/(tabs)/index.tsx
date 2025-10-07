@@ -1,12 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, ScrollView, View as RNView, Pressable, Image } from 'react-native';
+import { StyleSheet, ScrollView, View as RNView, Pressable, Image, Alert, Modal } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import DeveloperPanel from '@/components/DeveloperPanel';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { usePets } from '@/store/PetStore';
 
 export default function NewsScreen() {
   const [showDevPanel, setShowDevPanel] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
+  const [riddleAnswered, setRiddleAnswered] = useState(false);
+  const [showRiddleModal, setShowRiddleModal] = useState(false);
+  const [riddleResult, setRiddleResult] = useState<{ type: 'correct' | 'incorrect', message: string } | null>(null);
+  const { addStaminaToPet, state: petState } = usePets();
   
   // Update time every second
   useEffect(() => {
@@ -103,28 +109,85 @@ export default function NewsScreen() {
   const dailyRiddle = {
     question: "What has a head, a tail, but no body?",
     answer: "A coin",
-    reward: "50 tickets"
+    options: [
+      "A coin",
+      "A snake", 
+      "A fish",
+      "A pencil"
+    ],
+    reward: "50 stamina"
   };
 
   const lotteryNumbers = "12 • 19 • 04 • 07";
 
+  const handleRiddleSubmit = () => {
+    if (!selectedAnswer) {
+      setRiddleResult({ type: 'incorrect', message: 'Please select an answer before submitting!' });
+      setShowRiddleModal(true);
+      return;
+    }
+
+    if (selectedAnswer === dailyRiddle.answer) {
+      // Correct answer - reward stamina to active pet
+      const activePet = petState.adoptedPets.find(pet => pet.isActive);
+      if (activePet) {
+        const success = addStaminaToPet(activePet.id, 50);
+        setRiddleResult({ 
+          type: 'correct', 
+          message: `You earned 50 stamina for ${activePet.name}!` 
+        });
+      } else {
+        setRiddleResult({ 
+          type: 'correct', 
+          message: 'You earned 50 stamina! (No active pet to receive it)' 
+        });
+      }
+      setRiddleAnswered(true);
+    } else {
+      setRiddleResult({ 
+        type: 'incorrect', 
+        message: `The correct answer was "${dailyRiddle.answer}". Try again tomorrow!` 
+      });
+    }
+    setShowRiddleModal(true);
+  };
+
   return (
     <View style={styles.container}>
+      {/* Second Top Navigation */}
+      <RNView style={styles.secondNavContainer}>
+        <Pressable style={styles.navButton} onPress={() => {}}>
+          <FontAwesome name="bolt" size={20} color="#8b5cf6" />
+          <Text style={styles.navButtonText}>BREAKING</Text>
+        </Pressable>
+        <Pressable style={styles.navButton} onPress={() => {}}>
+          <FontAwesome name="fire" size={20} color="#8b5cf6" />
+          <Text style={styles.navButtonText}>TRENDING</Text>
+        </Pressable>
+        <Pressable style={styles.navButton} onPress={() => {}}>
+          <FontAwesome name="calendar" size={20} color="#8b5cf6" />
+          <Text style={styles.navButtonText}>EVENTS</Text>
+        </Pressable>
+        <Pressable style={styles.navButton} onPress={() => {}}>
+          <FontAwesome name="archive" size={20} color="#8b5cf6" />
+          <Text style={styles.navButtonText}>ARCHIVE</Text>
+        </Pressable>
+        <Pressable style={styles.navButton} onPress={() => {}}>
+          <FontAwesome name="cog" size={20} color="#8b5cf6" />
+          <Text style={styles.navButtonText}>SETTINGS</Text>
+        </Pressable>
+      </RNView>
+
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* News Header */}
         <RNView style={styles.headerContainer}>
-          <Image
-            source={require('@/assets/images/daily-news.png')}
-            style={styles.headerImage}
-            resizeMode="contain"
-          />
           <Text style={styles.headerTitle}>PXOPIA NEWS</Text>
           <Text style={styles.headerDate}>{getCurrentDate()}</Text>
           <Text style={styles.headerTime}>Pxopian Standard Time: {getPxopianTime()}</Text>
         </RNView>
 
         {/* Featured News Section */}
-        <RNView style={styles.featuredContainer}>
+        <RNView style={styles.newsSectionContainer}>
           <Text style={styles.sectionTitle}>FEATURED NEWS</Text>
           <RNView style={styles.featuredList}>
             {newsArticles.filter(article => article.featured).map((article) => (
@@ -153,7 +216,7 @@ export default function NewsScreen() {
         </RNView>
 
         {/* All News Section */}
-        <RNView style={styles.newsContainer}>
+        <RNView style={styles.newsSectionContainer}>
           <Text style={styles.sectionTitle}>ALL NEWS</Text>
           <RNView style={styles.newsList}>
             {newsArticles.filter(article => !article.featured).map((article) => (
@@ -179,7 +242,7 @@ export default function NewsScreen() {
         </RNView>
 
         {/* Daily Riddle Section */}
-        <RNView style={styles.riddleContainer}>
+        <RNView style={styles.newsSectionContainer}>
           <Text style={styles.sectionTitle}>DAILY RIDDLE</Text>
           <RNView style={styles.riddleItem}>
             <RNView style={styles.riddleHeader}>
@@ -187,21 +250,79 @@ export default function NewsScreen() {
               <Text style={styles.riddleQuestion}>{dailyRiddle.question}</Text>
             </RNView>
             <RNView style={styles.riddleReward}>
-              <FontAwesome name="ticket" size={14} color="#f59e0b" />
+              <FontAwesome name="bolt" size={14} color="#f59e0b" />
               <Text style={styles.riddleRewardText}>Reward: {dailyRiddle.reward}</Text>
             </RNView>
+            
+            {!riddleAnswered ? (
+              <>
+                <RNView style={styles.riddleOptions}>
+                  {dailyRiddle.options.map((option, index) => (
+                    <Pressable
+                      key={index}
+                      style={[
+                        styles.riddleOption,
+                        selectedAnswer === option && styles.riddleOptionSelected
+                      ]}
+                      onPress={() => setSelectedAnswer(option)}
+                    >
+                      <Text style={[
+                        styles.riddleOptionText,
+                        selectedAnswer === option && styles.riddleOptionTextSelected
+                      ]}>
+                        {String.fromCharCode(65 + index)}. {option}
+                      </Text>
+                    </Pressable>
+                  ))}
+                </RNView>
+                
+                <Pressable 
+                  style={[
+                    styles.riddleSubmitButton,
+                    !selectedAnswer && styles.riddleSubmitButtonDisabled
+                  ]}
+                  onPress={handleRiddleSubmit}
+                  disabled={!selectedAnswer}
+                >
+                  <Text style={[
+                    styles.riddleSubmitText,
+                    !selectedAnswer && styles.riddleSubmitTextDisabled
+                  ]}>
+                    SUBMIT ANSWER
+                  </Text>
+                </Pressable>
+              </>
+            ) : (
+              <RNView style={styles.riddleCompleted}>
+                <FontAwesome name="check-circle" size={20} color="#10b981" />
+                <Text style={styles.riddleCompletedText}>Riddle completed! Come back tomorrow for a new one.</Text>
+              </RNView>
+            )}
           </RNView>
         </RNView>
 
         {/* Lottery Section */}
-        <RNView style={styles.lotteryContainer}>
+        <RNView style={styles.newsSectionContainer}>
           <Text style={styles.sectionTitle}>DAILY LOTTERY</Text>
+          <Text style={styles.lotteryDrawTime}>Draw at midnight Pxopia time</Text>
           <RNView style={styles.lotteryItem}>
-            <RNView style={styles.lotteryHeader}>
-              <FontAwesome name="ticket" size={16} color="#ff1493" />
-              <Text style={styles.lotteryNumbers}>{lotteryNumbers}</Text>
+            <RNView style={styles.lotteryNumbersContainer}>
+              <RNView style={styles.lotteryBall}>
+                <Text style={styles.lotteryNumber}>12</Text>
+              </RNView>
+              <RNView style={styles.lotteryBall}>
+                <Text style={styles.lotteryNumber}>19</Text>
+              </RNView>
+              <RNView style={styles.lotteryBall}>
+                <Text style={styles.lotteryNumber}>04</Text>
+              </RNView>
+              <RNView style={styles.lotteryBall}>
+                <Text style={styles.lotteryNumber}>07</Text>
+              </RNView>
+              <RNView style={styles.lotteryBall}>
+                <Text style={styles.lotteryNumber}>23</Text>
+              </RNView>
             </RNView>
-            <Text style={styles.lotteryText}>Draw at midnight Pxopia time</Text>
           </RNView>
         </RNView>
 
@@ -222,6 +343,39 @@ export default function NewsScreen() {
         visible={showDevPanel} 
         onClose={() => setShowDevPanel(false)} 
       />
+
+      {/* Riddle Result Modal */}
+      <Modal
+        visible={showRiddleModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowRiddleModal(false)}
+      >
+        <RNView style={styles.modalOverlay}>
+          <RNView style={styles.riddleModal}>
+            <RNView style={styles.riddleModalHeader}>
+              <FontAwesome 
+                name={riddleResult?.type === 'correct' ? 'check-circle' : 'times-circle'} 
+                size={24} 
+                color={riddleResult?.type === 'correct' ? '#10b981' : '#ef4444'} 
+              />
+              <Text style={[
+                styles.riddleModalTitle,
+                { color: riddleResult?.type === 'correct' ? '#10b981' : '#ef4444' }
+              ]}>
+                {riddleResult?.type === 'correct' ? 'CORRECT!' : 'INCORRECT!'}
+              </Text>
+            </RNView>
+            <Text style={styles.riddleModalMessage}>{riddleResult?.message}</Text>
+            <Pressable 
+              style={styles.riddleModalButton}
+              onPress={() => setShowRiddleModal(false)}
+            >
+              <Text style={styles.riddleModalButtonText}>OK</Text>
+            </Pressable>
+          </RNView>
+        </RNView>
+      </Modal>
     </View>
   );
 }
@@ -230,26 +384,53 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  secondNavContainer: {
+    flexDirection: 'row',
+    backgroundColor: '#f8fafc',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e2e8f0',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    justifyContent: 'space-around',
+    alignItems: 'center',
+  },
+  navButton: {
+    alignItems: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 6,
+    minWidth: 60,
+    backgroundColor: 'transparent',
+  },
+  navButtonText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 8,
+    color: '#64748b',
+    fontWeight: '500',
+    marginTop: 2,
+    textAlign: 'center',
+    letterSpacing: 0.5,
+  },
+  newsSectionContainer: {
+    width: '100%',
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
+    padding: 12,
+    borderWidth: 2,
+    borderColor: '#0f172a',
+    marginBottom: 16,
+  },
   scrollContent: {
     alignItems: 'center',
     justifyContent: 'flex-start',
-    padding: 20,
+    padding: 12,
     flexGrow: 1,
   },
   headerContainer: {
-    width: '95%',
-    alignSelf: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.98)',
-    borderRadius: 12,
-    padding: 20,
+    width: '100%',
+    backgroundColor: 'transparent',
+    paddingVertical: 8,
     marginBottom: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(139, 92, 246, 0.3)',
-    shadowColor: '#8b5cf6',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
     alignItems: 'center',
   },
   headerImage: {
@@ -260,10 +441,12 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontFamily: 'PressStart2P_400Regular',
     fontSize: 14,
-    fontWeight: 'bold',
-    color: '#8b5cf6',
-    marginBottom: 8,
+    color: '#0f172a',
     textAlign: 'center',
+    fontWeight: 'bold',
+    letterSpacing: 1.2,
+    textTransform: 'uppercase',
+    marginBottom: 8,
   },
   headerDate: {
     fontFamily: 'Silkscreen_400Regular',
@@ -356,22 +539,22 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   featuredItem: {
-    paddingVertical: 12,
+    paddingVertical: 10,
     paddingHorizontal: 12,
     marginBottom: 8,
-    borderRadius: 8,
-    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+    borderRadius: 6,
+    backgroundColor: '#f8fafc',
     borderWidth: 1,
-    borderColor: 'rgba(139, 92, 246, 0.3)',
+    borderColor: '#0f172a',
   },
   newsItem: {
-    paddingVertical: 12,
+    paddingVertical: 10,
     paddingHorizontal: 12,
     marginBottom: 8,
-    borderRadius: 8,
-    backgroundColor: 'rgba(139, 92, 246, 0.05)',
+    borderRadius: 6,
+    backgroundColor: '#f8fafc',
     borderWidth: 1,
-    borderColor: 'rgba(139, 92, 246, 0.2)',
+    borderColor: '#0f172a',
   },
   articleHeader: {
     flexDirection: 'row',
@@ -454,8 +637,132 @@ const styles = StyleSheet.create({
     color: '#f59e0b',
     fontWeight: 'bold',
   },
+  riddleOptions: {
+    marginTop: 12,
+    gap: 6,
+  },
+  riddleOption: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 4,
+    backgroundColor: '#f8fafc',
+    borderWidth: 1,
+    borderColor: '#0f172a',
+  },
+  riddleOptionSelected: {
+    backgroundColor: '#0f172a',
+    borderWidth: 2,
+  },
+  riddleOptionText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#0f172a',
+    fontWeight: 'bold',
+  },
+  riddleOptionTextSelected: {
+    color: '#ffffff',
+  },
+  riddleSubmitButton: {
+    marginTop: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 4,
+    backgroundColor: '#0f172a',
+    borderWidth: 2,
+    borderColor: '#0f172a',
+    alignItems: 'center',
+  },
+  riddleSubmitButtonDisabled: {
+    backgroundColor: '#e2e8f0',
+    borderColor: '#e2e8f0',
+  },
+  riddleSubmitText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#ffffff',
+    fontWeight: 'bold',
+    letterSpacing: 0.5,
+  },
+  riddleSubmitTextDisabled: {
+    color: '#94a3b8',
+  },
+  riddleCompleted: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 12,
+    paddingVertical: 8,
+    gap: 8,
+  },
+  riddleCompletedText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 9,
+    color: '#10b981',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  riddleModal: {
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
+    padding: 20,
+    borderWidth: 2,
+    borderColor: '#0f172a',
+    width: '100%',
+    maxWidth: 300,
+    alignItems: 'center',
+  },
+  riddleModalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 12,
+  },
+  riddleModalTitle: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 12,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  riddleModalMessage: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#0f172a',
+    textAlign: 'center',
+    marginBottom: 16,
+    lineHeight: 14,
+  },
+  riddleModalButton: {
+    backgroundColor: '#0f172a',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 4,
+    borderWidth: 2,
+    borderColor: '#0f172a',
+  },
+  riddleModalButtonText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#ffffff',
+    fontWeight: 'bold',
+    letterSpacing: 0.5,
+  },
+  lotteryDrawTime: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 9,
+    color: '#ff1493',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 12,
+  },
   lotteryItem: {
-    padding: 12,
+    padding: 8,
     borderWidth: 1,
     borderColor: 'rgba(139, 92, 246, 0.3)',
     borderRadius: 8,
@@ -467,11 +774,33 @@ const styles = StyleSheet.create({
     marginBottom: 4,
     gap: 8,
   },
-  lotteryNumbers: {
-    fontFamily: 'Silkscreen_400Regular',
-    fontSize: 14,
-    color: '#ff1493',
+  lotteryNumbersContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 6,
+  },
+  lotteryBall: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#ffffff',
+    borderWidth: 2,
+    borderColor: '#0f172a',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  lotteryNumber: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 10,
+    color: '#0f172a',
     fontWeight: 'bold',
+    textAlign: 'center',
   },
   lotteryText: {
     fontFamily: 'Silkscreen_400Regular',

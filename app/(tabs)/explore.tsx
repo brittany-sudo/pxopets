@@ -21,7 +21,7 @@ const lilGnomeImage = require('@/assets/images/lil-gnome.png');
 const lullabyDownsIconImage = require('@/assets/images/lullaby-downs-icon.png');
 const lilTentGossImage = require('@/assets/images/lil-tent-goss.png');
 const lilPotImage = require('@/assets/images/lil-pot.png');
-const crescentOasisIconImage = require('@/assets/images/crescent-oasis-icon.png');
+const cosmicOasisIconImage = require('@/assets/images/cosmic-oasis-icon.png');
 const lilBayouImage = require('@/assets/images/lil-bayou.png');
 const loomersTinyImage = require('@/assets/images/loomers-tiny.png');
 const mapOfPxopiaImage = require('@/assets/images/map-of-pxopia.png');
@@ -49,14 +49,14 @@ export default function ExploreScreen() {
     },
     {
       id: "casino",
-      name: "Crescent Oasis",
+      name: "Cosmic Oasis",
       icon: "sun-o",
       color: "#f59e0b",
       description: "A desert mirage where atomic age meets cosmic wonder.",
-      image: crescentOasisIconImage
+      image: cosmicOasisIconImage
     },
     {
-      id: "vintage-hollow",
+      id: "barrelhaven",
       name: "Barrelhaven",
       icon: "glass",
       color: "#8b5cf6",
@@ -139,52 +139,38 @@ export default function ExploreScreen() {
 
 
   const handleWorldPress = (world: any) => {
-    console.log('World pressed:', world.id, world.name);
     if (world.id === 'enchanted-island') {
-      console.log('Navigating to Twilight Atoll from list...');
       router.navigate('/(tabs)/enchanted-island');
     } else if (world.id === 'artisan') {
-      console.log('Navigating to Artisan\'s Quarter from list...');
       router.navigate('/(tabs)/artisan-quarter');
     } else if (world.id === 'casino') {
-      console.log('Navigating to Crescent Oasis from list...');
       router.navigate('/(tabs)/crescent-oasis');
     } else if (world.id === 'crystal-cove') {
-      console.log('Navigating to Foggy Harbor from list...');
       router.navigate('/(tabs)/foggy-harbor');
-    } else if (world.id === 'vintage-hollow') {
-      console.log('Navigating to Barrelhaven from list...');
+    } else if (world.id === 'barrelhaven') {
       router.navigate('/(tabs)/barrelhaven');
     } else if (world.id === 'bag-of-stars-forest') {
-      console.log('Navigating to Stardiver Forest from list...');
       router.navigate('/(tabs)/bag-of-stars-forest');
     } else if (world.id === 'pxoburbs') {
-      console.log('Navigating to The Pxoburbs from list...');
       router.navigate('/(tabs)/pxoburbs');
     } else if (world.id === 'gossamer-midway') {
-      console.log('Navigating to Gossamer Midway from list...');
       router.navigate('/(tabs)/gossamer-midway');
     } else if (world.id === 'library') {
-      console.log('Navigating to Thistledown from list...');
       router.navigate('/(tabs)/scarecrow-vale');
     } else if (world.id === 'bayou-nocturne') {
-      console.log('Navigating to Bayou Nocturne from list...');
       router.navigate('/(tabs)/bayou-nocturne');
     } else if (world.id === 'midwinter-crossing') {
-      console.log('Navigating to Midwinter Crossing from list...');
       router.navigate('/(tabs)/midwinter-crossing');
     } else if (world.id === 'lumen-bazaar') {
-      console.log('Navigating to Lumen Bazaar from list...');
       router.navigate('/(tabs)/lumen-bazaar');
     } else if (world.id === 'lullaby-downs') {
-      console.log('Navigating to Lullaby Downs from list...');
       router.navigate('/(tabs)/lullaby-downs');
     } else {
       Alert.alert(
         `Welcome to ${world.name}!`,
         world.description,
         [
-          { text: "Explore", onPress: () => console.log(`Navigating to ${world.name}`) },
+          { text: "Explore", onPress: () => {} },
           { text: "Cancel", style: "cancel" }
         ]
       );
@@ -218,32 +204,87 @@ export default function ExploreScreen() {
       </RNView>
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
+        {/* Header Section */}
+        <RNView style={styles.headerSection}>
+          <RNView style={styles.mapSection}>
+            <RNView style={styles.mapContainer}>
+              <Image 
+                source={mapOfPxopiaImage} 
+                style={styles.mapOfPxopiaImage}
+                resizeMode="contain"
+              />
+            </RNView>
+            <RNView style={styles.mapSummary}>
+              <Text style={styles.summaryTitle}>Welcome to Pxopia</Text>
+              <Text style={styles.summaryText}>
+                A vibrant digital realm where neon-lit suburbs meet mystical forests, 
+                cosmic oases, and enchanted islands. Each location offers unique adventures, 
+                characters, and treasures waiting to be discovered.
+              </Text>
+            </RNView>
+          </RNView>
+        </RNView>
+
         {/* Worlds List */}
+        <Text style={styles.locationsTitle}>LOCATIONS</Text>
         <RNView style={styles.worldsContainer}>
-          <Image 
-            source={mapOfPxopiaImage} 
-            style={styles.mapOfPxopiaImage}
-            resizeMode="contain"
-          />
-          {worlds.map((world, index) => (
-            <Pressable 
-              key={index} 
-              style={styles.worldItem}
-              onPress={() => handleWorldPress(world)}
-            >
-              <RNView style={styles.worldIconContainer}>
-                {world.image ? (
-                  <Image source={world.image} style={styles.worldImage} />
-                ) : (
-                  <FontAwesome name={world.icon as any} size={32} color={world.color} style={styles.worldIcon} />
+          {worlds.map((world, index) => {
+            const isComingSoon = index > 3; // Barrelhaven is at index 3, so everything after is coming soon
+            
+            return (
+              <RNView key={index} style={styles.worldItemContainer}>
+                <Pressable 
+                  style={[
+                    styles.worldItem,
+                    isComingSoon && styles.worldItemDisabled
+                  ]}
+                  onPress={() => !isComingSoon && handleWorldPress(world)}
+                  disabled={isComingSoon}
+                >
+                  <RNView style={[
+                    styles.worldIconContainer,
+                    isComingSoon && styles.worldIconContainerDisabled
+                  ]}>
+                    {world.image ? (
+                      <Image 
+                        source={world.image} 
+                        style={[
+                          styles.worldImage,
+                          isComingSoon && styles.worldImageDisabled
+                        ]} 
+                      />
+                    ) : (
+                      <FontAwesome 
+                        name={world.icon as any} 
+                        size={32} 
+                        color={isComingSoon ? '#9ca3af' : world.color} 
+                        style={styles.worldIcon} 
+                      />
+                    )}
+                  </RNView>
+                  <RNView style={styles.worldContent}>
+                    <Text style={[
+                      styles.worldName,
+                      isComingSoon && styles.worldNameDisabled
+                    ]}>
+                      {world.name}
+                    </Text>
+                    <Text style={[
+                      styles.worldDescription,
+                      isComingSoon && styles.worldDescriptionDisabled
+                    ]}>
+                      {world.description}
+                    </Text>
+                  </RNView>
+                </Pressable>
+                {isComingSoon && (
+                  <RNView style={styles.comingSoonOverlay}>
+                    <Text style={styles.comingSoonText}>COMING SOON</Text>
+                  </RNView>
                 )}
               </RNView>
-              <RNView style={styles.worldContent}>
-                <Text style={styles.worldName}>{world.name}</Text>
-                <Text style={styles.worldDescription}>{world.description}</Text>
-              </RNView>
-            </Pressable>
-          ))}
+            );
+          })}
         </RNView>
       </ScrollView>
     </View>
@@ -287,9 +328,80 @@ const styles = StyleSheet.create({
   scrollContent: {
     alignItems: 'center',
     justifyContent: 'flex-start',
-    padding: 16, // More reasonable padding
-    paddingHorizontal: 12, // Better horizontal padding
+    padding: 16,
+    paddingHorizontal: 12,
     flexGrow: 1,
+  },
+  headerSection: {
+    width: '100%',
+    marginBottom: 24,
+  },
+  mainTitle: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#8b5cf6',
+    textAlign: 'center',
+    marginBottom: 20,
+    letterSpacing: 1,
+  },
+  mapSection: {
+    flexDirection: 'row',
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 2,
+    borderColor: 'rgba(139, 92, 246, 0.3)',
+    shadowColor: '#8b5cf6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 6,
+  },
+  mapContainer: {
+    width: 120,
+    height: 120,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: 'rgba(139, 92, 246, 0.4)',
+    backgroundColor: 'rgba(139, 92, 246, 0.05)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 16,
+    shadowColor: '#8b5cf6',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  mapSummary: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  summaryTitle: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 10,
+    fontWeight: 'bold',
+    color: '#8b5cf6',
+    marginBottom: 8,
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
+  },
+  summaryText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#64748b',
+    lineHeight: 14,
+    letterSpacing: 0.2,
+  },
+  locationsTitle: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#8b5cf6',
+    textAlign: 'center',
+    marginBottom: 16,
+    letterSpacing: 1,
   },
   title: {
     fontFamily: 'PressStart2P_400Regular',
@@ -308,12 +420,9 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
   mapOfPxopiaImage: {
-    width: '100%',
-    height: 140, // Slightly taller for better presence
-    marginTop: 8, // Reduced from 20 for tighter spacing
-    marginBottom: 20, // More space below the map (was 8)
-    alignSelf: 'center',
-    borderRadius: 12, // Rounded corners to match design
+    width: 100,
+    height: 100,
+    borderRadius: 8,
   },
   pxopiaBlurb: {
     fontFamily: 'Silkscreen_400Regular',
@@ -364,10 +473,9 @@ const styles = StyleSheet.create({
   worldIconContainer: {
     width: 50,
     height: 50,
-    borderRadius: 25,
-    backgroundColor: 'rgba(139, 92, 246, 0.1)',
-    borderWidth: 1,
-    borderColor: 'rgba(139, 92, 246, 0.2)',
+    borderRadius: 8,
+    backgroundColor: 'transparent',
+    borderWidth: 0,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 14,
@@ -390,7 +498,7 @@ const styles = StyleSheet.create({
     fontFamily: 'PressStart2P_400Regular',
     fontSize: 12,
     fontWeight: 'bold',
-    color: '#0f172a',
+    color: '#8b5cf6',
     marginBottom: 4,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
@@ -402,6 +510,63 @@ const styles = StyleSheet.create({
     lineHeight: 16,
     fontWeight: '400',
     letterSpacing: 0.1,
+  },
+  worldItemContainer: {
+    position: 'relative',
+    width: '100%',
+    marginBottom: 10,
+  },
+  worldItemDisabled: {
+    opacity: 0.6,
+  },
+  worldIconContainerDisabled: {
+    opacity: 0.7,
+    backgroundColor: 'transparent',
+    borderWidth: 0,
+  },
+  worldImageDisabled: {
+    opacity: 0.7,
+  },
+  worldNameDisabled: {
+    opacity: 0.7,
+  },
+  worldDescriptionDisabled: {
+    opacity: 0.7,
+  },
+  comingSoonOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: 'rgba(139, 92, 246, 0.6)',
+    shadowColor: '#8b5cf6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  comingSoonText: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 8,
+    color: '#ffffff',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    letterSpacing: 1.2,
+    textShadowColor: '#8b5cf6',
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 4,
+    backgroundColor: 'rgba(139, 92, 246, 0.8)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ffffff',
   },
 });
 

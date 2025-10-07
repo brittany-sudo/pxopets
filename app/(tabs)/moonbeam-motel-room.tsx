@@ -93,7 +93,8 @@ export default function MoonbeamMotelRoomScreen() {
           price: 0,
           image: 'moonbeandreamcatcher.png',
           category: 'special',
-          description: 'A mystical dreamcatcher from the Moonbeam Motel'
+          description: 'A mystical dreamcatcher from the Moonbeam Motel',
+          rarity: 'common'
         }, 1);
 
         // Mark rewards as received

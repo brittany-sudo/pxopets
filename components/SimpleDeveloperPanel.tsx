@@ -28,7 +28,6 @@ export default function SimpleDeveloperPanel({ visible, onClose }: SimpleDevelop
   const clearCoffeeCooldown = async () => {
     try {
       await AsyncStorage.removeItem('lastCoffeeClaim');
-      console.log('Coffee cooldown cleared');
     } catch (error) {
       console.error('Error clearing coffee cooldown:', error);
     }
@@ -53,7 +52,6 @@ export default function SimpleDeveloperPanel({ visible, onClose }: SimpleDevelop
       Alert.alert('No Active Pet', 'You need an active pet to add stamina!');
       return;
     }
-    console.log('Adding stamina to pet:', activePet.name, amount);
     addStaminaToPet(activePet.id, amount);
   };
 
@@ -150,7 +148,7 @@ export default function SimpleDeveloperPanel({ visible, onClose }: SimpleDevelop
 
             {/* Stamina Control */}
             <View style={styles.currencyControl}>
-              <Text style={styles.currencyLabel}>Pet Stamina: {getActivePet()?.stamina || 'No Active Pet'}</Text>
+              <Text style={styles.currencyLabel}>Pet Stamina: {getActivePet() ? Number(getActivePet()?.stamina) || 0 : 'No Active Pet'}</Text>
               <View style={styles.controlRow}>
                 <Pressable style={styles.arrowButton} onPress={() => handleAdjustStamina(-10)}>
                   <FontAwesome name="minus" size={16} color="#fff" />

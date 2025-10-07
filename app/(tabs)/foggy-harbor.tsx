@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, ScrollView, View as RNView, Image, Pressable } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { router, Link } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Import the banner image
 const loomersBackgroundImage = require('@/assets/images/loomers-wharf-main.png');
@@ -14,16 +15,37 @@ const lilAnchorImage = require('@/assets/images/lil-anchor.png');
 export default function FoggyHarborScreen() {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
 
-  const toggleFavorite = (activityId: string) => {
-    setFavorites(prev => {
-      const newFavorites = new Set(prev);
-      if (newFavorites.has(activityId)) {
-        newFavorites.delete(activityId);
-      } else {
-        newFavorites.add(activityId);
+  // Load starred activities from storage
+  useEffect(() => {
+    loadStarredActivities();
+  }, []);
+
+  const loadStarredActivities = async () => {
+    try {
+      const stored = await AsyncStorage.getItem('starredActivities');
+      if (stored) {
+        setFavorites(new Set(JSON.parse(stored)));
       }
-      return newFavorites;
-    });
+    } catch (error) {
+      console.error('Error loading starred activities:', error);
+    }
+  };
+
+  const toggleFavorite = async (activityId: string) => {
+    const newFavorites = new Set(favorites);
+    if (newFavorites.has(activityId)) {
+      newFavorites.delete(activityId);
+    } else {
+      newFavorites.add(activityId);
+    }
+    setFavorites(newFavorites);
+    
+    // Save to AsyncStorage
+    try {
+      await AsyncStorage.setItem('starredActivities', JSON.stringify([...newFavorites]));
+    } catch (error) {
+      console.error('Error saving starred activities:', error);
+    }
   };
 
   const activities = [

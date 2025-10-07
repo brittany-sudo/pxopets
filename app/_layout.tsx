@@ -11,7 +11,7 @@ import { GameProvider } from '@/store/GameStore';
 import { SimpleGameProvider } from '@/store/SimpleGameStore';
 import { InventoryProvider } from '@/store/InventoryStore';
 import { PetProvider } from '@/store/PetStore';
-import 'react-native-reanimated';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { useColorScheme } from '@/components/useColorScheme';
 import { ColorSchemeProvider } from '@/components/ColorSchemeContext';
@@ -59,13 +59,14 @@ function RootLayoutNav() {
   const colorScheme = useColorScheme();
 
   return (
-    <ColorSchemeProvider>
-      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <GameProvider>
-          <SimpleGameProvider>
-            <InventoryProvider>
-              <PetProvider>
-              <Stack>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ColorSchemeProvider>
+        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+          <GameProvider>
+            <SimpleGameProvider>
+              <InventoryProvider>
+                <PetProvider>
+                <Stack>
               <Stack.Screen name="(tabs)" options={{ header: () => <AppHeader /> }} />
               <Stack.Screen name="adoption" options={{ headerShown: false }} />
               <Stack.Screen name="enchanted-island" options={{ headerShown: false }} />
@@ -79,15 +80,17 @@ function RootLayoutNav() {
               <Stack.Screen name="scarecrow-vale" options={{ headerShown: false }} />
               <Stack.Screen name="pxopet-supply" options={{ headerShown: false }} />
               <Stack.Screen name="community-pool" options={{ headerShown: false }} />
+              <Stack.Screen name="starlight-glide" options={{ headerShown: false }} />
               <Stack.Screen name="more" options={{ headerShown: false }} />
               <Stack.Screen name="quickstop" options={{ headerShown: false }} />
               <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-              </Stack>
-              </PetProvider>
-            </InventoryProvider>
-          </SimpleGameProvider>
-        </GameProvider>
-      </ThemeProvider>
-    </ColorSchemeProvider>
+                </Stack>
+                </PetProvider>
+              </InventoryProvider>
+            </SimpleGameProvider>
+          </GameProvider>
+        </ThemeProvider>
+      </ColorSchemeProvider>
+    </GestureHandlerRootView>
   );
 }

@@ -15,7 +15,7 @@ function TabBarIcon(props: {
   color: string;
   focused: boolean;
 }) {
-  return <FontAwesome size={24} style={{ marginBottom: 2, marginTop: -8 }} {...props} />;
+  return <FontAwesome size={26} style={{ marginBottom: 2, marginTop: -4 }} {...props} />;
 }
 
 export default function TabLayout() {
@@ -28,31 +28,32 @@ export default function TabLayout() {
       screenOptions={{
         tabBarActiveTintColor: colorScheme === 'dark' ? '#8b5cf6' : '#8b5cf6',
         tabBarInactiveTintColor: colorScheme === 'dark' ? 'rgba(139, 92, 246, 0.3)' : 'rgba(139, 92, 246, 0.3)',
-                tabBarLabelStyle: { 
-                  fontFamily: 'Silkscreen_400Regular', 
-                  fontSize: 9, 
-                  fontWeight: '500',
-                  marginTop: 2, // Closer to icons (was 6)
-                  marginBottom: 0,
-                  color: colorScheme === 'dark' ? '#ffffff' : '#000000',
-                  letterSpacing: 0, // Normal spacing (was -1)
-                },
+        tabBarLabelStyle: { 
+          fontFamily: 'Silkscreen_400Regular', 
+          fontSize: 8, // Bigger font for better readability
+          fontWeight: '500',
+          marginTop: 2, // Reduced space from icons
+          marginBottom: 0,
+          color: colorScheme === 'dark' ? '#ffffff' : '#000000',
+          letterSpacing: 0, // No negative kerning to prevent clipping
+          textAlign: 'center',
+        },
         tabBarItemStyle: { 
-          paddingVertical: 6, // Adjusted for smaller icons
-          paddingHorizontal: 1, // Absolute minimal padding
+          paddingVertical: 6, // Reduced vertical padding
+          paddingHorizontal: 1, // Minimal horizontal padding for maximum text space
           justifyContent: 'center', // Center content
           alignItems: 'center', // Center alignment
           flex: 1, // Equal distribution - let flex handle the width
-          maxWidth: 65, // Prevent tabs from getting too wide
+          minWidth: 0, // Allow text to wrap/truncate properly
         },
         tabBarStyle: {
-          height: 80 + insets.bottom, // Shorter height (was 95)
-          backgroundColor: colorScheme === 'dark' ? '#1a1a1a' : '#ffffff',
-          borderTopColor: colorScheme === 'dark' ? '#333333' : '#e5e5e5',
+          height: 85 + insets.bottom, // Reduced height since icons are smaller
+          backgroundColor: '#1a120d', // Always use dark background
+          borderTopColor: '#333333',
           borderTopWidth: 1,
-          paddingTop: 10, // Less top padding (was 14)
-          paddingBottom: insets.bottom + 6, // Less bottom padding (was 10)
-          paddingHorizontal: 16,
+          paddingTop: 8, // Reduced top padding
+          paddingBottom: insets.bottom + 6, // Reduced bottom padding
+          paddingHorizontal: 0, // No horizontal padding for maximum tab space
         },
         // Disable the static render of the header on web
         // to prevent a hydration error in React Navigation v6.
@@ -68,7 +69,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="explore"
         options={{
-          title: 'Explore',
+          title: 'Map',
           tabBarIcon: ({ color, focused }) => <TabBarIcon name="map" color={color} focused={focused} />,
         }}
       />
@@ -87,12 +88,6 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="pets"
-        options={{
-          href: null, // Hide from tab bar
-        }}
-      />
-      <Tabs.Screen
         name="mail"
         options={{
           title: 'Mail',
@@ -100,10 +95,16 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="pets"
+        options={{
+          title: 'Pets',
+          tabBarIcon: ({ color, focused }) => <TabBarIcon name="paw" color={color} focused={focused} />,
+        }}
+      />
+      <Tabs.Screen
         name="home"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color, focused }) => <TabBarIcon name="home" color={color} focused={focused} />,
+          href: null, // Hide from tab bar
         }}
       />
       <Tabs.Screen
@@ -230,6 +231,12 @@ export default function TabLayout() {
       />
       <Tabs.Screen
         name="starlight-roller-rink"
+        options={{
+          href: null, // Hide from tab bar
+        }}
+      />
+      <Tabs.Screen
+        name="starlight-glide"
         options={{
           href: null, // Hide from tab bar
         }}
@@ -452,6 +459,42 @@ export default function TabLayout() {
       />
       <Tabs.Screen
         name="inventory"
+        options={{
+          href: null, // Hide from tab bar
+        }}
+      />
+      <Tabs.Screen
+        name="cosmic-drive-in"
+        options={{
+          href: null, // Hide from tab bar
+        }}
+      />
+      <Tabs.Screen
+        name="lone-airstream"
+        options={{
+          href: null, // Hide from tab bar
+        }}
+      />
+      <Tabs.Screen
+        name="neon-slot-machines"
+        options={{
+          href: null, // Hide from tab bar
+        }}
+      />
+      <Tabs.Screen
+        name="the-old-winery"
+        options={{
+          href: null, // Hide from tab bar
+        }}
+      />
+      <Tabs.Screen
+        name="the-ivy-post"
+        options={{
+          href: null, // Hide from tab bar
+        }}
+      />
+      <Tabs.Screen
+        name="cellar-keeper"
         options={{
           href: null, // Hide from tab bar
         }}

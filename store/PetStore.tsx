@@ -20,6 +20,9 @@ export type AdoptedPet = {
   background: string;
   stamina: number; // Current stamina for this pet
   lastDailyStamina: string | null; // Last time daily stamina was added
+  personalityTraits: string[]; // Array of 2 personality traits
+  hunger: number; // Hunger level (0-100, where 0 is starving and 100 is full)
+  zodiacSign: string; // Zodiac sign (e.g., "♈ Aries", "♉ Taurus", etc.)
 };
 
 export type PetState = {
@@ -71,7 +74,54 @@ export function PetProvider({ children }: { children: React.ReactNode }) {
         const stored = await AsyncStorage.getItem(STORAGE_KEY);
         if (stored) {
           const parsedState = JSON.parse(stored);
-          setState(parsedState);
+          
+          // Migrate existing pets to have personality traits and hunger if they don't have them
+          const migratedPets = parsedState.adoptedPets?.map((pet: any) => {
+            const updates: any = {};
+            
+            if (!pet.personalityTraits) {
+              const personalityTraits = [
+                'Bold', 'Timid', 'Brave', 'Calm', 'Energetic', 'Gentle', 'Playful', 'Serious',
+                'Curious', 'Loyal', 'Mischievous', 'Caring', 'Adventurous', 'Relaxed', 'Clever',
+                'Friendly', 'Independent', 'Protective', 'Silly', 'Wise'
+              ];
+              const shuffled = [...personalityTraits].sort(() => Math.random() - 0.5);
+              const randomTraits = shuffled.slice(0, 2);
+              updates.personalityTraits = randomTraits;
+            }
+            
+            if (pet.hunger === undefined) {
+              updates.hunger = 100; // Default to full hunger for existing pets
+            }
+            
+            if (pet.stamina === undefined || pet.stamina === null) {
+              updates.stamina = 150; // Default stamina for existing pets
+            }
+            
+            if (!pet.zodiacSign || pet.zodiacSign.includes('♈') || pet.zodiacSign.includes('♉') || pet.zodiacSign.includes('♊') || pet.zodiacSign.includes('♋') || pet.zodiacSign.includes('♌') || pet.zodiacSign.includes('♍') || pet.zodiacSign.includes('♎') || pet.zodiacSign.includes('♏') || pet.zodiacSign.includes('♐') || pet.zodiacSign.includes('♑') || pet.zodiacSign.includes('♒') || pet.zodiacSign.includes('♓')) {
+              const zodiacSigns = [
+                'Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo',
+                'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'
+              ];
+              updates.zodiacSign = zodiacSigns[Math.floor(Math.random() * zodiacSigns.length)];
+            }
+            
+            return { ...pet, ...updates };
+          }) || [];
+          
+          const newState = {
+            ...parsedState,
+            adoptedPets: migratedPets
+          };
+          
+          setState(newState);
+          
+          // Save migrated data back to storage
+          try {
+            await AsyncStorage.setItem('petState', JSON.stringify(newState));
+          } catch (error) {
+            console.error('Failed to save migrated pet state:', error);
+          }
         }
       } catch (error) {
         console.error('Failed to load pet state:', error);
@@ -125,12 +175,28 @@ export function PetProvider({ children }: { children: React.ReactNode }) {
     return stats;
   };
 
-  const adoptPet = (pet: Omit<AdoptedPet, 'adoptedAt' | 'happiness' | 'lastFed' | 'def' | 'spd' | 'luck' | 'int' | 'charm' | 'dex' | 'background' | 'stamina' | 'lastDailyStamina'>): boolean => {
+  const adoptPet = (pet: Omit<AdoptedPet, 'adoptedAt' | 'happiness' | 'lastFed' | 'def' | 'spd' | 'luck' | 'int' | 'charm' | 'dex' | 'background' | 'stamina' | 'lastDailyStamina' | 'personalityTraits' | 'hunger' | 'zodiacSign'>): boolean => {
     if (state.adoptedPets.length >= state.maxPets) {
       return false; // Can't adopt more pets
     }
 
     const randomStats = generateRandomStats();
+    
+    // Generate random personality traits
+    const personalityTraits = [
+      'Bold', 'Timid', 'Brave', 'Calm', 'Energetic', 'Gentle', 'Playful', 'Serious',
+      'Curious', 'Loyal', 'Mischievous', 'Caring', 'Adventurous', 'Relaxed', 'Clever',
+      'Friendly', 'Independent', 'Protective', 'Silly', 'Wise'
+    ];
+    const shuffled = [...personalityTraits].sort(() => Math.random() - 0.5);
+    const randomTraits = shuffled.slice(0, 2);
+
+    // Generate random zodiac sign
+    const zodiacSigns = [
+      'Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo',
+      'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'
+    ];
+    const randomZodiac = zodiacSigns[Math.floor(Math.random() * zodiacSigns.length)];
 
     const newPet: AdoptedPet = {
       ...pet,
@@ -142,6 +208,9 @@ export function PetProvider({ children }: { children: React.ReactNode }) {
       background: 'bg1', // Default background
       stamina: 150, // Start with 150 stamina
       lastDailyStamina: new Date().toISOString(), // Mark daily stamina as received
+      personalityTraits: randomTraits,
+      hunger: 100, // Start with full hunger (100 = full, 0 = starving)
+      zodiacSign: randomZodiac,
     };
 
     setState(prev => ({
@@ -190,7 +259,7 @@ export function PetProvider({ children }: { children: React.ReactNode }) {
           ? { 
               ...pet, 
               happiness: Math.min(100, pet.happiness + 10),
-              stamina: pet.stamina + staminaBoost, // Add stamina from food
+              stamina: (Number(pet.stamina) || 0) + staminaBoost, // Add stamina from food
               lastFed: new Date().toISOString(),
             }
           : pet
@@ -261,7 +330,7 @@ export function PetProvider({ children }: { children: React.ReactNode }) {
 
   const getActivePetStamina = (): number => {
     const activePet = getActivePet();
-    return activePet ? activePet.stamina : 0;
+    return activePet ? (Number(activePet.stamina) || 0) : 0;
   };
 
   const addStaminaToPet = (petId: string, amount: number): boolean => {
@@ -269,7 +338,7 @@ export function PetProvider({ children }: { children: React.ReactNode }) {
       ...prev,
       adoptedPets: prev.adoptedPets.map(pet => 
         pet.id === petId 
-          ? { ...pet, stamina: pet.stamina + amount }
+          ? { ...pet, stamina: (Number(pet.stamina) || 0) + amount }
           : pet
       ),
     }));
@@ -278,7 +347,7 @@ export function PetProvider({ children }: { children: React.ReactNode }) {
 
   const spendStamina = (amount: number): boolean => {
     const activePet = getActivePet();
-    if (!activePet || activePet.stamina < amount) {
+    if (!activePet || (Number(activePet.stamina) || 0) < amount) {
       return false; // Not enough stamina
     }
 
@@ -286,7 +355,7 @@ export function PetProvider({ children }: { children: React.ReactNode }) {
       ...prev,
       adoptedPets: prev.adoptedPets.map(pet => 
         pet.id === prev.activePetId 
-          ? { ...pet, stamina: pet.stamina - amount }
+          ? { ...pet, stamina: (Number(pet.stamina) || 0) - amount }
           : pet
       ),
     }));

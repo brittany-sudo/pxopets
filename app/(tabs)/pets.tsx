@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Image, StyleSheet, View as RNView, ScrollView, Pressable, Modal, Alert, Animated, Dimensions, PanResponder } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { useSimpleGame } from '@/store/SimpleGameStore';
@@ -10,6 +10,10 @@ import BorderedBox from '@/components/BorderedBox';
 import JazzyTitle from '@/components/JazzyTitle';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import DraggableFood from '@/components/DraggableFood';
+import { Rect } from '@/utils/dragMath';
+
+// Removed OldDraggableFood component - now using new DraggableFood component with gesture handlers
 
 export default function PetsScreen() {
   const scrollViewRef = useRef<ScrollView>(null);
@@ -33,21 +37,56 @@ export default function PetsScreen() {
   const [closetTab, setClosetTab] = useState<'backgrounds' | 'skins' | 'subpxos'>('backgrounds');
   const [showFeedModal, setShowFeedModal] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
-  const [selectedFood, setSelectedFood] = useState(null);
+  const [selectedFood, setSelectedFood] = useState<any>(null);
   const [equippedWeapon, setEquippedWeapon] = useState('none');
   const [equippedAccessory, setEquippedAccessory] = useState('none');
-  const [showFeedSuccess, setShowFeedSuccess] = useState(false);
-  const [lastFedStamina, setLastFedStamina] = useState(0);
+  // Feed menu food sprite state
+  const [selectedFoodSprite, setSelectedFoodSprite] = useState(null);
   
-  // Pet drag position state
+  // Removed old draggable food state - now using new gesture handler approach
+
+  // State for hearts animation
+  const [hearts, setHearts] = useState<Array<{
+    id: string;
+    x: number;
+    y: number;
+    rotation: number;
+    opacity: Animated.Value;
+    translateY: Animated.Value;
+    scale: Animated.Value;
+  }>>([]);
+
+  // State for new gesture handler approach
+  const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
+  const [visibleImageBounds, setVisibleImageBounds] = useState({ x: 0, y: 0, width: 0, height: 0 });
+  const [petRect, setPetRect] = useState<Rect>({ x: 0, y: 0, width: 88, height: 88 });
+  const [showNewFood, setShowNewFood] = useState(false);
+  const [selectedFoodForNew, setSelectedFoodForNew] = useState<any>(null);
+  
+  // Pet drag position state - using transform for smooth movement
   const [petPosition, setPetPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
-  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [lastTap, setLastTap] = useState(0);
+  
+  // Stable drag state ref to avoid re-renders
+  const dragStateRef = useRef({
+    dragging: false,
+    startTouch: { x: 0, y: 0 },
+    startPos: { x: 0, y: 0 },
+    rafId: 0 as number | 0,
+  });
+
+  // Calculate center position for heart animations
+  const screenWidth = Dimensions.get('window').width;
+  const containerWidth = screenWidth - 40;
+  const containerHeight = 200;
+  const petWidth = 88;
+  const petHeight = 88;
+  const centerX = (containerWidth - petWidth) / 2;
+  const centerY = (containerHeight - petHeight) / 2;
   
   // Animation values for hearts
-  const heartsOpacity = useRef(new Animated.Value(0)).current;
-  const heartsSlideUp = useRef(new Animated.Value(30)).current;
-  const heartsBob = useRef(new Animated.Value(0)).current;
+  // Removed animation values for now
   
   const activePet = getActivePet();
   
@@ -67,9 +106,14 @@ export default function PetsScreen() {
       if (savedPosition) {
         const position = JSON.parse(savedPosition);
         setPetPosition(position);
+      } else {
+        // If no saved position, use center position
+        resetPetPosition();
       }
     } catch (error) {
       console.error('Failed to load pet position:', error);
+      // Fallback to center position
+      resetPetPosition();
     }
   };
   
@@ -77,6 +121,24 @@ export default function PetsScreen() {
   useEffect(() => {
     loadPetPosition();
   }, []);
+
+  // Update petRect whenever petPosition changes
+  useEffect(() => {
+    setPetRect({
+      x: petPosition.x,
+      y: petPosition.y,
+      width: 88,
+      height: 88,
+    });
+  }, [petPosition]);
+
+  // Only reset position when a new pet becomes active (not when returning to the same pet)
+  useEffect(() => {
+    if (activePet) {
+      // Only reset if this is a truly new pet, not just returning to the same pet
+      loadPetPosition(); // Load saved position instead of resetting
+    }
+  }, [activePet?.id]);
   
   // Reset pet position to center
   const resetPetPosition = () => {
@@ -84,7 +146,7 @@ export default function PetsScreen() {
     const containerWidth = screenWidth - 40;
     const petWidth = 88;
     const petHeight = 88;
-    const containerHeight = 300;
+    const containerHeight = 200; // Match the actual container height
     
     const centerX = (containerWidth - petWidth) / 2;
     const centerY = (containerHeight - petHeight) / 2;
@@ -94,64 +156,89 @@ export default function PetsScreen() {
     savePetPosition(centerPosition);
   };
   
-  // PanResponder for pet dragging
-  const panResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponder: () => true,
-      onPanResponderGrant: (evt) => {
-        // Get absolute screen coordinates
-        const screenX = evt.nativeEvent.pageX;
-        const screenY = evt.nativeEvent.pageY;
-        const petWidth = 88;
-        const petHeight = 88;
-        
-        // Convert to background container coordinates
-        const containerX = screenX - 20; // Account for container padding
-        const containerY = screenY - 100; // Account for header height
-        
-        // Center the pet on the touch point
-        const newX = containerX - petWidth / 2;
-        const newY = containerY - petHeight / 2;
-        
-        // Apply boundary constraints
-        const screenWidth = Dimensions.get('window').width;
-        const containerWidth = screenWidth - 40;
-        const containerHeight = 300;
-        
-        const constrainedX = Math.max(0, Math.min(newX, containerWidth - petWidth));
-        const constrainedY = Math.max(0, Math.min(newY, containerHeight - petHeight));
-        
-        setPetPosition({ x: constrainedX, y: constrainedY });
-        setIsDragging(true);
-        return true;
-      },
-      onPanResponderMove: (evt, gestureState) => {
-        // Use the initial position plus the gesture movement
-        const newX = petPosition.x + gestureState.dx;
-        const newY = petPosition.y + gestureState.dy;
-        
-        // Simple boundary constraints
-        const screenWidth = Dimensions.get('window').width;
-        const containerWidth = screenWidth - 40;
-        const petWidth = 88;
-        const petHeight = 88;
-        const containerHeight = 300;
-        
-        const constrainedX = Math.max(0, Math.min(newX, containerWidth - petWidth));
-        const constrainedY = Math.max(0, Math.min(newY, containerHeight - petHeight));
-        
-        const newPosition = { x: constrainedX, y: constrainedY };
-        setPetPosition(newPosition);
-        // Save position as user drags
-        savePetPosition(newPosition);
-      },
-      onPanResponderRelease: () => {
-        setIsDragging(false);
-        setDragOffset({ x: 0, y: 0 });
-      },
-    })
-  ).current;
+  // Clamp position to container bounds - fixed for sprite size issues
+  const clampToBounds = (x: number, y: number) => {
+    const screenWidth = Dimensions.get('window').width;
+    const containerWidth = screenWidth - 40; // 20px padding each side
+    const containerHeight = 200; // Actual container height from styles
+    const petWidth = 88;
+    const petHeight = 88;
+    
+    // Debug logging
+    console.log('Container:', containerWidth, 'x', containerHeight);
+    console.log('Pet:', petWidth, 'x', petHeight);
+    console.log('Position before clamp:', x, y);
+    
+    // If the sprite is larger than the container, allow negative range
+    // Example: if petWidth=500 and containerWidth=300, range should be [-412, 0]
+    const minX = Math.min(0, containerWidth - petWidth);
+    const maxX = Math.max(0, containerWidth - petWidth);
+    const minY = Math.min(0, containerHeight - petHeight);
+    const maxY = Math.max(0, containerHeight - petHeight);
+    
+    const clamped = {
+      x: Math.max(minX, Math.min(x, maxX)),
+      y: Math.max(minY, Math.min(y, maxY)),
+    };
+    
+    console.log('Clamped to:', clamped);
+    console.log('Y range:', minY, 'to', maxY);
+    return clamped;
+  };
+
+  // Simple PanResponder for pet dragging
+  const panResponder = PanResponder.create({
+    onStartShouldSetPanResponder: () => true,
+    onMoveShouldSetPanResponder: () => true,
+    onPanResponderGrant: (evt, gestureState) => {
+      // Check for double tap to reset position
+      const now = Date.now();
+      if (now - lastTap < 300) {
+        resetPetPosition();
+        setLastTap(0);
+        return;
+      }
+      setLastTap(now);
+      
+      // Use gestureState coordinates (more reliable)
+      const startX = gestureState.x0;
+      const startY = gestureState.y0;
+      
+      // Store initial touch and position
+      dragStateRef.current.dragging = true;
+      dragStateRef.current.startTouch = { x: startX, y: startY };
+      dragStateRef.current.startPos = { ...petPosition };
+      setIsDragging(true);
+    },
+    onPanResponderMove: (evt, gestureState) => {
+      if (!dragStateRef.current.dragging) return;
+      
+      // Use gestureState coordinates
+      const currentX = gestureState.moveX;
+      const currentY = gestureState.moveY;
+      
+      // Calculate movement from start position
+      const dx = currentX - dragStateRef.current.startTouch.x;
+      const dy = currentY - dragStateRef.current.startTouch.y;
+      
+      // New position relative to where we started dragging
+      const desired = {
+        x: dragStateRef.current.startPos.x + dx,
+        y: dragStateRef.current.startPos.y + dy,
+      };
+      
+      // Clamp to bounds
+      const clamped = clampToBounds(desired.x, desired.y);
+      setPetPosition(clamped);
+      // Save position immediately during drag for better persistence
+      savePetPosition(clamped);
+    },
+    onPanResponderRelease: () => {
+      dragStateRef.current.dragging = false;
+      setIsDragging(false);
+      savePetPosition(petPosition);
+    },
+  });
   
   // Reset scroll position when screen comes into focus (only bottom section)
   useFocusEffect(
@@ -160,45 +247,7 @@ export default function PetsScreen() {
     }, [])
   );
   
-  // Animate hearts when feeding
-  useEffect(() => {
-    if (showFeedSuccess) {
-      // Reset animation values
-      heartsOpacity.setValue(0);
-      heartsSlideUp.setValue(30);
-      heartsBob.setValue(0);
-      
-      // Fade in and slide up animation
-      Animated.parallel([
-        Animated.timing(heartsOpacity, {
-          toValue: 1,
-          duration: 600,
-          useNativeDriver: true,
-        }),
-        Animated.timing(heartsSlideUp, {
-          toValue: 0,
-          duration: 800,
-          useNativeDriver: true,
-        }),
-      ]).start(() => {
-        // Once at the top, start bobbing animation
-        Animated.loop(
-          Animated.sequence([
-            Animated.timing(heartsBob, {
-              toValue: -8,
-              duration: 1000,
-              useNativeDriver: true,
-            }),
-            Animated.timing(heartsBob, {
-              toValue: 0,
-              duration: 1000,
-              useNativeDriver: true,
-            }),
-          ])
-        ).start();
-      });
-    }
-  }, [showFeedSuccess]);
+  // Removed animation useEffect for now
   
   // Wait for data to load before rendering
   if (!gameHydrated || !petsHydrated || !inventoryHydrated) {
@@ -285,6 +334,18 @@ export default function PetsScreen() {
       image: require('@/assets/images/bg-swamp-lagoon.png'),
       rarity: 'common'
     },
+    bg_zodiac_carousel: {
+      id: 'bg_zodiac_carousel',
+      name: 'Zodiac Carousel',
+      image: require('@/assets/images/bg-zodiac-carousel.png'),
+      rarity: 'common'
+    },
+    bg_twilight_sky: {
+      id: 'bg_twilight_sky',
+      name: 'Twilight Sky',
+      image: require('@/assets/images/bg-twlight-sky.png'),
+      rarity: 'common'
+    },
   };
 
   // Filter to only show backgrounds the player owns
@@ -314,15 +375,15 @@ export default function PetsScreen() {
     'monthly-slushee': require('@/assets/images/slushee3.png'),
     
     // QuickStop items (by item ID from store)
-    's1': require('@/assets/images/chocolate.png'), // Protein Bar
+    's1': require('@/assets/images/glow-worms.png'), // Glow Worm Gummies
     's2': require('@/assets/images/hotchips.png'), // Hot Chips
     's3': require('@/assets/images/slushee.png'), // Slushee
-    's4': require('@/assets/images/lil-soda.png'), // Lil Soda
-    's5': require('@/assets/images/cupnoodle.png'), // Cup O'Noodle
-    's6': require('@/assets/images/regularhotdog.png'), // Quickdog
-    's7': require('@/assets/images/potatochomps.png'), // Quick Chips
+    's4': require('@/assets/images/neon-cola.png'), // Neon Cola
+    's5': require('@/assets/images/astro-tarts.png'), // Astro Tarts
+    's6': require('@/assets/images/glitterdog.png'), // Glitterdog
+    's7': require('@/assets/images/quickchipz.png'), // Quick Chipz
     's8': require('@/assets/images/saturnsoda.png'), // Saturn Soda
-    's9': require('@/assets/images/nuggets.png'), // Nuggets
+    's9': require('@/assets/images/orbit-rings.png'), // Orbit Rings
     'l1': require('@/assets/images/gumballs.png'), // Space Bubblegum
     'l2': require('@/assets/images/cosmicburger.png'), // Cosmic Burger
     'l3': require('@/assets/images/pouchdrink.png'), // Punch Pouch
@@ -330,6 +391,8 @@ export default function PetsScreen() {
     
     // Additional food items
     'astro-tarts': require('@/assets/images/astro-tarts.png'), // Astro Tarts
+    'astrotarts': require('@/assets/images/astro-tarts.png'), // Astro Tarts (alternative spelling)
+    'astro tarts': require('@/assets/images/astro-tarts.png'), // Astro Tarts (with space)
     
     // Generic food/drink names (in case they're stored differently)
     'cosmicburger': require('@/assets/images/cosmicburger.png'),
@@ -354,6 +417,12 @@ export default function PetsScreen() {
     'nuggets': require('@/assets/images/nuggets.png'),
     'saturnsoda': require('@/assets/images/saturnsoda.png'),
     'glowcorn': require('@/assets/images/glowcorn.png'),
+    'glow-worm-gummies': require('@/assets/images/glow-worms.png'), // Glow Worm Gummies
+    'glowwormgummies': require('@/assets/images/glow-worms.png'), // Glow Worm Gummies (no spaces)
+    'glow worm gummies': require('@/assets/images/glow-worms.png'), // Glow Worm Gummies (with spaces)
+    'glow worms': require('@/assets/images/glow-worms.png'), // Glow Worms
+    'glowworms': require('@/assets/images/glow-worms.png'), // Glow Worms (no spaces)
+    'glow-worms': require('@/assets/images/glow-worms.png'), // Glow Worms (with hyphen)
     
     // Arcade/Rink items
     'arcadefries': require('@/assets/images/arcadefries.png'),
@@ -386,48 +455,78 @@ export default function PetsScreen() {
 
   // Get food items from actual inventory (food, drink, snack categories)
   // Exclude Pxogulp refillable jugs as they are not feedable
-  const availableFoods = inventoryState.mainInventory
+  const availableFoods = (inventoryState?.mainInventory || [])
     .filter(item => 
+      item && 
       ['food', 'drink', 'snack'].includes(item.category) && 
       !(item.name && item.name.toLowerCase().includes('pxogulp')) &&
       !(item.id && item.id.includes('pxogulp'))
     )
     .map(item => {
-      // Get the image from the map with multiple fallback strategies
-      let imageSource = null;
+      try {
+        // Process food item
+        
+        // Get the image from the map with multiple fallback strategies
+        let imageSource = null;
       
       // Try exact ID match first
       if (item.id && foodImageMap[item.id]) {
         imageSource = foodImageMap[item.id];
+        console.log('Found by ID:', item.id);
       }
       // Try image property if it exists
       else if (item.image && foodImageMap[item.image]) {
         imageSource = foodImageMap[item.image];
+        console.log('Found by image property:', item.image);
       }
       // Try name-based matching (convert to lowercase, remove spaces/special chars)
       else if (item.name) {
         const nameKey = item.name.toLowerCase().replace(/[^a-z0-9]/g, '');
+        console.log('Searching for name:', nameKey);
         const matchingKey = Object.keys(foodImageMap).find(key => 
           key.toLowerCase().replace(/[^a-z0-9]/g, '') === nameKey
         );
         if (matchingKey) {
           imageSource = foodImageMap[matchingKey];
+          console.log('Found by exact name match:', matchingKey);
+        } else {
+          // Try partial matching for common variations
+          const partialMatch = Object.keys(foodImageMap).find(key => {
+            const keyNormalized = key.toLowerCase().replace(/[^a-z0-9]/g, '');
+            return nameKey.includes(keyNormalized) || keyNormalized.includes(nameKey);
+          });
+          if (partialMatch) {
+            imageSource = foodImageMap[partialMatch];
+            console.log('Found by partial match:', partialMatch);
+          }
         }
       }
       
       // Fallback to burger if no match found
       if (!imageSource) {
         imageSource = require('@/assets/images/cosmicburger.png');
+        console.log('Using fallback image for:', item.name);
       }
       
-      return {
-        id: item.id,
-        name: item.name,
-        stamina: 15, // Default stamina boost - can be enhanced later with item-specific values
-        quantity: item.quantity,
-        image: imageSource
-      };
-    });
+        return {
+          id: item.id,
+          name: item.name,
+          stamina: 15, // Default stamina boost - can be enhanced later with item-specific values
+          quantity: item.quantity,
+          image: imageSource
+        };
+      } catch (error) {
+        console.error('Error processing food item:', item, error);
+        return {
+          id: item.id || 'unknown',
+          name: item.name || 'Unknown Food',
+          stamina: 15,
+          quantity: item.quantity || 0,
+          image: require('@/assets/images/cosmicburger.png')
+        };
+      }
+    })
+    .filter(food => food.quantity > 0);
 
   const getBackgroundImage = (bgId: string) => {
     return allBackgrounds[bgId]?.image || allBackgrounds.bg1.image;
@@ -454,7 +553,7 @@ export default function PetsScreen() {
   const purchaseItem = (item: any, type: string) => {
     if (item.unlocked) return;
     
-    if (state.coins >= item.cost) {
+    if (gameState.coins >= item.cost) {
       Alert.alert(
         `Purchase ${item.name}?`,
         `This will cost ${item.cost} coins.`,
@@ -475,30 +574,128 @@ export default function PetsScreen() {
   };
 
   const selectFood = (food: any) => {
+    console.log('selectFood called with:', food);
+    
     if (food.quantity > 0) {
       setSelectedFood(food);
+      console.log('Food selected:', food.name, 'waiting for user to press SELECT button');
     }
   };
 
-  const feedSelectedFood = () => {
-    if (selectedFood && activePet) {
-      // Remove food item from inventory
-      removeItem(selectedFood.id, 1);
-      
-      // Feed pet with stamina boost
-      feedPet(activePet.id, selectedFood.stamina);
-      
-      // Close modal and show success
-      setShowFeedModal(false);
-      setShowFeedSuccess(true);
-      
-      // Hide success message after 5 seconds
-      setTimeout(() => {
-        setShowFeedSuccess(false);
-        setSelectedFood(null);
-      }, 5000);
-    }
+  // Clear food when modal is opened or closed
+  const clearFood = () => {
+    setShowNewFood(false);
+    setSelectedFoodForNew(null);
+    setSelectedFood(null);
   };
+
+  // Removed old handleFoodConsumed function - now using onNewFoodFed
+
+  // Removed old playFeedSequence function - now using new gesture handler approach
+
+  // Hearts burst animation (React Native version of the web pattern)
+  const triggerHeartsBurst = (x: number, y: number) => {
+    // Create temporary heart elements (like the web version)
+    const newHearts: Array<{
+      id: string;
+      x: number;
+      y: number;
+      rotation: number;
+      opacity: Animated.Value;
+      translateY: Animated.Value;
+      scale: Animated.Value;
+    }> = [];
+    
+    for (let i = 0; i < 3; i++) {
+      // Random spread like the web version
+      const dx = (Math.random() * 40 + 20) * (Math.random() < 0.5 ? -1 : 1);
+      const dy = -(60 + Math.random() * 30);
+      const rot = (Math.random() < 0.5 ? -1 : 1) * (10 + Math.random() * 10);
+      
+      newHearts.push({
+        id: Math.random().toString(36).substr(2, 9),
+        x: x + dx,
+        y: y + dy,
+        rotation: rot,
+        opacity: new Animated.Value(0),
+        translateY: new Animated.Value(0),
+        scale: new Animated.Value(0.8),
+      });
+    }
+
+    setHearts(prev => [...prev, ...newHearts]);
+
+    // Animate hearts (like the web version with proper timing)
+    newHearts.forEach(heart => {
+      // Phase 1: Fade in and scale up (0-300ms)
+      Animated.parallel([
+        Animated.timing(heart.opacity, {
+          toValue: 1,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+        Animated.timing(heart.scale, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.timing(heart.translateY, {
+          toValue: heart.y - y, // Move to final position
+          duration: 900 + Math.random() * 200, // Random duration like web
+          useNativeDriver: true,
+        }),
+      ]).start();
+
+      // Phase 2: Fade out (after 400ms)
+      setTimeout(() => {
+        Animated.timing(heart.opacity, {
+          toValue: 0,
+          duration: 400,
+          useNativeDriver: true,
+        }).start(() => {
+          setHearts(prev => prev.filter(h => h.id !== heart.id));
+        });
+      }, 400);
+    });
+  };
+
+  // Pet squash animation
+  const triggerPetSquash = () => {
+    // This would animate the pet sprite, but since it's in a transform, 
+    // we'll just trigger a visual feedback
+    console.log('Pet squash animation triggered');
+  };
+
+  // New gesture handler onFed callback
+  const onNewFoodFed = useCallback(() => {
+    if (selectedFoodForNew) {
+      console.log('Pet consumed food:', selectedFoodForNew.name);
+      
+      // 1) Remove food from inventory
+      removeItem(selectedFoodForNew.id, 1);
+      
+      // 2) Feed the pet (this handles stamina, hunger, etc.)
+      const activePet = getActivePet();
+      if (activePet) {
+        feedPet(activePet.id, selectedFoodForNew.stamina);
+      }
+      
+      // 3) Trigger pet squash animation
+      triggerPetSquash();
+      
+      // 4) Show hearts
+      if (activePet) {
+        triggerHeartsBurst(petPosition.x + 44, petPosition.y + 44);
+      }
+      
+      // 5) Hide food
+      setShowNewFood(false);
+      setSelectedFoodForNew(null);
+      setSelectedFood(null);
+    }
+  }, [selectedFoodForNew, removeItem, getActivePet, feedPet]);
+
+  // Removed feedSelectedFood function for now
 
   const getRarityColor = (rarity: string) => {
     switch (rarity) {
@@ -526,7 +723,23 @@ export default function PetsScreen() {
         {/* Active Pet Card */}
         <RNView style={styles.activePetCard}>
           {activePet ? (
-            <RNView style={styles.petImageContainer}>
+            <RNView 
+              style={styles.petImageContainer}
+              onLayout={({ nativeEvent }) => {
+                const { width, height } = nativeEvent.layout;
+                setContainerSize({ width, height });
+                
+                // Calculate visible image bounds for the background image
+                // Assuming a typical background image aspect ratio (you can adjust this)
+                const backgroundImageAspectRatio = 16 / 9; // Adjust based on your actual background images
+                const { getVisibleImageBounds } = require('@/utils/dragMath');
+                const visibleBounds = getVisibleImageBounds(width, height, backgroundImageAspectRatio);
+                setVisibleImageBounds(visibleBounds);
+                
+                console.log('Container measured:', { width, height });
+                console.log('Visible image bounds:', visibleBounds);
+              }}
+            >
               <Image
                 source={getBackgroundImage(activePet.background)}
                 style={styles.petBackgroundImage}
@@ -537,10 +750,15 @@ export default function PetsScreen() {
                 style={[
                   styles.draggablePetContainer,
                   {
-                    left: petPosition.x,
-                    top: petPosition.y,
+                    transform: [
+                      { translateX: petPosition.x },
+                      { translateY: petPosition.y }
+                    ]
                   }
                 ]}
+                onLayout={() => {
+                  // Pet rect is now updated via useEffect when petPosition changes
+                }}
               >
                 <Image
                   source={getPetImage(activePet.image)}
@@ -548,47 +766,55 @@ export default function PetsScreen() {
                 />
               </Animated.View>
               
-              {/* Hearts animation above pet's head when feeding */}
-              {showFeedSuccess && (
-                <Animated.Image
-                  source={require('@/assets/images/pxo-hearts.png')}
-                  style={[
-                    styles.feedHeartsAnimation,
-                    {
-                      left: petPosition.x + 44 - 20, // Center on pet (44 is half of 88) minus half heart width
-                      top: petPosition.y - 30, // Above pet's head
-                      opacity: heartsOpacity,
-                      transform: [
-                        { translateY: Animated.add(heartsSlideUp, heartsBob) }
-                      ]
-                    }
-                  ]}
-                  resizeMode="contain"
-                />
-              )}
-              
               {/* Pet info on left side of image */}
               <RNView style={styles.petInfoOverlay}>
                 <Text style={styles.petName}>{activePet.name}</Text>
                 <Text style={styles.petLevel}>Level {activePet.level}</Text>
                 <RNView style={styles.petOverlayStaminaRow}>
                   <FontAwesome name="bolt" size={12} color="#f59e0b" />
-                  <Text style={styles.petOverlayStamina}>{activePet.stamina}</Text>
+                  <Text style={styles.petOverlayStamina}>{Number(activePet.stamina) || 0}</Text>
                 </RNView>
               </RNView>
 
-              {/* Feed Success Overlay - Appears at bottom of pet image */}
-              {showFeedSuccess && (
-                <RNView style={styles.feedSuccessOverlayInline}>
-                  <Text style={styles.feedSuccessInlineText}>
-                    {activePet?.name} devoured {selectedFood?.name}!
-                  </Text>
-                  <RNView style={styles.feedSuccessInlineStamina}>
-                    <FontAwesome name="bolt" size={12} color="#fbbf24" />
-                    <Text style={styles.feedSuccessInlineStaminaText}>+{selectedFood?.stamina || 0}</Text>
-                  </RNView>
-                </RNView>
+              {/* Draggable food items - using new gesture handler approach */}
+
+              {/* Hearts animation */}
+              {hearts.map((heart) => (
+                <Animated.View
+                  key={heart.id}
+                  style={[
+                    styles.heartAnimation,
+                    {
+                      left: heart.x,
+                      top: heart.y,
+                      opacity: heart.opacity,
+                      transform: [
+                        { translateY: heart.translateY },
+                        { scale: heart.scale },
+                        { rotate: `${heart.rotation}deg` }
+                      ],
+                    }
+                  ]}
+                >
+                  <Image 
+                    source={require('@/assets/images/pxo-hearts.png')} 
+                    style={styles.heartImage}
+                    resizeMode="contain"
+                  />
+                </Animated.View>
+              ))}
+
+              {/* New gesture handler food */}
+              {showNewFood && containerSize.width > 0 && selectedFoodForNew && (
+                <DraggableFood
+                  src={selectedFoodForNew.image}
+                  containerSize={containerSize}
+                  petRect={petRect}
+                  onFed={onNewFoodFed}
+                />
               )}
+
+              {/* Removed feed success overlay for now */}
             </RNView>
           ) : (
             <RNView style={styles.noPetsContainer}>
@@ -613,7 +839,9 @@ export default function PetsScreen() {
                 onPress={() => {
                   if (activePet) {
                     setCurrentPage(0);
+                    clearFood(); // Clear any existing food
                     setShowFeedModal(true);
+                    // Don't show food sprite until food is selected
                   }
                 }}
               >
@@ -644,26 +872,64 @@ export default function PetsScreen() {
 
           {/* About Section - Inside the pet card */}
           {activePet && (
-            <>
+            <RNView style={styles.aboutContainer}>
               <Text style={styles.aboutTitle}>ABOUT</Text>
-              <RNView style={styles.aboutContainer}>
-                <RNView style={styles.aboutRow}>
-                  <Text style={styles.aboutLabel}>Personality:</Text>
-                  <Text style={styles.aboutValue}>Shy, Playful</Text>
-                </RNView>
-                <RNView style={styles.aboutRow}>
-                  <Text style={styles.aboutLabel}>Fav Hobby:</Text>
-                  <Text style={styles.aboutValue}>?</Text>
+              <RNView style={styles.aboutRow}>
+                <Text style={styles.aboutLabel}>Personality:</Text>
+                <Text style={styles.aboutValue}>
+                  {activePet.personalityTraits ? activePet.personalityTraits.join(', ') : 'Shy, Playful'}
+                </Text>
+              </RNView>
+              <RNView style={styles.aboutRow}>
+                <Text style={styles.aboutLabel}>Sign:</Text>
+                <Text style={styles.aboutValue}>{activePet.zodiacSign || 'Aries'}</Text>
+              </RNView>
+            </RNView>
+          )}
+
+          {/* Mood Section - Inside the pet card */}
+          {activePet && (
+            <RNView style={styles.moodContainer}>
+              <Text style={styles.moodTitle}>MOOD</Text>
+              <RNView style={styles.moodRow}>
+                <Text style={styles.moodLabel}>Happiness:</Text>
+                <RNView style={styles.moodBarContainer}>
+                  <RNView style={styles.moodBar}>
+                    <RNView style={[
+                      styles.moodBarFill, 
+                      { 
+                        width: `${Math.min(100, (activePet.happiness / 100) * 100)}%`,
+                        backgroundColor: activePet.happiness >= 80 ? '#10b981' : 
+                                       activePet.happiness >= 50 ? '#f59e0b' : '#ef4444'
+                      }
+                    ]} />
+                  </RNView>
+                  <Text style={styles.moodValue}>{activePet.happiness}</Text>
                 </RNView>
               </RNView>
-            </>
+              <RNView style={styles.moodRow}>
+                <Text style={styles.moodLabel}>Hunger:</Text>
+                <RNView style={styles.moodBarContainer}>
+                  <RNView style={styles.moodBar}>
+                    <RNView style={[
+                      styles.moodBarFill, 
+                      { 
+                        width: `${Math.min(100, ((100 - (activePet.hunger || 50)) / 100) * 100)}%`,
+                        backgroundColor: (activePet.hunger || 50) <= 20 ? '#ef4444' : 
+                                       (activePet.hunger || 50) <= 50 ? '#f59e0b' : '#10b981'
+                      }
+                    ]} />
+                  </RNView>
+                  <Text style={styles.moodValue}>{100 - (activePet.hunger || 50)}</Text>
+                </RNView>
+              </RNView>
+            </RNView>
           )}
 
           {/* Stats Section - Inside the pet card */}
           {activePet && (
-            <>
+            <RNView style={styles.barStatsContainer}>
               <Text style={styles.statsTitle}>STATS</Text>
-              <RNView style={styles.barStatsContainer}>
                 {/* HP First - Colored based on value */}
                 <RNView style={styles.barStatRow}>
                   <Text style={[styles.barStatLabel, activePet.hp < 30 ? styles.hpLow : styles.hpGood]}>HP</Text>
@@ -725,80 +991,10 @@ export default function PetsScreen() {
                   </RNView>
                   <Text style={styles.barStatValue}>{activePet.dex}</Text>
                 </RNView>
-              </RNView>
-            </>
+            </RNView>
           )}
         </RNView>
 
-        {/* Closet Section - Only show if there's an active pet */}
-        {activePet && (
-          <>
-          <Text style={styles.closetTitle}>CLOSET</Text>
-          <RNView style={styles.closetCard}>
-          <RNView style={styles.closetContainer}>
-            {/* Row 1 */}
-            <RNView style={styles.closetRow}>
-              {/* Weapon */}
-              <Pressable 
-                style={styles.equippedItem}
-                onPress={() => purchaseItem(equipment.weapons[equippedWeapon], 'weapon')}
-              >
-                <Text style={styles.equippedItemName}>Weapon</Text>
-                <Text style={styles.equippedItemValue}>{equipment.weapons[equippedWeapon]?.name}</Text>
-              </Pressable>
-
-              {/* Accessory */}
-              <Pressable 
-                style={styles.equippedItem}
-                onPress={() => purchaseItem(equipment.accessories[equippedAccessory], 'accessory')}
-              >
-                <Text style={styles.equippedItemName}>Accessory</Text>
-                <Text style={styles.equippedItemValue}>{equipment.accessories[equippedAccessory]?.name}</Text>
-              </Pressable>
-
-              {/* Glasses */}
-              <Pressable 
-                style={styles.equippedItem}
-                onPress={() => purchaseItem({ id: 'none', name: 'None', unlocked: true }, 'glasses')}
-              >
-                <Text style={styles.equippedItemName}>Glasses</Text>
-                <Text style={styles.equippedItemValue}>None</Text>
-              </Pressable>
-            </RNView>
-
-            {/* Row 2 */}
-            <RNView style={styles.closetRow}>
-              {/* Necklace */}
-              <Pressable 
-                style={styles.equippedItem}
-                onPress={() => purchaseItem({ id: 'none', name: 'None', unlocked: true }, 'necklace')}
-              >
-                <Text style={styles.equippedItemName}>Necklace</Text>
-                <Text style={styles.equippedItemValue}>None</Text>
-              </Pressable>
-
-              {/* Bracelet */}
-              <Pressable 
-                style={styles.equippedItem}
-                onPress={() => purchaseItem({ id: 'none', name: 'None', unlocked: true }, 'bracelet')}
-              >
-                <Text style={styles.equippedItemName}>Bracelet</Text>
-                <Text style={styles.equippedItemValue}>None</Text>
-              </Pressable>
-
-              {/* Wings */}
-              <Pressable 
-                style={styles.equippedItem}
-                onPress={() => purchaseItem({ id: 'none', name: 'None', unlocked: true }, 'wings')}
-              >
-                <Text style={styles.equippedItemName}>Wings</Text>
-                <Text style={styles.equippedItemValue}>None</Text>
-              </Pressable>
-            </RNView>
-          </RNView>
-        </RNView>
-        </>
-        )}
 
         {/* Only show Adopted Pets section if there's at least 1 pet */}
         {petState.adoptedPets.length > 0 && (
@@ -818,7 +1014,7 @@ export default function PetsScreen() {
                       <Text style={styles.petListLevel}>Level {pet.level}</Text>
                       <RNView style={styles.petStaminaRow}>
                         <FontAwesome name="bolt" size={12} color="#f59e0b" />
-                        <Text style={styles.petStaminaText}>{pet.stamina}</Text>
+                        <Text style={styles.petStaminaText}>{Number(pet.stamina) || 0}</Text>
                       </RNView>
                     </RNView>
                     <RNView style={styles.petListActions}>
@@ -1021,7 +1217,11 @@ export default function PetsScreen() {
                 style={styles.feedCloseButton}
                 onPress={() => {
                   setShowFeedModal(false);
+                  setSelectedFoodSprite(null);
                   setSelectedFood(null);
+                  setShowNewFood(false);
+                  setSelectedFoodForNew(null);
+                  // Don't clear draggable foods - let them stay in the pet container
                 }}
               >
                 <FontAwesome name="times" size={20} color="#64748b" />
@@ -1060,6 +1260,10 @@ export default function PetsScreen() {
                     style={styles.exploreButton}
                     onPress={() => {
                       setShowFeedModal(false);
+                      setSelectedFoodSprite(null);
+                      setShowNewFood(false);
+                      setSelectedFoodForNew(null);
+                      // Don't clear draggable foods - let them stay in the pet container
                       router.push('/(tabs)/explore');
                     }}
                   >
@@ -1078,7 +1282,16 @@ export default function PetsScreen() {
                     styles.feedModalButton,
                     !selectedFood && styles.feedModalButtonDisabled
                   ]}
-                  onPress={feedSelectedFood}
+                  onPress={() => {
+                    console.log('Feed button pressed - spawning draggable food');
+                    if (selectedFood) {
+                      setSelectedFoodForNew(selectedFood);
+                      setShowNewFood(true);
+                      console.log('Spawning food:', selectedFood.name);
+                    }
+                    setShowFeedModal(false);
+                    setSelectedFoodSprite(null);
+                  }}
                   disabled={!selectedFood}
                 >
                   <Text style={[
@@ -1297,13 +1510,6 @@ const styles = StyleSheet.create({
       minWidth: '30%',
       minHeight: 40,
     },
-  actionBoxes: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 10,
-    marginTop: 4,
-    marginBottom: 16,
-  },
   actionBox: {
     flex: 1,
     borderWidth: 1.5,
@@ -1316,7 +1522,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     flexDirection: 'column',
     gap: 8,
-    flex: 1,
     height: 70,
     shadowColor: '#8b5cf6',
     shadowOffset: { width: 0, height: 2 },
@@ -1334,23 +1539,29 @@ const styles = StyleSheet.create({
   petImage: {
     width: 88, // 20% smaller than 110
     height: 88, // 20% smaller than 110
-    imageRendering: 'pixelated' as any,
   },
   draggablePetContainer: {
     position: 'absolute',
+    left: 0,              // Important: pin origin to top-left
+    top: 0,               // Important: pin origin to top-left
     width: 88, // 20% smaller than 110
     height: 88, // 20% smaller than 110
+    backgroundColor: 'transparent',
+    // Prevent iOS gestures and selection
+    touchAction: 'none',
+    userSelect: 'none',
+    willChange: 'transform',
   },
   petName: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 'bold',
     color: '#ffffff',
     textAlign: 'left',
   },
   petLevel: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 12,
+    fontSize: 10,
     color: '#ffffff',
     textAlign: 'left',
     opacity: 0.8,
@@ -1423,7 +1634,7 @@ const styles = StyleSheet.create({
     fontFamily: 'PressStart2P_400Regular',
     fontSize: 12,
     fontWeight: 'bold',
-    color: '#8b5cf6',
+    color: '#0f172a',
     textAlign: 'center',
     marginTop: 0,
     marginBottom: 16,
@@ -1468,7 +1679,6 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     marginRight: 8,
-    imageRendering: 'pixelated' as any,
   },
   petSlotName: {
     fontFamily: 'Silkscreen_400Regular',
@@ -1498,16 +1708,20 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   barStatsContainer: {
-    width: '100%',
+    width: '95%',
+    alignSelf: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.98)',
+    borderRadius: 12,
+    padding: 12,
     marginBottom: 12,
-    paddingHorizontal: 4,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.3)',
+    gap: 8,
   },
     barStatRow: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      marginBottom: 8,
-      paddingHorizontal: 10,
     },
     barStatLabel: {
       fontFamily: 'Silkscreen_400Regular',
@@ -1984,8 +2198,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#8b5cf6',
     textAlign: 'center',
-    marginTop: 8,
-    marginBottom: 10,
+    marginBottom: 6,
   },
   aboutContainer: {
     width: '95%',
@@ -2015,14 +2228,61 @@ const styles = StyleSheet.create({
     color: '#0f172a',
     fontWeight: 'bold',
   },
-  statsTitle: {
+  moodTitle: {
     fontFamily: 'PressStart2P_400Regular',
     fontSize: 9,
     fontWeight: 'bold',
     color: '#8b5cf6',
     textAlign: 'center',
-    marginTop: 8,
-    marginBottom: 10,
+    marginBottom: 6,
+  },
+  moodContainer: {
+    width: '95%',
+    alignSelf: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.98)',
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.3)',
+    gap: 8,
+  },
+  moodRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  moodLabel: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#64748b',
+    fontWeight: 'bold',
+  },
+  moodBarContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
+  moodBar: {
+    width: 80,
+    height: 8,
+    backgroundColor: '#f1f5f9',
+    borderRadius: 4,
+    overflow: 'hidden',
+  },
+  moodBarFill: {
+    height: '100%',
+    borderRadius: 4,
+  },
+  moodValue: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#0f172a',
+    fontWeight: 'bold',
+    minWidth: 20,
+    textAlign: 'right',
   },
   statsCard: {
     width: '95%',
@@ -2126,7 +2386,6 @@ const styles = StyleSheet.create({
   petListImage: {
     width: 45,
     height: 45,
-    imageRendering: 'pixelated' as any,
   },
   petListInfo: {
     flex: 1,
@@ -2449,10 +2708,12 @@ const styles = StyleSheet.create({
     },
     feedCard: {
       width: '47%',
+      height: 100, // Fixed height for consistency
       backgroundColor: '#f8fafc',
       borderRadius: 12,
       padding: 12,
       alignItems: 'center',
+      justifyContent: 'center', // Center content vertically
       borderWidth: 2,
       borderColor: '#e2e8f0',
     },
@@ -2461,12 +2722,12 @@ const styles = StyleSheet.create({
       backgroundColor: 'rgba(139, 92, 246, 0.05)',
       borderWidth: 3,
     },
-    feedImage: {
-      width: 48,
-      height: 48,
-      marginBottom: 6,
-      imageRendering: 'pixelated' as any,
-    },
+  feedImage: {
+    width: 36,
+    height: 36,
+    marginBottom: 6,
+    resizeMode: 'contain', // Ensure whole icon is visible
+  },
     feedName: {
       fontFamily: 'Silkscreen_400Regular',
       fontSize: 9,
@@ -2662,15 +2923,74 @@ const styles = StyleSheet.create({
       fontWeight: 'bold',
     },
     // Hearts animation that appears above pet's head
-    feedHeartsAnimation: {
+    feedHeartAnimation: {
       position: 'absolute',
-      top: 50,
-      left: '52%',
-      marginLeft: -25,
+      width: 16,
+      height: 16,
+      zIndex: 10,
+      pointerEvents: 'none', // Don't interfere with pet dragging
+    },
+    // Food icon that appears next to pet when feeding
+    fedFoodIcon: {
+      position: 'absolute',
+      width: 25,
+      height: 25,
+      zIndex: 5,
+      pointerEvents: 'none', // Don't interfere with pet dragging
+    },
+    feedMenuSprite: {
+      position: 'absolute',
+      width: 25,
+      height: 25,
+      top: 10,
+      right: 10,
+      zIndex: 15,
+      pointerEvents: 'none', // Don't interfere with pet dragging
+      resizeMode: 'contain', // Ensure whole food icon is visible
+    },
+    draggableFood: {
+      position: 'absolute',
+      width: 60,
+      height: 60,
+      zIndex: 20,
+      backgroundColor: 'rgba(255, 0, 0, 0.5)', // Red background so you can see it
+      borderRadius: 8,
+    },
+    draggableFoodImage: {
       width: 50,
       height: 50,
-      imageRendering: 'pixelated' as any,
-      zIndex: 10,
+    },
+    heartAnimation: {
+      position: 'absolute',
+      width: 24,
+      height: 24,
+      zIndex: 999,
+      pointerEvents: 'none',
+    },
+    heartImage: {
+      width: '100%',
+      height: '100%',
+    },
+    debugText: {
+      position: 'absolute',
+      top: -20,
+      left: 0,
+      color: 'white',
+      fontSize: 10,
+      fontWeight: 'bold',
+      backgroundColor: 'black',
+      padding: 2,
+    },
+    debugCounter: {
+      position: 'absolute',
+      top: 10,
+      right: 10,
+      color: 'white',
+      fontSize: 12,
+      fontWeight: 'bold',
+      backgroundColor: 'rgba(0,0,0,0.7)',
+      padding: 4,
+      zIndex: 1000,
     },
     successOverlay: {
       position: 'absolute',
@@ -2729,13 +3049,6 @@ const styles = StyleSheet.create({
       paddingVertical: 20,
       borderBottomWidth: 1,
       borderBottomColor: '#f1f5f9',
-    },
-    closetModalTitle: {
-      fontFamily: 'Silkscreen_400Regular',
-      fontSize: 16,
-      color: '#0f172a',
-      fontWeight: 'bold',
-      letterSpacing: 0.5,
     },
     closetCloseButton: {
       padding: 4,
@@ -2814,12 +3127,6 @@ const styles = StyleSheet.create({
     },
     closetSelectedIcon: {
       marginLeft: 8,
-    },
-    closetSection: {
-      padding: 48,
-      alignItems: 'center',
-      justifyContent: 'center',
-      minHeight: 300,
     },
     closetEmptyText: {
       fontFamily: 'Silkscreen_400Regular',

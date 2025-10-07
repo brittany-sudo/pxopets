@@ -28,7 +28,7 @@ export default function InteractiveMap({ onRegionPress }: InteractiveMapProps) {
     },
     {
       id: 'casino',
-      name: 'Crescent Oasis',
+      name: 'Cosmic Oasis',
       x: 80, // Far right
       y: 50, // Upper area
       width: 12,
@@ -43,7 +43,7 @@ export default function InteractiveMap({ onRegionPress }: InteractiveMapProps) {
       height: 12
     },
     {
-      id: 'vintage-hollow',
+      id: 'barrelhaven',
       name: 'Barrelhaven',
       x: 55, // Center-right
       y: 65, // Lower area
@@ -109,8 +109,6 @@ export default function InteractiveMap({ onRegionPress }: InteractiveMapProps) {
   ];
 
   const handleRegionPress = (region: MapRegion) => {
-    console.log('InteractiveMap: Region pressed:', region.id, region.name);
-    console.log('Available regions:', regions.map(r => r.id));
     setSelectedRegion(region.id);
     onRegionPress(region.id, region.name);
   };

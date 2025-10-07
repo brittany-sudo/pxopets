@@ -11,9 +11,7 @@ export default function SimpleHomeScreen() {
   const [showDevPanel, setShowDevPanel] = useState(false);
 
   const handleTestAddTickets = () => {
-    console.log('Test button clicked!');
     addTickets(10);
-    console.log('Added 10 tickets, new total:', state.tickets + 10);
   };
 
   return (

@@ -20,7 +20,6 @@ export default function DeveloperPanel({ visible, onClose }: DeveloperPanelProps
   const clearCoffeeCooldown = async () => {
     try {
       await AsyncStorage.removeItem('lastCoffeeClaim');
-      console.log('Coffee cooldown cleared');
     } catch (error) {
       console.error('Error clearing coffee cooldown:', error);
     }
@@ -30,14 +29,12 @@ export default function DeveloperPanel({ visible, onClose }: DeveloperPanelProps
     try {
       await AsyncStorage.removeItem('trapperDailyTraps');
       await AsyncStorage.removeItem('trapperLastReset');
-      console.log('Trapper game data cleared');
     } catch (error) {
       console.error('Error clearing trapper game data:', error);
     }
   };
 
   const handleAddTickets = (amount: number) => {
-    console.log('Adding tickets:', amount);
     addTickets(amount);
   };
 
@@ -47,7 +44,6 @@ export default function DeveloperPanel({ visible, onClose }: DeveloperPanelProps
       Alert.alert('No Active Pet', 'You need an active pet to add stamina!');
       return;
     }
-    console.log('Adding stamina to pet:', activePet.name, amount);
     addStaminaToPet(activePet.id, amount);
   };
 

@@ -51,7 +51,7 @@ const pxogulpJugImage = require('@/assets/images/pxogulp-jug.png');
 
 export default function ShopScreen() {
   const [shopkeeperSaying, setShopkeeperSaying] = useState("Welcome to QuickStop! Best prices in Pxoburbs!");
-  const [countdown, setCountdown] = useState(3600); // 1 hour in seconds
+  const [countdown, setCountdown] = useState(10800); // 3 hours in seconds
   const [showCoffeePopup, setShowCoffeePopup] = useState(false);
   const [showSlusheePopup, setShowSlusheePopup] = useState(false);
   const [showPurchaseConfirm, setShowPurchaseConfirm] = useState(false);
@@ -137,25 +137,45 @@ export default function ShopScreen() {
     },
   ]);
 
-  // Shop inventory that changes every few hours
+  // Shop inventory with higher stock amounts and rarity system
   const [shopInventory, setShopInventory] = useState([
-    { id: 's1', name: 'GLOW WORM GUMMIES', price: 1, stock: 3, image: 'glow-worms' },
-    { id: 's2', name: 'HOT CHIPS', price: 1, stock: 1, image: 'hotchips' },
-    { id: 's3', name: 'SLUSHEE', price: 1, stock: 5, image: 'slushee' },
-    { id: 's4', name: 'NEON COLA', price: 1, stock: 2, image: 'neon-cola' },
-    { id: 's5', name: 'ASTRO TARTS', price: 1, stock: 4, image: 'astro-tarts' },
-    { id: 's6', name: 'GLITTERDOG', price: 1, stock: 2, image: 'glitterdog' },
-    { id: 's7', name: 'QUICK CHIPZ', price: 1, stock: 1, image: 'quickchipz' },
-    { id: 's8', name: 'SATURN SODA', price: 1, stock: 3, image: 'saturnsoda' },
-    { id: 's9', name: 'ORBIT RINGS', price: 1, stock: 4, image: 'orbit-rings' },
+    { id: 's1', name: 'GLOW WORM GUMMIES', price: 1, stock: 45, maxStock: 45, rarity: 'common', image: 'glow-worms' },
+    { id: 's2', name: 'HOT CHIPS', price: 1, stock: 35, maxStock: 35, rarity: 'common', image: 'hotchips' },
+    { id: 's3', name: 'SLUSHEE', price: 1, stock: 50, maxStock: 50, rarity: 'common', image: 'slushee' },
+    { id: 's4', name: 'NEON COLA', price: 1, stock: 40, maxStock: 40, rarity: 'common', image: 'neon-cola' },
+    { id: 's5', name: 'ASTRO TARTS', price: 1, stock: 30, maxStock: 30, rarity: 'uncommon', image: 'astro-tarts' },
+    { id: 's6', name: 'GLITTERDOG', price: 1, stock: 25, maxStock: 25, rarity: 'uncommon', image: 'glitterdog' },
+    { id: 's7', name: 'QUICK CHIPZ', price: 1, stock: 20, maxStock: 20, rarity: 'rare', image: 'quickchipz' },
+    { id: 's8', name: 'SATURN SODA', price: 1, stock: 35, maxStock: 35, rarity: 'common', image: 'saturnsoda' },
+    { id: 's9', name: 'ORBIT RINGS', price: 1, stock: 15, maxStock: 15, rarity: 'rare', image: 'orbit-rings' },
   ]);
 
-  // Countdown timer effect
+  // Restock function that resets all stock to max
+  const restockShop = async () => {
+    setShopInventory(prev => 
+      prev.map(item => ({
+        ...item,
+        stock: item.maxStock
+      }))
+    );
+    
+    // Save restock time
+    try {
+      await AsyncStorage.setItem('lastRestockTime', new Date().toISOString());
+    } catch (error) {
+      console.error('Failed to save restock time:', error);
+    }
+    
+    console.log('Shop restocked! All items back to full stock.');
+  };
+
+  // Countdown timer effect with 3-hour restock cycle
   useEffect(() => {
     const timer = setInterval(() => {
       setCountdown(prev => {
         if (prev <= 1) {
-          return 3600; // Reset to 1 hour
+          restockShop(); // Restock when timer reaches 0
+          return 10800; // Reset to 3 hours
         }
         return prev - 1;
       });
@@ -163,6 +183,62 @@ export default function ShopScreen() {
 
     return () => clearInterval(timer);
   }, []);
+
+  // Load and save stock data with persistence
+  useEffect(() => {
+    const loadStockData = async () => {
+      try {
+        const savedStock = await AsyncStorage.getItem('quickstopStock');
+        const savedCountdown = await AsyncStorage.getItem('quickstopCountdown');
+        const lastRestock = await AsyncStorage.getItem('lastRestockTime');
+        
+        if (savedStock && savedCountdown) {
+          const stockData = JSON.parse(savedStock);
+          const countdownValue = parseInt(savedCountdown);
+          
+          // Check if it's been more than 3 hours since last restock
+          if (lastRestock) {
+            const lastRestockTime = new Date(lastRestock).getTime();
+            const now = new Date().getTime();
+            const timeSinceRestock = (now - lastRestockTime) / 1000; // seconds
+            
+            if (timeSinceRestock >= 10800) { // 3 hours
+              // Time to restock
+              restockShop();
+              setCountdown(10800);
+              await AsyncStorage.setItem('lastRestockTime', new Date().toISOString());
+            } else {
+              // Use saved data
+              setShopInventory(stockData);
+              setCountdown(countdownValue);
+            }
+          } else {
+            // First time, use saved data
+            setShopInventory(stockData);
+            setCountdown(countdownValue);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to load stock data:', error);
+      }
+    };
+
+    loadStockData();
+  }, []);
+
+  // Save stock data whenever it changes
+  useEffect(() => {
+    const saveStockData = async () => {
+      try {
+        await AsyncStorage.setItem('quickstopStock', JSON.stringify(shopInventory));
+        await AsyncStorage.setItem('quickstopCountdown', countdown.toString());
+      } catch (error) {
+        console.error('Failed to save stock data:', error);
+      }
+    };
+
+    saveStockData();
+  }, [shopInventory, countdown]);
 
   // Load coffee claim status on component mount
   useEffect(() => {
@@ -327,7 +403,8 @@ export default function ShopScreen() {
       price: selectedItem.price,
       image: selectedItem.image,
       category: 'snack' as const,
-      description: `Purchased from QuickStop`
+      description: `Purchased from QuickStop`,
+      rarity: selectedItem.rarity
     };
     
     addItem(itemData, 1);
@@ -336,11 +413,11 @@ export default function ShopScreen() {
     setShowPurchaseConfirm(false);
     setShowPurchaseSuccess(true);
     
-    // Auto-close success modal after 2 seconds
+    // Auto-close success modal after 4 seconds
     setTimeout(() => {
       setShowPurchaseSuccess(false);
       setSelectedItem(null);
-    }, 2000);
+    }, 4000);
   };
 
   const cancelPurchase = () => {
@@ -564,7 +641,8 @@ export default function ShopScreen() {
         price: item.price,
         image: item.image,
         category: 'snack' as const,
-        description: `Purchased from QuickStop`
+        description: `Purchased from QuickStop`,
+        rarity: item.rarity
       };
       
       const success = addItem(itemData, 1);
@@ -1113,40 +1191,61 @@ export default function ShopScreen() {
       {showPurchaseSuccess && selectedItem && (
         <RNView style={styles.modalOverlay}>
           <RNView style={styles.purchaseSuccessPopup}>
-            <Text style={styles.purchaseSuccessTitle}>PURCHASE SUCCESSFUL! 🎉</Text>
-            <Image 
-              source={
-                selectedItem.image === 'glow-worms' ? glowWormsImage :
-                selectedItem.image === 'chocolate' ? chocolateImage :
-                selectedItem.image === 'astro-tarts' ? astroTartsImage :
-                selectedItem.image === 'cupnoodle' ? cupnoodleImage :
-                selectedItem.image === 'cupnoddle' ? cupnoddleImage :
-                selectedItem.image === 'hotchips' ? hotchipsImage :
-                selectedItem.image === 'neon-cola' ? neonColaImage :
-                selectedItem.image === 'glitterdog' ? glitterdogImage :
-                selectedItem.image === 'regularhotdog' ? regularHotdogImage :
-                selectedItem.image === 'potatochomps' ? potatochompsImage :
-                selectedItem.image === 'saturnsoda' ? saturnsodaImage :
-                selectedItem.image === 'slushee' ? slusheeImage :
-                selectedItem.image === 'orbit-rings' ? orbitRingsImage :
-                selectedItem.image === 'nuggets' ? nuggetsImage :
-                selectedItem.image === 'milkshakes' ? milkshakesImage :
-                selectedItem.image === 'glowcorn' ? glowcornImage :
-                selectedItem.image === 'game-lunchbox' ? gameLunchboxImage :
-                selectedItem.image === 'cute-lunchbox' ? cuteLunchboxImage :
-                selectedItem.image === 'whale-lunchbox' ? whaleLunchboxImage :
-                selectedItem.image === 'rocket-lunchbox' ? rocketLunchboxImage :
-                selectedItem.image === 'dragon-lunchbox' ? dragonLunchboxImage :
-                chocolateImage
-              } 
-              style={styles.purchaseSuccessImage} 
-            />
+            <Text style={styles.purchaseSuccessTitle}>PURCHASE SUCCESSFUL!</Text>
+            <RNView style={styles.purchaseSuccessItemContainer}>
+              <Image 
+                source={
+                  selectedItem.image === 'glow-worms' ? glowWormsImage :
+                  selectedItem.image === 'chocolate' ? chocolateImage :
+                  selectedItem.image === 'astro-tarts' ? astroTartsImage :
+                  selectedItem.image === 'cupnoodle' ? cupnoodleImage :
+                  selectedItem.image === 'cupnoddle' ? cupnoddleImage :
+                  selectedItem.image === 'hotchips' ? hotchipsImage :
+                  selectedItem.image === 'neon-cola' ? neonColaImage :
+                  selectedItem.image === 'glitterdog' ? glitterdogImage :
+                  selectedItem.image === 'regularhotdog' ? regularHotdogImage :
+                  selectedItem.image === 'potatochomps' ? potatochompsImage :
+                  selectedItem.image === 'saturnsoda' ? saturnsodaImage :
+                  selectedItem.image === 'slushee' ? slusheeImage :
+                  selectedItem.image === 'orbit-rings' ? orbitRingsImage :
+                  selectedItem.image === 'nuggets' ? nuggetsImage :
+                  selectedItem.image === 'milkshakes' ? milkshakesImage :
+                  selectedItem.image === 'glowcorn' ? glowcornImage :
+                  selectedItem.image === 'game-lunchbox' ? gameLunchboxImage :
+                  selectedItem.image === 'cute-lunchbox' ? cuteLunchboxImage :
+                  selectedItem.image === 'whale-lunchbox' ? whaleLunchboxImage :
+                  selectedItem.image === 'rocket-lunchbox' ? rocketLunchboxImage :
+                  selectedItem.image === 'dragon-lunchbox' ? dragonLunchboxImage :
+                  chocolateImage
+                } 
+                style={styles.purchaseSuccessItemImage} 
+              />
+            </RNView>
             <Text style={styles.purchaseSuccessText}>
               {selectedItem.name} was added to your inventory!
             </Text>
             <Text style={styles.purchaseSuccessSubtext}>
               Check your inventory on the home page to see it.
             </Text>
+            <Pressable 
+              style={styles.purchaseSuccessInventoryButton}
+              onPress={() => {
+                setShowPurchaseSuccess(false);
+                setSelectedItem(null);
+                router.push('/inventory');
+              }}
+            >
+              <Text style={styles.purchaseSuccessInventoryButtonText}>GO TO INVENTORY</Text>
+            </Pressable>
+            <Pressable 
+              style={styles.purchaseSuccessButton}
+              onPress={() => {
+                setShowPurchaseSuccess(false);
+                setSelectedItem(null);
+              }}
+            >
+              <Text style={styles.purchaseSuccessButtonText}>CONTINUE</Text>
+            </Pressable>
           </RNView>
         </RNView>
       )}
@@ -1222,7 +1321,7 @@ export default function ShopScreen() {
         <RNView style={styles.modalOverlay}>
           <RNView style={styles.coffeePopup}>
             <RNView style={styles.popupHeader}>
-              <Text style={styles.popupTitle}>PURCHASE SUCCESSFUL! 🎉</Text>
+              <Text style={styles.popupTitle}>PURCHASE SUCCESSFUL!</Text>
             </RNView>
             <Image source={pxogulpJugImage} style={styles.coffeePopupImage} />
             <Text style={styles.coffeePopupText}>
@@ -1732,6 +1831,32 @@ const styles = StyleSheet.create({
     fontSize: 7,
     color: '#64748b',
     textAlign: 'center',
+    marginBottom: 2,
+  },
+  rareStock: {
+    color: '#dc2626', // Red for rare items
+    fontWeight: 'bold',
+  },
+  uncommonStock: {
+    color: '#2563eb', // Blue for uncommon items
+    fontWeight: 'bold',
+  },
+  rarityLabel: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 6,
+    textAlign: 'center',
+    marginBottom: 4,
+    fontWeight: 'bold',
+    letterSpacing: 0.5,
+  },
+  commonRarity: {
+    color: '#64748b', // Gray for common
+  },
+  uncommonRarity: {
+    color: '#2563eb', // Blue for uncommon
+  },
+  rareRarity: {
+    color: '#dc2626', // Red for rare
   },
   buyButton: {
     backgroundColor: '#8b5cf6',
@@ -2792,8 +2917,8 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   purchaseConfirmItemImage: {
-    width: 32,
-    height: 32,
+    width: 28,
+    height: 28,
     resizeMode: 'contain',
   },
   purchaseConfirmText: {
@@ -2904,6 +3029,64 @@ const styles = StyleSheet.create({
     color: '#64748b',
     textAlign: 'center',
     lineHeight: 16,
+    marginBottom: 20,
+  },
+  purchaseSuccessButton: {
+    backgroundColor: '#10b981',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: '#059669',
+    shadowColor: '#10b981',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  purchaseSuccessButtonText: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 10,
+    color: '#ffffff',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  purchaseSuccessInventoryButton: {
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(0, 0, 0, 0.1)',
+    marginBottom: 12,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  purchaseSuccessInventoryButtonText: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 9,
+    color: '#64748b',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  purchaseSuccessItemContainer: {
+    width: 48,
+    height: 48,
+    backgroundColor: 'rgba(16, 185, 129, 0.05)',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(16, 185, 129, 0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+  },
+  purchaseSuccessItemImage: {
+    width: 28,
+    height: 28,
+    resizeMode: 'contain',
   },
   // Error Modal Styles
   errorModal: {

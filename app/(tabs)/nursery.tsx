@@ -31,7 +31,7 @@ const personalityTraits = [
 export default function NurseryScreen() {
   const scrollViewRef = useRef<ScrollView>(null);
   const { adoptPet, canAdoptMore, state: petState } = usePets();
-  const { state: gameState, spendGems } = useSimpleGame();
+  const { state: gameState, spendTickets } = useSimpleGame();
   const [selectedTab, setSelectedTab] = useState<'create' | 'adopt'>('create');
   const [donatedItems, setDonatedItems] = useState<Set<string>>(new Set());
   
@@ -55,6 +55,8 @@ export default function NurseryScreen() {
   const [errorTitle, setErrorTitle] = useState('');
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [successPetName, setSuccessPetName] = useState('');
+  const [showAdoptModal, setShowAdoptModal] = useState(false);
+  const [selectedAdoptPet, setSelectedAdoptPet] = useState<any>(null);
 
   // Generate random stats (3-15 range with potential outliers)
   const generateRandomStats = () => {
@@ -90,14 +92,14 @@ export default function NurseryScreen() {
       return;
     }
 
-    // Calculate cost: first pet free, all others 25 gems
+    // Calculate cost: first pet free, all others 25 tickets
     const cost = petState.adoptedPets.length === 0 ? 0 : 25;
-    const currentGems = gameState.gems || 0;
+    const currentTickets = gameState.tickets || 0;
 
-    // Check if player has enough gems (if not free)
-    if (cost > 0 && currentGems < cost) {
-      setErrorTitle('Not Enough Gems');
-      setErrorMessage(`You need ${cost} gems to create this pet.\n\nYou currently have ${currentGems} gems.`);
+    // Check if player has enough tickets (if not free)
+    if (cost > 0 && currentTickets < cost) {
+      setErrorTitle('Not Enough Tickets');
+      setErrorMessage(`You need ${cost} tickets to create this pet.\n\nYou currently have ${currentTickets} tickets.`);
       setShowErrorModal(true);
       return;
     }
@@ -118,26 +120,26 @@ export default function NurseryScreen() {
   };
 
   const handleConfirmCreate = () => {
-    // First pet is free, all others cost 25 gems
+    // First pet is free, all others cost 25 tickets
     const cost = petState.adoptedPets.length === 0 ? 0 : 25;
     
-    // If there's a cost, check and spend gems
+    // If there's a cost, check and spend tickets
     if (cost > 0) {
-      const currentGems = gameState.gems || 0;
+      const currentTickets = gameState.tickets || 0;
       
-      // Check if player has enough gems
-      if (currentGems < cost) {
-        setErrorTitle('Not Enough Gems');
-        setErrorMessage(`You need ${cost} gems to create this pet.\n\nYou currently have ${currentGems} gems.`);
+      // Check if player has enough tickets
+      if (currentTickets < cost) {
+        setErrorTitle('Not Enough Tickets');
+        setErrorMessage(`You need ${cost} tickets to create this pet.\n\nYou currently have ${currentTickets} tickets.`);
         setShowErrorModal(true);
         return;
       }
       
-      // Try to spend the gems
-      const success = spendGems(cost);
+      // Try to spend the tickets
+      const success = spendTickets(cost);
       if (!success) {
-        setErrorTitle('Not Enough Gems');
-        setErrorMessage(`You need ${cost} gems to create this pet.\n\nYou currently have ${currentGems} gems.`);
+        setErrorTitle('Not Enough Tickets');
+        setErrorMessage(`You need ${cost} tickets to create this pet.\n\nYou currently have ${currentTickets} tickets.`);
         setShowErrorModal(true);
         return;
       }
@@ -179,57 +181,60 @@ export default function NurseryScreen() {
       return;
     }
 
-    // First pet is free, all others cost 25 gems
+    // First pet is free, all others cost 25 tickets
     const cost = petState.adoptedPets.length === 0 ? 0 : 25;
-    const costText = cost === 0 ? 'FREE' : `${cost} gems`;
-    const currentGems = gameState.gems || 0;
+    const costText = cost === 0 ? 'FREE' : `${cost} tickets`;
+    const currentTickets = gameState.tickets || 0;
 
-    // Check if player has enough gems (if not free)
-    if (cost > 0 && currentGems < cost) {
-      setErrorTitle('Not Enough Gems');
-      setErrorMessage(`You need ${cost} gems to adopt this pet.\n\nYou currently have ${currentGems} gems.`);
+    // Check if player has enough tickets (if not free)
+    if (cost > 0 && currentTickets < cost) {
+      setErrorTitle('Not Enough Tickets');
+      setErrorMessage(`You need ${cost} tickets to adopt this pet.\n\nYou currently have ${currentTickets} tickets.`);
       setShowErrorModal(true);
       return;
     }
 
-    Alert.alert(
-      'Adopt Pet',
-      `Adopt ${pet.name} for ${costText}?\n\n${pet.description}\n\nPrevious owner: ${pet.previousOwner}`,
-      [
-        { text: "Cancel", style: "cancel" },
-        { text: "Adopt", onPress: () => {
-          // Spend gems if not first pet
-          if (cost > 0) {
-            const gemSuccess = spendGems(cost);
-            if (!gemSuccess) {
-              setErrorTitle('Not Enough Gems');
-              setErrorMessage(`You need ${cost} gems to adopt this pet.\n\nYou currently have ${currentGems} gems.`);
-              setShowErrorModal(true);
-              return;
-            }
-          }
+    setSelectedAdoptPet(pet);
+    setShowAdoptModal(true);
+  };
 
-          const success = adoptPet({
-            id: `${pet.id}-${Date.now()}`, // Unique ID
-            name: pet.name,
-            image: pet.imageName,
-            hp: 100,
-            atk: 10,
-            level: 1,
-          });
-          
-          if (success) {
-            Alert.alert(
-              'Pet Adopted!', 
-              `Welcome ${pet.name} to your family!`,
-              [{ text: 'View Pet', onPress: () => router.push('/(tabs)/pets') }]
-            );
-          } else {
-            Alert.alert('Error', 'Failed to adopt pet. Please try again.');
-          }
-        }}
-      ]
-    );
+  const handleConfirmAdopt = () => {
+    if (!selectedAdoptPet) return;
+
+    const cost = petState.adoptedPets.length === 0 ? 0 : 25;
+    const currentTickets = gameState.tickets || 0;
+
+    // Spend tickets if not first pet
+    if (cost > 0) {
+      const ticketSuccess = spendTickets(cost);
+      if (!ticketSuccess) {
+        setErrorTitle('Not Enough Tickets');
+        setErrorMessage(`You need ${cost} tickets to adopt this pet.\n\nYou currently have ${currentTickets} tickets.`);
+        setShowErrorModal(true);
+        setShowAdoptModal(false);
+        return;
+      }
+    }
+
+    const success = adoptPet({
+      id: `${selectedAdoptPet.id}-${Date.now()}`, // Unique ID
+      name: selectedAdoptPet.name,
+      image: selectedAdoptPet.imageName,
+      hp: selectedAdoptPet.hp,
+      atk: selectedAdoptPet.atk,
+      level: selectedAdoptPet.level,
+    });
+    
+    if (success) {
+      setShowAdoptModal(false);
+      setSuccessPetName(selectedAdoptPet.name);
+      setShowSuccessModal(true);
+    } else {
+      setErrorTitle('Error');
+      setErrorMessage('Failed to adopt pet. Please try again.');
+      setShowErrorModal(true);
+      setShowAdoptModal(false);
+    }
   };
 
   const handleDonateItem = (item: any) => {
@@ -332,103 +337,133 @@ export default function NurseryScreen() {
   const adoptablePets = [
     {
       id: 'adopt-1',
-      name: 'xXx_TigerLord_xXx',
-      description: 'Surrendered by previous owner. Loves to hunt and play.',
+      name: 'PixelPaws',
+      personalityTraits: ['Clever', 'Playful'],
+      zodiacSign: 'Gemini',
       image: tigerguyImage,
+      imageName: 'tigerguy',
       color: '#8b5cf6',
-      level: 3,
-      hp: 85,
-      atk: 45
+      level: 4,
+      hp: 90,
+      atk: 50,
+      previousOwner: 'DevStreamer'
     },
     {
       id: 'adopt-2',
-      name: 'PlumecaQueen',
-      description: 'Sweet and caring. Needs a patient owner.',
+      name: 'CosmicBloom',
+      personalityTraits: ['Gentle', 'Curious'],
+      zodiacSign: 'Pisces',
       image: plumecaImage,
+      imageName: 'plumeca',
       color: '#ec4899',
-      level: 2,
-      hp: 70,
-      atk: 30
+      level: 3,
+      hp: 75,
+      atk: 35,
+      previousOwner: 'Stargazer'
     },
     {
       id: 'adopt-3',
-      name: 'CocoBean2001',
-      description: 'Energetic and friendly. Great with kids.',
-      image: coconutGuyImage,
+      name: 'TropicalVibe',
+      personalityTraits: ['Energetic', 'Friendly'],
+      zodiacSign: 'Leo',
+      image: frekkiImage,
+      imageName: 'frekki',
       color: '#10b981',
-      level: 4,
-      hp: 95,
-      atk: 40
+      level: 5,
+      hp: 100,
+      atk: 45,
+      previousOwner: 'BeachBum'
     },
     {
       id: 'adopt-4',
-      name: 'LallazoTheGreat',
-      description: 'Mysterious and independent. Prefers quiet homes.',
+      name: 'MysticWhisper',
+      personalityTraits: ['Wise', 'Independent'],
+      zodiacSign: 'Scorpio',
       image: lallazoImage,
+      imageName: 'lallazo',
       color: '#f59e0b',
-      level: 5,
-      hp: 80,
-      atk: 55
+      level: 6,
+      hp: 85,
+      atk: 60,
+      previousOwner: 'BookWorm'
     },
     {
       id: 'adopt-5',
-      name: 'TechNoob_2024',
-      description: 'Tech-savvy but needs guidance. Very loyal.',
+      name: 'CyberPunk',
+      personalityTraits: ['Bold', 'Mischievous'],
+      zodiacSign: 'Aquarius',
       image: gazoImage,
+      imageName: 'gazo',
       color: '#ef4444',
-      level: 2,
-      hp: 65,
-      atk: 35
+      level: 3,
+      hp: 70,
+      atk: 40,
+      previousOwner: 'NeonDreams'
     },
     {
       id: 'adopt-6',
-      name: 'SheepySheep123',
-      description: 'Gentle and calm. Perfect for beginners.',
+      name: 'CloudWalker',
+      personalityTraits: ['Calm', 'Caring'],
+      zodiacSign: 'Cancer',
       image: sheepGuyImage,
+      imageName: 'sheep-guy',
       color: '#6b7280',
-      level: 3,
-      hp: 90,
-      atk: 25
+      level: 4,
+      hp: 95,
+      atk: 30,
+      previousOwner: 'CozyCorner'
     },
     {
       id: 'adopt-7',
-      name: 'BullMoose88',
-      description: 'Strong and protective. Needs experienced owner.',
+      name: 'ThunderGuard',
+      personalityTraits: ['Brave', 'Protective'],
+      zodiacSign: 'Aries',
       image: bullGuyImage,
+      imageName: 'bull-guy',
       color: '#92400e',
-      level: 6,
-      hp: 120,
-      atk: 70
+      level: 7,
+      hp: 125,
+      atk: 75,
+      previousOwner: 'GymRat'
     },
     {
       id: 'adopt-8',
-      name: 'StormChaser_Pro',
-      description: 'Powerful but unpredictable. For advanced trainers.',
+      name: 'StormDancer',
+      personalityTraits: ['Adventurous', 'Serious'],
+      zodiacSign: 'Sagittarius',
       image: stormGuyImage,
+      imageName: 'storm-guy',
       color: '#3b82f6',
-      level: 7,
-      hp: 75,
-      atk: 80
+      level: 8,
+      hp: 80,
+      atk: 85,
+      previousOwner: 'WeatherWitch'
     },
     {
       id: 'adopt-9',
-      name: 'FishGang_Leader',
-      description: 'Social and playful. Loves water activities.',
+      name: 'AquaSquad',
+      personalityTraits: ['Loyal', 'Silly'],
+      zodiacSign: 'Libra',
       image: fishGuysImage,
+      imageName: 'fish-guys',
       color: '#06b6d4',
-      level: 4,
-      hp: 60,
-      atk: 50
+      level: 5,
+      hp: 65,
+      atk: 55,
+      previousOwner: 'PoolParty'
     },
     {
       id: 'adopt-10',
-      name: 'WiseOldSage_OG',
-      description: 'Ancient wisdom. Requires special care.',
+      name: 'CrystalSage',
+      personalityTraits: ['Wise', 'Relaxed'],
+      zodiacSign: 'Capricorn',
       image: sappoImage,
+      imageName: 'sappo',
       color: '#7c3aed',
-      level: 8,
-      hp: 100,
-      atk: 90
+      level: 9,
+      hp: 105,
+      atk: 95,
+      previousOwner: 'CrystalHealer'
     }
   ];
 
@@ -547,7 +582,16 @@ export default function NurseryScreen() {
                     </RNView>
                     <RNView style={styles.adoptTextInfo}>
                       <Text style={styles.adoptName}>{pet.name}</Text>
-                      <Text style={styles.adoptDescription}>{pet.description}</Text>
+                      <RNView style={styles.adoptPersonalityContainer}>
+                        <Text style={styles.adoptZodiac}>{pet.zodiacSign}</Text>
+                        <RNView style={styles.adoptTraitsContainer}>
+                          {pet.personalityTraits.map((trait, index) => (
+                            <RNView key={index} style={styles.adoptTraitBadge}>
+                              <Text style={styles.adoptTraitText}>{trait}</Text>
+                            </RNView>
+                          ))}
+                        </RNView>
+                      </RNView>
                       <RNView style={styles.adoptStats}>
                         <Text style={styles.adoptLevel}>Level {pet.level}</Text>
                         <Text style={styles.adoptHpAtk}>HP: {pet.hp} | ATK: {pet.atk}</Text>
@@ -555,7 +599,10 @@ export default function NurseryScreen() {
                     </RNView>
                   </RNView>
                   <RNView style={styles.adoptButtonContainer}>
-                    <Pressable style={styles.adoptButton}>
+                    <Pressable 
+                      style={styles.adoptButton}
+                      onPress={() => handleAdoptPet(pet)}
+                    >
                       <FontAwesome name="heart" size={12} color="#ffffff" />
                       <Text style={styles.adoptButtonText}>ADOPT</Text>
                     </Pressable>
@@ -663,14 +710,32 @@ export default function NurseryScreen() {
                     <Text style={styles.modalPetName}>{selectedPet.name}</Text>
                     <Text style={styles.modalPetDescription}>{selectedPet.description}</Text>
 
-                    {/* Gender */}
-                    <RNView style={styles.modalInfoRow}>
-                      <FontAwesome 
-                        name={petGender === 'Male' ? 'mars' : 'venus'} 
-                        size={16} 
-                        color={petGender === 'Male' ? '#3b82f6' : '#ec4899'} 
-                      />
-                      <Text style={styles.modalInfoText}>{petGender}</Text>
+                    {/* Sleek Info Cards */}
+                    <RNView style={styles.infoCardsContainer}>
+                      {/* Zodiac Card */}
+                      <RNView style={styles.infoCard}>
+                        <Text style={styles.cardLabel}>ZODIAC</Text>
+                        <Text style={styles.zodiacText}>{petTraits.length > 0 ? (() => {
+                          const zodiacSigns = [
+                            'Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo',
+                            'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'
+                          ];
+                          return zodiacSigns[Math.floor(Math.random() * zodiacSigns.length)];
+                        })() : 'Aries'}</Text>
+                      </RNView>
+
+                      {/* Gender Card */}
+                      <RNView style={styles.infoCard}>
+                        <Text style={styles.cardLabel}>GENDER</Text>
+                        <RNView style={styles.genderRow}>
+                          <FontAwesome 
+                            name={petGender === 'Male' ? 'mars' : 'venus'} 
+                            size={14} 
+                            color={petGender === 'Male' ? '#3b82f6' : '#ec4899'} 
+                          />
+                          <Text style={styles.genderText}>{petGender}</Text>
+                        </RNView>
+                      </RNView>
                     </RNView>
 
                     {/* Personality Traits */}
@@ -717,9 +782,16 @@ export default function NurseryScreen() {
                     </RNView>
 
                     {/* Cost */}
-                    <Text style={styles.modalCostText}>
-                      Cost: {petState.adoptedPets.length === 0 ? 'FREE' : '25 💎'}
-                    </Text>
+                    <RNView style={styles.costContainer}>
+                      {petState.adoptedPets.length === 0 ? (
+                        <Text style={styles.freeText}>FREE</Text>
+                      ) : (
+                        <>
+                          <FontAwesome name="ticket" size={20} color="#8b5cf6" />
+                          <Text style={styles.costNumber}>25</Text>
+                        </>
+                      )}
+                    </RNView>
 
                     {/* Buttons */}
                     <RNView style={styles.modalButtons}>
@@ -823,6 +895,115 @@ export default function NurseryScreen() {
         </RNView>
       </Modal>
 
+      {/* Adoption Confirmation Modal */}
+      <Modal
+        visible={showAdoptModal}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={() => setShowAdoptModal(false)}
+      >
+        <RNView style={styles.modalOverlay}>
+          <RNView style={styles.modalContainer}>
+            <RNView style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>ADOPT PET</Text>
+              <Pressable 
+                style={styles.modalCloseButton}
+                onPress={() => setShowAdoptModal(false)}
+              >
+                <FontAwesome name="times" size={18} color="#64748b" />
+              </Pressable>
+            </RNView>
+
+            {selectedAdoptPet && (
+              <RNView style={styles.modalContent}>
+                {/* Pet Image */}
+                <RNView style={styles.modalPetImageContainer}>
+                  <Image source={selectedAdoptPet.image} style={styles.modalPetImage} />
+                </RNView>
+
+                {/* Pet Info */}
+                <Text style={styles.modalPetName}>{selectedAdoptPet.name}</Text>
+                
+                {/* Personality Info */}
+                <RNView style={styles.modalSection}>
+                  <Text style={styles.modalSectionTitle}>PERSONALITY</Text>
+                  <RNView style={styles.infoCardsContainer}>
+                    <RNView style={styles.infoCard}>
+                      <Text style={styles.cardLabel}>ZODIAC</Text>
+                      <Text style={styles.zodiacText}>{selectedAdoptPet.zodiacSign}</Text>
+                    </RNView>
+                    <RNView style={styles.infoCard}>
+                      <Text style={styles.cardLabel}>TRAITS</Text>
+                      <RNView style={styles.traitsContainer}>
+                        {selectedAdoptPet.personalityTraits.map((trait: string, index: number) => (
+                          <RNView key={index} style={styles.traitBadge}>
+                            <Text style={styles.traitText}>{trait}</Text>
+                          </RNView>
+                        ))}
+                      </RNView>
+                    </RNView>
+                  </RNView>
+                </RNView>
+
+                {/* Stats */}
+                <RNView style={styles.modalSection}>
+                  <Text style={styles.modalSectionTitle}>STATS</Text>
+                  <RNView style={styles.statsGrid}>
+                    <RNView style={styles.statBox}>
+                      <Text style={styles.statLabel}>LEVEL</Text>
+                      <Text style={styles.statValue}>{selectedAdoptPet.level}</Text>
+                    </RNView>
+                    <RNView style={styles.statBox}>
+                      <Text style={styles.statLabel}>HP</Text>
+                      <Text style={styles.statValue}>{selectedAdoptPet.hp}</Text>
+                    </RNView>
+                    <RNView style={styles.statBox}>
+                      <Text style={styles.statLabel}>ATK</Text>
+                      <Text style={styles.statValue}>{selectedAdoptPet.atk}</Text>
+                    </RNView>
+                  </RNView>
+                </RNView>
+
+                {/* Previous Owner */}
+                <RNView style={styles.previousOwnerContainer}>
+                  <Text style={styles.previousOwnerLabel}>Previous Owner:</Text>
+                  <Text style={styles.previousOwnerName}>{selectedAdoptPet.previousOwner}</Text>
+                </RNView>
+
+                {/* Cost */}
+                <RNView style={styles.costContainer}>
+                  {petState.adoptedPets.length === 0 ? (
+                    <Text style={styles.freeText}>FREE ADOPTION</Text>
+                  ) : (
+                    <>
+                      <FontAwesome name="ticket" size={20} color="#8b5cf6" />
+                      <Text style={styles.costNumber}>25</Text>
+                    </>
+                  )}
+                </RNView>
+
+                {/* Buttons */}
+                <RNView style={styles.modalButtons}>
+                  <Pressable 
+                    style={styles.modalCancelButton}
+                    onPress={() => setShowAdoptModal(false)}
+                  >
+                    <Text style={styles.modalCancelButtonText}>Cancel</Text>
+                  </Pressable>
+                  <Pressable 
+                    style={styles.modalCreateButton}
+                    onPress={handleConfirmAdopt}
+                  >
+                    <FontAwesome name="heart" size={12} color="#ffffff" />
+                    <Text style={styles.modalCreateButtonText}>ADOPT</Text>
+                  </Pressable>
+                </RNView>
+              </RNView>
+            )}
+          </RNView>
+        </RNView>
+      </Modal>
+
       {/* Success Modal */}
       <Modal
         visible={showSuccessModal}
@@ -835,7 +1016,7 @@ export default function NurseryScreen() {
             <RNView style={styles.successModalHeader}>
               <FontAwesome name="check-circle" size={48} color="#8b5cf6" />
             </RNView>
-            <Text style={styles.successModalTitle}>Welcome, {successPetName}</Text>
+            <Text style={styles.successModalTitle}>Welcome, {successPetName}!</Text>
             <Text style={styles.successModalMessage}>Your new companion is ready to explore Pxopia with you.</Text>
             <Pressable 
               style={styles.successModalButton}
@@ -844,7 +1025,7 @@ export default function NurseryScreen() {
                 router.push('/(tabs)/pets');
               }}
             >
-              <Text style={styles.successModalButtonText}>Continue</Text>
+              <Text style={styles.successModalButtonText}>View Pet</Text>
             </Pressable>
           </RNView>
         </RNView>
@@ -1087,12 +1268,35 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     letterSpacing: 0.3,
   },
-  adoptDescription: {
-    fontFamily: 'Silkscreen_400Regular',
-    fontSize: 11,
-    color: '#6b7280',
+  adoptPersonalityContainer: {
     marginBottom: 12,
-    lineHeight: 16,
+  },
+  adoptZodiac: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#8b5cf6',
+    fontWeight: 'bold',
+    marginBottom: 6,
+    letterSpacing: 0.3,
+  },
+  adoptTraitsContainer: {
+    flexDirection: 'row',
+    gap: 6,
+    flexWrap: 'wrap',
+  },
+  adoptTraitBadge: {
+    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.3)',
+    borderRadius: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  adoptTraitText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 8,
+    color: '#8b5cf6',
+    fontWeight: 'bold',
     letterSpacing: 0.2,
   },
   adoptStats: {
@@ -1415,11 +1619,12 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   modalPetName: {
-    fontFamily: 'Silkscreen_400Regular',
-    fontSize: 18,
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 14,
     color: '#0f172a',
     fontWeight: 'bold',
     marginBottom: 8,
+    textAlign: 'center',
   },
   modalPetDescription: {
     fontFamily: 'Silkscreen_400Regular',
@@ -1443,14 +1648,16 @@ const styles = StyleSheet.create({
   },
   modalSection: {
     width: '100%',
-    marginBottom: 16,
+    marginBottom: 12,
   },
   modalSectionTitle: {
     fontFamily: 'PressStart2P_400Regular',
-    fontSize: 8,
+    fontSize: 7,
     color: '#8b5cf6',
     marginBottom: 12,
     textAlign: 'center',
+    letterSpacing: 1.2,
+    opacity: 0.9,
   },
   traitsContainer: {
     flexDirection: 'row',
@@ -1459,18 +1666,24 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   traitBadge: {
-    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+    backgroundColor: 'rgba(139, 92, 246, 0.08)',
     borderWidth: 1,
-    borderColor: '#8b5cf6',
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    borderColor: 'rgba(139, 92, 246, 0.3)',
+    borderRadius: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    shadowColor: '#8b5cf6',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 1,
   },
   traitText: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 10,
+    fontSize: 9,
     color: '#8b5cf6',
     fontWeight: 'bold',
+    letterSpacing: 0.3,
   },
   statsGrid: {
     flexDirection: 'row',
@@ -1480,32 +1693,51 @@ const styles = StyleSheet.create({
   },
   statBox: {
     width: '30%',
-    backgroundColor: '#f8fafc',
-    borderRadius: 8,
+    backgroundColor: 'rgba(15, 23, 42, 0.02)',
+    borderRadius: 12,
     padding: 12,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#e2e8f0',
+    borderColor: 'rgba(139, 92, 246, 0.15)',
+    shadowColor: '#8b5cf6',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 1,
   },
   statLabel: {
-    fontFamily: 'Silkscreen_400Regular',
-    fontSize: 8,
-    color: '#64748b',
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 6,
+    color: '#8b5cf6',
     marginBottom: 4,
+    letterSpacing: 0.5,
+    opacity: 0.7,
   },
   statValue: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 16,
-    color: '#0f172a',
+    fontSize: 14,
+    color: '#1e293b',
     fontWeight: 'bold',
   },
-  modalCostText: {
-    fontFamily: 'Silkscreen_400Regular',
+  costContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 8,
+    marginBottom: 16,
+    gap: 8,
+  },
+  freeText: {
+    fontFamily: 'PressStart2P_400Regular',
     fontSize: 12,
     color: '#8b5cf6',
     fontWeight: 'bold',
-    marginTop: 8,
-    marginBottom: 16,
+  },
+  costNumber: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 24,
+    color: '#8b5cf6',
+    fontWeight: 'bold',
   },
   modalButtons: {
     flexDirection: 'row',
@@ -1689,5 +1921,76 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontWeight: 'bold',
     letterSpacing: 0.5,
+  },
+  infoCardsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 8,
+    marginBottom: 16,
+    gap: 12,
+  },
+  infoCard: {
+    flex: 1,
+    backgroundColor: 'rgba(15, 23, 42, 0.03)',
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.2)',
+    alignItems: 'center',
+    shadowColor: '#8b5cf6',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  cardLabel: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 6,
+    color: '#8b5cf6',
+    letterSpacing: 1,
+    marginBottom: 8,
+    opacity: 0.8,
+  },
+  zodiacText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 12,
+    color: '#1e293b',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  genderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  genderText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 12,
+    color: '#1e293b',
+    fontWeight: 'bold',
+  },
+  previousOwnerContainer: {
+    alignItems: 'center',
+    marginBottom: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    backgroundColor: 'rgba(139, 92, 246, 0.05)',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.2)',
+  },
+  previousOwnerLabel: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 6,
+    color: '#8b5cf6',
+    letterSpacing: 1,
+    marginBottom: 4,
+    opacity: 0.8,
+  },
+  previousOwnerName: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 11,
+    color: '#1e293b',
+    fontWeight: 'bold',
   },
 });

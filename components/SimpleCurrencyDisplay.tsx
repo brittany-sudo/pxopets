@@ -14,7 +14,6 @@ export default function SimpleCurrencyDisplay() {
     return petState.adoptedPets.reduce((total, pet) => total + (pet.stamina || 0), 0);
   };
 
-  console.log('SimpleCurrencyDisplay render - tickets:', state.tickets, 'stamina:', getTotalPetStamina(), 'coins:', state.coins);
 
   return (
     <View style={styles.container}>

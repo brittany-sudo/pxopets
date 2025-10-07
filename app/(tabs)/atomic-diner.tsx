@@ -44,15 +44,15 @@ export default function AtomicDinerScreen() {
   // Zara's California Valley Girl Personality
   const getZaraGreeting = () => {
     const greetings = [
-      "Oh my gosh, like, welcome to the Atomic Diner! I'm totally Zara and I'm, like, so stoked you're here!",
+      "Oh my gosh, like, welcome to the Atomic Automat! I'm totally Zara and I'm, like, so stoked you're here!",
       "Hey there, space cadet! Like, I'm Zara and this place is totally out of this world, you know?",
       "Oh em gee, another customer! I'm Zara and I'm, like, totally your cosmic waitress today!",
-      "Like, welcome to our little atomic paradise! I'm Zara and I'm so ready to serve you some stellar eats!",
+      "Like, welcome to our little atomic automat paradise! I'm Zara and I'm so ready to serve you some stellar eats!",
       "Dude, you're totally going to love our cosmic cuisine! I'm Zara and I'm, like, the best waitress in the galaxy!",
-      "Oh my gosh, like, you just made my day! I'm Zara and I'm totally here to make your dining experience stellar!",
-      "Like, welcome to the most rad diner in the universe! I'm Zara and I'm so excited to serve you!",
+      "Oh my gosh, like, you just made my day! I'm Zara and I'm totally here to make your automat experience stellar!",
+      "Like, welcome to the most rad automat in the universe! I'm Zara and I'm so excited to serve you!",
       "Hey there, space traveler! I'm Zara and I'm, like, totally your guide to the best atomic eats around!",
-      "Oh em gee, another awesome customer! I'm Zara and I'm so ready to show you our cosmic menu!",
+      "Oh em gee, another awesome customer! I'm Zara and I'm so ready to show you our cosmic automat!",
       "Like, you're totally going to love this place! I'm Zara and I'm, like, the most enthusiastic waitress ever!"
     ];
     return greetings[Math.floor(Math.random() * greetings.length)];
@@ -237,22 +237,17 @@ export default function AtomicDinerScreen() {
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Back Button - Fixed Position */}
-        <Pressable 
-          style={styles.backButton}
-          onPress={() => router.navigate('/(tabs)/crescent-oasis')}
-        >
-          <FontAwesome name="arrow-left" size={12} color="#8b5cf6" />
-          <Text style={styles.backButtonText}>Back</Text>
-        </Pressable>
-
         {/* Header Row */}
         <RNView style={styles.headerRow}>
-          <Text style={styles.locationTitle}>ATOMIC DINER</Text>
+          <Pressable 
+            style={styles.backButton}
+            onPress={() => router.navigate('/(tabs)/crescent-oasis')}
+          >
+            <FontAwesome name="arrow-left" size={12} color="#ec4899" />
+            <Text style={styles.backButtonText}>Back</Text>
+          </Pressable>
+          <Text style={styles.locationTitle}>ATOMIC AUTOMAT</Text>
         </RNView>
-
-        {/* Diner Image */}
-        <Image source={atomicDinerImage} style={styles.dinerImage} />
 
         {/* Zara the Waitress */}
         <RNView style={styles.attendantContainer}>
@@ -263,6 +258,35 @@ export default function AtomicDinerScreen() {
             </Text>
           </RNView>
           <Image source={require('@/assets/images/zara-icon.png')} style={styles.zaraImage} />
+        </RNView>
+
+        {/* Automat Wall */}
+        <Text style={styles.automatTitle}>ATOMIC AUTOMAT</Text>
+        <Text style={styles.automatSubtitle}>Insert Coins • Select Item • Enjoy!</Text>
+        
+        <RNView style={styles.automatWall}>
+          {menuItems.map((item, index) => (
+            <RNView key={item.id} style={styles.automatCompartment}>
+              <RNView style={styles.compartmentFrame}>
+                <RNView style={styles.compartmentGlass}>
+                  <Image source={imageMap[item.icon]} style={styles.compartmentItem} />
+                </RNView>
+                <RNView style={styles.compartmentInfo}>
+                  <Text style={styles.compartmentName}>{item.name}</Text>
+                  <Text style={styles.compartmentDescription}>{item.description}</Text>
+                </RNView>
+                <RNView style={styles.compartmentControls}>
+                  <RNView style={styles.ticketSlot}>
+                    <FontAwesome name="ticket" size={8} color="#8b5cf6" />
+                    <Text style={styles.ticketSlotText}>1</Text>
+                  </RNView>
+                  <Pressable style={styles.dispenseButton}>
+                    <Text style={styles.dispenseText}>DISPENSE</Text>
+                  </Pressable>
+                </RNView>
+              </RNView>
+            </RNView>
+          ))}
         </RNView>
 
         {/* Activities */}
@@ -290,31 +314,6 @@ export default function AtomicDinerScreen() {
             </Pressable>
           </RNView>
         ))}
-
-        {/* Menu */}
-        <Text style={styles.menuTitle}>ATOMIC DINER MENU</Text>
-        <RNView style={styles.menuContainer}>
-          {menuItems.map((item) => (
-            <RNView key={item.id} style={styles.menuItem}>
-              <RNView style={styles.menuItemHeader}>
-                <Image source={imageMap[item.icon]} style={styles.menuItemIcon} />
-                <RNView style={styles.menuItemInfo}>
-                  <Text style={styles.menuItemName}>{item.name}</Text>
-                  <Text style={styles.menuItemDescription}>{item.description}</Text>
-                </RNView>
-              </RNView>
-              <RNView style={styles.menuItemFooter}>
-                <RNView style={styles.ticketPriceContainer}>
-                  <Text style={styles.menuItemPrice}>{item.price}</Text>
-                  <FontAwesome name="ticket" size={10} color="#8b5cf6" />
-                </RNView>
-                <RNView style={styles.staminaContainer}>
-                  <Text style={styles.staminaText}>⚡ {item.stamina}</Text>
-                </RNView>
-              </RNView>
-            </RNView>
-          ))}
-        </RNView>
 
         {/* Jukebox Modal */}
         <Modal
@@ -407,30 +406,35 @@ const styles = StyleSheet.create({
   scrollContent: {
     alignItems: 'center',
     justifyContent: 'flex-start',
-    paddingHorizontal: 10,
-    paddingTop: 5,
+    padding: 20,
+    paddingTop: 20,
     paddingBottom: 100,
   },
   headerRow: {
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 5,
-    paddingHorizontal: 4,
-    height: 40,
+    width: '100%',
+    marginBottom: 20,
+    paddingHorizontal: 16,
+    position: 'relative',
   },
   backButton: {
-    position: 'absolute',
-    top: 20,
-    left: 20,
-    zIndex: 1000,
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 12,
     paddingVertical: 8,
-    backgroundColor: 'rgba(139, 92, 246, 0.1)',
-    borderRadius: 6,
+    backgroundColor: 'rgba(236, 72, 153, 0.1)',
+    borderRadius: 8,
     borderWidth: 1,
-    borderColor: 'rgba(139, 92, 246, 0.3)',
+    borderColor: 'rgba(236, 72, 153, 0.3)',
+    shadowColor: '#ec4899',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+    position: 'absolute',
+    left: 0,
   },
   locationTitle: {
     fontFamily: 'PressStart2P_400Regular',
@@ -439,12 +443,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     letterSpacing: 1,
     textAlign: 'center',
+    flex: 1,
+    marginLeft: 16,
   },
   backButtonText: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 12,
-    color: '#8b5cf6',
+    fontSize: 14,
+    color: '#ec4899',
     marginLeft: 6,
+    fontWeight: 'bold',
   },
   title: {
     fontFamily: 'PressStart2P_400Regular',
@@ -490,14 +497,20 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   pubActivityItem: {
-    backgroundColor: 'rgba(139, 92, 246, 0.05)',
-    borderRadius: 6,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: 'rgba(139, 92, 246, 0.2)',
-    padding: 12,
-    marginBottom: 8,
-    width: '80%',
+    borderColor: 'rgba(0, 0, 0, 0.1)',
+    padding: 16,
+    marginBottom: 12,
+    width: '90%',
     alignSelf: 'center',
+    marginTop: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
   },
   pubActivityPressable: {
     width: '100%',
@@ -513,9 +526,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   pubActivityImageIcon: {
-    width: 20,
-    height: 20,
-    marginRight: 8,
+    width: 24,
+    height: 24,
+    marginRight: 12,
     alignSelf: 'center',
   },
   pubActivityText: {
@@ -529,15 +542,15 @@ const styles = StyleSheet.create({
   },
   pubActivityName: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 12,
-    color: '#0f172a',
+    fontSize: 14,
+    color: '#1f2937',
     fontWeight: 'bold',
   },
   pubActivityDescription: {
     fontFamily: 'Silkscreen_400Regular',
-    fontSize: 9,
-    color: '#64748b',
-    lineHeight: 12,
+    fontSize: 11,
+    color: '#6b7280',
+    lineHeight: 16,
   },
   activityItem: {
     backgroundColor: 'rgba(139, 92, 246, 0.05)',
@@ -611,7 +624,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     justifyContent: 'center',
-    marginTop: -10,
+    marginTop: 10,
     marginBottom: 20,
     paddingHorizontal: 20,
   },
@@ -619,7 +632,7 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     resizeMode: 'contain',
-    marginLeft: 15,
+    marginLeft: 8,
   },
   speechBubble: {
     backgroundColor: 'rgba(13, 148, 136, 0.1)',
@@ -627,7 +640,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 1,
     borderColor: 'rgba(13, 148, 136, 0.3)',
-    maxWidth: 300,
+    maxWidth: 220,
+    alignSelf: 'center',
   },
   characterName: {
     fontFamily: 'PressStart2P_400Regular',
@@ -642,18 +656,126 @@ const styles = StyleSheet.create({
     color: '#0f172a',
     textAlign: 'left',
   },
-  menuTitle: {
+  automatTitle: {
     fontFamily: 'PressStart2P_400Regular',
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: 'bold',
     color: '#0d9488',
-    marginTop: 20,
-    marginBottom: 8,
+    marginTop: 8,
+    marginBottom: 4,
     textAlign: 'center',
     alignSelf: 'center',
     textShadowColor: '#5eead4',
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 2,
+  },
+  automatSubtitle: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 10,
+    color: '#64748b',
+    textAlign: 'center',
+    marginBottom: 16,
+    fontStyle: 'italic',
+  },
+  automatWall: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    width: '95%',
+    alignSelf: 'center',
+    backgroundColor: '#1f2937',
+    borderRadius: 12,
+    borderWidth: 3,
+    borderColor: '#374151',
+    padding: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  automatCompartment: {
+    width: '48%',
+    marginBottom: 12,
+  },
+  compartmentFrame: {
+    backgroundColor: '#374151',
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: '#4b5563',
+    padding: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  compartmentGlass: {
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#d1d5db',
+    padding: 8,
+    marginBottom: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 60,
+  },
+  compartmentItem: {
+    width: 40,
+    height: 40,
+    resizeMode: 'contain',
+  },
+  compartmentInfo: {
+    marginBottom: 8,
+  },
+  compartmentName: {
+    fontFamily: 'PressStart2P_400Regular',
+    fontSize: 8,
+    fontWeight: 'bold',
+    color: '#ffffff',
+    textAlign: 'center',
+    marginBottom: 2,
+  },
+  compartmentDescription: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 7,
+    color: '#d1d5db',
+    textAlign: 'center',
+    lineHeight: 9,
+  },
+  compartmentControls: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: 8,
+  },
+  ticketSlot: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#1f2937',
+    borderRadius: 4,
+    paddingHorizontal: 4,
+    paddingVertical: 2,
+    gap: 2,
+  },
+  ticketSlotText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 8,
+    color: '#8b5cf6',
+    fontWeight: 'bold',
+  },
+  dispenseButton: {
+    backgroundColor: '#dc2626',
+    borderRadius: 4,
+    paddingHorizontal: 6,
+    paddingVertical: 3,
+  },
+  dispenseText: {
+    fontFamily: 'Silkscreen_400Regular',
+    fontSize: 6,
+    color: '#ffffff',
+    fontWeight: 'bold',
   },
   menuContainer: {
     width: '85%',
