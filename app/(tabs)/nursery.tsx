@@ -14,7 +14,7 @@ const frekkiImage = require('@/assets/images/frekki.png');
 const lallazoImage = require('@/assets/images/lallazo.png');
 const robotGuyImage = require('@/assets/images/robot-guy.png');
 const sheepGuyImage = require('@/assets/images/sheep-guy.png');
-const bullGuyImage = require('@/assets/images/bull-guy.png');
+const cursivoSpriteImage = require('@/assets/images/cursivo-sprite.png');
 const stormGuyImage = require('@/assets/images/storm-guy.png');
 const fishGuysImage = require('@/assets/images/fish-guys.png');
 const sappoImage = require('@/assets/images/sappo.png');
@@ -304,8 +304,8 @@ export default function NurseryScreen() {
       id: 'cursive',
       name: 'CURSIVE',
       description: 'A strong bull with incredible strength.',
-      image: bullGuyImage,
-      imageName: 'bull-guy',
+      image: cursivoSpriteImage,
+      imageName: 'cursivo-sprite',
       color: '#92400e'
     },
     {
@@ -418,8 +418,8 @@ export default function NurseryScreen() {
       name: 'ThunderGuard',
       personalityTraits: ['Brave', 'Protective'],
       zodiacSign: 'Aries',
-      image: bullGuyImage,
-      imageName: 'bull-guy',
+      image: cursivoSpriteImage,
+      imageName: 'cursivo-sprite',
       color: '#92400e',
       level: 7,
       hp: 125,

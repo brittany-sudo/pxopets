@@ -541,7 +541,7 @@ export default function PetsScreen() {
       'lallazo': require('@/assets/images/lallazo.png'),
       'robot-guy': require('@/assets/images/robot-guy.png'),
       'sheep-guy': require('@/assets/images/sheep-guy.png'),
-      'bull-guy': require('@/assets/images/bull-guy.png'),
+      'cursivo-sprite': require('@/assets/images/cursivo-sprite.png'),
       'storm-guy': require('@/assets/images/storm-guy.png'),
       'fish-guys': require('@/assets/images/fish-guys.png'),
       'sappo': require('@/assets/images/sappo.png'),
